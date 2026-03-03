@@ -1,0 +1,26 @@
+// app/api/login/route.ts  (or Server Action)
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
+import { createSessionToken } from '~/lib/auth-sdk';
+
+
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
+
+  // Call your shared SDK
+  const token = await createSessionToken({ email, role: 'buyer' }); // example
+
+  const response = NextResponse.redirect(new URL('/dashboard', req.url));
+
+  response.cookies.set({
+    name: 'session',
+    value: token,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    path: '/',
+  });
+
+  return response;
+}
