@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
+import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
 import {
   InputOTP,
   InputOTPGroup,
@@ -18,7 +19,7 @@ import {
 import Link from "next/link";
 import { cn } from "~/lib/utils";
 
-// ── Step 1 Schema
+//=== Step 1 Schema
 const phoneSchema = z.object({
   phone: z
     .string()
@@ -30,7 +31,7 @@ const phoneSchema = z.object({
 
 type PhoneForm = z.infer<typeof phoneSchema>;
 
-// ── Main Component
+//=== Main Component
 export default function LoginPage() {
   const router = useRouter();
 
@@ -40,8 +41,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+  const [statusModal, setStatusModal] = useState<{
+    open: boolean;
+    variant: "loading" | "success";
+  }>({
+    open: false,
+    variant: "loading",
+  });
 
-  // Form for Step 1
+  //=== Form for Step 1
   const {
     register,
     handleSubmit,
@@ -52,7 +60,7 @@ export default function LoginPage() {
     defaultValues: { phone: "" },
   });
 
-  // ── Step 1: Send OTP
+  // === Step 1: Send OTP
   const onSendOtp = async (data: PhoneForm) => {
     setLoading(true);
     setError(null);
@@ -73,12 +81,14 @@ export default function LoginPage() {
     }
   };
 
-  // ── Step 2: Verify OTP
+  //=== Step 2: Verify OTP
   const handleVerify = useCallback(async () => {
     if (loading || success) return;
 
     setLoading(true);
     setError(null);
+
+    setStatusModal({ open: true, variant: "loading" });
 
     try {
       console.log(`Verifying OTP: ${otp} for phone: ${phoneNumber}`);
@@ -95,6 +105,7 @@ export default function LoginPage() {
       const roleFromBackend = data.role as "Farmer" | "Buyer";
 
       setSuccess(true);
+      setStatusModal({ open: true, variant: "success" });
 
       localStorage.setItem(
         "currentUser",
@@ -117,13 +128,14 @@ export default function LoginPage() {
       }
 
       setError(msg);
+      setStatusModal({ open: false, variant: "loading" });
       toast.error(msg);
     } finally {
       setLoading(false);
     }
   }, [loading, success, otp, phoneNumber, router]);
 
-  // Auto-submit OTP when 6 digits entered
+  //===Auto-submit OTP when 6 digits entered
   useEffect(() => {
     if (step === 2 && otp.length === 6 && !loading && !success) {
       void handleVerify();
@@ -133,120 +145,139 @@ export default function LoginPage() {
   const hasOtpError = !!error;
 
   return (
-    <motion.div
-      className="flex min-h-screen flex-col py-(--section-px) sm:py-(--section-px-sm)"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-    >
+    <>
       <motion.div
-        className="flex w-full max-w-md flex-col gap-(--section-gap)"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: {},
-          visible: {
-            transition: {
-              staggerChildren: 0.15,
-            },
-          },
-        }}
+        className="flex min-h-screen flex-col py-(--section-px) sm:py-(--section-px-sm)"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {/* Form for Step 1 */}
-        {step === 1 ? (
-          <form
-            onSubmit={handleSubmit(onSendOtp)}
-            className="flex w-full flex-col gap-(--section-gap)"
-          >
-            {/* Heading */}
-            <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
-              Enter your phone number to receive a verification code
-            </p>
-
-            <DynamicInput
-              fieldType="tel"
-              label="Phone Number"
-              placeholder="08012345678"
-              error={errors.phone?.message}
-              {...register("phone")}
-              required
-              disabled={loading}
-            />
-
-            <div className="mt-16 flex w-full flex-col gap-(--gap-base)">
-              <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
-                Send OTP
-              </SubmitPrimaryButton>
-
-              <p className="text-center text-sm text-(--text-colour)">
-                Don&apos;t have an account?{" "}
-                <Link
-                  href="/register"
-                  className="font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
-                >
-                  Register
-                </Link>
+        <motion.div
+          className="flex w-full max-w-md flex-col gap-(--section-gap)"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.15,
+              },
+            },
+          }}
+        >
+          {/* Form for Step 1 */}
+          {step === 1 ? (
+            <form
+              onSubmit={handleSubmit(onSendOtp)}
+              className="flex w-full flex-col gap-(--section-gap)"
+            >
+              {/* Heading */}
+              <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
+                Enter your phone number to receive a verification code
               </p>
-            </div>
-          </form>
-        ) : (
-          // Step 2: OTP Input
-          <div className="flex flex-col gap-(--section-gap)">
-            <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
-              Enter the OTP sent to the provided number
-            </p>
 
-            <div className="flex flex-col items-center gap-6">
-              <InputOTP
-                maxLength={6}
-                value={otp}
-                onChange={setOtp}
-                containerClassName={cn("gap-3", hasOtpError && "animate-shake")}
-              >
-                <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-2xl">
-                  <InputOTPSlot index={0} aria-invalid={hasOtpError} />
-                  <InputOTPSlot index={1} aria-invalid={hasOtpError} />
-                  <InputOTPSlot index={2} aria-invalid={hasOtpError} />
-                </InputOTPGroup>
-
-                <InputOTPSeparator className="text-muted-foreground/60" />
-
-                <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-2xl">
-                  <InputOTPSlot index={3} aria-invalid={hasOtpError} />
-                  <InputOTPSlot index={4} aria-invalid={hasOtpError} />
-                  <InputOTPSlot index={5} aria-invalid={hasOtpError} />
-                </InputOTPGroup>
-              </InputOTP>
-
-              {error && <p className="text-destructive text-center text-sm font-medium">{error}</p>}
+              <DynamicInput
+                fieldType="tel"
+                label="Phone Number"
+                placeholder="08012345678"
+                error={errors.phone?.message}
+                {...register("phone")}
+                required
+                disabled={loading}
+              />
 
               <div className="mt-16 flex w-full flex-col gap-(--gap-base)">
-                <SubmitPrimaryButton
-                  onClick={handleVerify}
-                  disabled={otp.length < 6 || loading || success}
-                  loading={loading}
-                  className={cn(success && "mt-16 bg-(--theme-green-dark) hover:opacity-96")}
-                >
-                  {success ? "Verified! Redirecting..." : loading ? "Verifying..." : "Verify Code"}
+                <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
+                  Send OTP
                 </SubmitPrimaryButton>
 
                 <p className="text-center text-sm text-(--text-colour)">
-                  Didn&apos;t receive a code?{" "}
-                  <button
-                    type="button"
-                    className="cursor-pointer font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
-                    onClick={() => setStep(1)}
-                    disabled={loading || success}
+                  Don&apos;t have an account?{" "}
+                  <Link
+                    href="/register"
+                    className="font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
                   >
-                    Send again
-                  </button>
+                    Register
+                  </Link>
                 </p>
               </div>
+            </form>
+          ) : (
+            // Step 2: OTP Input
+            <div className="flex flex-col gap-(--section-gap)">
+              <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
+                Enter the OTP sent to the provided number
+              </p>
+
+              <div className="flex flex-col items-center gap-6">
+                <InputOTP
+                  maxLength={6}
+                  value={otp}
+                  onChange={setOtp}
+                  containerClassName={cn("gap-3", hasOtpError && "animate-shake")}
+                >
+                  <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-2xl">
+                    <InputOTPSlot index={0} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={1} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={2} aria-invalid={hasOtpError} />
+                  </InputOTPGroup>
+
+                  <InputOTPSeparator className="text-muted-foreground/60" />
+
+                  <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-2xl">
+                    <InputOTPSlot index={3} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={4} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={5} aria-invalid={hasOtpError} />
+                  </InputOTPGroup>
+                </InputOTP>
+
+                {error && (
+                  <p className="text-destructive text-center text-sm font-medium">{error}</p>
+                )}
+
+                <div className="mt-16 flex w-full flex-col gap-(--gap-base)">
+                  <SubmitPrimaryButton
+                    onClick={handleVerify}
+                    disabled={otp.length < 6 || loading || success}
+                    loading={loading}
+                    className={cn(success && "mt-16 bg-(--theme-green-dark) hover:opacity-96")}
+                  >
+                    {success
+                      ? "Verified! Redirecting..."
+                      : loading
+                        ? "Verifying..."
+                        : "Verify Code"}
+                  </SubmitPrimaryButton>
+
+                  <p className="text-center text-sm text-(--text-colour)">
+                    Didn&apos;t receive a code?{" "}
+                    <button
+                      type="button"
+                      className="cursor-pointer font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
+                      onClick={() => setStep(1)}
+                      disabled={loading || success}
+                    >
+                      Send again
+                    </button>
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </motion.div>
       </motion.div>
-    </motion.div>
+
+      <FullScreenStatusModal
+        open={statusModal.open}
+        variant={statusModal.variant}
+        title={
+          statusModal.variant === "loading" ? "Verifying your account..." : "Login Successful!"
+        }
+        description={
+          statusModal.variant === "success" ? "Redirecting you to your dashboard." : undefined
+        }
+      />
+    </>
   );
 }

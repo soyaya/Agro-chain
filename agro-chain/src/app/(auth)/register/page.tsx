@@ -12,8 +12,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
+import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
 
-// ── Zod Schema (Nigeria phone friendly)
+// === Zod Schema (Nigeria phone friendly)
 const registerSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
   phone: z
@@ -36,6 +37,13 @@ export default function RegisterPage() {
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [statusModal, setStatusModal] = useState<{
+    open: boolean;
+    variant: "loading" | "success";
+  }>({
+    open: false,
+    variant: "loading",
+  });
 
   const {
     register,
@@ -51,7 +59,7 @@ export default function RegisterPage() {
 
   const locationValue = watch("location");
 
-  // ── Geolocation effect (clean - no direct set inside without deps)
+  //=== Geolocation effect (clean - no direct set inside without deps)
   useEffect(() => {
     if (!useCurrentLocation) return;
 
@@ -73,7 +81,7 @@ export default function RegisterPage() {
         try {
           // BigDataCloud free reverse geocoding (no key needed for basic use)
           const res = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
           );
           if (!res.ok) throw new Error();
           const data = await res.json();
@@ -97,7 +105,7 @@ export default function RegisterPage() {
         setUseCurrentLocation(false);
         setLoadingLocation(false);
       },
-      { timeout: 10000, maximumAge: 0 }
+      { timeout: 10000, maximumAge: 0 },
     );
 
     return () => {
@@ -105,7 +113,7 @@ export default function RegisterPage() {
     };
   }, [useCurrentLocation, setValue]);
 
-  // Reset location when toggle off
+  //=== Reset location when toggle off
   useEffect(() => {
     if (!useCurrentLocation) {
       setValue("location", "", { shouldValidate: true });
@@ -114,14 +122,32 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterForm) => {
     setSubmitting(true);
+    setStatusModal({ open: true, variant: "loading" });
     try {
-      // TODO: real POST /api/auth/register
+      //=== TODO: real POST /api/auth/register
       console.log("Register payload:", { ...data, role });
       await new Promise((r) => setTimeout(r, 1400)); // simulate
       toast.success("Account created! Redirecting...");
-      router.push("/verify-identity");
-    } catch (error) {
-      toast.error("Registration failed. Please try again.");
+      await new Promise((r) => setTimeout(r, 1600));
+
+      setStatusModal({ open: true, variant: "success" });
+
+      setTimeout(() => {
+        router.push("/verify-identity");
+      }, 2200);
+    } catch (error: unknown) {
+      setStatusModal({ open: false, variant: "loading" });
+      let message = "Registration failed. Please try again.";
+
+      if (error instanceof Error) {
+        message = error.message;
+        console.log("Error submitting:", error.message);
+      } else {
+        console.log("Unexpected error:", error);
+      }
+
+      toast.error(message);
+      console.log("Error submitting: ", message);
     } finally {
       setSubmitting(false);
     }
@@ -130,63 +156,81 @@ export default function RegisterPage() {
   const isFormComplete = isValid && (locationValue?.trim() || !useCurrentLocation);
 
   return (
-    <Card className="border shadow-xl">
-      <CardHeader>
-        <CardTitle className="text-2xl text-center">Create Account ({role})</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <DynamicInput
-            label="Full Name"
-            error={errors.fullName?.message}
-            {...register("fullName")}
-            required
-          />
+    <>
+      <div className="flex h-full w-full flex-col gap-(--section-gap)">
+        <h2 className="font-ubuntu text-center text-2xl font-bold sm:text-3xl lg:text-4xl">
+          Create Account {role}
+        </h2>
 
-          <DynamicInput
-            fieldType="tel"
-            label="Phone Number"
-            error={errors.phone?.message}
-            {...register("phone")}
-            placeholder="08012345678 or +2348012345678"
-            required
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-(--gap-lg)">
+          <div className="flex w-full flex-col lg:grid lg:grid-cols-2">
+            <DynamicInput
+              label="Full Name"
+              error={errors.fullName?.message}
+              {...register("fullName")}
+              required
+            />
 
-          <DynamicInput
-            fieldType="email"
-            label="Email Address"
-            error={errors.email?.message}
-            {...register("email")}
-            required
-          />
+            <DynamicInput
+              fieldType="tel"
+              label="Phone Number"
+              error={errors.phone?.message}
+              {...register("phone")}
+              placeholder="08012345678 or +2348012345678"
+              required
+            />
 
-          <div className="flex items-center justify-between py-2">
-            <label className="text-sm font-medium">Use current location</label>
-            <div className="flex items-center gap-3">
-              {loadingLocation && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-              <Switch checked={useCurrentLocation} onCheckedChange={setUseCurrentLocation} />
+            <DynamicInput
+              fieldType="email"
+              label="Email Address"
+              error={errors.email?.message}
+              {...register("email")}
+              required
+            />
+
+            <div className="flex items-center justify-between py-2">
+              <label className="text-sm font-medium">Use current location</label>
+              <div className="flex items-center gap-3">
+                {loadingLocation && <Loader2 className="text-primary h-4 w-4 animate-spin" />}
+                <Switch checked={useCurrentLocation} onCheckedChange={setUseCurrentLocation} />
+              </div>
             </div>
+
+            <DynamicInput
+              label="Location"
+              error={errors.location?.message}
+              {...register("location")}
+              placeholder="Lagos, Ikeja or coordinates"
+              disabled={useCurrentLocation}
+            />
           </div>
 
-          <DynamicInput
-            label="Location"
-            error={errors.location?.message}
-            {...register("location")}
-            placeholder="Lagos, Ikeja or coordinates"
-            disabled={useCurrentLocation}
-          />
-
-          {isFormComplete ? (
-            <SubmitPrimaryButton loading={submitting} type="submit">
-              Create Account
-            </SubmitPrimaryButton>
-          ) : (
-            <SubmitSecondaryButton disabled type="button">
-              Create Account
-            </SubmitSecondaryButton>
-          )}
+          <div className="mt-(--submit-button-mt) flex w-full flex-col">
+            {isFormComplete ? (
+              <SubmitPrimaryButton loading={submitting} type="submit">
+                Create Account
+              </SubmitPrimaryButton>
+            ) : (
+              <SubmitSecondaryButton disabled type="button">
+                Create Account
+              </SubmitSecondaryButton>
+            )}
+          </div>
         </form>
-      </CardContent>
-    </Card>
+
+        <FullScreenStatusModal
+          open={statusModal.open}
+          variant={statusModal.variant}
+          title={
+            statusModal.variant === "loading"
+              ? "Creating your account..."
+              : "Account Created Successfully!"
+          }
+          description={
+            statusModal.variant === "success" ? "We're preparing your dashboard now." : undefined
+          }
+        />
+      </div>
+    </>
   );
 }

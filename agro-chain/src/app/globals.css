@@ -1,10 +1,8 @@
 /* Font ubuntu */
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
 
 /* Roboto Slab */
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
-
-
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -132,14 +130,14 @@
   --section-px-sm: 1.5rem;
   --section-px-lg: 2rem;
 
-  --section-py: 2rem;
-  --section-py-sm: 2.5rem;
-  --section-py-lg: 6.25rem; /* 100px */
+  --section-py: 1.5rem;
+  --section-py-sm: 2rem;
+  --section-py-lg: 2.5rem; /* 100px */
 
-  --white: #FFFFFF;
+  --white: #ffffff;
   --black: #000000;
   --hover-black: #010101;
-  --gray-bg: #F7F7F7;
+  --gray-bg: #f7f7f7;
 
   --border-gray: #e0e0e0;
   --border-black: #1b1b1b;
@@ -162,14 +160,14 @@
 
   --error-red: #ff0000;
 
-  --theme-green-dark: #1B4332;
-  --theme-green-light: #1B4332;
+  --theme-green-dark: #1b4332;
+  --theme-green-light: #1b4332;
 
   /* --theme-green-dark: #0F3D2E -> #1B4332 -> #0B3D2E -> #14532D -> #283618
   --theme-green-light: #A7D7C5 -> #B7E4C7 -> #95D5B2 -> #BBF7D0 -> #D8F3DC */
 
-  --twelve-px: 12px;
-  --forty-px: 40px;
+  --space-md: 12px;
+  --space-forty: 40px;
 }
 
 @layer utilities {
@@ -191,9 +189,23 @@
 
 /* Global Animations */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-  20%, 40%, 60%, 80% { transform: translateX(4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 .animate-shake {

@@ -93,7 +93,7 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
             placeholder={finalPlaceholder}
             className={cn(
               "h-16 w-full rounded-full border text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none sm:text-lg lg:text-xl",
-              LeadingIcon ? "pl-(--forty-px)" : "pl-(--twelve-px)",
+              LeadingIcon ? "pl-(--space-forty)" : "pl-(--space-md)",
               fieldType === "password" || fieldType === "confirm-password" ? "pr-10" : "pr-3",
               hasError ? "border-(--error-red)" : "border-(--border-input)",
               "border-(--border-input) text-(--text-colour) caret-(--input-field-green) placeholder:text-base focus:border-(--border-gray)",
@@ -106,7 +106,7 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
             <button
               aria-label={visible ? "Hide password" : "Show password"}
               onClick={() => setVisible((v) => !v)}
-              className="absolute inset-y-0 right-0 flex cursor-pointer items-center px-(--twelve-px) transition-all duration-300 ease-in-out hover:text-gray-700"
+              className="absolute inset-y-0 right-0 flex cursor-pointer items-center px-(--space-md) transition-all duration-300 ease-in-out hover:text-gray-700"
             >
               {visible ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
