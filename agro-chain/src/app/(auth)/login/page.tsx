@@ -154,7 +154,7 @@ export default function LoginPage() {
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <motion.div
-          className="flex w-full max-w-md flex-col gap-(--section-gap)"
+          className="flex w-full max-w-md mx-auto flex-col gap-(--section-gap)"
           initial="hidden"
           animate="visible"
           variants={{
@@ -217,7 +217,7 @@ export default function LoginPage() {
                   onChange={setOtp}
                   containerClassName={cn("gap-3", hasOtpError && "animate-shake")}
                 >
-                  <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-2xl">
+                  <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 py-(--space-lg) *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
                     <InputOTPSlot index={0} aria-invalid={hasOtpError} />
                     <InputOTPSlot index={1} aria-invalid={hasOtpError} />
                     <InputOTPSlot index={2} aria-invalid={hasOtpError} />
@@ -225,7 +225,7 @@ export default function LoginPage() {
 
                   <InputOTPSeparator className="text-muted-foreground/60" />
 
-                  <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-2xl">
+                  <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 py-(--space-lg) *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
                     <InputOTPSlot index={3} aria-invalid={hasOtpError} />
                     <InputOTPSlot index={4} aria-invalid={hasOtpError} />
                     <InputOTPSlot index={5} aria-invalid={hasOtpError} />

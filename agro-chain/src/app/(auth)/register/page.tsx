@@ -6,9 +6,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Switch } from "~/components/ui/switch";
 import { Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
@@ -28,6 +33,7 @@ const registerSchema = z.object({
 type RegisterForm = z.infer<typeof registerSchema>;
 
 type Role = "Farmer" | "Buyer";
+type LocationSwitch = "on" | "off";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,6 +41,7 @@ export default function RegisterPage() {
   const role = (searchParams.get("role") || "") as Role;
 
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
+  const [locationMode, setLocationMode] = useState<LocationSwitch>("off");
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [statusModal, setStatusModal] = useState<{
@@ -62,6 +69,12 @@ export default function RegisterPage() {
   //=== Geolocation effect (clean - no direct set inside without deps)
   useEffect(() => {
     if (!useCurrentLocation) return;
+
+    if (locationMode === "on") {
+      setUseCurrentLocation(true);
+    } else {
+      setUseCurrentLocation(false);
+    }
 
     let mounted = true;
     setLoadingLocation(true);
@@ -111,7 +124,7 @@ export default function RegisterPage() {
     return () => {
       mounted = false;
     };
-  }, [useCurrentLocation, setValue]);
+  }, [useCurrentLocation, setValue, locationMode]);
 
   //=== Reset location when toggle off
   useEffect(() => {
@@ -157,13 +170,13 @@ export default function RegisterPage() {
 
   return (
     <>
-      <div className="flex h-full w-full flex-col gap-(--section-gap)">
+      <div className="flex h-full min-h-full w-full flex-col gap-(--section-gap)">
         <h2 className="font-ubuntu text-center text-2xl font-bold sm:text-3xl lg:text-4xl">
           Create Account {role}
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-(--gap-lg)">
-          <div className="flex w-full flex-col lg:grid lg:grid-cols-2">
+          <div className="flex w-full flex-col gap-(--gap-base) lg:grid lg:grid-cols-2">
             <DynamicInput
               label="Full Name"
               error={errors.fullName?.message}
@@ -188,21 +201,46 @@ export default function RegisterPage() {
               required
             />
 
-            <div className="flex items-center justify-between py-2">
-              <label className="text-sm font-medium">Use current location</label>
-              <div className="flex items-center gap-3">
-                {loadingLocation && <Loader2 className="text-primary h-4 w-4 animate-spin" />}
-                <Switch checked={useCurrentLocation} onCheckedChange={setUseCurrentLocation} />
-              </div>
-            </div>
+            {/* When OFF -> Show Label + Select */}
+            {locationMode === "off" && (
+              <div className="flex flex-col gap-(--space-md) font-roboto-slab">
+                <label className="text-sm">Use current location?</label>
 
-            <DynamicInput
-              label="Location"
-              error={errors.location?.message}
-              {...register("location")}
-              placeholder="Lagos, Ikeja or coordinates"
-              disabled={useCurrentLocation}
-            />
+                <Select
+                  value={locationMode}
+                  onValueChange={(value: "on" | "off") => setLocationMode(value)}
+                >
+                  <SelectTrigger className="w-full cursor-pointer rounded-full py-(--space-lg) text-base">
+                    <SelectValue placeholder="Select option" />
+                  </SelectTrigger>
+
+                  <SelectContent className="overflow-hidden border border-(--border-gray) p-(--space-sm)">
+                    <SelectItem value="on" className="cursor-pointer border-b py-3">
+                      On
+                    </SelectItem>
+                    <SelectItem value="off" className="cursor-pointer py-3">
+                      Off
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* When ON -> Show Loader OR Input */}
+            {locationMode === "on" && (
+              <div className="flex flex-col gap-2">
+                {loadingLocation ? (
+                  <Loader2 className="text-primary h-5 w-5 animate-spin" />
+                ) : (
+                  <DynamicInput
+                    label="Location"
+                    error={errors.location?.message}
+                    {...register("location")}
+                    disabled
+                  />
+                )}
+              </div>
+            )}
           </div>
 
           <div className="mt-(--submit-button-mt) flex w-full flex-col">

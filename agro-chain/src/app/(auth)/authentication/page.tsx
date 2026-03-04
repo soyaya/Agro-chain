@@ -24,7 +24,7 @@ export default function AuthWelcome() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        className="min-h-screen font-roboto-slab py-(--section-py) flex flex-col gap-(--gap-lg)"
+        className="font-roboto-slab flex min-h-screen flex-col gap-(--gap-lg) py-(--section-py)"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -32,7 +32,7 @@ export default function AuthWelcome() {
       >
         {/* Step Content */}
         <motion.div
-          className="w-full flex flex-col gap-(--section-gap) mx-auto"
+          className="mx-auto flex w-full flex-col gap-(--section-gap)"
           initial="hidden"
           animate="visible"
           variants={{
@@ -53,43 +53,38 @@ export default function AuthWelcome() {
             }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <h1 className="text-2xl font-ubuntu sm:text-3xl lg:text-3xl font-bold tracking-tight">
+            <h1 className="font-ubuntu text-2xl font-bold tracking-tight sm:text-3xl lg:text-3xl">
               Fish Vendor
             </h1>
-            <p className="text-(--text-colour) font-roboto-slab text-base">
+            <p className="font-roboto-slab text-base text-(--text-colour)">
               A marketplace for catfish farmers and verified buyers.
             </p>
           </motion.div>
 
           {/* Select Role */}
           <motion.div
-            className="flex flex-col gap-(--gap-base) md:gap-(--gap-md)"
+            className="flex flex-col gap-(--gap-md)"
             variants={{
               hidden: { opacity: 0, y: 30 },
               visible: { opacity: 1, y: 0 },
             }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <label className="text-base font-medium">
-              Select your role
-            </label>
+            <label className="text-base font-medium">Select your role</label>
 
             <Select value={role} onValueChange={(v: Role) => setRole(v)}>
-              <SelectTrigger className="cursor-pointer rounded-full py-6 text-base w-full">
+              <SelectTrigger className="py-(--space-lg) w-full cursor-pointer rounded-full text-base">
                 <SelectValue placeholder="Select Role" />
               </SelectTrigger>
 
-              <SelectContent className="p-0 overflow-hidden border border-(--border-gray) p-2">
+              <SelectContent className="overflow-hidden border border-(--border-gray) p-(--space-sm)">
                 <SelectItem
                   value="Farmer"
-                  className="border-b border-(--border-input) py-3 cursor-pointer"
+                  className="cursor-pointer border-b border-(--border-input) py-(--space-md)"
                 >
                   Farmer
                 </SelectItem>
-                <SelectItem
-                  value="Buyer"
-                  className="py-3 cursor-pointer"
-                >
+                <SelectItem value="Buyer" className="cursor-pointer py-3">
                   Buyer
                 </SelectItem>
               </SelectContent>
@@ -99,7 +94,7 @@ export default function AuthWelcome() {
 
         {/* Button Section */}
         <motion.div
-          className="max-w-md mt-16 w-full mx-auto flex flex-col gap-(--gap-base)"
+          className="mx-auto mt-16 flex w-full max-w-md flex-col gap-(--gap-base)"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}

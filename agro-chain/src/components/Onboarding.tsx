@@ -27,15 +27,14 @@ export default function Onboarding({ steps, onFinish }: OnboardingProps) {
   };
 
   return (
-    <div className="flex w-full max-w-xl flex-col items-center justify-center gap-10 text-center px-6 py-16">
-      
+    <div className="flex w-full max-w-xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
       {/* Heading + Description */}
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-semibold tracking-tight text-black dark:text-white">
           {steps[currentStep].heading}
         </h1>
 
-        <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-md">
+        <p className="max-w-md text-lg text-zinc-600 dark:text-zinc-400">
           {steps[currentStep].description}
         </p>
       </div>
@@ -47,7 +46,7 @@ export default function Onboarding({ steps, onFinish }: OnboardingProps) {
             key={index}
             className={`h-3 w-3 rounded-full transition-all duration-300 ${
               index === currentStep
-                ? "bg-black dark:bg-white scale-110"
+                ? "scale-110 bg-black dark:bg-white"
                 : "bg-zinc-300 dark:bg-zinc-700"
             }`}
           />
@@ -55,10 +54,7 @@ export default function Onboarding({ steps, onFinish }: OnboardingProps) {
       </div>
 
       {/* Button */}
-      <Button
-        onClick={handleNext}
-        className="rounded-full px-10 py-6 text-base font-medium"
-      >
+      <Button onClick={handleNext} className="--space-lg rounded-full px-10 text-base font-medium">
         {isLastStep ? "Get Started" : "Next"}
       </Button>
     </div>

@@ -166,8 +166,13 @@
   /* --theme-green-dark: #0F3D2E -> #1B4332 -> #0B3D2E -> #14532D -> #283618
   --theme-green-light: #A7D7C5 -> #B7E4C7 -> #95D5B2 -> #BBF7D0 -> #D8F3DC */
 
-  --space-md: 12px;
+  --space-md: 0.75rem;
+  --space-base: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
   --space-forty: 40px;
+
+  --submit-button-mt: 4rem;
 }
 
 @layer utilities {
@@ -183,7 +188,7 @@
 /* @apply mx-auto w-full max-w-[1440px]; */
 @layer components {
   .container-max-width {
-    @apply mx-auto w-full max-w-120;
+    @apply mx-auto w-full max-w-200;
   }
 }
 

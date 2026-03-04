@@ -109,8 +109,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center">
-        <div className="w-full container-max-width px-(--section-px) sm:px-(--section-px-sm) lg:px-(--section-px-lg)">{children}</div>
+      <main className="flex-1 flex flex-col w-full h-full">
+        <div className="w-full container-max-width px-(--section-px) py-(--section-py) sm:py-(--section-py-sm) lg:py-(--section-py-lg) sm:px-(--section-px-sm) lg:px-(--section-px-lg)">{children}</div>
       </main>
     </div>
   );

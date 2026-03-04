@@ -64,12 +64,12 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
     const hasError = !!error || typeof error === "string";
 
     return (
-      <div className={cn("flex flex-col gap-2", className)}>
+      <div className={cn("flex flex-col gap-(--space-md)", className)}>
         {/* Label */}
         {label && (
           <label
             htmlFor={label}
-            className="flex cursor-default items-center gap-1 text-base font-medium text-(--heading-colour) transition-all duration-300 ease-in-out hover:cursor-pointer focus:cursor-text lg:font-medium"
+            className="flex font-roboto-slab cursor-default items-center gap-1 text-base font-medium text-(--heading-colour) transition-all duration-300 ease-in-out hover:cursor-pointer focus:cursor-text lg:font-medium"
           >
             {label}
             {required && <span className="text-(--error-red)">*</span>}
@@ -92,7 +92,7 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
             aria-label={label || fieldType}
             placeholder={finalPlaceholder}
             className={cn(
-              "h-16 w-full rounded-full border text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none sm:text-lg lg:text-xl",
+              "h-12 w-full rounded-full border text-base shadow-xs ring-0 transition-all font-roboto-slab duration-300 ease-in-out outline-none py-(--space-lg)",
               LeadingIcon ? "pl-(--space-forty)" : "pl-(--space-md)",
               fieldType === "password" || fieldType === "confirm-password" ? "pr-10" : "pr-3",
               hasError ? "border-(--error-red)" : "border-(--border-input)",
