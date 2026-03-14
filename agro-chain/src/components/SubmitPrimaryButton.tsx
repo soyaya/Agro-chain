@@ -30,8 +30,11 @@ export const SubmitPrimaryButton = React.forwardRef<HTMLButtonElement, SubmitPri
         disabled={loading || disabled}
         variant="default"
         className={cn(
-          "rounded-full h-14 w-full bg-(--theme-green-dark) font-bold text-(--white) border border-(--border-gray) transition-all duration-300 hover:shadow-md shadow-sm ease-in-out hover:cursor-pointer hover:opacity-96",
-          (loading || disabled) && "cursor-not-allowed opacity-70",
+          "rounded-full h-14 w-full bg-(--theme-green-dark) font-bold text-(--white) border border-(--border-gray) transition-all duration-300 shadow-sm ease-in-out cursor-pointer",
+          "hover:shadow-md hover:opacity-96 hover:scale-[1.01]",
+          "focus:outline-none focus:ring-2 focus:ring-(--theme-green-dark) focus:ring-offset-2",
+          "active:scale-[0.99]",
+          (loading || disabled) && "cursor-not-allowed opacity-70 hover:scale-100 active:scale-100",
           className,
         )}
         {...props}

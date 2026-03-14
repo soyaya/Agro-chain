@@ -46,6 +46,7 @@ const metadata = {
 
 export default function Home() {
   const router = useRouter();
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   const steps = [
     {
@@ -76,6 +77,19 @@ export default function Home() {
     headingRef.current?.focus();
   }, [currentStep]);
 
+  // === Handle Enter key press
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && !loading) {
+        e.preventDefault();
+        buttonRef.current?.click();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [loading]);
+
   const goToStep = useCallback((index: number) => {
     if (loading || index === currentStep) return;
 
@@ -87,16 +101,6 @@ export default function Home() {
       setLoading(false);
     }, 400);
   }, [loading, currentStep]);
-
-  useEffect(() => {
-  if (loading || isLastStep) return;
-
-  const timer = setTimeout(() => {
-    goToStep(currentStep + 1);
-  }, 4000);
-
-  return () => clearTimeout(timer);
-}, [currentStep, goToStep, loading, isLastStep]);
 
   // === Handle Next
   const handleNext = useCallback(() => {
@@ -110,6 +114,26 @@ export default function Home() {
 
     goToStep(currentStep + 1);
   }, [currentStep, goToStep, isLastStep, loading, router]);
+
+  useEffect(() => {
+    if (loading || isLastStep) return;
+
+    const timer = setTimeout(() => {
+      goToStep(currentStep + 1);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [currentStep, goToStep, loading, isLastStep]);
+
+  useEffect(() => {
+    if (loading || !isLastStep) return;
+
+    const timer = setTimeout(() => {
+      handleNext();
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [handleNext, isLastStep, loading]);
 
   const variants = {
     enter: (direction: number) => ({
@@ -127,13 +151,14 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-zinc-100">
+    <div className="flex h-full w-full overflow-hidden bg-zinc-100" role="application" aria-label="Agro-chain onboarding">
       <main
         className="relative flex min-h-screen w-full flex-col items-center justify-center text-center"
         aria-live="polite"
+        aria-atomic="true"
       >
         {/* Step Content */}
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 items-center justify-center" role="region" aria-label="Onboarding content">
           <div className="relative flex w-full max-w-md flex-col items-center justify-center">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
@@ -141,6 +166,7 @@ export default function Home() {
                 id={`step-panel-${currentStep}`}
                 role="tabpanel"
                 aria-labelledby={`step-tab-${currentStep}`}
+                aria-live="polite"
                 custom={direction}
                 variants={variants}
                 initial="enter"
@@ -156,20 +182,23 @@ export default function Home() {
                   ref={headingRef}
                   tabIndex={-1}
                   className="text-3xl font-semibold focus:outline-none sm:text-4xl"
+                  aria-label={`Step ${currentStep + 1} of ${steps.length}: ${steps[currentStep].heading}`}
                 >
                   {steps[currentStep].heading}
                 </h1>
 
-                <p className="text-lg text-zinc-600">{steps[currentStep].description}</p>
+                <p className="text-lg text-zinc-600" aria-label={steps[currentStep].description}>
+                  {steps[currentStep].description}
+                </p>
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex w-full max-w-md flex-col items-center gap-6 pb-8">
+        <div className="flex w-full max-w-md flex-col items-center gap-6 pb-8" role="region" aria-label="Onboarding navigation">
           {/* Dots */}
-          <div className="flex items-center gap-3" role="tablist" aria-label="Onboarding steps">
+          <div className="flex items-center gap-3" role="tablist" aria-label="Onboarding steps navigation">
             {steps.map((step, index) => {
               const isActive = index === currentStep;
 
@@ -181,9 +210,10 @@ export default function Home() {
                   role="tab"
                   aria-selected={isActive}
                   aria-controls={`step-panel-${index}`}
+                  aria-label={`Go to step ${index + 1} of ${steps.length}: ${step.heading}`}
                   tabIndex={isActive ? 0 : -1}
                   disabled={loading}
-                  data-active={isActive} // 👈 ACTIVE STATE FOR STYLING
+                  data-active={isActive}
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 1.15 }}
                   onClick={() => goToStep(index)}
@@ -215,7 +245,6 @@ export default function Home() {
                   }}
                   transition={{ duration: 0.3 }}
                   className="h-3 w-3 rounded-full bg-(--black) transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2 focus:ring-black focus:outline-none disabled:opacity-60 data-[active=true]:scale-120 data-[active=true]:opacity-100"
-                  aria-label={`Go to step ${index + 1}: ${step.heading}`}
                 />
               );
             })}
@@ -224,11 +253,13 @@ export default function Home() {
           {/* Button */}
           <div className="w-full max-w-xs">
             <SubmitPrimaryButton
+              ref={buttonRef}
               type="button"
               loading={loading}
               loadingText="Loading next step"
               onClick={handleNext}
               aria-disabled={loading}
+              aria-label={isLastStep ? "Get started with Agro-chain" : `Continue to step ${currentStep + 2} of ${steps.length}`}
             >
               {isLastStep ? "Get Started" : "Next"}
             </SubmitPrimaryButton>

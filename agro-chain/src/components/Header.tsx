@@ -54,7 +54,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="border-border/40 sticky top-0 left-0 z-50 w-full border-b bg-linear-to-b from-(--navbar-bg) to-(--navbar-bg)/10 backdrop-blur-sm supports-[backdrop-filter]:bg-(--navbar-bg)/60">
+      <header className="border-border/40 sticky top-0 left-0 z-50 w-full border-b bg-linear-to-b from-(--navbar-bg) to-(--navbar-bg)/10 backdrop-blur-sm supports-backdrop-filter:bg-(--navbar-bg)/60">
         <div className="mx-auto flex h-(--navbar-h) w-full max-w-7xl items-center justify-between gap-2 px-(--section-px) sm:px-(--section-px-sm) lg:px-(--section-px-lg)">
           {/* Left: Menu + Logo */}
           <div className="flex items-center gap-4">
@@ -64,7 +64,7 @@ export default function Header() {
           </div>
 
           {/* Center: Desktop Nav */}
-          <nav className="items-center hidden gap-2 lg:flex">
+          <nav className="hidden items-center gap-2 lg:flex">
             <ul className="flex items-center gap-2 rounded-full bg-[#FEFEFE] p-1 shadow-md">
               {navLinks.map(({ label, href, icon: Icon }) => {
                 const isActive = pathname == href;
@@ -78,7 +78,7 @@ export default function Header() {
                           : "text-(--debridger-green-dark) hover:bg-(--debridger-green-dark) hover:text-white"
                       }`}
                     >
-                      {Icon && <Icon className="w-4 h-4" />}
+                      {Icon && <Icon className="h-4 w-4" />}
                       <span>{label}</span>
                     </Link>
                   </li>
@@ -95,13 +95,13 @@ export default function Header() {
               className="lg:hidden"
               onClick={() => setIsSidebarOpen(true)}
             >
-              <Menu className="w-5 h-5 text-white" />
+              <Menu className="h-5 w-5 text-white" />
             </Button>
           </div>
 
           {/* Desktop Authentication Links */}
-          <div className="relative items-center hidden gap-2 lg:flex">
-            <SecondaryLink href="/signin" label="Log In" className="text-white border-white" />
+          <div className="relative hidden items-center gap-2 lg:flex">
+            <SecondaryLink href="/signin" label="Log In" className="border-white text-white" />
 
             <PrimaryLink href="/signup" label="Sign Up" />
           </div>
@@ -118,7 +118,7 @@ export default function Header() {
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-(--black)/50 backdrop-blur-sm lg:hidden"
               onClick={() => setIsSidebarOpen(false)}
             />
 
@@ -128,15 +128,15 @@ export default function Header() {
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed top-0 left-0 z-50 w-full h-full transition-all duration-300 ease-in-out transform bg-white shadow-lg sm:w-1/2 lg:hidden lg:w-1/3"
+              className="fixed top-0 left-0 z-50 h-full w-full transform bg-(--white) shadow-lg transition-all duration-300 ease-in-out sm:w-1/2 lg:hidden lg:w-1/3"
               onClick={(e) => e.stopPropagation()}
             >
               <div
                 ref={sidebarRef}
-                className="flex flex-col h-full gap-4"
+                className="flex h-full flex-col gap-4"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex flex-col h-full gap-4">
+                <div className="flex h-full flex-col gap-4">
                   {/* Header */}
                   <div className="flex h-(--navbar-h) w-full items-center justify-between gap-4 p-3 backdrop-blur-sm">
                     <div className="relative flex items-center gap-2">
@@ -167,7 +167,7 @@ export default function Header() {
                         console.log(isSidebarOpen);
                       }}
                     >
-                      <X className="w-6 h-6" />
+                      <X className="h-6 w-6" />
                     </Button>
                   </div>
 

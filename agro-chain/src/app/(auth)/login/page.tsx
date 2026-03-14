@@ -13,7 +13,6 @@ import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from "~/components/ui/input-otp";
 import Link from "next/link";
@@ -102,7 +101,7 @@ export default function LoginPage() {
 
       const data = await response.json();
 
-      const roleFromBackend = data.role as "Farmer" | "Buyer";
+      const roleFromBackend = data.role as "Farmer" | "Buyer" | "Cluster Farmer";
 
       setSuccess(true);
       setStatusModal({ open: true, variant: "success" });
@@ -114,8 +113,18 @@ export default function LoginPage() {
 
       toast.success("Login successful!");
 
-      const dashboardPath = roleFromBackend === "Farmer" ? "/farmer-dashboard" : "/buyer-dashboard";
-      console.log("Role from backend:", roleFromBackend);
+      const isCluster = data.isClusterFarmer === true || roleFromBackend === "Cluster Farmer" || data.role === "Farmer & Cluster";
+      
+      let dashboardPath = "/buyer-dashboard";
+      if (isCluster) {
+        dashboardPath = "/cluster-dashboard";
+      } else if (roleFromBackend === "Farmer") {
+        dashboardPath = "/farmers-dashboard";
+      } else {
+        dashboardPath = "/buyers-dashboard";
+      }
+      
+      console.log("Role from backend:", roleFromBackend, "isCluster:", isCluster);
 
       setTimeout(() => {
         router.push(dashboardPath);
@@ -137,7 +146,7 @@ export default function LoginPage() {
 
   //===Auto-submit OTP when 6 digits entered
   useEffect(() => {
-    if (step === 2 && otp.length === 6 && !loading && !success) {
+    if (step === 2 && otp.length === 4 && !loading && !success) {
       void handleVerify();
     }
   }, [otp, step, loading, success, handleVerify]);
@@ -147,14 +156,14 @@ export default function LoginPage() {
   return (
     <>
       <motion.div
-        className="flex min-h-screen flex-col py-(--section-px) sm:py-(--section-px-sm)"
+        className="default-container-max-width flex min-h-screen flex-col py-(--section-px) sm:py-(--section-px-sm)"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <motion.div
-          className="flex w-full max-w-md mx-auto flex-col gap-(--section-gap)"
+          className="default-page-max-width flex w-full flex-col gap-(--section-gap)"
           initial="hidden"
           animate="visible"
           variants={{
@@ -212,23 +221,19 @@ export default function LoginPage() {
 
               <div className="flex flex-col items-center gap-6">
                 <InputOTP
-                  maxLength={6}
+                  maxLength={4}
                   value={otp}
                   onChange={setOtp}
                   containerClassName={cn("gap-3", hasOtpError && "animate-shake")}
                 >
-                  <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 py-(--space-lg) *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
+                  <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
                     <InputOTPSlot index={0} aria-invalid={hasOtpError} />
                     <InputOTPSlot index={1} aria-invalid={hasOtpError} />
-                    <InputOTPSlot index={2} aria-invalid={hasOtpError} />
                   </InputOTPGroup>
 
-                  <InputOTPSeparator className="text-muted-foreground/60" />
-
-                  <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 py-(--space-lg) *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
+                  <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
+                    <InputOTPSlot index={2} aria-invalid={hasOtpError} />
                     <InputOTPSlot index={3} aria-invalid={hasOtpError} />
-                    <InputOTPSlot index={4} aria-invalid={hasOtpError} />
-                    <InputOTPSlot index={5} aria-invalid={hasOtpError} />
                   </InputOTPGroup>
                 </InputOTP>
 

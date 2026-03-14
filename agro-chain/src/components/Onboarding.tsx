@@ -46,7 +46,7 @@ export default function Onboarding({ steps, onFinish }: OnboardingProps) {
             key={index}
             className={`h-3 w-3 rounded-full transition-all duration-300 ${
               index === currentStep
-                ? "scale-110 bg-black dark:bg-white"
+                ? "scale-110 bg-(--black) dark:bg-(--white)"
                 : "bg-zinc-300 dark:bg-zinc-700"
             }`}
           />

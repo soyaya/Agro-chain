@@ -52,7 +52,7 @@ export default function Footer() {
                   <li key={href} className="group relative flex flex-col items-center">
                     {/* Label */}
                     <span
-                      className={`absolute -top-6 rounded-md bg-red-900 bg-white/80 px-2 py-0.5 text-xs text-black opacity-0 backdrop-blur-sm transition-all duration-300 ease-in-out group-hover:translate-y-[-2px] group-hover:opacity-100 dark:bg-black/50 dark:text-white ${color?.replace("hover:", "")} `}
+                      className={`absolute -top-6 rounded-md bg-(--white)/80 bg-red-900 px-2 py-0.5 text-xs text-black opacity-0 backdrop-blur-sm transition-all duration-300 ease-in-out group-hover:translate-y-[-2px] group-hover:opacity-100 dark:bg-(--black)/50 dark:text-white ${color?.replace("hover:", "")} `}
                     >
                       {label}
                     </span>

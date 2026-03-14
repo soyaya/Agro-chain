@@ -23,7 +23,7 @@ export function FullScreenStatusModal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-(--black)/40 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -37,14 +37,12 @@ export function FullScreenStatusModal({
               duration: 0.35,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="w-[90%] max-w-md rounded-2xl bg-white p-10 shadow-2xl"
+            className="w-[90%] max-w-md rounded-2xl bg-(--white) p-10 shadow-2xl"
           >
             {/* LOADING STATE */}
             {variant === "loading" && (
-              <div className="flex flex-col items-center text-center gap-(--gap-base)">
-                <p className="text-lg font-medium text-(--text-colour)">
-                  {title}
-                </p>
+              <div className="flex flex-col items-center gap-(--gap-base) text-center">
+                <p className="text-lg font-medium text-(--text-colour)">{title}</p>
 
                 <Loader2 className="h-12 w-12 animate-spin text-(--black)" />
               </div>
@@ -52,18 +50,14 @@ export function FullScreenStatusModal({
 
             {/* SUCCESS STATE */}
             {variant === "success" && (
-              <div className="flex flex-col items-center text-center gap-(--gap-base)">
+              <div className="flex flex-col items-center gap-(--gap-base) text-center">
                 <CheckCircle2 className="h-14 w-14 text-(--theme-green-dark)" />
 
                 <div>
-                  <p className="text-lg font-semibold text-(--text-colour)">
-                    {title}
-                  </p>
+                  <p className="text-lg font-semibold text-(--text-colour)">{title}</p>
 
                   {description && (
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {description}
-                    </p>
+                    <p className="text-muted-foreground mt-2 text-sm">{description}</p>
                   )}
                 </div>
               </div>

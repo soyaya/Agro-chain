@@ -1,7 +1,5 @@
-
-// Hader
+// Icon
 import type { LucideIcon } from "lucide-react";
-
 
 export interface NavLink {
   label: string;
@@ -9,3 +7,8 @@ export interface NavLink {
   icon?: LucideIcon;
   color?: string;
 };
+
+export interface Object {
+  label: string;
+  value: string;
+}

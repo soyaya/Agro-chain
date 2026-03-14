@@ -7,7 +7,6 @@ export async function verifyToken(token: string) {
   throw new Error('Invalid token');
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createSessionToken(data: any) {
+export async function createSessionToken(data: Record<string, unknown>) {
   return 'valid-demo-token'; // in real life → sign JWT
 }

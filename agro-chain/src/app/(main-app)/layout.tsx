@@ -3,36 +3,25 @@
 // import Footer from "~/components/PageLanding/Footer";
 
 export const metadata = {
-  metadataBase: new URL("https://Agro-chain-bom-vercel.vercel.app"),
+  // metadataBase, title.template, openGraph.siteName, openGraph.locale,
+  // twitter.card, twitter.site, twitter.creator are all inherited from root layout
 
-  title: {
-    template: "%s | Agro-chain",
-    default: "Agro-chain | Catfish Marketplace for Farmers & Buyers",
-  },
+  title: "Agro-chain | Catfish Marketplace for Farmers & Buyers",
 
   description:
     "Agro-chain is a digital marketplace connecting cluster catfish farmers with verified bulk buyers. We streamline sourcing, secure payments, and coordinate logistics for fresh, traceable supply.",
 
-  authors: [
-    {
-      name: "Agro-chain Team",
-      url: "https://agro-chain-bom-vercel.vercel.app/",
-    },
+  keywords: [
+    "catfish marketplace",
+    "buy catfish",
+    "fresh catfish Nigeria",
+    "bulk catfish supply",
+    "aquaculture marketplace",
   ],
-
-  creator: "Agro-chain Team",
-  publisher: "Agro-chain",
 
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
   },
 
   alternates: {
@@ -40,27 +29,16 @@ export const metadata = {
   },
 
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    siteName: "Agro-chain",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Agro-chain - Premium Nigerian Crops",
-      },
-    ],
+    url: "https://agro-chain-bom-vercel.vercel.app",
+    title: "Agro-chain | Catfish Marketplace for Farmers & Buyers in Nigeria",
+    description:
+      "Connect with verified catfish farmers and bulk buyers on Agro-chain. Fresh, traceable catfish supply with secure payments and coordinated logistics.",
   },
 
   twitter: {
-    card: "summary_large_image",
-    site: "@Agro-chain",
-    creator: "@Agro-chain",
-    images: {
-      url: "/twitter-image.png",
-      alt: "Agro-chain Twitter Card",
-    },
+    title: "Agro-chain | Catfish Marketplace for Farmers & Buyers in Nigeria",
+    description:
+      "Connect with verified catfish farmers and bulk buyers on Agro-chain. Fresh, traceable catfish supply with secure payments and coordinated logistics.",
   },
 };
 

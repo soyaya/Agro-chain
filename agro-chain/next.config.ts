@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
 };
 
 const withSerwist = withSerwistInit({
-  swSrc: 'app/sw.ts',           // your custom service worker
+  swSrc: 'src/app/sw.ts',           // your custom service worker
   swDest: 'public/sw.js',
   disable: process.env.NODE_ENV === 'development',
   register: true,

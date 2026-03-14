@@ -4,16 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+import { SelectInput } from "~/components/dynamic-input";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Role = "Farmer" | "Buyer" | "";
+const roles = [
+  { value: "Buyer", label: "Buyer" },
+  { value: "Farmer", label: "Farmer" },
+];
 
 export default function AuthWelcome() {
   const router = useRouter();
@@ -24,7 +22,7 @@ export default function AuthWelcome() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        className="font-roboto-slab flex min-h-screen flex-col gap-(--gap-lg) py-(--section-py)"
+        className="font-roboto-slab -mt-(--navbar-h) pt-(--navbar-h) default-container-max-width flex min-h-screen flex-col gap-(--gap-lg)"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -32,7 +30,7 @@ export default function AuthWelcome() {
       >
         {/* Step Content */}
         <motion.div
-          className="mx-auto flex w-full flex-col gap-(--section-gap)"
+          className="default-page-max-width flex-1 flex w-full flex-col gap-(--section-gap) pt-(--section-py)"
           initial="hidden"
           animate="visible"
           variants={{
@@ -70,31 +68,19 @@ export default function AuthWelcome() {
             }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <label className="text-base font-medium">Select your role</label>
-
-            <Select value={role} onValueChange={(v: Role) => setRole(v)}>
-              <SelectTrigger className="py-(--space-lg) w-full cursor-pointer rounded-full text-base">
-                <SelectValue placeholder="Select Role" />
-              </SelectTrigger>
-
-              <SelectContent className="overflow-hidden border border-(--border-gray) p-(--space-sm)">
-                <SelectItem
-                  value="Farmer"
-                  className="cursor-pointer border-b border-(--border-input) py-(--space-md)"
-                >
-                  Farmer
-                </SelectItem>
-                <SelectItem value="Buyer" className="cursor-pointer py-3">
-                  Buyer
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <SelectInput
+              label="Select your role"
+              value={role}
+              onValueChange={(value) => setRole(value as Role)}
+              options={roles}
+              required
+            />
           </motion.div>
         </motion.div>
 
         {/* Button Section */}
         <motion.div
-          className="mx-auto mt-16 flex w-full max-w-md flex-col gap-(--gap-base)"
+          className="mx-auto flex w-full max-w-md flex-col gap-(--gap-base)"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}

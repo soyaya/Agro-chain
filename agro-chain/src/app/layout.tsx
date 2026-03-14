@@ -1,6 +1,7 @@
 import { inter, openSans } from "./fonts";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { LocationProvider } from "~/lib/location-context";
 
 export const metadata = {
   metadataBase: new URL("https://agro-chain-bom-vercel.vercel.app"),
@@ -12,6 +13,16 @@ export const metadata = {
 
   description:
     "Agro-chain is a digital marketplace connecting cluster catfish farmers with verified bulk buyers. We streamline sourcing, secure payments, and coordinate logistics for fresh, traceable supply.",
+
+  keywords: [
+    "catfish",
+    "marketplace",
+    "farmers",
+    "buyers",
+    "Nigeria",
+    "aquaculture",
+    "supply chain",
+  ],
 
   authors: [
     {
@@ -69,8 +80,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.variable} ${openSans.variable} antialiased`}>
-        {children}
-        <Toaster position="top-center" richColors closeButton />
+        <LocationProvider>
+          {children}
+          <Toaster position="top-center" richColors closeButton />
+        </LocationProvider>
       </body>
     </html>
   );
