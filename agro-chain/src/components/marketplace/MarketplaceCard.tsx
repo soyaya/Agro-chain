@@ -23,8 +23,10 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
     });
   };
 
-  const lowestPrice = Math.min(...listing.packaging.map((p) => p.pricePerUnit));
-  const highestPrice = Math.max(...listing.packaging.map((p) => p.pricePerUnit));
+  const packagePrices = listing.packaging?.map((p) => p.pricePerUnit) ?? [];
+  const lowestPrice = packagePrices.length > 0 ? Math.min(...packagePrices) : listing.pricePerKg ?? 0;
+  const highestPrice = packagePrices.length > 0 ? Math.max(...packagePrices) : lowestPrice;
+  const displayPricePerKg = listing.pricePerKg ?? lowestPrice;
 
   return (
     <motion.div
@@ -59,10 +61,12 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
             <Heart size={20} className={cn("transition-colors", isLiked ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500")} />
           </button>
           <span className="font-ubuntu text-lg font-bold text-(--theme-green-dark) mt-6">
-            ₦{lowestPrice.toLocaleString()}
+            ₦{displayPricePerKg.toLocaleString()}/kg
           </span>
           {lowestPrice !== highestPrice && (
-            <span className="text-sm text-(--text-colour)">- ₦{highestPrice.toLocaleString()}</span>
+            <span className="text-xs text-(--text-colour)">
+              Packs from ₦{lowestPrice.toLocaleString()}
+            </span>
           )}
         </div>
       </div>

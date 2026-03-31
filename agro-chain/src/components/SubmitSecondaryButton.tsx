@@ -30,9 +30,9 @@ export const SubmitSecondaryButton = React.forwardRef<HTMLButtonElement, SubmitS
         variant="outline"
         disabled={loading || disabled}
         className={cn(
-          "rounded-full h-14 w-full bg-transparent border border-(--border-gray) font-bold transition-all shadow-sm duration-300 ease-in-out cursor-pointer",
-          "hover:shadow-md hover:opacity-96 hover:bg-(--bg-pink) hover:scale-[1.01]",
-          "focus:outline-none focus:ring-2 focus:ring-(--border-gray) focus:ring-offset-2",
+          "rounded-full h-12 w-full bg-transparent border border-(--border-gray) font-bold transition-all shadow-xs duration-300 ease-in-out cursor-default",
+          "hover:shadow-sm hover:opacity-96 hover:bg-(--bg-pink) hover:scale-[1.01] hover:cursor-pointer",
+          "focus:outline-none focus:ring-1 focus:ring-(--border-gray)",
           "active:scale-[0.99]",
           (loading || disabled) && "cursor-not-allowed opacity-90 hover:scale-100 active:scale-100 hover:bg-transparent",
           className,

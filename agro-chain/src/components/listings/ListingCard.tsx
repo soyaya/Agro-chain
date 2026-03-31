@@ -21,11 +21,6 @@ export function ListingCard({
   onApprove,
   onReject,
 }: ListingCardProps) {
-  const totalValue = listing.packaging.reduce(
-    (sum, pkg) => sum + pkg.quantity * pkg.pricePerUnit,
-    0,
-  );
-
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-NG", {
       year: "numeric",
@@ -88,17 +83,10 @@ export function ListingCard({
         <p className="text-sm font-medium text-(--heading-colour)">Packaging Options:</p>
         <div className="flex flex-col gap-1">
           {listing.packaging.map((pkg, index) => (
-            <div key={index} className="flex justify-between text-sm text-(--text-colour)">
-              <span>
-                {pkg.weightKg}kg × {pkg.quantity}
-              </span>
-              <span className="font-medium">₦{pkg.pricePerUnit.toLocaleString()}</span>
+            <div key={index} className="text-sm text-(--text-colour)">
+              {pkg.weightKg}kg × {pkg.quantity}
             </div>
           ))}
-        </div>
-        <div className="flex justify-between border-t border-(--border-gray) pt-(--space-md) text-sm font-medium text-(--heading-colour)">
-          <span>Total Value:</span>
-          <span>₦{totalValue.toLocaleString()}</span>
         </div>
       </div>
 

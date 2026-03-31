@@ -2,93 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Package, Clock, CheckCircle, Truck, XCircle, FileText } from "lucide-react";
+import { toast } from "sonner";
 import type { Order, OrderStatus } from "~/types";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, STATUS_COLORS } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
+import { apiFetch } from "~/lib/api";
 
-// Mock data to match what's in /orders/page.tsx
-const mockOrders: Order[] = [
-  {
-    id: "ORD-001",
-    buyerId: "buyer-1",
-    buyerName: "John Smith",
-    buyerPhone: "08012345678",
-    clusterFarmerId: "cluster-1",
-    clusterFarmerName: "Green Valley Farms",
-    items: [
-      {
-        listingId: "1",
-        fishType: "Catfish",
-        weightKg: 5,
-        quantity: 10,
-        pricePerUnit: 7000,
-        totalPrice: 70000,
-      },
-    ],
-    totalAmount: 70000,
-    deliveryAddress: "123 Main Street, Kaduna",
-    deliveryOption: "Delivery within state",
-    status: "delivered",
-    paymentStatus: "paid",
-    paymentMethod: "Bank Transfer",
-    createdAt: new Date("2024-03-01"),
-    updatedAt: new Date("2024-03-05"),
-  },
-  {
-    id: "ORD-002",
-    buyerId: "buyer-1",
-    buyerName: "John Smith",
-    buyerPhone: "08012345678",
-    clusterFarmerId: "cluster-2",
-    clusterFarmerName: "Blue Ocean Fisheries",
-    items: [
-      {
-        listingId: "2",
-        fishType: "Tilapia",
-        weightKg: 2,
-        quantity: 20,
-        pricePerUnit: 2800,
-        totalPrice: 56000,
-      },
-    ],
-    totalAmount: 56000,
-    deliveryAddress: "123 Main Street, Kaduna",
-    deliveryOption: "Pickup from warehouse",
-    status: "processing",
-    paymentStatus: "paid",
-    paymentMethod: "Card",
-    createdAt: new Date("2024-03-10"),
-    updatedAt: new Date("2024-03-10"),
-  },
-  {
-    id: "ORD-003",
-    buyerId: "buyer-1",
-    buyerName: "John Smith",
-    buyerPhone: "08012345678",
-    clusterFarmerId: "cluster-1",
-    clusterFarmerName: "Green Valley Farms",
-    items: [
-      {
-        listingId: "3",
-        fishType: "Mackerel",
-        weightKg: 3,
-        quantity: 15,
-        pricePerUnit: 4200,
-        totalPrice: 63000,
-      },
-    ],
-    totalAmount: 63000,
-    deliveryAddress: "123 Main Street, Kaduna",
-    deliveryOption: "Express delivery",
-    status: "pending",
-    paymentStatus: "pending",
-    createdAt: new Date("2024-03-15"),
-    updatedAt: new Date("2024-03-15"),
-  },
-];
+type OrderResponse = Order | { order?: Order; data?: Order };
 
 const statusIcons: Record<OrderStatus, typeof Package> = {
   pending: Clock,
@@ -102,27 +25,64 @@ const statusIcons: Record<OrderStatus, typeof Package> = {
 export default function OrderDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const orderId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [deliveryConfirmed, setDeliveryConfirmed] = useState(false);
+  const [payoutDropdownOpen, setPayoutDropdownOpen] = useState(false);
+  const [selectedPayoutWindow, setSelectedPayoutWindow] = useState("24 hours");
+  const [confirmingDelivery, setConfirmingDelivery] = useState(false);
 
   useEffect(() => {
-    // Mock fetching the order
-    const loadOrder = () => {
+    let mounted = true;
+
+    const loadOrder = async () => {
       setLoading(true);
-      setTimeout(() => {
-        const found = mockOrders.find((o) => o.id === params.id);
-        setOrder(found || null);
-        setLoading(false);
-      }, 600);
+      setErrorMessage(null);
+      try {
+        const response = await apiFetch<OrderResponse>(`/buyers/orders/${orderId}`);
+        const payload = "id" in (response as Order) ? (response as Order) : response.order ?? response.data ?? null;
+        if (mounted) {
+          setOrder(payload ?? null);
+          setDeliveryConfirmed(Boolean(payload?.deliveryConfirmed));
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to load order";
+        if (mounted) {
+          setErrorMessage(message);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
     };
 
-    if (params.id) {
-      loadOrder();
+    if (orderId) {
+      void loadOrder();
     }
-  }, [params.id]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [orderId]);
 
   if (loading) {
     return <LoadingState message="Loading order details..." size="lg" />;
+  }
+
+  if (errorMessage) {
+    return (
+      <EmptyState
+        icon={Package}
+        title="Unable to load order"
+        description={errorMessage}
+        actionLabel="Back to Orders"
+        actionHref="/buyers-dashboard/orders"
+        size="lg"
+      />
+    );
   }
 
   if (!order) {
@@ -140,6 +100,34 @@ export default function OrderDetailsPage() {
 
   const StatusIcon = statusIcons[order.status];
   const statusColor = STATUS_COLORS[order.status] || "bg-gray-100 text-gray-800";
+  const payoutOptions = [
+    "30 seconds",
+    "5 minutes",
+    "30 minutes",
+    "1 hour",
+    "6 hours",
+    "12 hours",
+    "24 hours",
+  ];
+
+  const handleConfirmDelivery = async () => {
+    if (!order) return;
+    setConfirmingDelivery(true);
+    try {
+      await apiFetch(`/buyers/orders/${order.id}/confirm-delivery`, {
+        method: "PATCH",
+        body: JSON.stringify({ payoutDelay: selectedPayoutWindow }),
+      });
+      setDeliveryConfirmed(true);
+      toast.success("Delivery confirmed. Payout countdown started.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to confirm delivery";
+      toast.error(message);
+    } finally {
+      setConfirmingDelivery(false);
+      setPayoutDropdownOpen(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -190,9 +178,12 @@ export default function OrderDetailsPage() {
                       <Package size={24} />
                     </div>
                     <div>
-                      <p className="font-roboto-slab font-semibold text-gray-900">{item.fishType}</p>
+                      <p className="font-roboto-slab font-semibold text-gray-900">
+                        {item.fishType}
+                        {item.variant ? ` • ${item.variant}` : ""}
+                      </p>
                       <p className="font-roboto-slab text-sm text-gray-500">
-                        {item.weightKg}kg Pack × {item.quantity}
+                        {item.weightKg}kg Pack × {item.quantity} {item.processed ? "• Processed" : "• Unprocessed"}
                       </p>
                     </div>
                   </div>
@@ -215,7 +206,9 @@ export default function OrderDetailsPage() {
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Delivery Fee</span>
-                <span>Calculated at checkout</span>
+                <span>
+                  {order.deliveryFee ? `₦${order.deliveryFee.toLocaleString()}` : "Calculated at checkout"}
+                </span>
               </div>
               <div className="flex justify-between pt-3 border-t border-gray-100">
                 <span className="font-ubuntu font-bold text-gray-900">Total</span>
@@ -277,6 +270,86 @@ export default function OrderDetailsPage() {
 
             </div>
           </motion.div>
+
+          {/* Delivery Confirmation */}
+          {order.status === "delivered" && (
+            <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <h2 className="font-ubuntu text-xl font-bold text-gray-900">Confirm Delivery</h2>
+                  <p className="font-roboto-slab text-sm text-gray-500">
+                    Confirm you received your delivery in good condition to start the 24-hour payout window.
+                  </p>
+                </div>
+
+                {!deliveryConfirmed ? (
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <button
+                      onClick={() => setPayoutDropdownOpen((prev) => !prev)}
+                      className="flex flex-1 items-center justify-center rounded-full border border-green-600 px-6 py-3 font-roboto-slab text-sm font-semibold text-green-700 transition hover:bg-green-50"
+                    >
+                      Yes, received in good condition
+                    </button>
+                    <button
+                      onClick={() => toast.info("We’ve noted your issue and will follow up.")}
+                      className="flex flex-1 items-center justify-center rounded-full border border-gray-200 px-6 py-3 font-roboto-slab text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                    >
+                      Report an Issue
+                    </button>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700">
+                    Delivery confirmed. Payout countdown started for {selectedPayoutWindow}.
+                  </div>
+                )}
+
+                <AnimatePresence>
+                  {payoutDropdownOpen && !deliveryConfirmed && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+                    >
+                      <p className="mb-3 text-sm text-gray-600">
+                        Select payout countdown window (max 24 hours):
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                        {payoutOptions.map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => setSelectedPayoutWindow(option)}
+                            className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+                              selectedPayoutWindow === option
+                                ? "bg-green-600 text-white"
+                                : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                        <button
+                          onClick={handleConfirmDelivery}
+                          disabled={confirmingDelivery}
+                          className="flex flex-1 items-center justify-center rounded-full bg-green-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {confirmingDelivery ? "Confirming..." : "Start Payout Countdown"}
+                        </button>
+                        <button
+                          onClick={() => setPayoutDropdownOpen(false)}
+                          className="flex flex-1 items-center justify-center rounded-full border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Sidebar Info */}

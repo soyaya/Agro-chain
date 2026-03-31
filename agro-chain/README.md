@@ -1,5 +1,14 @@
 # Agro-chain
 
+## Environment Setup
+
+Create a `.env.local` file based on `.env.example` and set the backend base URL:
+
+```bash
+NEXT_PUBLIC_BASE_BACKEND_URL=https://your-backend.example.com
+```
+
+This value is used by the frontend to call production APIs via `src/lib/api.ts`.
 
 ## File Structure
 

@@ -8,95 +8,27 @@ import { Store, ShoppingBag } from "lucide-react";
 import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import { MarketplaceFilters } from "~/components/marketplace/MarketplaceFilters";
 import type { MarketplaceListing, MarketplaceFilters as Filters } from "~/types";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, BASE_PRICE_PER_KG_NAIRA } from "~/types/constants";
+import { apiFetch } from "~/lib/api";
+import { useCart } from "~/components/marketplace/useCart";
+import { CartDrawer } from "~/components/marketplace/CartDrawer";
 
-// Mock data - replace with actual API call
-const mockListings: MarketplaceListing[] = [
-  {
-    id: "1",
-    clusterFarmerId: "cluster-1",
-    clusterFarmerName: "Green Valley Farms",
-    businessName: "Green Valley Fish Supply",
-    fishType: "Catfish",
-    harvestDate: new Date("2024-03-15"),
-    totalAvailableKg: 2000,
-    packaging: [
-      { weightKg: 1, quantity: 1000, pricePerUnit: 1500 },
-      { weightKg: 5, quantity: 200, pricePerUnit: 7000 },
-    ],
-    location: "Kaduna North, Kaduna",
-    state: "Kaduna",
-    localGovernment: "Kaduna North",
-    pricePerKg: 1500,
-    deliveryOptions: ["Pickup from warehouse", "Delivery within state"],
-    visibleOnMarketplace: true,
-    status: "approved",
-    clusterFarmerContact: "08012345678",
-    warehouseLocation: "123 Farm Road, Kaduna",
-    logisticsAvailable: true,
-    createdAt: new Date("2024-03-10"),
-    updatedAt: new Date("2024-03-10"),
-  },
-  {
-    id: "2",
-    clusterFarmerId: "cluster-2",
-    clusterFarmerName: "Blue Ocean Fisheries",
-    businessName: "Blue Ocean Fish Market",
-    fishType: "Tilapia",
-    harvestDate: new Date("2024-03-12"),
-    totalAvailableKg: 1500,
-    packaging: [
-      { weightKg: 2, quantity: 750, pricePerUnit: 2800 },
-      { weightKg: 10, quantity: 150, pricePerUnit: 13500 },
-    ],
-    location: "Lagos Island, Lagos",
-    state: "Lagos",
-    localGovernment: "Lagos Island",
-    pricePerKg: 1400,
-    deliveryOptions: ["Pickup from warehouse", "Delivery nationwide"],
-    visibleOnMarketplace: true,
-    status: "approved",
-    clusterFarmerContact: "08098765432",
-    warehouseLocation: "45 Market Street, Lagos",
-    logisticsAvailable: true,
-    createdAt: new Date("2024-03-08"),
-    updatedAt: new Date("2024-03-08"),
-  },
-  {
-    id: "3",
-    clusterFarmerId: "cluster-1",
-    clusterFarmerName: "Green Valley Farms",
-    businessName: "Green Valley Fish Supply",
-    fishType: "Mackerel",
-    harvestDate: new Date("2024-03-18"),
-    totalAvailableKg: 3000,
-    packaging: [
-      { weightKg: 3, quantity: 1000, pricePerUnit: 4200 },
-      { weightKg: 5, quantity: 600, pricePerUnit: 6800 },
-    ],
-    location: "Kaduna North, Kaduna",
-    state: "Kaduna",
-    localGovernment: "Kaduna North",
-    pricePerKg: 1400,
-    deliveryOptions: ["Pickup from warehouse", "Delivery within state", "Express delivery"],
-    visibleOnMarketplace: true,
-    status: "approved",
-    clusterFarmerContact: "08012345678",
-    warehouseLocation: "123 Farm Road, Kaduna",
-    logisticsAvailable: true,
-    createdAt: new Date("2024-03-11"),
-    updatedAt: new Date("2024-03-11"),
-  },
-];
+type MarketplaceResponse =
+  | MarketplaceListing[]
+  | { listings?: MarketplaceListing[]; data?: MarketplaceListing[] };
 
 export default function MarketplacePage() {
   const router = useRouter();
-  const [listings, setListings] = useState<MarketplaceListing[]>(mockListings);
+  const [listings, setListings] = useState<MarketplaceListing[]>([]);
   const [filters, setFilters] = useState<Filters>({
     sortBy: "date",
     sortOrder: "desc",
   });
   const [likedListings, setLikedListings] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const cart = useCart();
   
   useEffect(() => {
     const saved = localStorage.getItem("liked_listings");
@@ -105,6 +37,49 @@ export default function MarketplacePage() {
         setLikedListings(JSON.parse(saved));
       } catch (e) {}
     }
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadListings = async () => {
+      setLoading(true);
+      setErrorMessage(null);
+      try {
+        const response = await apiFetch<MarketplaceResponse>("/marketplace");
+        const payload = Array.isArray(response)
+          ? response
+          : response.listings ?? response.data ?? [];
+
+        const normalized = payload.map((listing) => ({
+          ...listing,
+          pricePerKg: listing.pricePerKg ?? BASE_PRICE_PER_KG_NAIRA,
+          packaging: listing.packaging?.map((pkg) => ({
+            ...pkg,
+            pricePerUnit: pkg.pricePerUnit ?? pkg.weightKg * BASE_PRICE_PER_KG_NAIRA,
+          })),
+        }));
+
+        if (mounted) {
+          setListings(normalized);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to load listings";
+        if (mounted) {
+          setErrorMessage(message);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadListings();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleToggleLike = (listing: MarketplaceListing) => {
@@ -120,8 +95,13 @@ export default function MarketplacePage() {
   };
 
   const handleAddToCart = (listing: MarketplaceListing) => {
-    toast.success(`${listing.fishType} added to cart!`);
-    // TODO: Implement cart functionality
+    const defaultPkg = listing.packaging?.[0];
+    if (!defaultPkg) {
+      toast.error("No packages available for this listing");
+      return;
+    }
+    cart.addToCart(listing, defaultPkg, { variant: "Table Size", processed: false });
+    setCartOpen(true);
   };
 
   const handleResetFilters = () => {
@@ -189,6 +169,21 @@ export default function MarketplacePage() {
                   Browse fresh fish supplies from verified cluster farmers
                 </p>
               </div>
+              <div className="ml-auto">
+                <button
+                  onClick={() => setCartOpen(true)}
+                  className="relative flex items-center gap-2 rounded-full border border-(--border-gray) bg-(--white) px-4 py-2 text-sm font-medium text-(--heading-colour) shadow-sm transition hover:bg-(--gray-bg)"
+                  aria-label="Open cart"
+                >
+                  <ShoppingBag size={18} />
+                  Cart
+                  {cart.totalItems > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-(--theme-green-dark) text-xs font-semibold text-white">
+                      {cart.totalItems}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           </motion.div>
 
@@ -240,7 +235,29 @@ export default function MarketplacePage() {
 
             {/* Listings Grid */}
             <div className="lg:col-span-3">
-              {sortedListings.length > 0 ? (
+              {loading ? (
+                <motion.div
+                  variants={FADE_IN_VARIANT}
+                  className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+                >
+                  <ShoppingBag size={48} className="text-(--text-colour)" />
+                  <p className="text-(--text-colour)">Loading marketplace listings...</p>
+                </motion.div>
+              ) : errorMessage ? (
+                <motion.div
+                  variants={FADE_IN_VARIANT}
+                  className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+                >
+                  <ShoppingBag size={48} className="text-(--text-colour)" />
+                  <p className="text-(--error-red)">{errorMessage}</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="rounded-full border border-(--border-gray) px-(--space-xl) py-(--space-md) text-(--heading-colour) transition hover:bg-(--gray-bg)"
+                  >
+                    Retry
+                  </button>
+                </motion.div>
+              ) : sortedListings.length > 0 ? (
                 <motion.div
                   variants={STAGGER_CONTAINER_VARIANT}
                   className="grid grid-cols-1 gap-(--gap-lg) md:grid-cols-2 xl:grid-cols-3"
@@ -282,6 +299,13 @@ export default function MarketplacePage() {
           </div>
         </motion.div>
       </div>
+      <CartDrawer
+        isOpen={cartOpen}
+        items={cart.items}
+        subtotal={cart.subtotal}
+        onClose={() => setCartOpen(false)}
+        onUpdateQuantity={cart.updateQuantity}
+      />
     </div>
   );
 }

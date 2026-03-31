@@ -30,6 +30,8 @@ const mockFarmerProfile: FarmerProfile = {
   updatedAt: new Date(),
 };
 
+// === 
+
 type ClusterFarmerDocuments = {
   bvnVerification: File | null;
   proofOfAddress: File | null;
@@ -42,7 +44,7 @@ export default function FarmerProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<FarmerProfile>(mockFarmerProfile);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Editable form state
   const [formData, setFormData] = useState({
     fullName: profile.fullName,
@@ -56,10 +58,10 @@ export default function FarmerProfilePage() {
     farmingCapacityKg: profile.farmingCapacityKg,
     yearsOfExperience: profile.yearsOfExperience,
   });
-  
+
   const [profileImage, setProfileImage] = useState<File | undefined>();
   const [imagePreview, setImagePreview] = useState<string | undefined>(profile.profileImage);
-  
+
   // Cluster farmer application state
   const [showClusterApplication, setShowClusterApplication] = useState(false);
   const [isClusterInterested, setIsClusterInterested] = useState(false);
@@ -70,7 +72,7 @@ export default function FarmerProfilePage() {
     distributionCapacity: 0,
     logisticsAvailable: false,
   });
-  
+
   const [clusterDocuments, setClusterDocuments] = useState<ClusterFarmerDocuments>({
     bvnVerification: null,
     proofOfAddress: null,
@@ -78,7 +80,7 @@ export default function FarmerProfilePage() {
     businessLicense: null,
     taxClearance: null,
   });
-  
+
   const [openUploadFields, setOpenUploadFields] = useState<Record<string, boolean>>({});
 
   const handleImageChange = (file: File) => {
@@ -93,18 +95,18 @@ export default function FarmerProfilePage() {
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       // TODO: Replace with actual API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      
+
       const updatedProfile: FarmerProfile = {
         ...profile,
         ...formData,
         profileImage: imagePreview,
         updatedAt: new Date(),
       };
-      
+
       setProfile(updatedProfile);
       setIsEditing(false);
       toast.success("Profile updated successfully!");
@@ -118,26 +120,26 @@ export default function FarmerProfilePage() {
   const handleClusterApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       // Validate all required documents are uploaded
       const requiredDocs = ['bvnVerification', 'proofOfAddress', 'cacRegistration', 'businessLicense'] as const;
       const missingDocs = requiredDocs.filter(doc => !clusterDocuments[doc]);
-      
+
       if (missingDocs.length > 0) {
         toast.error("Please upload all required documents");
         setIsLoading(false);
         return;
       }
-      
+
       // TODO: Replace with actual API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      
+
       console.log("Cluster farmer application submitted:", {
         ...clusterFormData,
         documents: clusterDocuments,
       });
-      
+
       toast.success("Cluster farmer application submitted successfully! We'll review it shortly.");
       setShowClusterApplication(false);
       setIsClusterInterested(false);
@@ -460,7 +462,7 @@ export default function FarmerProfilePage() {
           <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
             Become a Cluster Farmer
           </h2>
-          
+
           <div className="flex items-start gap-(--space-md) mb-(--space-lg)">
             <input
               type="checkbox"
@@ -597,7 +599,7 @@ export default function FarmerProfilePage() {
                         onFileChange={(file) => setClusterDocuments({ ...clusterDocuments, bvnVerification: file })}
                         onUploadComplete={(file) => setClusterDocuments({ ...clusterDocuments, bvnVerification: file })}
                       />
-                      
+
                       <FileUploadField
                         label="Proof of Address"
                         accept=".pdf,.jpg,.jpeg,.png"
@@ -608,7 +610,7 @@ export default function FarmerProfilePage() {
                         onFileChange={(file) => setClusterDocuments({ ...clusterDocuments, proofOfAddress: file })}
                         onUploadComplete={(file) => setClusterDocuments({ ...clusterDocuments, proofOfAddress: file })}
                       />
-                      
+
                       <FileUploadField
                         label="CAC Registration Certificate"
                         accept=".pdf,.jpg,.jpeg,.png"
@@ -619,7 +621,7 @@ export default function FarmerProfilePage() {
                         onFileChange={(file) => setClusterDocuments({ ...clusterDocuments, cacRegistration: file })}
                         onUploadComplete={(file) => setClusterDocuments({ ...clusterDocuments, cacRegistration: file })}
                       />
-                      
+
                       <FileUploadField
                         label="Business License"
                         accept=".pdf,.jpg,.jpeg,.png"
@@ -630,7 +632,7 @@ export default function FarmerProfilePage() {
                         onFileChange={(file) => setClusterDocuments({ ...clusterDocuments, businessLicense: file })}
                         onUploadComplete={(file) => setClusterDocuments({ ...clusterDocuments, businessLicense: file })}
                       />
-                      
+
                       <FileUploadField
                         label="Tax Clearance Certificate (Optional)"
                         accept=".pdf,.jpg,.jpeg,.png"

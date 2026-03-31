@@ -15,6 +15,8 @@ export type ListingStatus = "pending" | "approved" | "rejected";
 
 export type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
 
+export type DeliveryType = "pickup" | "delivery";
+
 // ============================================
 // NAVIGATION & UI
 // ============================================
@@ -442,6 +444,8 @@ export interface MarketplaceListing extends ClusterFarmerListing {
 export interface OrderItem {
   listingId: string;
   fishType: string;
+  variant?: string;
+  processed?: boolean;
   weightKg: number;
   quantity: number;
   pricePerUnit: number;
@@ -457,9 +461,13 @@ export interface Order {
   clusterFarmerName: string;
   items: OrderItem[];
   totalAmount: number;
+  deliveryFee?: number;
+  deliveryType?: DeliveryType;
   deliveryAddress: string;
   deliveryOption: string;
   status: OrderStatus;
+  deliveryConfirmed?: boolean;
+  buyerConfirmedAt?: Date;
   paymentStatus: "pending" | "paid" | "failed";
   paymentMethod?: string;
   notes?: string;

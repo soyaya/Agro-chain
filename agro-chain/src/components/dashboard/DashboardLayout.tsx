@@ -16,7 +16,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, config }: DashboardLayoutProps) {
   const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -59,14 +59,14 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
         />
       </div>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Backdrop */}
       <AnimatePresence>
-        {sidebarOpen && (
+        {isSidebarOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSidebarOpen(false)}
+            onClick={() => setIsSidebarOpen(false)}
             className="fixed inset-0 cursor-pointer z-40 bg-(--black)/50 backdrop-blur-sm lg:hidden"
             aria-hidden="true"
           />
@@ -79,11 +79,11 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
           <motion.aside
             initial={false}
             animate={{
-              x: sidebarOpen ? 0 : "-100%",
+              x: isSidebarOpen ? 0 : "-100%",
             }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className={cn(
-              "fixed top-0 left-0 z-50 flex h-full min-h-screen w-full max-w-70 flex-col border-r border-gray-200/50 bg-(--white)/85 shadow-xl backdrop-blur-xl lg:sticky lg:shadow-none",
+              "fixed top-0 left-0 z-50 flex h-full min-h-screen w-full max-w-70 flex-col border-r border-gray-200/50 bg-(--white)/95 shadow-xl backdrop-blur-sm lg:sticky lg:shadow-none",
               "lg:translate-x-70",
             )}
           >
@@ -97,7 +97,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                 AgroChain
               </Link>
               <button
-                onClick={() => setSidebarOpen(false)}
+                onClick={() => setIsSidebarOpen(false)}
                 className="rounded-lg p-2 transition-colors hover:bg-gray-100 lg:hidden"
                 aria-label="Close sidebar"
               >
@@ -106,10 +106,10 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
             </div>
 
             {/* Dashboard Title */}
-            <div className="border-b border-gray-200/50 bg-linear-to-br from-green-50/50 to-transparent px-6 py-5">
+            {/* <div className="border-b border-gray-200/50 bg-linear-to-br from-green-50/50 to-transparent px-6 py-5">
               <h2 className="font-ubuntu text-lg font-bold text-gray-900">{config.title}</h2>
               <p className="font-roboto-slab mt-1 text-sm text-gray-600">{config.description}</p>
-            </div>
+            </div> */}
 
             {/* Navigation Links */}
             <nav
@@ -129,7 +129,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        onClick={() => setSidebarOpen(false)}
+                        onClick={() => setIsSidebarOpen(false)}
                         className={cn(
                           "font-roboto-slab group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
                           isParentActive
@@ -148,7 +148,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                         <Icon
                           size={20}
                           className={cn(
-                            "relative z-10",
+                            "relative z-10 group-hover:scale-105 transition-all ease-in-out duration-300",
                             isParentActive ? "text-white" : "text-gray-500 group-hover:text-gray-700",
                           )}
                         />
@@ -167,7 +167,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                               <li key={subLink.href}>
                                 <Link
                                   href={subLink.href}
-                                  onClick={() => setSidebarOpen(false)}
+                                  onClick={() => setIsSidebarOpen(false)}
                                   className={cn(
                                     "font-roboto-slab group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
                                     isSubActive
@@ -202,7 +202,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                 className={cn(
                   "font-roboto-slab flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
                   "text-(--error-red) hover:bg-red-50 hover:text-red-700",
-                  "focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none",
+                  "focus:ring-1 focus:ring-red-500 focus:ring-offset-2 focus:outline-none",
                 )}
                 aria-label="Logout"
               >
@@ -219,8 +219,8 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
               <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-(--space-base) py-(--space-sm)">
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => setSidebarOpen(true)}
-                    className="rounded-lg p-2 transition-colors hover:bg-gray-100 lg:hidden"
+                    onClick={() => setIsSidebarOpen(true)}
+                    className="rounded-lg p-2 cursor-pointer transition-colors hover:bg-gray-100 lg:hidden"
                     aria-label="Open sidebar"
                   >
                     <Menu size={24} className="text-gray-700" />

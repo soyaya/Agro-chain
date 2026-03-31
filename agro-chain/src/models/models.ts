@@ -125,6 +125,7 @@ export const clusterFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "Dashboard", href: "/cluster-dashboard", icon: LayoutDashboard },
     { label: "Profile", href: "/cluster-dashboard/profile", icon: User },
     { label: "Pending Approvals", href: "/cluster-dashboard/pending-approvals", icon: Clock },
+    { label: "Orders", href: "/cluster-dashboard/orders", icon: Package },
     { label: "My Listings", href: "/cluster-dashboard/listings", icon: FileText },
     { label: "Farmers", href: "/cluster-dashboard/farmers", icon: UsersIcon },
   ],
@@ -215,6 +216,7 @@ export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "Dashboard", href: "/cluster-dashboard", icon: LayoutDashboard },
     { label: "Profile", href: "/cluster-dashboard/profile", icon: User },
     { label: "Pending Approvals", href: "/cluster-dashboard/pending-approvals", icon: Clock },
+    { label: "Orders", href: "/cluster-dashboard/orders", icon: Package },
     { label: "My Listings", href: "/cluster-dashboard/listings", icon: FileText },
     { label: "Farmers", href: "/cluster-dashboard/farmers", icon: UsersIcon },
     // Financial Services Navigation

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -17,105 +17,85 @@ import {
   Minus,
 } from "lucide-react";
 import type { MarketplaceListing, PackagingOption } from "~/types";
-import { FADE_IN_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, SLIDE_UP_VARIANT, BASE_PRICE_PER_KG_NAIRA, FISH_VARIANTS } from "~/types/constants";
+import { apiFetch } from "~/lib/api";
+import { useCart } from "~/components/marketplace/useCart";
 
-// Mock data - replace with actual API call
-const mockListing: MarketplaceListing = {
-  id: "1",
-  clusterFarmerId: "cluster-1",
-  clusterFarmerName: "Green Valley Farms",
-  businessName: "Green Valley Fish Supply",
-  fishType: "Catfish",
-  harvestDate: new Date("2024-03-15"),
-  totalAvailableKg: 2000,
-  packaging: [
-    { weightKg: 1, quantity: 1000, pricePerUnit: 1500 },
-    { weightKg: 5, quantity: 200, pricePerUnit: 7000 },
-    { weightKg: 10, quantity: 100, pricePerUnit: 13500 },
-  ],
-  location: "Kaduna North, Kaduna",
-  state: "Kaduna",
-  localGovernment: "Kaduna North",
-  pricePerKg: 1500,
-  deliveryOptions: ["Pickup from warehouse", "Delivery within state", "Express delivery"],
-  visibleOnMarketplace: true,
-  status: "approved",
-  clusterFarmerContact: "08012345678",
-  warehouseLocation: "123 Farm Road, Kaduna",
-  logisticsAvailable: true,
-  createdAt: new Date("2024-03-10"),
-  updatedAt: new Date("2024-03-10"),
-};
-
-interface CartItem {
-  packaging: PackagingOption;
-  quantity: number;
-}
+type MarketplaceDetailResponse =
+  | MarketplaceListing
+  | { listing?: MarketplaceListing; data?: MarketplaceListing };
 
 export default function ListingDetailPage() {
   const router = useRouter();
-  const [listing] = useState<MarketplaceListing>(mockListing);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [selectedDelivery, setSelectedDelivery] = useState<string>(listing.deliveryOptions[0]);
+  const params = useParams();
+  const listingId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const [listing, setListing] = useState<MarketplaceListing | null>(null);
+  const [selectedDelivery, setSelectedDelivery] = useState<string>("");
+  const [selectedVariant, setSelectedVariant] = useState(FISH_VARIANTS[0]);
+  const [processed, setProcessed] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const cart = useCart();
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadListing = async () => {
+      setLoading(true);
+      setErrorMessage(null);
+      try {
+        const response = await apiFetch<MarketplaceDetailResponse>(`/marketplace/${listingId}`);
+        const payload =
+          "id" in (response as MarketplaceListing)
+            ? (response as MarketplaceListing)
+            : response.listing ?? response.data ?? null;
+
+        if (payload && mounted) {
+          setListing({
+            ...payload,
+            pricePerKg: payload.pricePerKg ?? BASE_PRICE_PER_KG_NAIRA,
+            packaging: payload.packaging?.map((pkg) => ({
+              ...pkg,
+              pricePerUnit: pkg.pricePerUnit ?? pkg.weightKg * BASE_PRICE_PER_KG_NAIRA,
+            })),
+          });
+          setSelectedDelivery(payload.deliveryOptions?.[0] ?? "");
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to load listing";
+        if (mounted) {
+          setErrorMessage(message);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    if (listingId) {
+      loadListing();
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [listingId]);
 
   const addToCart = (pkg: PackagingOption) => {
-    const existingItem = cart.find((item) => item.packaging.weightKg === pkg.weightKg);
-
-    if (existingItem) {
-      if (existingItem.quantity >= pkg.quantity) {
-        toast.error("Maximum quantity reached for this package");
-        return;
-      }
-      setCart(
-        cart.map((item) =>
-          item.packaging.weightKg === pkg.weightKg
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        ),
-      );
-    } else {
-      setCart([...cart, { packaging: pkg, quantity: 1 }]);
-    }
-    toast.success("Added to cart");
+    if (!listing) return;
+    cart.addToCart(listing, pkg, { variant: selectedVariant, processed });
   };
 
-  const updateQuantity = (pkg: PackagingOption, delta: number) => {
-    const existingItem = cart.find((item) => item.packaging.weightKg === pkg.weightKg);
-    if (!existingItem) return;
-
-    const newQuantity = existingItem.quantity + delta;
-
-    if (newQuantity <= 0) {
-      setCart(cart.filter((item) => item.packaging.weightKg !== pkg.weightKg));
-      return;
-    }
-
-    if (newQuantity > pkg.quantity) {
-      toast.error("Maximum quantity reached");
-      return;
-    }
-
-    setCart(
-      cart.map((item) =>
-        item.packaging.weightKg === pkg.weightKg ? { ...item, quantity: newQuantity } : item,
-      ),
-    );
-  };
-
-  const totalAmount = cart.reduce(
-    (sum, item) => sum + item.packaging.pricePerUnit * item.quantity,
-    0,
-  );
-
-  const totalWeight = cart.reduce((sum, item) => sum + item.packaging.weightKg * item.quantity, 0);
+  const totalAmount = cart.subtotal;
+  const totalWeight = cart.items.reduce((sum, item) => sum + item.weightKg * item.quantity, 0);
 
   const handleCheckout = () => {
-    if (cart.length === 0) {
+    if (cart.items.length === 0) {
       toast.error("Please add items to cart");
       return;
     }
-    toast.success("Proceeding to checkout...");
-    // TODO: Navigate to checkout page
+    router.push("/marketplace/checkout");
   };
 
   const formatDate = (date: Date) => {
@@ -125,6 +105,22 @@ export default function ListingDetailPage() {
       day: "numeric",
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-(--gray-bg) flex items-center justify-center">
+        <p className="text-(--text-colour)">Loading listing...</p>
+      </div>
+    );
+  }
+
+  if (errorMessage || !listing) {
+    return (
+      <div className="min-h-screen bg-(--gray-bg) flex items-center justify-center">
+        <p className="text-(--error-red)">{errorMessage ?? "Listing not found"}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-(--gray-bg)">
@@ -223,10 +219,65 @@ export default function ListingDetailPage() {
                     Available Packages
                   </h3>
                   <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
+                    <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) p-(--space-md)">
+                      <span className="text-sm font-medium text-(--heading-colour)">
+                        Choose Fish Type
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {FISH_VARIANTS.map((variant) => (
+                          <button
+                            key={variant}
+                            onClick={() => setSelectedVariant(variant)}
+                            className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
+                              selectedVariant === variant
+                                ? "bg-(--theme-green-dark) text-white"
+                                : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
+                            }`}
+                          >
+                            {variant}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) p-(--space-md)">
+                      <span className="text-sm font-medium text-(--heading-colour)">
+                        Processing Preference
+                      </span>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setProcessed(false)}
+                          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition ${
+                            !processed
+                              ? "bg-(--theme-green-dark) text-white"
+                              : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
+                          }`}
+                        >
+                          Unprocessed
+                        </button>
+                        <button
+                          onClick={() => setProcessed(true)}
+                          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition ${
+                            processed
+                              ? "bg-(--theme-green-dark) text-white"
+                              : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
+                          }`}
+                        >
+                          Processed
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
                     {listing.packaging.map((pkg, index) => {
-                      const cartItem = cart.find(
-                        (item) => item.packaging.weightKg === pkg.weightKg,
+                      const cartItemIndex = cart.items.findIndex(
+                        (item) =>
+                          item.weightKg === pkg.weightKg &&
+                          item.variant === selectedVariant &&
+                          item.processed === processed,
                       );
+                      const cartItem = cartItemIndex >= 0 ? cart.items[cartItemIndex] : null;
 
                       return (
                         <div
@@ -248,7 +299,7 @@ export default function ListingDetailPage() {
                           {cartItem ? (
                             <div className="flex items-center justify-between rounded-full border border-(--border-gray) p-1">
                               <button
-                                onClick={() => updateQuantity(pkg, -1)}
+                                onClick={() => cart.updateQuantity(cartItemIndex, cartItem.quantity - 1)}
                                 className="flex h-8 w-8 items-center justify-center rounded-full bg-(--gray-bg) transition hover:bg-(--border-gray)"
                               >
                                 <Minus size={16} />
@@ -257,7 +308,7 @@ export default function ListingDetailPage() {
                                 {cartItem.quantity}
                               </span>
                               <button
-                                onClick={() => updateQuantity(pkg, 1)}
+                                onClick={() => cart.updateQuantity(cartItemIndex, cartItem.quantity + 1)}
                                 className="flex h-8 w-8 items-center justify-center rounded-full bg-(--gray-bg) transition hover:bg-(--border-gray)"
                               >
                                 <Plus size={16} />
@@ -284,7 +335,7 @@ export default function ListingDetailPage() {
                     Delivery Options
                   </h3>
                   <div className="flex flex-col gap-(--space-md)">
-                    {listing.deliveryOptions.map((option, index) => (
+                    {(listing.deliveryOptions ?? []).map((option, index) => (
                       <label
                         key={index}
                         className="flex items-center gap-(--gap-base) rounded-2xl border border-(--border-gray) p-(--space-lg) transition hover:bg-(--gray-bg)"
@@ -318,16 +369,16 @@ export default function ListingDetailPage() {
                   Order Summary
                 </h3>
 
-                {cart.length > 0 ? (
+                {cart.items.length > 0 ? (
                   <>
                     <div className="flex flex-col gap-(--space-md)">
-                      {cart.map((item, index) => (
+                      {cart.items.map((item, index) => (
                         <div key={index} className="flex justify-between text-sm">
                           <span className="text-(--text-colour)">
-                            {item.packaging.weightKg}kg × {item.quantity}
+                            {item.weightKg}kg × {item.quantity} ({item.variant})
                           </span>
                           <span className="font-medium text-(--heading-colour)">
-                            ₦{(item.packaging.pricePerUnit * item.quantity).toLocaleString()}
+                            ₦{(item.pricePerUnit * item.quantity).toLocaleString()}
                           </span>
                         </div>
                       ))}

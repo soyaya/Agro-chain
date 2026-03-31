@@ -10,33 +10,34 @@ import { motion } from "framer-motion";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "~/components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "~/components/ui/input-otp";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
 
 //=== Step 1 Schema
-const phoneSchema = z.object({
-  phone: z
-    .string()
-    .regex(
-      /^(0|\+234)[789][01]\d{8}$/,
-      "Please enter a valid Nigerian phone number (e.g. 08012345678 or +2348012345678)",
-    ),
-});
+// const phoneSchema = z.object({
+//   phone: z
+//     .string()
+//     .regex(
+//       /^(0|\+234)[789][01]\d{8}$/,
+//       "Please enter a valid Nigerian phone number (e.g. 08012345678 or +2348012345678)",
+//     ),
+// });
 
-type PhoneForm = z.infer<typeof phoneSchema>;
+// type PhoneForm = z.infer<typeof phoneSchema>;
+const emailSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+type EmailForm = z.infer<typeof emailSchema>;
 
 //=== Main Component
 export default function LoginPage() {
   const router = useRouter();
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [otp, setOtp] = useState<string>("");
+  const [emailAddress, setEmailAddress] = useState<string>("");
+  const [loginOtp, setLoginOtp] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -53,28 +54,39 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<PhoneForm>({
-    resolver: zodResolver(phoneSchema),
+  } = useForm<EmailForm>({
+    resolver: zodResolver(emailSchema),
     mode: "onChange",
-    defaultValues: { phone: "" },
+    defaultValues: { email: "" },
   });
 
   // === Step 1: Send OTP
-  const onSendOtp = async (data: PhoneForm) => {
+  const onSendOtp = async (data: EmailForm) => {
     setLoading(true);
     setError(null);
 
     try {
-      // TODO: Real API call → /api/auth/send-otp
-      console.log("Sending OTP to:", data.phone);
-      await new Promise((r) => setTimeout(r, 1400)); // simulate network
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emailAddress: data.email, password: data.password }),
+      });
 
-      toast.success(`OTP sent to ${data.phone}`);
-      setPhoneNumber(data.phone);
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || "Login failed");
+      }
+
+      toast.success(`OTP sent to ${data.email}`);
+      setEmailAddress(data.email);
       setStep(2);
+      setResendAttempts(0);
+      setResendLocked(false);
+      setCooldownSeconds(60);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to send OTP. Please try again.");
+      const msg = err instanceof Error ? err.message : "Failed to send OTP. Please try again.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -90,31 +102,38 @@ export default function LoginPage() {
     setStatusModal({ open: true, variant: "loading" });
 
     try {
-      console.log(`Verifying OTP: ${otp} for phone: ${phoneNumber}`);
+      console.log(`Verifying OTP: ${loginOtp} for phone: ${emailAddress}`);
       await new Promise((r) => setTimeout(r, 1600));
 
-      const response = await fetch("/api/auth/verify-otp", {
+      const response = await fetch("/api/auth/login/otp", {
         method: "POST",
-        body: JSON.stringify({ phone: phoneNumber, otp }),
+        body: JSON.stringify({ emailAddress, loginOtp: Number(loginOtp) }),
         headers: { "Content-Type": "application/json" },
       });
 
       const data = await response.json();
 
-      const roleFromBackend = data.role as "Farmer" | "Buyer" | "Cluster Farmer";
+      const roleFromBackend = data.role as "Farmer" | "Buyer" | "Cluster Farmer" | "Farmer & Cluster";
+      const token = data.token || data.accessToken || data.bearerToken;
+      if (token) {
+        sessionStorage.setItem("auth_token", token);
+      }
 
       setSuccess(true);
       setStatusModal({ open: true, variant: "success" });
 
       localStorage.setItem(
         "currentUser",
-        JSON.stringify({ phone: phoneNumber, role: roleFromBackend }),
+        JSON.stringify({ phone: emailAddress, role: roleFromBackend }),
       );
 
       toast.success("Login successful!");
 
-      const isCluster = data.isClusterFarmer === true || roleFromBackend === "Cluster Farmer" || data.role === "Farmer & Cluster";
-      
+      const isCluster =
+        data.isClusterFarmer === true ||
+        roleFromBackend === "Cluster Farmer" ||
+        data.role === "Farmer & Cluster";
+
       let dashboardPath = "/buyer-dashboard";
       if (isCluster) {
         dashboardPath = "/cluster-dashboard";
@@ -123,7 +142,7 @@ export default function LoginPage() {
       } else {
         dashboardPath = "/buyers-dashboard";
       }
-      
+
       console.log("Role from backend:", roleFromBackend, "isCluster:", isCluster);
 
       setTimeout(() => {
@@ -142,16 +161,67 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  }, [loading, success, otp, phoneNumber, router]);
+  }, [loading, success, loginOtp, emailAddress, router]);
 
-  //===Auto-submit OTP when 6 digits entered
+  //===Auto-submit loginOTP when 6 digits entered
   useEffect(() => {
-    if (step === 2 && otp.length === 4 && !loading && !success) {
+    if (step === 2 && loginOtp.length === 6 && !loading && !success) {
       void handleVerify();
     }
-  }, [otp, step, loading, success, handleVerify]);
+  }, [loginOtp, step, loading, success, handleVerify]);
 
   const hasOtpError = !!error;
+
+  useEffect(() => {
+    if (step !== 2 || resendLocked) return;
+    if (cooldownSeconds <= 0) return;
+
+    const timer = setInterval(() => {
+      setCooldownSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [step, cooldownSeconds, resendLocked]);
+
+  const handleResendOtp = async () => {
+    if (loading || resendLocked || cooldownSeconds > 0) return;
+    if (resendAttempts >= 2) {
+      setResendLocked(true);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch("/api/auth/login/otp/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emailAddress }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to resend OTP");
+      }
+
+      const nextAttempts = resendAttempts + 1;
+      const attemptsLeft = 2 - nextAttempts;
+      setResendAttempts(nextAttempts);
+      setCooldownSeconds(60);
+      if (nextAttempts >= 2) {
+        setResendLocked(true);
+      }
+      toast.success(
+        attemptsLeft >= 0
+          ? `OTP resent. ${attemptsLeft} resend${attemptsLeft === 1 ? "" : "s"} left.`
+          : "OTP resent.",
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to resend OTP";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -183,23 +253,42 @@ export default function LoginPage() {
             >
               {/* Heading */}
               <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
-                Enter your phone number to receive a verification code
+                Enter your email address to receive a verification code
               </p>
 
               <DynamicInput
-                fieldType="tel"
-                label="Phone Number"
-                placeholder="08012345678"
-                error={errors.phone?.message}
-                {...register("phone")}
+                fieldType="email"
+                label="Email address"
+                placeholder="user@gmail.com"
+                error={errors.email?.message}
+                {...register("email")}
+                required
+                disabled={loading}
+              />
+              <DynamicInput
+                fieldType="password"
+                label="Password"
+                placeholder="Enter your password"
+                error={errors.password?.message}
+                {...register("password")}
                 required
                 disabled={loading}
               />
 
-              <div className="mt-16 flex w-full flex-col gap-(--gap-base)">
+              <div className="mt-(--submit-button-mt) flex w-full flex-col gap-(--gap-base)">
                 <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
                   Send OTP
                 </SubmitPrimaryButton>
+
+                <p className="text-center text-sm text-(--text-colour)">
+                  Forgot your password?{" "}
+                  <Link
+                    href="/forgot-password"
+                    className="font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
+                  >
+                    Reset it
+                  </Link>
+                </p>
 
                 <p className="text-center text-sm text-(--text-colour)">
                   Don&apos;t have an account?{" "}
@@ -216,24 +305,28 @@ export default function LoginPage() {
             // Step 2: OTP Input
             <div className="flex flex-col gap-(--section-gap)">
               <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
-                Enter the OTP sent to the provided number
+                Enter the OTP sent to your email
               </p>
 
               <div className="flex flex-col items-center gap-6">
                 <InputOTP
-                  maxLength={4}
-                  value={otp}
-                  onChange={setOtp}
+                  maxLength={6}
+                  value={loginOtp}
+                  onChange={setLoginOtp}
                   containerClassName={cn("gap-3", hasOtpError && "animate-shake")}
                 >
                   <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
                     <InputOTPSlot index={0} aria-invalid={hasOtpError} />
                     <InputOTPSlot index={1} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={2} aria-invalid={hasOtpError} />
                   </InputOTPGroup>
 
+                  <InputOTPSeparator />
+
                   <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
-                    <InputOTPSlot index={2} aria-invalid={hasOtpError} />
                     <InputOTPSlot index={3} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={4} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={5} aria-invalid={hasOtpError} />
                   </InputOTPGroup>
                 </InputOTP>
 
@@ -244,7 +337,7 @@ export default function LoginPage() {
                 <div className="mt-16 flex w-full flex-col gap-(--gap-base)">
                   <SubmitPrimaryButton
                     onClick={handleVerify}
-                    disabled={otp.length < 6 || loading || success}
+                    disabled={loginOtp.length < 6 || loading || success}
                     loading={loading}
                     className={cn(success && "mt-16 bg-(--theme-green-dark) hover:opacity-96")}
                   >
@@ -260,11 +353,22 @@ export default function LoginPage() {
                     <button
                       type="button"
                       className="cursor-pointer font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
-                      onClick={() => setStep(1)}
-                      disabled={loading || success}
+                      onClick={handleResendOtp}
+                      disabled={loading || success || cooldownSeconds > 0 || resendLocked}
                     >
-                      Send again
+                      {resendLocked
+                        ? "Retry after 24 hours"
+                        : cooldownSeconds > 0
+                          ? `Resend in ${cooldownSeconds}s`
+                          : "Resend OTP"}
                     </button>
+                  </p>
+                  <p className="text-center text-xs text-(--text-colour)">
+                    {resendLocked
+                      ? "You’ve reached the resend limit. Try again after 24 hours."
+                      : `${Math.max(0, 2 - resendAttempts)} resend${
+                          2 - resendAttempts === 1 ? "" : "s"
+                        } left`}
                   </p>
                 </div>
               </div>
@@ -286,3 +390,6 @@ export default function LoginPage() {
     </>
   );
 }
+  const [resendAttempts, setResendAttempts] = useState(0);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const [resendLocked, setResendLocked] = useState(false);

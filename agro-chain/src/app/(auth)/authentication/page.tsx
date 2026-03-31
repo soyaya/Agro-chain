@@ -19,10 +19,25 @@ export default function AuthWelcome() {
 
   const isValid = role !== "";
 
+  const handleRoleSubmit = async (target: "login" | "register") => {
+    if (!role) return;
+    try {
+      await fetch("/api/auth/role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+    } catch (error) {
+      // non-blocking
+    } finally {
+      router.push(`/${target}?role=${role}`);
+    }
+  };
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        className="font-roboto-slab -mt-(--navbar-h) pt-(--navbar-h) default-container-max-width flex min-h-screen flex-col gap-(--gap-lg)"
+        className="font-roboto-slab -mt-(--navbar-h) pt-(--navbar-h) default-container-max-width flex min-h-screen flex-col gap-(--gap-2xl)"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -30,7 +45,7 @@ export default function AuthWelcome() {
       >
         {/* Step Content */}
         <motion.div
-          className="default-page-max-width flex-1 flex w-full flex-col gap-(--section-gap) pt-(--section-py)"
+          className="default-page-max-width flex w-full flex-col gap-(--section-gap) pt-(--section-py)"
           initial="hidden"
           animate="visible"
           variants={{
@@ -80,21 +95,21 @@ export default function AuthWelcome() {
 
         {/* Button Section */}
         <motion.div
-          className="mx-auto flex w-full max-w-md flex-col gap-(--gap-base)"
+          className="mx-auto mt-(--space-3xl) flex w-full default-page-max-width flex-col gap-(--gap-base)"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
         >
           <SubmitSecondaryButton
             disabled={!isValid}
-            onClick={() => router.push(`/login?role=${role}`)}
+            onClick={() => handleRoleSubmit("login")}
           >
             Log In
           </SubmitSecondaryButton>
 
           <SubmitPrimaryButton
             disabled={!isValid}
-            onClick={() => router.push(`/register?role=${role}`)}
+            onClick={() => handleRoleSubmit("register")}
           >
             Register
           </SubmitPrimaryButton>

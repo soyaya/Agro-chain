@@ -8,12 +8,14 @@ interface AuthLayoutProps {
   children: ReactNode;
 }
 
-type AuthRouteKey = "authentication" | "register" | "login";
+type AuthRouteKey = "authentication" | "register" | "login" | "verify" | "forgot-password";
 
 const routeTitleMap: Record<AuthRouteKey, string> = {
   authentication: "Authentication",
   register: "Register",
   login: "Log In",
+  verify: "Verify Identity",
+  "forgot-password": "Forgot Password",
 };
 
 

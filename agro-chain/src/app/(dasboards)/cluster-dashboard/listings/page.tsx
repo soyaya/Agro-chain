@@ -25,7 +25,7 @@ const mockListings: ClusterFarmerListing[] = [
     location: "Km 5, Sagamu-Ore Expressway",
     state: "Ogun",
     localGovernment: "Ijebu Ode",
-    pricePerKg: 1800,
+    pricePerKg: 3500,
     deliveryOptions: ["Pickup", "Local Delivery"],
     visibleOnMarketplace: true,
     status: "approved",
@@ -37,7 +37,7 @@ const mockListings: ClusterFarmerListing[] = [
     clusterFarmerId: "cluster-1",
     clusterFarmerName: "Emeka Okonkwo",
     businessName: "Okonkwo Fish Distributors Ltd",
-    fishType: "Tilapia",
+    fishType: "Catfish",
     harvestDate: new Date("2026-03-20"),
     totalAvailableKg: 5000,
     packaging: [
@@ -46,7 +46,7 @@ const mockListings: ClusterFarmerListing[] = [
     location: "Km 5, Sagamu-Ore Expressway",
     state: "Ogun",
     localGovernment: "Ijebu Ode",
-    pricePerKg: 1600,
+    pricePerKg: 3500,
     deliveryOptions: ["Pickup", "Local Delivery", "Interstate Delivery"],
     visibleOnMarketplace: false,
     status: "pending",
@@ -58,7 +58,7 @@ const mockListings: ClusterFarmerListing[] = [
     clusterFarmerId: "cluster-1",
     clusterFarmerName: "Emeka Okonkwo",
     businessName: "Okonkwo Fish Distributors Ltd",
-    fishType: "Mackerel",
+    fishType: "Catfish",
     harvestDate: new Date("2026-02-28"),
     totalAvailableKg: 3000,
     packaging: [
@@ -67,7 +67,7 @@ const mockListings: ClusterFarmerListing[] = [
     location: "Km 5, Sagamu-Ore Expressway",
     state: "Ogun",
     localGovernment: "Ijebu Ode",
-    pricePerKg: 1500,
+    pricePerKg: 3500,
     deliveryOptions: ["Pickup"],
     visibleOnMarketplace: false,
     status: "rejected",
@@ -189,12 +189,13 @@ export default function ClusterListingsPage() {
                 </div>
               </div>
 
-              {/* Price + Marketplace badge */}
               <div className="flex items-center justify-between rounded-xl bg-(--bg-pink) px-4 py-2.5">
-                <span className="font-ubuntu text-lg font-bold text-(--theme-green-dark)">
-                  ₦{listing.pricePerKg.toLocaleString()}/kg
-                </span>
-                <span className={`text-xs font-medium ${listing.visibleOnMarketplace ? "text-green-600" : "text-gray-400"}`}>
+                <span className="text-xs font-medium text-(--text-colour)">Marketplace Status</span>
+                <span
+                  className={`text-xs font-medium ${
+                    listing.visibleOnMarketplace ? "text-green-600" : "text-gray-400"
+                  }`}
+                >
                   {listing.visibleOnMarketplace ? "● Live on marketplace" : "○ Not listed"}
                 </span>
               </div>

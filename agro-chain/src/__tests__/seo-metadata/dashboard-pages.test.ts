@@ -28,6 +28,7 @@ import { metadata as farmersFinancialProfileMetadata } from "../../app/(dasboard
 import { metadata as clusterDashMetadata } from "../../app/(dasboards)/cluster-dashboard/layout";
 import { metadata as clusterListingsMetadata } from "../../app/(dasboards)/cluster-dashboard/listings/layout";
 import { metadata as clusterPendingMetadata } from "../../app/(dasboards)/cluster-dashboard/pending-approvals/layout";
+import { metadata as clusterOrdersMetadata } from "../../app/(dasboards)/cluster-dashboard/orders/layout";
 import { metadata as clusterProfileMetadata } from "../../app/(dasboards)/cluster-dashboard/profile/layout";
 import { metadata as clusterFinancialMetadata } from "../../app/(dasboards)/cluster-dashboard/financial/layout";
 import { metadata as clusterLoansMetadata } from "../../app/(dasboards)/cluster-dashboard/financial/loans/layout";
@@ -64,6 +65,7 @@ const dashboardPageMetadata: AnyMetadata[] = [
   clusterDashMetadata as AnyMetadata,
   clusterListingsMetadata as AnyMetadata,
   clusterPendingMetadata as AnyMetadata,
+  clusterOrdersMetadata as AnyMetadata,
   clusterProfileMetadata as AnyMetadata,
   clusterFinancialMetadata as AnyMetadata,
   clusterLoansMetadata as AnyMetadata,
@@ -96,6 +98,7 @@ const pageNames = [
   "cluster-dashboard",
   "cluster-dashboard/listings",
   "cluster-dashboard/pending-approvals",
+  "cluster-dashboard/orders",
   "cluster-dashboard/profile",
   "cluster-dashboard/financial",
   "cluster-dashboard/financial/loans",

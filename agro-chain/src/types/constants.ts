@@ -5,16 +5,17 @@
 // FISH TYPES
 // ============================================
 
-export const FISH_TYPES = [
-  "Catfish",
-  "Tilapia",
-  "Mackerel",
-  "Croaker",
-  "Snapper",
-  "Barracuda",
-] as const;
+export const FISH_TYPES = ["Catfish"] as const;
 
 export type FishType = typeof FISH_TYPES[number];
+
+export const FISH_VARIANTS = ["Dried", "Jumbo", "Table Size", "Broodstock"] as const;
+
+export type FishVariant = typeof FISH_VARIANTS[number];
+
+export const BASE_PRICE_PER_KG_NAIRA = 3500;
+
+export const BASE_DELIVERY_FEE_NAIRA = 1500;
 
 // ============================================
 // NIGERIAN STATES

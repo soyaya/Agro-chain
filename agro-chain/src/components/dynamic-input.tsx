@@ -70,7 +70,7 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
         {label && (
           <label
             htmlFor={label}
-            className="font-roboto-slab flex cursor-default items-center gap-1 text-base font-medium text-(--heading-colour) transition-all duration-300 ease-in-out hover:cursor-pointer focus:cursor-text lg:font-medium"
+            className="font-roboto-slab flex cursor-pointer items-center gap-1 text-base font-medium text-(--heading-colour) transition-all duration-300 ease-in-out"
           >
             {label}
             {required && <span className="text-(--error-red)">*</span>}
@@ -82,18 +82,18 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
           {/* Leading icon (email, text, etc.) */}
           {LeadingIcon && (
             <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-              <LeadingIcon size={20} className="text-gray-400" />
+              <LeadingIcon size={18} className="text-gray-400" />
             </div>
           )}
 
-          <Input
+          <input
             ref={ref}
             type={inputType}
             id={label}
             aria-label={label || fieldType}
             placeholder={finalPlaceholder}
             className={cn(
-              "font-roboto-slab h-12 w-full rounded-full border py-(--space-lg) text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none",
+              "font-roboto-slab h-12 w-full rounded-full hover:bg-(--bg-pink) focus:bg-transparent bg-transparent focus:ring focus:ring-(--theme-green) border py-(--space-lg) text-base shadow-xs ring-0 transition-all hover:cursor-pointer cursor-default focus:cursor-text duration-300 ease-in-out outline-none",
               LeadingIcon ? "pl-(--space-forty)" : "pl-(--space-md)",
               fieldType === "password" || fieldType === "confirm-password" ? "pr-10" : "pr-3",
               hasError ? "border-(--error-red)" : "border-(--border-input)",
@@ -216,7 +216,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
               hasError ? "border-(--error-red)" : "border-(--border-input)",
               "cursor-pointer text-(--text-colour)",
               "hover:border-(--border-gray) hover:shadow-sm",
-              "focus:border-(--theme-green-dark) focus:ring-2 focus:ring-(--theme-green-dark) focus:ring-offset-1",
+              "focus:border-(--theme-green-dark) focus:ring-[0.2px] focus:ring-(--theme-green-dark)",
             )}
           >
             <span className={cn(selectedOption ? "text-(--text-colour)" : "text-gray-400")}>
@@ -265,7 +265,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
                     className={cn(
                       "font-roboto-slab cursor-pointer px-(--space-md) py-(--space-md) text-base text-(--text-colour) transition-all duration-200 ease-in-out",
                       "hover:bg-(--bg-pink) hover:shadow-sm",
-                      "focus:bg-(--bg-pink) focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none focus:ring-inset",
+                      "focus:bg-(--bg-pink) focus:outline-none focus:ring-inset",
                       option.value === value && "bg-(--bg-pink)",
                     )}
                   >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Package, Clock, CheckCircle, XCircle, Truck, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -8,87 +8,9 @@ import type { Order, OrderStatus } from "~/types";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, STATUS_COLORS } from "~/types/constants";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { LoadingState } from "~/components/ui/LoadingState";
+import { apiFetch } from "~/lib/api";
 
-// Mock data - replace with actual API call
-const mockOrders: Order[] = [
-  {
-    id: "ORD-001",
-    buyerId: "buyer-1",
-    buyerName: "John Smith",
-    buyerPhone: "08012345678",
-    clusterFarmerId: "cluster-1",
-    clusterFarmerName: "Green Valley Farms",
-    items: [
-      {
-        listingId: "1",
-        fishType: "Catfish",
-        weightKg: 5,
-        quantity: 10,
-        pricePerUnit: 7000,
-        totalPrice: 70000,
-      },
-    ],
-    totalAmount: 70000,
-    deliveryAddress: "123 Main Street, Kaduna",
-    deliveryOption: "Delivery within state",
-    status: "delivered",
-    paymentStatus: "paid",
-    paymentMethod: "Bank Transfer",
-    createdAt: new Date("2024-03-01"),
-    updatedAt: new Date("2024-03-05"),
-  },
-  {
-    id: "ORD-002",
-    buyerId: "buyer-1",
-    buyerName: "John Smith",
-    buyerPhone: "08012345678",
-    clusterFarmerId: "cluster-2",
-    clusterFarmerName: "Blue Ocean Fisheries",
-    items: [
-      {
-        listingId: "2",
-        fishType: "Tilapia",
-        weightKg: 2,
-        quantity: 20,
-        pricePerUnit: 2800,
-        totalPrice: 56000,
-      },
-    ],
-    totalAmount: 56000,
-    deliveryAddress: "123 Main Street, Kaduna",
-    deliveryOption: "Pickup from warehouse",
-    status: "processing",
-    paymentStatus: "paid",
-    paymentMethod: "Card",
-    createdAt: new Date("2024-03-10"),
-    updatedAt: new Date("2024-03-10"),
-  },
-  {
-    id: "ORD-003",
-    buyerId: "buyer-1",
-    buyerName: "John Smith",
-    buyerPhone: "08012345678",
-    clusterFarmerId: "cluster-1",
-    clusterFarmerName: "Green Valley Farms",
-    items: [
-      {
-        listingId: "3",
-        fishType: "Mackerel",
-        weightKg: 3,
-        quantity: 15,
-        pricePerUnit: 4200,
-        totalPrice: 63000,
-      },
-    ],
-    totalAmount: 63000,
-    deliveryAddress: "123 Main Street, Kaduna",
-    deliveryOption: "Express delivery",
-    status: "pending",
-    paymentStatus: "pending",
-    createdAt: new Date("2024-03-15"),
-    updatedAt: new Date("2024-03-15"),
-  },
-];
+type OrdersResponse = Order[] | { orders?: Order[]; data?: Order[] };
 
 const statusIcons: Record<OrderStatus, typeof Package> = {
   pending: Clock,
@@ -101,9 +23,41 @@ const statusIcons: Record<OrderStatus, typeof Package> = {
 
 export default function BuyerOrdersPage() {
   const router = useRouter();
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [filterStatus, setFilterStatus] = useState<OrderStatus | "all">("all");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadOrders = async () => {
+      setLoading(true);
+      setErrorMessage(null);
+      try {
+        const response = await apiFetch<OrdersResponse>("/buyers/orders");
+        const payload = Array.isArray(response) ? response : response.orders ?? response.data ?? [];
+        if (mounted) {
+          setOrders(payload);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to load orders";
+        if (mounted) {
+          setErrorMessage(message);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadOrders();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const filteredOrders =
     filterStatus === "all" ? orders : orders.filter((o) => o.status === filterStatus);
@@ -120,6 +74,19 @@ export default function BuyerOrdersPage() {
 
   if (loading) {
     return <LoadingState message="Loading your orders..." size="lg" />;
+  }
+
+  if (errorMessage) {
+    return (
+      <EmptyState
+        icon={Package}
+        title="Unable to load orders"
+        description={errorMessage}
+        actionLabel="Retry"
+        onAction={() => window.location.reload()}
+        size="lg"
+      />
+    );
   }
 
   return (
@@ -223,7 +190,8 @@ export default function BuyerOrdersPage() {
                         <div className="flex items-center gap-3">
                           <Package size={18} className="text-gray-400" />
                           <span className="font-roboto-slab text-gray-900">
-                            {item.fishType} - {item.weightKg}kg × {item.quantity}
+                            {item.fishType}
+                            {item.variant ? ` • ${item.variant}` : ""} - {item.weightKg}kg × {item.quantity}
                           </span>
                         </div>
                         <span className="font-roboto-slab font-semibold text-gray-900">

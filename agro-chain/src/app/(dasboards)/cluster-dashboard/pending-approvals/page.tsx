@@ -1,55 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ListingCard } from "~/components/listings/ListingCard";
 import type { FarmerSupplyListing } from "~/types";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { apiFetch } from "~/lib/api";
 
-// Mock data - replace with actual API call
-const mockPendingListings: FarmerSupplyListing[] = [
-  {
-    id: "1",
-    farmerId: "farmer-1",
-    farmerName: "John Doe",
-    fishType: "Catfish",
-    harvestDate: new Date("2024-03-15"),
-    totalAvailableKg: 2000,
-    packaging: [
-      { weightKg: 1, quantity: 1000, pricePerUnit: 1500 },
-      { weightKg: 5, quantity: 200, pricePerUnit: 7000 },
-    ],
-    status: "pending",
-    createdAt: new Date("2024-03-10"),
-    updatedAt: new Date("2024-03-10"),
-  },
-  {
-    id: "2",
-    farmerId: "farmer-2",
-    farmerName: "Jane Smith",
-    fishType: "Tilapia",
-    harvestDate: new Date("2024-03-12"),
-    totalAvailableKg: 1500,
-    packaging: [{ weightKg: 2, quantity: 750, pricePerUnit: 2800 }],
-    status: "pending",
-    createdAt: new Date("2024-03-08"),
-    updatedAt: new Date("2024-03-08"),
-  },
-  {
-    id: "3",
-    farmerId: "farmer-3",
-    farmerName: "Mike Johnson",
-    fishType: "Catfish",
-    harvestDate: new Date("2024-03-18"),
-    totalAvailableKg: 3000,
-    packaging: [{ weightKg: 3, quantity: 1000, pricePerUnit: 4200 }],
-    status: "pending",
-    createdAt: new Date("2024-03-11"),
-    updatedAt: new Date("2024-03-11"),
-  },
-];
+type PendingListingsResponse =
+  | FarmerSupplyListing[]
+  | { listings?: FarmerSupplyListing[]; data?: FarmerSupplyListing[] };
 
 interface RejectModalProps {
   isOpen: boolean;
@@ -131,19 +93,58 @@ function RejectModal({ isOpen, onClose, onConfirm }: RejectModalProps) {
 }
 
 export default function PendingApprovalsPage() {
-  const [listings, setListings] = useState<FarmerSupplyListing[]>(mockPendingListings);
+  const [listings, setListings] = useState<FarmerSupplyListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
 
+  useEffect(() => {
+    let mounted = true;
+
+    const loadListings = async () => {
+      setLoading(true);
+      setErrorMessage(null);
+      try {
+        const response = await apiFetch<PendingListingsResponse>("/cluster/pending-approvals");
+        const payload = Array.isArray(response)
+          ? response
+          : response.listings ?? response.data ?? [];
+
+        if (mounted) {
+          setListings(payload);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to load listings";
+        if (mounted) {
+          setErrorMessage(message);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadListings();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const handleApprove = async (id: string) => {
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await apiFetch(`/cluster/pending-approvals/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "approved" }),
+      });
 
       setListings((prev) => prev.filter((l) => l.id !== id));
       toast.success("Listing approved successfully!");
     } catch (error) {
-      toast.error("Failed to approve listing");
+      const message = error instanceof Error ? error.message : "Failed to approve listing";
+      toast.error(message);
     }
   };
 
@@ -156,15 +157,18 @@ export default function PendingApprovalsPage() {
     if (!selectedListingId) return;
 
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await apiFetch(`/cluster/pending-approvals/${selectedListingId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "rejected", reason }),
+      });
 
       setListings((prev) => prev.filter((l) => l.id !== selectedListingId));
       toast.success("Listing rejected");
       setRejectModalOpen(false);
       setSelectedListingId(null);
     } catch (error) {
-      toast.error("Failed to reject listing");
+      const message = error instanceof Error ? error.message : "Failed to reject listing";
+      toast.error(message);
     }
   };
 
@@ -205,7 +209,15 @@ export default function PendingApprovalsPage() {
           </motion.div>
 
           {/* Listings Grid */}
-          {listings.length > 0 ? (
+          {loading ? (
+            <div className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap) text-center">
+              <p className="text-(--text-colour)">Loading pending approvals...</p>
+            </div>
+          ) : errorMessage ? (
+            <div className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap) text-center">
+              <p className="text-(--error-red)">{errorMessage}</p>
+            </div>
+          ) : listings.length > 0 ? (
             <motion.div
               variants={STAGGER_CONTAINER_VARIANT}
               className="grid grid-cols-1 gap-(--gap-lg) md:grid-cols-2 lg:grid-cols-3"
