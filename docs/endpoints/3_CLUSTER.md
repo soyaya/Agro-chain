@@ -1,232 +1,395 @@
-# ENDPOINTS
+# Cluster Farmer Endpoints
 
-## Cluster Farmers routes
+All cluster farmer endpoints require authentication. The authenticated user must have `role: "cluster"`.
 
-Cluster Farmer&apos; role should be "`cluster`";
+---
 
-1. **Cluster Farmers Profile**: The cluster farmer should be able to update the information in ther profile
-   - `/cluster/account-profile`: PATCH
+## Update Profile
+
+The cluster farmer updates their personal, farm, and business information. All fields are optional.
+
+**PATCH /cluster/account-profile**
 
 ```typescript
-type FishType = "Catfish";
-```
+// Request body — all fields optional
+{
+  fullName: string,
+  phoneNumber: string,
+  email: string,
+  profileImage: string,        // Cloudinary URL
+  farmName: string,
+  farmAddress: string,
+  localGovernment: string,
+  state: string,
+  fishType: string,
+  farmingCapacityKg: number,
+  yearsOfExperience: number,
+  businessName: string,
+  cacNumber: string,
+  warehouseLocation: string,
+  distributionCapacity: number,
+  logisticsAvailable: boolean
+}
 
-```typescript
-interface {
-  id: string;
-  userId: string;
-  profileImage: File | undefined;
-  fullName: string;
-  phoneNumber: number;
-  email: string;
-  farmName: string;
-  farmAddress: string;
-
-  localGovernment: string;
-  state: string;
-  fishType: FishType;
-  farmingCapacityKg: number;
-  yearsOfExperience: number;
-
-  businessName: string;
-  cacNumber: string;
-  warehouseLocation: string; // Shop Locations
-  distributionCapacity: number;
-  logisticsAvailable: boolean;
-
-  isClusterFarmer?: boolean;
-  verificationStatus: boolean; // This could be useful incase we want to revoke the status of a cluster farmer whether they will remain one or not
-  createdAt: Date;
-  updatedAt: Date;
+// Response
+{
+  status: "success",
+  message: "Profile updated successfully.",
+  data: {
+    profile: {
+      id: string,
+      userId: string,
+      profileImage: string | null,
+      fullName: string,
+      phoneNumber: string,
+      email: string,
+      farmName: string | null,
+      farmAddress: string | null,
+      localGovernment: string,
+      state: string,
+      fishType: string | null,
+      farmingCapacityKg: number | null,
+      yearsOfExperience: number | null,
+      businessName: string | null,
+      cacNumber: string | null,
+      warehouseLocation: string | null,
+      distributionCapacity: number | null,
+      logisticsAvailable: boolean,
+      isClusterFarmer: boolean,
+      verificationStatus: boolean,   // true means cluster_approved
+      createdAt: string,
+      updatedAt: string
+    }
+  }
 }
 ```
 
-2. **Listings**: This should fetch information about a particular cluster farmers listings
-   - `/cluster/listings/get`: GET
+---
+
+## Listings Overview
+
+Returns a summary of all listings from farmers under this cluster farmer, along with the full list. This is the cluster farmer's view of all supply under their management.
+
+**GET /cluster/listings/get**
 
 ```typescript
-type Status = "approved" | "pending" | "rejected";
-
-interface Packaging {
-  weightKg: number;
-  quantity: number;
+// Response
+{
+  status: "success",
+  data: {
+    summary: {
+      farmersUnderMe: number,
+      pendingApproval: number,
+      allListings: number,
+      totalSupply: number       // Total kg of approved active listings
+    },
+    listings: Array<{
+      id: string,
+      farmerId: string,
+      fishType: string,
+      location: string,         // "LGA, State" format
+      harvestDate: string,
+      listedDate: string,
+      totalFishAvailable: number,
+      packaging: {
+        weightKg: number,
+        quantity: number
+      },
+      status: "approved" | "pending" | "rejected"
+    }>
+  }
 }
 ```
 
+---
+
+## Current Activities
+
+Returns recent activity logs for the cluster farmer and all farmers under them. Used to populate the activity feed on the cluster dashboard.
+
+**GET /cluster/current-activities**
+
 ```typescript
-interface {
-  farmersUnderMe: number;
- pendingApproval: number; // Listings to either approve or reject
- allListings: number; // All listings ever approved or rejected
-  totalSupply: number;
-
-  // === These 2 fields may inform us, maybe later of some stats if we have to know the rate at which a cluster farmer is approving or rejecting listings and whatever decisions have to be made with that
- status: Status;
-
-
-  totalListings: number;
-
- totalFishAvailable: number; // Like 200ks available
- location: string; // This will be the location of the farmer that posted the listing
- harvestDate: Date;
- listedDate: Date;
-  packaging: Packaging;
+// Response
+{
+  status: "success",
+  data: {
+    activities: Array<{
+      id: string,
+      description: string,
+      type: string,
+      created_at: string,
+      user: {
+        full_name: string
+      }
+    }>
+  }
 }
 ```
 
-3. **Recent Activity**: This should fetch information/logs about a particular farmers activity
-   - `/cluster/current-activities`: GET
+---
+
+## Pending Approvals
+
+Returns all listings from farmers under this cluster farmer that are waiting for approval. The cluster farmer reviews each one and either approves or rejects it.
+
+**GET /cluster/pending-approvals**
 
 ```typescript
-type Status = "approved" | "pending" | "rejected";
-```
-
-```typescript
-interface {
- supply: number;
- status: Status;
- approved: number;
- totalSupply: number;
+// Response
+{
+  status: "success",
+  data: {
+    listings: Array<{
+      id: string,
+      fishType: string,
+      farmerName: string,
+      harvestDate: string,
+      listedDate: string,
+      totalFishAvailable: number,
+      packaging: {
+        weightKg: number,
+        quantity: number
+      },
+      createdAt: string,
+      updatedAt: string
+    }>
+  }
 }
 ```
 
-There's a number of things they can do on their dashboard which is limited to approvals, profile, listings and farmers, they should receive notifications about some activities done by the farmers under them like:
+**PATCH /cluster/pending-approvals/:listingId**
 
-- I should be able to display changes like Approved listings from John Doe - Catfish 500kg
-- New listing pending approval from Jane Smith
-- New farmer joined your cluster - Mike Johnson
-- Jane Doe updated their profile
-
-4. **Pending Approval**: This is where the farmer approves the listings of the farmers under them. The farmers under them submits listings and they submit the form. It appears here as a card with a choice for the cluster farmer to reject or approve.
-   In retrospect, it's actually better I fetch the lsitings, and just approve it for the marketplace here and not submit the whole thing again.
-   So, I'll fetch the listings then, and append approve to it.
-   The backend will now watch for an approved lsitings before going to the marketplace.
-
-   - `/cluster/pending-approvals`: GET
+The cluster farmer approves or rejects a specific listing. Approved listings become visible on the marketplace under the cluster farmer's name.
 
 ```typescript
-type Status = "approved" | "pending" | "rejected";
-
-type FishType = "Catfish";
-
-interface Packaging {
-  weightKg: number;
-  quantity: number;
+// Request body
+{
+  status: "approved" | "rejected",
+  rejectionReason: string    // Required when status is "rejected"
 }
 
-interface {
- fishType: FishType;
- farmerName: string;
-  harvestDate: Date;
- listedDate: Date;
-  totalFishAvailable: number; // Like 200kgs available
-  packaging: Packaging;
-  createdAt: Date;
-  updatedAt: Date;
+// Response
+{
+  status: "success",
+  message: "Listing approved successfully." | "Listing rejected successfully.",
+  data: {
+    listing: { /* updated listing object */ }
+  }
 }
 ```
 
- - `/cluster/pending-approvals/:listingId`: PATCH
+Note: The frontend also calls `PUT /listings/:id/cluster-approve` with `{ action: "approve" | "reject", reason?: string }` for the same purpose. Both routes exist. The cluster pending approvals page uses the listings route directly.
+
+---
+
+## Farmers Under Cluster
+
+Returns all farmers assigned to this cluster farmer along with their stats.
+
+**GET /cluster/farmers**
+
 ```typescript
-type Status = "approved" | "pending" | "rejected";
-
-type FishType = "Catfish";
-
-interface Packaging {
-  weightKg: number;
-  quantity: number;
-}
-
-interface {
- fishType: FishType;
- farmerName: string;
-  harvestDate: Date;
- listedDate: Date;
-  totalFishAvailable: number; // Like 200kgs available
-  packaging: Packaging;
-  createdAt: Date;
-  updatedAt: Date;
-  status: Status;
-  rejectionReason?: string;
-}
-```
-
-5. **Farmers**: This is where the cluster farmer sees the farmers under them
-
-   - `/cluster/farmers`: GET
-```typescript
-type Status = "approved" | "pending" | "rejected";
-
-type FishType = "Catfish";
-
-interface Packaging {
-  weightKg: number;
-  quantity: number;
-}
-
-interface {
-  totalFarmers: number;
-  totalFarmersCapacity: number; // This should be the Sigma of all the totalCapacity of the farmers under the cluster farmer;
-  locationCovering: number; // Depending on how its structured if its by lgas, city's or states, how many is this one covering?
-
-  farmerName: string;
- fishType: FishType;
- totalListings: number;
- totalApprovedListings: number;
- totalPendingListings: number;
-
- farmName: string;
- location: string;
- phoneNumber: number;
- emailAddress: string;
- capacity: number;
- experience: number;
- memberSince: Date;
- lastActive: Date;
+// Response
+{
+  status: "success",
+  data: {
+    summary: {
+      totalFarmers: number,
+      totalFarmersCapacity: number,   // Sum of all farmers' farming_capacity_kg
+      locationCovering: number        // Number of unique LGAs covered
+    },
+    farmers: Array<{
+      farmerName: string,
+      fishType: string,
+      totalListings: number,
+      totalApprovedListings: number,
+      totalPendingListings: number,
+      farmName: string | null,
+      location: string,               // "LGA, State" format
+      phoneNumber: string,
+      emailAddress: string | null,
+      capacity: number | null,
+      experience: number | null,
+      memberSince: string,
+      lastActive: string
+    }>
+  }
 }
 ```
 
-6. **Orders**: Manage incoming buyer orders for the cluster farmer
-   - `/cluster/orders`: GET
+---
+
+## Orders
+
+Returns all orders routed through this cluster farmer.
+
+**GET /cluster/orders**
 
 ```typescript
-type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
-```
-
-```typescript
-interface {
-  orderId: string;
-  buyerName: string;
-  buyerPhone: string;
-  fishType: "Catfish";
-  variant: "Dried" | "Jumbo" | "Table Size" | "Broodstock";
-  processed: boolean;
-  weightKg: number;
-  quantity: number;
-  deliveryOption: string;
-  status: OrderStatus;
-  createdAt: Date;
+// Response
+{
+  status: "success",
+  data: {
+    orders: Array<{
+      orderId: string,
+      buyerName: string,
+      buyerPhone: string,
+      fishType: string,
+      variant: string | null,
+      processed: boolean,
+      weightKg: number | null,
+      quantity: number,
+      deliveryOption: string | null,
+      status: "draft" | "payment_pending" | "paid" | "confirmed" | "processing" | "shipped" | "delivered" | "completed" | "cancelled" | "disputed",
+      createdAt: string
+    }>
+  }
 }
 ```
 
-   - `/cluster/orders/:orderId`: PATCH
+**PATCH /cluster/orders/:orderId**
+
+The cluster farmer updates the status of an order as they process and ship it.
 
 ```typescript
-interface {
-  status: OrderStatus;
-  notes?: string;
+// Request body
+{
+  status: "confirmed" | "processing" | "shipped" | "delivered" | "cancelled",
+  notes: string    // Optional notes about the status update
+}
+
+// Response
+{
+  status: "success",
+  message: "Order updated successfully.",
+  data: {
+    order: { /* updated order object */ }
+  }
 }
 ```
 
-7. **Payouts**: View upcoming payouts after buyer confirmation
-   - `/cluster/payouts`: GET
+---
+
+## Demands
+
+These endpoints are not yet implemented on the backend. The frontend is fully built and wired. Once these endpoints exist, the cluster demands page will work automatically.
+
+**GET /cluster/demands**
+
+Returns all demands assigned to this cluster farmer by admin.
 
 ```typescript
-interface {
-  payoutId: string;
-  orderId: string;
-  amount: number;
-  scheduledFor: Date;
-  status: "pending" | "processing" | "paid" | "failed";
+// Response
+{
+  status: "success",
+  data: {
+    demands: Array<{
+      id: string,
+      buyerName: string,
+      buyerPhone: string,
+      fishType: "catfish" | "fingerlings" | "juveniles" | "table_size" | "jumbo" | "parent_stocks",
+      weightKg: number,
+      fishVariant: "dried" | "jumbo" | "table_size" | "broodstock",
+      locationState: string,
+      locationLga: string,
+      deliveryAddress: string,
+      notes: string | null,
+      status: "pending" | "assigned" | "accepted" | "declined" | "fulfilled" | "cancelled",
+      assignedAt: string | null,
+      acceptedAt: string | null,
+      fulfilledAt: string | null,
+      createdAt: string
+    }>
+  }
+}
+```
+
+**PATCH /cluster/demands/:id/accept**
+
+The cluster farmer accepts a demand. This sets status to "accepted" and records the accepted timestamp.
+
+```typescript
+// No request body required
+
+// Response
+{
+  status: "success",
+  message: "Demand accepted.",
+  data: {
+    demand: {
+      id: string,
+      status: "accepted",
+      acceptedAt: string
+    }
+  }
+}
+```
+
+**PATCH /cluster/demands/:id/decline**
+
+The cluster farmer declines a demand with an optional reason.
+
+```typescript
+// Request body
+{
+  reason: string    // Optional
+}
+
+// Response
+{
+  status: "success",
+  message: "Demand declined.",
+  data: {
+    demand: {
+      id: string,
+      status: "declined"
+    }
+  }
+}
+```
+
+**PATCH /cluster/demands/:id/fulfill**
+
+The cluster farmer marks a demand as fulfilled after delivery.
+
+```typescript
+// No request body required
+
+// Response
+{
+  status: "success",
+  message: "Demand marked as fulfilled.",
+  data: {
+    demand: {
+      id: string,
+      status: "fulfilled",
+      fulfilledAt: string
+    }
+  }
+}
+```
+
+---
+
+## Payouts
+
+Returns payout history for the cluster farmer.
+
+**GET /cluster/payouts**
+
+```typescript
+// Response
+{
+  status: "success",
+  data: {
+    payouts: Array<{
+      payoutId: string,
+      orderId: string,
+      amount: number,
+      scheduledFor: string,
+      status: "pending" | "processing" | "paid" | "failed"
+    }>
+  }
 }
 ```

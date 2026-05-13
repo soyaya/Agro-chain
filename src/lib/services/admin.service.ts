@@ -100,6 +100,41 @@ export interface AdminOrder {
   createdAt: string;
 }
 
+// === User / Farmer types
+
+export interface AdminUser {
+  id: string;
+  full_name: string;
+  email?: string;
+  phone_number: string;
+  role: "farmer" | "cluster" | "buyer" | "admin" | "pending";
+  verification_status: "unverified" | "pending" | "verified" | "rejected";
+  location_state: string;
+  location_lga: string;
+  is_active: boolean;
+  is_cluster_farmer: boolean;
+  cluster_approved: boolean;
+  farm_name?: string;
+  business_name?: string;
+  created_at: string;
+}
+
+// === Listing types
+
+export interface AdminListing {
+  id: string;
+  fishType: string;
+  quantityAvailable: number;
+  totalAvailableKg: number;
+  pricePerKg: number;
+  clusterFarmerName: string;
+  locationState: string;
+  locationLga: string;
+  status: string;
+  clusterApproved: boolean;
+  createdAt: string;
+}
+
 export const adminService = {
   getMetrics() {
     return apiFetch<AdminMetricResponse>("/admin/dashboard/metrics");
@@ -156,5 +191,35 @@ export const adminService = {
 
   getOrder(id: string) {
     return apiFetch<{ status: string; data: { order: AdminOrder } }>(`/admin/orders/${id}`);
+  },
+
+  // === Farmers / Users
+
+  getFarmers(params?: { role?: string; state?: string; verificationStatus?: string }) {
+    const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : "";
+    return apiFetch<{ status: string; data: { users: AdminUser[]; total: number } }>(`/admin/farmers${query}`);
+  },
+
+  getFarmer(id: string) {
+    return apiFetch<{ status: string; data: { user: AdminUser } }>(`/admin/farmers/${id}`);
+  },
+
+  toggleUserActive(id: string) {
+    return apiFetch(`/admin/farmers/${id}/toggle-active`, { method: "PATCH" });
+  },
+
+  // === Listings
+
+  getListings(params?: { status?: string; fishType?: string; state?: string }) {
+    const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : "";
+    return apiFetch<{ status: string; data: { listings: AdminListing[]; total: number } }>(`/admin/listings${query}`);
+  },
+
+  flagListing(id: string) {
+    return apiFetch(`/admin/listings/${id}/flag`, { method: "PATCH" });
+  },
+
+  removeListing(id: string) {
+    return apiFetch(`/admin/listings/${id}`, { method: "DELETE" });
   },
 };

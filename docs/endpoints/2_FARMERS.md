@@ -1,171 +1,250 @@
-# ENDPOINTS
+# Farmer Endpoints
 
-## Farmers routes
+All farmer endpoints require authentication. The authenticated user must have `role: "farmer"` or `role: "cluster"`.
 
-Farmer&apos; role should be "`farmer`";
+---
 
-1. **Create Listings**: This should enable the farmers to create listings
-   - `/farmers/listings/create`: POST
+## Create Listing
+
+The farmer submits a new supply listing. If the farmer is assigned to a cluster farmer, the listing is held for cluster approval before appearing on the marketplace. If the farmer has no cluster farmer assigned, it is auto-approved.
+
+**POST /farmers/listings/create**
 
 ```typescript
-type FishType = "Catfish";
-```
+// Request body
+{
+  fishType: "catfish" | "fingerlings" | "juveniles" | "table_size" | "jumbo" | "parent_stocks",
+  harvestDate: string,          // ISO date string e.g. "2026-03-15"
+  listedDate: string,           // ISO date string, optional, defaults to today
+  totalFishAvailable: number,   // Total number of fish e.g. 200
+  packaging: {
+    weightKg: number,           // Weight per fish in kg e.g. 1.5
+    pricePerUnit: number        // Price per fish in Naira
+  }
+}
 
-```typescript
-interface Packaging {
-  weightKg: number;
-  quantity: number;
+// Response
+{
+  status: "success",
+  message: "Listing submitted and sent to your cluster manager for approval.",
+  data: {
+    listing: {
+      id: string,
+      farmer_id: string,
+      fish_type: string,
+      quantity_available: number,
+      price_per_fish: number,
+      price_per_kg: number,
+      packaging_weight_kg: number,
+      total_available_kg: number,
+      harvest_date: string,
+      listed_date: string,
+      location_state: string,
+      location_lga: string,
+      location_address: string,
+      status: "active",
+      cluster_approved: boolean,
+      expires_at: string,
+      created_at: string,
+      updated_at: string
+    }
+  }
 }
 ```
 
+---
+
+## Get Listings
+
+Returns all listings belonging to the logged-in farmer along with summary stats. The frontend uses this to populate the farmer's listings dashboard.
+
+**GET /farmers/listings/get**
+
 ```typescript
-interface {
- fishType: FishType;
- harvestDate: Date;
- listedDate: Date;
-  totalFishAvailable: number; // Like 200ks available
-  packaging: Packaging;
-  isApproved: false; // I will set this by default. The farmer will not see this field.
+// Response
+{
+  status: "success",
+  data: {
+    summary: {
+      totalListings: number,
+      pendingApproval: number,
+      approved: number,
+      rejected: number,
+      totalSupply: number   // Total kg across all active listings
+    },
+    listings: Array<{
+      id: string,
+      fishType: string,
+      harvestDate: string,
+      listedDate: string,
+      totalFishAvailable: number,
+      totalAvailableKg: number,
+      packaging: {
+        weightKg: number,
+        quantity: number,
+        pricePerUnit: number
+      },
+      status: "approved" | "pending" | "rejected",
+      isApproved: boolean,
+      createdAt: string
+    }>
+  }
 }
 ```
 
-2. **Listings**: This should fetch information about a particular farmers listings
- - `/farmers/listings/get`: GET
+---
+
+## Recent Activities
+
+Returns the last 20 activity log entries for the farmer. Used to populate the activity feed on the farmer dashboard.
+
+**GET /farmers/recent-activities**
 
 ```typescript
-type Status = "approved" | "pending" | "rejected";
-```
-
-```typescript
-interface {
- totalListings: number;
- pendingApproval: number;
- approved: number;
- rejected: number;
- totalSupply: number;
-
- totalFishAvailable: number; // Like 200ks available
- harvestDate: Date;
- listedDate: Date;
-  packaging: Packaging;
+// Response
+{
+  status: "success",
+  data: {
+    activities: Array<{
+      id: string,
+      description: string,   // Human-readable e.g. "Listing Catfish 300kg was approved"
+      type: string,          // e.g. "listing_created", "listing_approved", "profile_updated"
+      created_at: string
+    }>
+  }
 }
 ```
 
-3. **Recent Activity**: This should fetch information/logs about a particular farmers activity
-   - `/farmers/recent-activities`: GET
+---
+
+## Update Profile
+
+The farmer updates their personal and farm information. All fields are optional and only provided fields are updated.
+
+**PATCH /farmers/account-profile**
 
 ```typescript
-type Status = "approved" | "pending" | "rejected";
-```
+// Request body — all fields optional, only send what changed
+{
+  fullName: string,
+  phoneNumber: string,       // Nigerian format
+  email: string,
+  profileImage: string,      // URL string from Cloudinary upload
+  farmName: string,
+  farmAddress: string,
+  localGovernment: string,
+  state: string,
+  fishType: string,
+  farmingCapacityKg: number,
+  yearsOfExperience: number
+}
 
-```typescript
-interface {
- supply: number;
- status: Status;
- approved: number;
- totalSupply: number;
+// Response
+{
+  status: "success",
+  message: "Profile updated successfully.",
+  data: {
+    profile: {
+      id: string,
+      userId: string,
+      fullName: string,
+      phoneNumber: string,
+      email: string,
+      profileImage: string | null,
+      farmName: string | null,
+      farmAddress: string | null,
+      localGovernment: string,
+      state: string,
+      fishType: string | null,
+      farmingCapacityKg: number | null,
+      yearsOfExperience: number | null,
+      isClusterFarmer: boolean,
+      createdAt: string,
+      updatedAt: string
+    }
+  }
 }
 ```
 
-I should be able to render something like
+---
 
-- Listing "Catfish 500kg" was approved
-- Listing "Catfish 500kg" is pending approval
-- Profile updated successfully
+## Cluster Farmer Application
 
-NOTE!!!
-Help me auto-complete this one
+The farmer applies to become a cluster farmer. Document fields receive Cloudinary URL strings obtained by uploading files to the /api/upload endpoint first. The backend stores these URLs directly. The application can only be updated once every 6 months.
 
-4. **Farmers Profile**: The farmer should be able to update the information in ther profile
-   - `/farmers/account-profile`: PATCH
+**PATCH /farmers/cluster-farmer-application**
 
 ```typescript
-type FishType = "Catfish";
-```
-
-```typescript
-interface {
-  id: string;
-  userId: string;
- profileImage: File | undefined;
- fullName: string;
- phoneNumber: number;
- email: string;
- farmName: string;
- farmAddress: string;
-
- localGovernment: string;
- state: string;
- fishType: FishType;
- farmingCapacityKg: number;
- yearsOfExperience: number;
- isClusterFarmer?: boolean; // This could come in handy or so I think
-   createdAt: Date,
-  updatedAt: Date,
-}
-```
-
-5. **Cluster Farmer Applicatione**: The farmer should be able to update their cluster farmer&apos;s application:
-   - `/farmers/cluster-farmer-application`: PATCH
-
-```typescript
-type ClusterFarmerDocuments = {
-  bvnVerification: File | null;
-  proofOfAddress: File | null;
-  cacRegistration: File | null;
-  businessLicense: File | null;
-  taxClearance: File | null;
-};
-```
-
-```typescript
-interface {
+// Request body — all fields required for a new application
+{
   businessName: string,
   cacNumber: string,
   warehouseLocation: string,
   distributionCapacity: number,
-  logisticsAvailable: false,
-  bvnVerification: File | null,
-  proofOfAddress: File | null,
-  cacRegistration: File | null,
-  businessLicense: File | null,
-  taxClearance: File | null,
+  logisticsAvailable: boolean,
+  bvnVerification: string,      // Cloudinary secure_url for BVN document
+  proofOfAddress: string,       // Cloudinary secure_url for proof of address
+  cacRegistration: string,      // Cloudinary secure_url for CAC certificate
+  businessLicense: string,      // Cloudinary secure_url for business license
+  taxClearance: string          // Cloudinary secure_url for tax clearance
+}
+
+// Response
+{
+  status: "success",
+  message: "Cluster farmer application submitted. Admin will review shortly."
 }
 ```
 
-NOTE: Additionally, I can also make them update this say they can every 6 months from the time they last updated it.
+Note: The backend currently accepts these document fields as string URLs and stores them in `bvn_doc_url`, `proof_of_address_url`, `cac_registration_url`, `business_license_url`, and `tax_clearance_url` on the user record. It also sets `is_cluster_farmer: true` and `cluster_approved: false` automatically on submission.
 
-6. **Orders (Read Only)**: Farmers can view orders tied to their listings
-   - `/farmers/orders`: GET
+---
+
+## Orders
+
+Returns all orders tied to the farmer's listings. Read-only for farmers.
+
+**GET /farmers/orders**
 
 ```typescript
-type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
-```
-
-```typescript
-interface {
-  orderId: string;
-  listingId: string;
-  buyerName: string;
-  quantity: number;
-  weightKg: number;
-  status: OrderStatus;
-  createdAt: Date;
+// Response
+{
+  status: "success",
+  data: {
+    orders: Array<{
+      orderId: string,
+      listingId: string | null,
+      buyerName: string,
+      quantity: number,
+      weightKg: number | null,
+      status: "draft" | "payment_pending" | "paid" | "confirmed" | "processing" | "shipped" | "delivered" | "completed" | "cancelled" | "disputed",
+      createdAt: string
+    }>
+  }
 }
 ```
 
-7. **Payouts**: Farmers can view payout schedule and history
-   - `/farmers/payouts`: GET
+---
+
+## Payouts
+
+Returns the farmer's payout history. Payouts are created when a buyer confirms delivery.
+
+**GET /farmers/payouts**
 
 ```typescript
-interface {
-  payoutId: string;
-  orderId: string;
-  amount: number;
-  scheduledFor: Date;
-  status: "pending" | "processing" | "paid" | "failed";
-  createdAt: Date;
+// Response
+{
+  status: "success",
+  data: {
+    payouts: Array<{
+      payoutId: string,
+      orderId: string,
+      amount: number,
+      scheduledFor: string,
+      status: "pending" | "processing" | "paid" | "failed",
+      createdAt: string
+    }>
+  }
 }
 ```
-
-<!-- Financial Services will have to come later. We can focus on the MVP for now -->

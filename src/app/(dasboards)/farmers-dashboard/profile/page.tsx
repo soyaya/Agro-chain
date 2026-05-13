@@ -1,10 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { farmerService } from "~/lib/services/farmer.service";
-import { authService } from "~/lib/services/auth.service";
+import { authService, type BackendUser } from "~/lib/services/auth.service";
+import { uploadFile } from "~/lib/upload";
+import { DynamicInput, SelectInput } from "~/components/dynamic-input";
+import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
+import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
+import { FileUploadField } from "~/components/profile/FileUploadField";
+import { LoadingState } from "~/components/ui/LoadingState";
+import { FADE_IN_VARIANT } from "~/types/constants";
+
+// === Types
 
 type ProfileForm = {
   fullName: string;
@@ -25,14 +35,54 @@ type ClusterForm = {
   warehouseLocation: string;
   distributionCapacity: number;
   logisticsAvailable: boolean;
-  bvnVerification: boolean;
-  proofOfAddress: boolean;
-  cacRegistration: boolean;
-  businessLicense: boolean;
-  taxClearance: boolean;
 };
 
+type DocFiles = {
+  bvnVerification: File | null;
+  proofOfAddress: File | null;
+  cacRegistration: File | null;
+  businessLicense: File | null;
+  taxClearance: File | null;
+};
+
+type DocUrls = {
+  bvnVerification: string;
+  proofOfAddress: string;
+  cacRegistration: string;
+  businessLicense: string;
+  taxClearance: string;
+};
+
+const FISH_TYPE_OPTIONS = [
+  { label: "Catfish", value: "catfish" },
+  { label: "Fingerlings", value: "fingerlings" },
+  { label: "Juveniles", value: "juveniles" },
+  { label: "Table Size", value: "table_size" },
+  { label: "Jumbo", value: "jumbo" },
+  { label: "Parent Stocks", value: "parent_stocks" },
+];
+
+const DOC_FIELDS: { key: keyof DocFiles; label: string }[] = [
+  { key: "bvnVerification", label: "BVN Verification Document" },
+  { key: "proofOfAddress", label: "Proof of Address" },
+  { key: "cacRegistration", label: "CAC Registration Certificate" },
+  { key: "businessLicense", label: "Business License" },
+  { key: "taxClearance", label: "Tax Clearance Certificate" },
+];
+
+// === Page
+
 export default function FarmerProfilePage() {
+  const [user, setUser] = useState<BackendUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [applyingCluster, setApplyingCluster] = useState(false);
+  const [wantsCluster, setWantsCluster] = useState(false);
+
+  // Open/close state for each FileUploadField accordion
+  const [openDoc, setOpenDoc] = useState<keyof DocFiles | null>(null);
+
   const [form, setForm] = useState<ProfileForm>({
     fullName: "",
     phoneNumber: "",
@@ -45,57 +95,65 @@ export default function FarmerProfilePage() {
     farmingCapacityKg: 0,
     yearsOfExperience: 0,
   });
+
   const [clusterForm, setClusterForm] = useState<ClusterForm>({
     businessName: "",
     cacNumber: "",
     warehouseLocation: "",
     distributionCapacity: 0,
     logisticsAvailable: false,
-    bvnVerification: false,
-    proofOfAddress: false,
-    cacRegistration: false,
-    businessLicense: false,
-    taxClearance: false,
   });
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [applying, setApplying] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  // Files held in state — not uploaded yet
+  const [docFiles, setDocFiles] = useState<DocFiles>({
+    bvnVerification: null,
+    proofOfAddress: null,
+    cacRegistration: null,
+    businessLicense: null,
+    taxClearance: null,
+  });
 
+  // Already-uploaded URLs from a previous application
+  const [existingDocUrls, setExistingDocUrls] = useState<Partial<DocUrls>>({});
+
+  // Load user
   useEffect(() => {
     let mounted = true;
     const load = async () => {
       setLoading(true);
       try {
-        const response = await authService.getMe();
-        const user = response.data.user;
+        const res = await authService.getMe();
+        const u = res.data.user;
         if (!mounted) return;
+        setUser(u);
         setForm({
-          fullName: user.full_name ?? "",
-          phoneNumber: user.phone_number ?? "",
-          email: user.email ?? "",
-          farmName: user.farm_name ?? "",
-          farmAddress: user.location_address ?? "",
-          state: user.location_state ?? "",
-          localGovernment: user.location_lga ?? "",
-          fishType: user.fish_type_preference ?? "",
-          farmingCapacityKg: Number(user.farming_capacity_kg ?? 0),
-          yearsOfExperience: Number(user.years_of_experience ?? 0),
+          fullName: u.full_name ?? "",
+          phoneNumber: u.phone_number ?? "",
+          email: u.email ?? "",
+          farmName: u.farm_name ?? "",
+          farmAddress: u.location_address ?? "",
+          state: u.location_state ?? "",
+          localGovernment: u.location_lga ?? "",
+          fishType: u.fish_type_preference ?? "",
+          farmingCapacityKg: Number(u.farming_capacity_kg ?? 0),
+          yearsOfExperience: Number(u.years_of_experience ?? 0),
         });
-        setClusterForm((prev) => ({
-          ...prev,
-          businessName: user.business_name ?? "",
-          cacNumber: user.cac_number ?? "",
-          warehouseLocation: user.warehouse_location ?? "",
-          distributionCapacity: Number(user.distribution_capacity ?? 0),
-          logisticsAvailable: Boolean(user.logistics_available),
-          bvnVerification: Boolean(user.bvn_doc_url),
-          proofOfAddress: Boolean(user.proof_of_address_url),
-          cacRegistration: Boolean(user.cac_registration_url),
-          businessLicense: Boolean(user.business_license_url),
-          taxClearance: Boolean(user.tax_clearance_url),
-        }));
+        setClusterForm({
+          businessName: u.business_name ?? "",
+          cacNumber: u.cac_number ?? "",
+          warehouseLocation: u.warehouse_location ?? "",
+          distributionCapacity: Number(u.distribution_capacity ?? 0),
+          logisticsAvailable: Boolean(u.logistics_available),
+        });
+        setExistingDocUrls({
+          bvnVerification: u.bvn_doc_url ?? undefined,
+          proofOfAddress: u.proof_of_address_url ?? undefined,
+          cacRegistration: u.cac_registration_url ?? undefined,
+          businessLicense: u.business_license_url ?? undefined,
+          taxClearance: u.tax_clearance_url ?? undefined,
+        });
+        // Pre-expand cluster section if already applied
+        if (u.is_cluster_farmer) setWantsCluster(true);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to load profile");
       } finally {
@@ -108,24 +166,9 @@ export default function FarmerProfilePage() {
     };
   }, []);
 
-  const profileRows = useMemo(
-    () => [
-      ["Full Name", "fullName" as const],
-      ["Phone Number", "phoneNumber" as const],
-      ["Email", "email" as const],
-      ["Farm Name", "farmName" as const],
-      ["Farm Address", "farmAddress" as const],
-      ["State", "state" as const],
-      ["Local Government", "localGovernment" as const],
-      ["Fish Type", "fishType" as const],
-      ["Farming Capacity (kg)", "farmingCapacityKg" as const],
-      ["Years Of Experience", "yearsOfExperience" as const],
-    ],
-    [],
-  );
-
+  // === Save profile
   const saveProfile = async () => {
-    setSaving(true);
+    setSavingProfile(true);
     try {
       await farmerService.updateProfile({
         fullName: form.fullName,
@@ -136,54 +179,102 @@ export default function FarmerProfilePage() {
         state: form.state,
         localGovernment: form.localGovernment,
         fishType: form.fishType,
-        farmingCapacityKg: Number(form.farmingCapacityKg),
-        yearsOfExperience: Number(form.yearsOfExperience),
+        farmingCapacityKg: form.farmingCapacityKg,
+        yearsOfExperience: form.yearsOfExperience,
       });
       setIsEditing(false);
-      toast.success("Profile updated successfully");
+      toast.success("Profile updated successfully.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update profile");
     } finally {
-      setSaving(false);
+      setSavingProfile(false);
     }
   };
 
+  // === Submit cluster application
+  // Uploads any new files first, then sends all URLs + text fields as JSON
   const submitClusterApplication = async () => {
-    setApplying(true);
+    setApplyingCluster(true);
     try {
+      // Upload any new files — skip if already have a URL for that doc
+      const uploadDoc = async (key: keyof DocFiles): Promise<string | undefined> => {
+        const file = docFiles[key];
+        if (file) return uploadFile(file);
+        return existingDocUrls[key as keyof DocUrls];
+      };
+
+      const [bvnUrl, poaUrl, cacUrl, licUrl, taxUrl] = await Promise.all([
+        uploadDoc("bvnVerification"),
+        uploadDoc("proofOfAddress"),
+        uploadDoc("cacRegistration"),
+        uploadDoc("businessLicense"),
+        uploadDoc("taxClearance"),
+      ]);
+
       await farmerService.applyForCluster({
         businessName: clusterForm.businessName,
         cacNumber: clusterForm.cacNumber,
         warehouseLocation: clusterForm.warehouseLocation,
-        distributionCapacity: Number(clusterForm.distributionCapacity),
+        distributionCapacity: clusterForm.distributionCapacity,
         logisticsAvailable: clusterForm.logisticsAvailable,
-        bvnVerification: clusterForm.bvnVerification,
-        proofOfAddress: clusterForm.proofOfAddress,
-        cacRegistration: clusterForm.cacRegistration,
-        businessLicense: clusterForm.businessLicense,
-        taxClearance: clusterForm.taxClearance,
+        bvnVerification: bvnUrl,
+        proofOfAddress: poaUrl,
+        cacRegistration: cacUrl,
+        businessLicense: licUrl,
+        taxClearance: taxUrl,
       });
-      toast.success("Cluster farmer application submitted");
+
+      toast.success("Application submitted. Admin will review shortly.");
+      // Refresh user to show updated status
+      const res = await authService.getMe();
+      setUser(res.data.user);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to submit application");
     } finally {
-      setApplying(false);
+      setApplyingCluster(false);
     }
   };
 
-  if (loading) {
-    return <div className="text-(--text-colour)">Loading profile...</div>;
-  }
+  // === Derived state
+  const hasApplied = user?.is_cluster_farmer ?? false;
+  const isApproved = user?.cluster_approved ?? false;
+
+  const allDocsPresent = DOC_FIELDS.every(
+    ({ key }) => docFiles[key] !== null || !!existingDocUrls[key as keyof DocUrls],
+  );
+
+  const clusterFormComplete =
+    clusterForm.businessName.trim().length >= 2 &&
+    clusterForm.cacNumber.trim().length >= 3 &&
+    clusterForm.warehouseLocation.trim().length >= 3 &&
+    clusterForm.distributionCapacity > 0;
+
+  const canSubmitCluster = allDocsPresent && clusterFormComplete;
+
+  if (loading) return <LoadingState message="Loading profile..." size="lg" />;
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
         <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">My Profile</h1>
-        <p className="font-roboto-slab text-(--text-colour)">Manage your farmer profile</p>
+        <p className="font-roboto-slab text-(--text-colour)">
+          Manage your farmer profile and cluster application
+        </p>
       </motion.div>
 
-      <div className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl)">
-        <div className="mb-4 flex items-center justify-between">
+      {/* === Profile Section */}
+      <motion.div
+        variants={FADE_IN_VARIANT}
+        initial="hidden"
+        animate="visible"
+        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+      >
+        <div className="mb-5 flex items-center justify-between">
           <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">
             Profile Information
           </h2>
@@ -191,22 +282,22 @@ export default function FarmerProfilePage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setIsEditing(false)}
-                className="rounded-xl border border-(--border-gray) px-4 py-2 text-sm"
+                className="font-roboto-slab rounded-xl border border-(--border-gray) px-4 py-2 text-sm text-(--text-colour) transition hover:bg-(--bg-pink)"
               >
                 Cancel
               </button>
               <button
                 onClick={saveProfile}
-                disabled={saving}
-                className="rounded-xl bg-(--theme-green-dark) px-4 py-2 text-sm text-white"
+                disabled={savingProfile}
+                className="font-roboto-slab rounded-xl bg-(--theme-green-dark) px-4 py-2 text-sm text-white transition hover:opacity-90 disabled:opacity-50"
               >
-                {saving ? "Saving..." : "Save"}
+                {savingProfile ? "Saving..." : "Save"}
               </button>
             </div>
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="rounded-xl border border-(--border-gray) px-4 py-2 text-sm"
+              className="font-roboto-slab rounded-xl border border-(--border-gray) px-4 py-2 text-sm text-(--text-colour) transition hover:bg-(--bg-pink)"
             >
               Edit
             </button>
@@ -214,99 +305,283 @@ export default function FarmerProfilePage() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {profileRows.map(([label, key]) => (
-            <label key={key} className="text-sm text-(--text-colour)">
-              <span className="mb-1 block font-medium text-(--heading-colour)">{label}</span>
-              <input
-                type={
-                  key === "email"
-                    ? "email"
-                    : key.includes("Capacity") || key.includes("years")
-                      ? "number"
-                      : "text"
-                }
-                value={String(form[key as keyof ProfileForm])}
-                disabled={!isEditing}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    [key]:
-                      key === "farmingCapacityKg" || key === "yearsOfExperience"
-                        ? Number(e.target.value || 0)
-                        : e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
-              />
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl)">
-        <h2 className="font-ubuntu mb-4 text-xl font-semibold text-(--heading-colour)">
-          Cluster Farmer Application
-        </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <input
-            placeholder="Business Name"
-            value={clusterForm.businessName}
-            onChange={(e) => setClusterForm((p) => ({ ...p, businessName: e.target.value }))}
-            className="rounded-lg border border-(--border-input) px-3 py-2"
-          />
-          <input
-            placeholder="CAC Number"
-            value={clusterForm.cacNumber}
-            onChange={(e) => setClusterForm((p) => ({ ...p, cacNumber: e.target.value }))}
-            className="rounded-lg border border-(--border-input) px-3 py-2"
-          />
-          <input
-            placeholder="Warehouse Location"
-            value={clusterForm.warehouseLocation}
-            onChange={(e) => setClusterForm((p) => ({ ...p, warehouseLocation: e.target.value }))}
-            className="rounded-lg border border-(--border-input) px-3 py-2"
-          />
-          <input
-            type="number"
-            placeholder="Distribution Capacity"
-            value={clusterForm.distributionCapacity}
-            onChange={(e) =>
-              setClusterForm((p) => ({ ...p, distributionCapacity: Number(e.target.value || 0) }))
-            }
-            className="rounded-lg border border-(--border-input) px-3 py-2"
-          />
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {(
             [
-              ["logisticsAvailable", "Logistics Available"],
-              ["bvnVerification", "BVN Verification Document"],
-              ["proofOfAddress", "Proof Of Address"],
-              ["cacRegistration", "CAC Registration"],
-              ["businessLicense", "Business License"],
-              ["taxClearance", "Tax Clearance"],
-            ] as const
-          ).map(([key, label]) => (
-            <label key={key} className="flex items-center gap-2 text-sm text-(--text-colour)">
-              <input
-                type="checkbox"
-                checked={clusterForm[key]}
-                onChange={(e) => setClusterForm((p) => ({ ...p, [key]: e.target.checked }))}
-              />
-              {label}
-            </label>
+              ["Full Name", "fullName"],
+              ["Phone Number", "phoneNumber"],
+              ["Email", "email"],
+              ["Farm Name", "farmName"],
+              ["Farm Address", "farmAddress"],
+              ["State", "state"],
+              ["Local Government", "localGovernment"],
+            ] as [string, keyof ProfileForm][]
+          ).map(([label, key]) => (
+            <DynamicInput
+              key={key}
+              label={label}
+              fieldType={key === "email" ? "email" : key === "phoneNumber" ? "tel" : "text"}
+              value={String(form[key])}
+              disabled={!isEditing}
+              onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
+            />
           ))}
+
+          {/* Fish Type select */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+              Fish Type
+            </label>
+            {isEditing ? (
+              <SelectInput
+                label=""
+                value={form.fishType}
+                onValueChange={(v) => setForm((prev) => ({ ...prev, fishType: v }))}
+                options={FISH_TYPE_OPTIONS}
+              />
+            ) : (
+              <input
+                value={form.fishType}
+                disabled
+                className="font-roboto-slab w-full rounded-lg border border-(--border-input) px-3 py-2 text-sm disabled:bg-gray-50"
+              />
+            )}
+          </div>
+
+          <DynamicInput
+            label="Farming Capacity (kg)"
+            value={String(form.farmingCapacityKg)}
+            disabled={!isEditing}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, farmingCapacityKg: Number(e.target.value || 0) }))
+            }
+          />
+
+          <DynamicInput
+            label="Years of Experience"
+            value={String(form.yearsOfExperience)}
+            disabled={!isEditing}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, yearsOfExperience: Number(e.target.value || 0) }))
+            }
+          />
+        </div>
+      </motion.div>
+
+      {/* === Cluster Farmer Application Section */}
+      <motion.div
+        variants={FADE_IN_VARIANT}
+        initial="hidden"
+        animate="visible"
+        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+      >
+        {/* Trigger checkbox */}
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            id="wantsCluster"
+            checked={wantsCluster}
+            onChange={(e) => setWantsCluster(e.target.checked)}
+            disabled={hasApplied}
+            className="mt-1 h-5 w-5 cursor-pointer rounded border-gray-300 text-(--theme-green-dark) focus:ring-2 focus:ring-(--theme-green-dark) disabled:cursor-default"
+          />
+          <div>
+            <label
+              htmlFor="wantsCluster"
+              className={`font-ubuntu block text-lg font-semibold text-(--heading-colour) ${!hasApplied ? "cursor-pointer" : ""}`}
+            >
+              Apply to become a Cluster Farmer
+            </label>
+            <p className="font-roboto-slab mt-0.5 text-sm text-(--text-colour)">
+              Cluster farmers aggregate supply from multiple farmers and sell on the marketplace
+              under their name.
+            </p>
+          </div>
         </div>
 
-        <button
-          onClick={submitClusterApplication}
-          disabled={applying}
-          className="mt-5 rounded-xl bg-(--theme-green-dark) px-5 py-2 text-white"
-        >
-          {applying ? "Submitting..." : "Submit Application"}
-        </button>
-      </div>
+        {/* Status banner — shown when already applied */}
+        <AnimatePresence>
+          {hasApplied && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div
+                className={`mt-4 flex items-center gap-3 rounded-xl p-4 ${
+                  isApproved
+                    ? "border border-green-200 bg-green-50"
+                    : "border border-yellow-200 bg-yellow-50"
+                }`}
+              >
+                {isApproved ? (
+                  <CheckCircle size={20} className="shrink-0 text-green-600" />
+                ) : (
+                  <Clock size={20} className="shrink-0 text-yellow-600" />
+                )}
+                <p
+                  className={`font-roboto-slab text-sm font-medium ${isApproved ? "text-green-800" : "text-yellow-800"}`}
+                >
+                  {isApproved
+                    ? "Approved — you are a Cluster Farmer. Log out and back in to access your cluster dashboard."
+                    : "Application under review. Admin will approve or reject shortly."}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Application form — shown when checkbox is checked */}
+        <AnimatePresence>
+          {wantsCluster && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="overflow-hidden"
+            >
+              <div className="mt-6 flex flex-col gap-(--gap-lg)">
+                {/* Text fields */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <DynamicInput
+                    label="Business Name"
+                    value={clusterForm.businessName}
+                    onChange={(e) =>
+                      setClusterForm((p) => ({ ...p, businessName: e.target.value }))
+                    }
+                    placeholder="Your registered business name"
+                    required
+                  />
+                  <DynamicInput
+                    label="CAC Number"
+                    value={clusterForm.cacNumber}
+                    onChange={(e) => setClusterForm((p) => ({ ...p, cacNumber: e.target.value }))}
+                    placeholder="CAC registration number"
+                    required
+                  />
+                  <DynamicInput
+                    label="Warehouse Location"
+                    value={clusterForm.warehouseLocation}
+                    onChange={(e) =>
+                      setClusterForm((p) => ({ ...p, warehouseLocation: e.target.value }))
+                    }
+                    placeholder="Address of your warehouse"
+                    required
+                  />
+                  <DynamicInput
+                    label="Distribution Capacity (kg)"
+                    value={String(clusterForm.distributionCapacity)}
+                    onChange={(e) =>
+                      setClusterForm((p) => ({
+                        ...p,
+                        distributionCapacity: Number(e.target.value || 0),
+                      }))
+                    }
+                    placeholder="Max kg you can distribute"
+                    required
+                  />
+                </div>
+
+                {/* Logistics checkbox */}
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="logisticsAvailable"
+                    checked={clusterForm.logisticsAvailable}
+                    onChange={(e) =>
+                      setClusterForm((p) => ({ ...p, logisticsAvailable: e.target.checked }))
+                    }
+                    className="h-5 w-5 cursor-pointer rounded border-gray-300 text-(--theme-green-dark) focus:ring-2 focus:ring-(--theme-green-dark)"
+                  />
+                  <label
+                    htmlFor="logisticsAvailable"
+                    className="font-roboto-slab cursor-pointer text-sm font-medium text-(--heading-colour)"
+                  >
+                    I have logistics / transportation available for distribution
+                  </label>
+                </div>
+
+                {/* Document uploads */}
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-ubuntu text-base font-semibold text-(--heading-colour)">
+                      Required Documents
+                    </h3>
+                    <span className="font-roboto-slab text-xs text-gray-400">
+                      (
+                      {
+                        DOC_FIELDS.filter(
+                          ({ key }) =>
+                            docFiles[key] !== null || !!existingDocUrls[key as keyof DocUrls],
+                        ).length
+                      }
+                      /{DOC_FIELDS.length} uploaded)
+                    </span>
+                  </div>
+
+                  {DOC_FIELDS.map(({ key, label }) => {
+                    const hasExisting = !!existingDocUrls[key as keyof DocUrls];
+                    const hasNew = docFiles[key] !== null;
+                    return (
+                      <div key={key}>
+                        {/* Show existing URL badge if already uploaded and no new file selected */}
+                        {hasExisting && !hasNew && (
+                          <div className="mb-1 flex items-center gap-2">
+                            <CheckCircle size={14} className="text-green-600" />
+                            <span className="font-roboto-slab text-xs text-green-700">
+                              Previously uploaded — upload a new file to replace
+                            </span>
+                          </div>
+                        )}
+                        <FileUploadField
+                          label={label}
+                          required={!hasExisting}
+                          isOpen={openDoc === key}
+                          onToggle={() => setOpenDoc((prev) => (prev === key ? null : key))}
+                          onFileChange={(file) => setDocFiles((prev) => ({ ...prev, [key]: file }))}
+                          onUploadComplete={(file) =>
+                            setDocFiles((prev) => ({ ...prev, [key]: file }))
+                          }
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Validation hint */}
+                {!canSubmitCluster && (
+                  <div className="flex items-center gap-2 rounded-xl bg-yellow-50 p-3">
+                    <AlertCircle size={16} className="shrink-0 text-yellow-600" />
+                    <p className="font-roboto-slab text-xs text-yellow-800">
+                      {!clusterFormComplete
+                        ? "Fill in all business fields above."
+                        : "Upload all 5 required documents to submit."}
+                    </p>
+                  </div>
+                )}
+
+                {/* Submit */}
+                <div className="max-w-sm">
+                  {canSubmitCluster ? (
+                    <SubmitPrimaryButton
+                      loading={applyingCluster}
+                      onClick={submitClusterApplication}
+                      type="button"
+                    >
+                      {hasApplied ? "Update Application" : "Submit Application"}
+                    </SubmitPrimaryButton>
+                  ) : (
+                    <SubmitSecondaryButton disabled type="button">
+                      {hasApplied ? "Update Application" : "Submit Application"}
+                    </SubmitSecondaryButton>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

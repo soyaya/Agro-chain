@@ -78,11 +78,12 @@ export interface ClusterApplicationPayload {
   warehouseLocation?: string;
   distributionCapacity?: number;
   logisticsAvailable?: boolean;
-  bvnVerification?: boolean;
-  proofOfAddress?: boolean;
-  cacRegistration?: boolean;
-  businessLicense?: boolean;
-  taxClearance?: boolean;
+  // Document URLs — obtained after uploading files to Cloudinary
+  bvnVerification?: string;
+  proofOfAddress?: string;
+  cacRegistration?: string;
+  businessLicense?: string;
+  taxClearance?: string;
 }
 
 // === Farmer Service
