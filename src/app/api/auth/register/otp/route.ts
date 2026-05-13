@@ -1,5 +1,5 @@
-import { forwardAuthRequest } from "../../_utils";
+import { forwardAuthAndSetCookies } from "../../_utils";
 
 export async function POST(req: Request) {
-  return forwardAuthRequest(req, "/auth/register/otp");
+  return forwardAuthAndSetCookies(req, "/auth/register/otp");
 }

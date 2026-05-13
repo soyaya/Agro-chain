@@ -1,12 +1,18 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Plus, FileText, Clock, CheckCircle, XCircle, DollarSign, Calendar } from "lucide-react";
-import Link from "next/link";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
-import type { LoanApplication, LoanApplicationStatus } from "~/types/index";
+// === Coming Soon — existing content preserved below
+// import { motion } from "framer-motion";
+// import { Plus, FileText, Clock, CheckCircle, XCircle, DollarSign, Calendar } from "lucide-react";
+// import Link from "next/link";
+// import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+// import type { LoanApplication, LoanApplicationStatus } from "~/types/index";
+
+import { ComingSoon } from "~/components/shared/ComingSoon";
 
 export default function LoanApplicationsPage() {
+  return <ComingSoon />;
+
+  /* === Original content (preserved, not deleted)
   // Mock data - replace with actual data fetching
   const loanApplications: LoanApplication[] = [
     {
@@ -112,7 +118,6 @@ export default function LoanApplicationsPage() {
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -136,7 +141,6 @@ export default function LoanApplicationsPage() {
         </Link>
       </motion.div>
 
-      {/* Stats Grid */}
       <motion.div
         variants={STAGGER_CONTAINER_VARIANT}
         initial="hidden"
@@ -165,7 +169,6 @@ export default function LoanApplicationsPage() {
         })}
       </motion.div>
 
-      {/* Applications List */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -211,7 +214,6 @@ export default function LoanApplicationsPage() {
                           {statusConfig.label}
                         </span>
                       </div>
-                      
                       <div className="grid grid-cols-1 gap-(--space-sm) sm:grid-cols-2 mb-(--space-md)">
                         <div>
                           <p className="font-roboto-slab text-xs text-gray-500">Loan Type</p>
@@ -240,11 +242,9 @@ export default function LoanApplicationsPage() {
                           </div>
                         )}
                       </div>
-                      
                       <p className="font-roboto-slab text-sm text-(--text-colour)">
                         <span className="font-medium">Purpose:</span> {application.purpose}
                       </p>
-                      
                       {application.repaymentTerms && (
                         <div className="mt-(--space-md) rounded-lg bg-green-50 p-(--space-md)">
                           <p className="font-roboto-slab text-xs text-green-800 mb-2">Repayment Terms</p>
@@ -271,7 +271,6 @@ export default function LoanApplicationsPage() {
                         </div>
                       )}
                     </div>
-                    
                     <Link
                       href={`/farmers-dashboard/financial/loans/${application.id}`}
                       className="font-roboto-slab rounded-lg border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-sm) text-center text-sm font-medium text-(--heading-colour) hover:cursor-pointer ease-in-out transition-all duration-300 hover:bg-(--bg-pink) focus:ring-2 focus:ring-(--border-gray) focus:ring-offset-2 focus:outline-none"
@@ -287,4 +286,5 @@ export default function LoanApplicationsPage() {
       </motion.div>
     </div>
   );
+  */
 }

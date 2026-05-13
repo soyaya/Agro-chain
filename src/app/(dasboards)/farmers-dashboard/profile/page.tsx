@@ -184,7 +184,9 @@ export default function FarmerProfilePage() {
 
       <div className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl)">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">Profile Information</h2>
+          <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">
+            Profile Information
+          </h2>
           {isEditing ? (
             <div className="flex gap-2">
               <button
@@ -216,15 +218,22 @@ export default function FarmerProfilePage() {
             <label key={key} className="text-sm text-(--text-colour)">
               <span className="mb-1 block font-medium text-(--heading-colour)">{label}</span>
               <input
-                type={key === "email" ? "email" : key.includes("Capacity") || key.includes("years") ? "number" : "text"}
-                value={String(form[key])}
+                type={
+                  key === "email"
+                    ? "email"
+                    : key.includes("Capacity") || key.includes("years")
+                      ? "number"
+                      : "text"
+                }
+                value={String(form[key as keyof ProfileForm])}
                 disabled={!isEditing}
                 onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
-                    [key]: key === "farmingCapacityKg" || key === "yearsOfExperience"
-                      ? Number(e.target.value || 0)
-                      : e.target.value,
+                    [key]:
+                      key === "farmingCapacityKg" || key === "yearsOfExperience"
+                        ? Number(e.target.value || 0)
+                        : e.target.value,
                   }))
                 }
                 className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
@@ -239,10 +248,33 @@ export default function FarmerProfilePage() {
           Cluster Farmer Application
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <input placeholder="Business Name" value={clusterForm.businessName} onChange={(e) => setClusterForm((p) => ({ ...p, businessName: e.target.value }))} className="rounded-lg border border-(--border-input) px-3 py-2" />
-          <input placeholder="CAC Number" value={clusterForm.cacNumber} onChange={(e) => setClusterForm((p) => ({ ...p, cacNumber: e.target.value }))} className="rounded-lg border border-(--border-input) px-3 py-2" />
-          <input placeholder="Warehouse Location" value={clusterForm.warehouseLocation} onChange={(e) => setClusterForm((p) => ({ ...p, warehouseLocation: e.target.value }))} className="rounded-lg border border-(--border-input) px-3 py-2" />
-          <input type="number" placeholder="Distribution Capacity" value={clusterForm.distributionCapacity} onChange={(e) => setClusterForm((p) => ({ ...p, distributionCapacity: Number(e.target.value || 0) }))} className="rounded-lg border border-(--border-input) px-3 py-2" />
+          <input
+            placeholder="Business Name"
+            value={clusterForm.businessName}
+            onChange={(e) => setClusterForm((p) => ({ ...p, businessName: e.target.value }))}
+            className="rounded-lg border border-(--border-input) px-3 py-2"
+          />
+          <input
+            placeholder="CAC Number"
+            value={clusterForm.cacNumber}
+            onChange={(e) => setClusterForm((p) => ({ ...p, cacNumber: e.target.value }))}
+            className="rounded-lg border border-(--border-input) px-3 py-2"
+          />
+          <input
+            placeholder="Warehouse Location"
+            value={clusterForm.warehouseLocation}
+            onChange={(e) => setClusterForm((p) => ({ ...p, warehouseLocation: e.target.value }))}
+            className="rounded-lg border border-(--border-input) px-3 py-2"
+          />
+          <input
+            type="number"
+            placeholder="Distribution Capacity"
+            value={clusterForm.distributionCapacity}
+            onChange={(e) =>
+              setClusterForm((p) => ({ ...p, distributionCapacity: Number(e.target.value || 0) }))
+            }
+            className="rounded-lg border border-(--border-input) px-3 py-2"
+          />
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">

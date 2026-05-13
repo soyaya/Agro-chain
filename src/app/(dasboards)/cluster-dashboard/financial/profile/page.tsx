@@ -1,11 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus, CreditCard, DollarSign, Receipt, AlertCircle, CheckCircle } from "lucide-react";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
-import type { FarmerFinancialProfile, RiskLevel } from "~/types/index";
+// === Coming Soon — existing content preserved below
+// import { motion } from "framer-motion";
+// import { TrendingUp, TrendingDown, Minus, CreditCard, DollarSign, Receipt, AlertCircle, CheckCircle } from "lucide-react";
+// import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+// import type { FarmerFinancialProfile, RiskLevel } from "~/types/index";
+
+import { ComingSoon } from "~/components/shared/ComingSoon";
 
 export default function FinancialProfilePage() {
+  return <ComingSoon />;
+
+  /* === Original content (preserved, not deleted)
   // Mock data - replace with actual data fetching
   const financialProfile: FarmerFinancialProfile = {
     farmerId: "farmer-1",
@@ -90,7 +96,6 @@ export default function FinancialProfilePage() {
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -104,7 +109,6 @@ export default function FinancialProfilePage() {
         </p>
       </motion.div>
 
-      {/* Stats Grid */}
       <motion.div
         variants={STAGGER_CONTAINER_VARIANT}
         initial="hidden"
@@ -136,7 +140,6 @@ export default function FinancialProfilePage() {
         })}
       </motion.div>
 
-      {/* Credit Score Details */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -146,7 +149,6 @@ export default function FinancialProfilePage() {
         <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
           Credit Score Overview
         </h2>
-        
         <div className="flex flex-col gap-(--space-lg) lg:flex-row lg:items-center">
           <div className="flex-1">
             <div className="mb-(--space-md)">
@@ -167,7 +169,6 @@ export default function FinancialProfilePage() {
                 />
               </div>
             </div>
-            
             <div className={`rounded-lg p-(--space-md) ${creditScoreConfig.bgColor}`}>
               <p className={`font-ubuntu text-lg font-semibold mb-1 ${creditScoreConfig.color}`}>
                 {creditScoreConfig.label} Credit Score
@@ -177,7 +178,6 @@ export default function FinancialProfilePage() {
               </p>
             </div>
           </div>
-          
           <div className="lg:w-1/3">
             <div className="rounded-xl border border-(--border-input) p-(--space-lg) bg-gray-50">
               <p className="font-roboto-slab text-xs text-gray-600 mb-2">Score Breakdown</p>
@@ -204,7 +204,6 @@ export default function FinancialProfilePage() {
         </div>
       </motion.div>
 
-      {/* Credit Utilization */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -214,7 +213,6 @@ export default function FinancialProfilePage() {
         <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
           Credit Utilization
         </h2>
-        
         <div className="mb-(--space-md)">
           <div className="flex items-center justify-between mb-2">
             <span className="font-roboto-slab text-sm text-gray-600">
@@ -235,7 +233,6 @@ export default function FinancialProfilePage() {
             />
           </div>
         </div>
-        
         <p className="font-roboto-slab text-sm text-gray-600">
           {creditUtilization < 30 ? "Excellent! Keep your utilization below 30% for the best credit score." :
            creditUtilization < 50 ? "Good utilization rate. Try to keep it below 30% for better credit." :
@@ -244,7 +241,6 @@ export default function FinancialProfilePage() {
         </p>
       </motion.div>
 
-      {/* Risk Assessment */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -260,13 +256,11 @@ export default function FinancialProfilePage() {
             {riskConfig.label}
           </span>
         </div>
-        
         <div className="flex flex-col gap-(--space-md)">
           {financialProfile.riskAssessment.factors.map((factor, index) => {
             const ImpactIcon = getImpactIcon(factor.impact);
             const impactColor = factor.impact === "positive" ? "text-green-600" :
                                factor.impact === "negative" ? "text-red-600" : "text-gray-600";
-            
             return (
               <div
                 key={index}
@@ -296,7 +290,6 @@ export default function FinancialProfilePage() {
             );
           })}
         </div>
-        
         <div className="mt-(--space-lg) rounded-lg bg-blue-50 p-(--space-md)">
           <p className="font-roboto-slab text-xs text-blue-800">
             Last assessed: {financialProfile.riskAssessment.lastAssessment.toLocaleDateString()} • 
@@ -306,4 +299,5 @@ export default function FinancialProfilePage() {
       </motion.div>
     </div>
   );
+  */
 }

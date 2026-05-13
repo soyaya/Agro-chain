@@ -2,29 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Package, Clock, CheckCircle, XCircle, Truck, Eye } from "lucide-react";
+import { Package, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { Order, OrderStatus } from "~/types";
+import { buyerService, type BackendOrder } from "~/lib/services/buyer.service";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, STATUS_COLORS } from "~/types/constants";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { LoadingState } from "~/components/ui/LoadingState";
-import { apiFetch } from "~/lib/api";
-
-type OrdersResponse = Order[] | { orders?: Order[]; data?: Order[] };
-
-const statusIcons: Record<OrderStatus, typeof Package> = {
-  pending: Clock,
-  confirmed: CheckCircle,
-  processing: Package,
-  shipped: Truck,
-  delivered: CheckCircle,
-  cancelled: XCircle,
-};
 
 export default function BuyerOrdersPage() {
   const router = useRouter();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [filterStatus, setFilterStatus] = useState<OrderStatus | "all">("all");
+  const [orders, setOrders] = useState<BackendOrder[]>([]);
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -35,10 +23,9 @@ export default function BuyerOrdersPage() {
       setLoading(true);
       setErrorMessage(null);
       try {
-        const response = await apiFetch<OrdersResponse>("/buyers/orders");
-        const payload = Array.isArray(response) ? response : response.orders ?? response.data ?? [];
+        const response = await buyerService.getOrders();
         if (mounted) {
-          setOrders(payload);
+          setOrders(response.data.orders ?? []);
         }
       } catch (error) {
         const message = error instanceof Error ? error.message : "Failed to load orders";
@@ -52,7 +39,7 @@ export default function BuyerOrdersPage() {
       }
     };
 
-    loadOrders();
+    void loadOrders();
 
     return () => {
       mounted = false;
@@ -62,9 +49,9 @@ export default function BuyerOrdersPage() {
   const filteredOrders =
     filterStatus === "all" ? orders : orders.filter((o) => o.status === filterStatus);
 
-  const statusCounts = {
+  const statusCounts: Record<string, number> = {
     all: orders.length,
-    pending: orders.filter((o) => o.status === "pending").length,
+    pending: orders.filter((o) => ["pending", "payment_pending"].includes(o.status)).length,
     confirmed: orders.filter((o) => o.status === "confirmed").length,
     processing: orders.filter((o) => o.status === "processing").length,
     shipped: orders.filter((o) => o.status === "shipped").length,
@@ -146,12 +133,13 @@ export default function BuyerOrdersPage() {
           className="flex flex-col gap-4"
         >
           {filteredOrders.map((order) => {
-            const StatusIcon = statusIcons[order.status];
-            const statusColor = STATUS_COLORS[order.status] || "bg-gray-100 text-gray-800";
+            const statusColor =
+              STATUS_COLORS[order.status as keyof typeof STATUS_COLORS] ??
+              "bg-gray-100 text-gray-800";
 
             return (
               <motion.div
-                key={order.id}
+                key={order.orderId}
                 variants={FADE_IN_VARIANT}
                 className="rounded-2xl border border-gray-200 bg-(--white) p-6 transition-all duration-200 hover:shadow-lg"
               >
@@ -160,11 +148,11 @@ export default function BuyerOrdersPage() {
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                       <div className="rounded-xl bg-green-50 p-3">
-                        <StatusIcon size={24} className="text-green-600" />
+                        <Package size={24} className="text-green-600" />
                       </div>
                       <div>
                         <h3 className="font-ubuntu text-lg font-bold text-gray-900">
-                          Order #{order.id}
+                          {order.orderNumber}
                         </h3>
                         <p className="font-roboto-slab text-sm text-gray-600">
                           {new Date(order.createdAt).toLocaleDateString("en-US", {
@@ -183,24 +171,6 @@ export default function BuyerOrdersPage() {
                     </div>
                   </div>
 
-                  {/* Items */}
-                  <div className="flex flex-col gap-2 rounded-xl bg-gray-50 p-4">
-                    {order.items.map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Package size={18} className="text-gray-400" />
-                          <span className="font-roboto-slab text-gray-900">
-                            {item.fishType}
-                            {item.variant ? ` • ${item.variant}` : ""} - {item.weightKg}kg × {item.quantity}
-                          </span>
-                        </div>
-                        <span className="font-roboto-slab font-semibold text-gray-900">
-                          ₦{item.totalPrice.toLocaleString()}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
                   {/* Details */}
                   <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                     <div>
@@ -212,23 +182,18 @@ export default function BuyerOrdersPage() {
                     <div>
                       <p className="font-roboto-slab mb-1 text-gray-600">Delivery</p>
                       <p className="font-roboto-slab font-medium text-gray-900">
-                        {order.deliveryOption}
+                        {order.deliveryOption ?? "—"}
                       </p>
                     </div>
                     <div>
                       <p className="font-roboto-slab mb-1 text-gray-600">Payment Status</p>
                       <p
                         className={`font-roboto-slab font-medium ${
-                          order.paymentStatus === "paid" ? "text-green-600" : "text-yellow-600"
+                          order.payment_status === "paid" ? "text-green-600" : "text-yellow-600"
                         }`}
                       >
-                        {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="font-roboto-slab mb-1 text-gray-600">Total Amount</p>
-                      <p className="font-ubuntu text-lg font-bold text-gray-900">
-                        ₦{order.totalAmount.toLocaleString()}
+                        {order.payment_status.charAt(0).toUpperCase() +
+                          order.payment_status.slice(1)}
                       </p>
                     </div>
                   </div>
@@ -236,22 +201,12 @@ export default function BuyerOrdersPage() {
                   {/* Actions */}
                   <div className="flex flex-col gap-3 border-t border-gray-200 pt-4 sm:flex-row">
                     <button
-                      onClick={() => router.push(`/buyers-dashboard/orders/${order.id}`)}
+                      onClick={() => router.push(`/buyers-dashboard/orders/${order.orderId}`)}
                       className="font-roboto-slab flex flex-1 items-center justify-center gap-2 rounded-full bg-green-600 px-6 py-3 font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
                     >
                       <Eye size={18} />
                       View Details
                     </button>
-                    {order.status === "pending" && (
-                      <button
-                        onClick={() => {
-                          // TODO: Implement cancel order
-                        }}
-                        className="font-roboto-slab flex-1 rounded-full border border-red-600 px-6 py-3 font-medium text-(--error-red) transition-colors hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
-                      >
-                        Cancel Order
-                      </button>
-                    )}
                   </div>
                 </div>
               </motion.div>

@@ -37,7 +37,7 @@ export interface FarmerListingRecord {
   listedDate: string;
   totalFishAvailable: number;
   totalAvailableKg: number;
-  packaging: { weightKg: number; quantity: number };
+  packaging: { weightKg: number; quantity: number; pricePerUnit: number };
   status: "approved" | "pending" | "rejected";
   isApproved: boolean;
   createdAt: string;

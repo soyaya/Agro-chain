@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { AuthUser, DashboardType } from "~/types/index";
 import { authService, type BackendUser } from "~/lib/services/auth.service";
+import { ApiError } from "~/lib/api";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -20,28 +21,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = sessionStorage.getItem("auth_token");
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
       try {
+        // Always attempt getMe — the auth_token httpOnly cookie is sent automatically.
+        // A 401 means no valid session, which is fine.
         const response = await authService.getMe();
-        const backendUser = response.data.user;
-        const mapped = mapBackendUser(backendUser);
-        setUser(mapped);
-        localStorage.setItem("auth_user", JSON.stringify(backendUser));
+        setUser(mapBackendUser(response.data.user));
       } catch (error) {
-        sessionStorage.removeItem("auth_token");
-        localStorage.removeItem("auth_user");
+        // 401 = not logged in (expected)
+        // status 0 = network error / backend not running (expected in dev)
+        // anything else is unexpected — log it
+        const isExpected =
+          error instanceof ApiError && (error.status === 401 || error.status === 0);
+        if (!isExpected) {
+          console.error("Failed to fetch user session:", error);
+        }
         setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchUser();
+    void fetchUser();
   }, []);
 
   const updateUser = (updatedUser: AuthUser) => {
@@ -50,22 +50,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      const refreshToken = localStorage.getItem("refresh_token") ?? undefined;
-      await authService.logout(refreshToken).catch(() => null);
+      await authService.logout();
     } finally {
-      sessionStorage.removeItem("auth_token");
-      localStorage.removeItem("auth_user");
-      localStorage.removeItem("refresh_token");
-      document.cookie = "currentUser=; path=/; max-age=0; samesite=lax";
       setUser(null);
       window.location.replace("/login");
     }
   };
 
-  // Determine dashboard type based on user role and pathname
   const getDashboardType = (): DashboardType => {
     if (!user) return "farmer";
-
     if (user.role === "admin") return "admin";
     if (user.role === "buyer") return "buyer";
     if (user.isClusterFarmer) return "cluster-farmer";
@@ -102,10 +95,8 @@ function mapBackendUser(user: BackendUser): AuthUser {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-
   if (context === undefined) {
     throw new Error("useAuth must be used within AuthProvider");
   }
-
   return context;
 }

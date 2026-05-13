@@ -13,6 +13,12 @@ import { apiFetch } from "~/lib/api";
 
 type OrderResponse = Order | { order?: Order; data?: Order };
 
+function extractOrder(response: OrderResponse): Order | null {
+  if ("id" in response) return response as Order;
+  const r = response as { order?: Order; data?: Order };
+  return r.order ?? r.data ?? null;
+}
+
 const statusIcons: Record<OrderStatus, typeof Package> = {
   pending: Clock,
   confirmed: CheckCircle,
@@ -42,7 +48,7 @@ export default function OrderDetailsPage() {
       setErrorMessage(null);
       try {
         const response = await apiFetch<OrderResponse>(`/buyers/orders/${orderId}`);
-        const payload = "id" in (response as Order) ? (response as Order) : response.order ?? response.data ?? null;
+        const payload = extractOrder(response);
         if (mounted) {
           setOrder(payload ?? null);
           setDeliveryConfirmed(Boolean(payload?.deliveryConfirmed));
@@ -148,7 +154,7 @@ export default function OrderDetailsPage() {
           </button>
           <h1 className="font-ubuntu text-3xl font-bold text-gray-900">Order Details</h1>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <span className={`rounded-full px-4 py-2 text-sm font-medium ${statusColor}`}>
             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
@@ -168,11 +174,17 @@ export default function OrderDetailsPage() {
       >
         <div className="flex flex-col gap-6 lg:col-span-2">
           {/* Order Items */}
-          <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          >
             <h2 className="font-ubuntu mb-4 text-xl font-bold text-gray-900">Items Ordered</h2>
             <div className="flex flex-col gap-4">
               {order.items.map((item, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-xl border border-gray-100 bg-gray-50 p-4">
+                <div
+                  key={idx}
+                  className="flex flex-col rounded-xl border border-gray-100 bg-gray-50 p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
                   <div className="flex items-center gap-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 text-green-600">
                       <Package size={24} />
@@ -183,11 +195,12 @@ export default function OrderDetailsPage() {
                         {item.variant ? ` • ${item.variant}` : ""}
                       </p>
                       <p className="font-roboto-slab text-sm text-gray-500">
-                        {item.weightKg}kg Pack × {item.quantity} {item.processed ? "• Processed" : "• Unprocessed"}
+                        {item.weightKg}kg Pack × {item.quantity}{" "}
+                        {item.processed ? "• Processed" : "• Unprocessed"}
                       </p>
                     </div>
                   </div>
-                  <div className="mt-4 sm:mt-0 text-left sm:text-right">
+                  <div className="mt-4 text-left sm:mt-0 sm:text-right">
                     <p className="font-roboto-slab font-bold text-gray-900">
                       ₦{item.totalPrice.toLocaleString()}
                     </p>
@@ -198,7 +211,7 @@ export default function OrderDetailsPage() {
                 </div>
               ))}
             </div>
-            
+
             <div className="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-6">
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Subtotal</span>
@@ -207,23 +220,27 @@ export default function OrderDetailsPage() {
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Delivery Fee</span>
                 <span>
-                  {order.deliveryFee ? `₦${order.deliveryFee.toLocaleString()}` : "Calculated at checkout"}
+                  {order.deliveryFee
+                    ? `₦${order.deliveryFee.toLocaleString()}`
+                    : "Calculated at checkout"}
                 </span>
               </div>
-              <div className="flex justify-between pt-3 border-t border-gray-100">
+              <div className="flex justify-between border-t border-gray-100 pt-3">
                 <span className="font-ubuntu font-bold text-gray-900">Total</span>
-                <span className="font-ubuntu font-bold text-green-600 text-xl">
+                <span className="font-ubuntu text-xl font-bold text-green-600">
                   ₦{order.totalAmount.toLocaleString()}
                 </span>
               </div>
             </div>
           </motion.div>
-          
+
           {/* Tracking */}
-          <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          >
             <h2 className="font-ubuntu mb-4 text-xl font-bold text-gray-900">Order Tracking</h2>
-            <div className="relative border-l-2 border-green-200 ml-4 space-y-8 pb-4 mt-6">
-              
+            <div className="relative mt-6 ml-4 space-y-8 border-l-2 border-green-200 pb-4">
               <div className="relative">
                 <div className="absolute -left-[25px] flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-green-100">
                   <Package size={20} className="text-green-600" />
@@ -232,53 +249,99 @@ export default function OrderDetailsPage() {
                   <h3 className="font-roboto-slab font-bold text-gray-900">Order Placed</h3>
                   <p className="font-roboto-slab text-sm text-gray-500">
                     {new Date(order.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit"
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </p>
                 </div>
               </div>
-              
+
               <div className="relative">
-                <div className={`absolute -left-[25px] flex h-12 w-12 items-center justify-center rounded-full border-4 border-white ${['processing', 'shipped', 'delivered'].includes(order.status) ? 'bg-green-100' : 'bg-gray-100'}`}>
-                  <Clock size={20} className={['processing', 'shipped', 'delivered'].includes(order.status) ? 'text-green-600' : 'text-gray-400'} />
+                <div
+                  className={`absolute -left-[25px] flex h-12 w-12 items-center justify-center rounded-full border-4 border-white ${["processing", "shipped", "delivered"].includes(order.status) ? "bg-green-100" : "bg-gray-100"}`}
+                >
+                  <Clock
+                    size={20}
+                    className={
+                      ["processing", "shipped", "delivered"].includes(order.status)
+                        ? "text-green-600"
+                        : "text-gray-400"
+                    }
+                  />
                 </div>
                 <div className="ml-10">
-                  <h3 className={`font-roboto-slab font-bold ${['processing', 'shipped', 'delivered'].includes(order.status) ? 'text-gray-900' : 'text-gray-400'}`}>Processing</h3>
-                  <p className="font-roboto-slab text-sm text-gray-500">Supplier is preparing your order</p>
+                  <h3
+                    className={`font-roboto-slab font-bold ${["processing", "shipped", "delivered"].includes(order.status) ? "text-gray-900" : "text-gray-400"}`}
+                  >
+                    Processing
+                  </h3>
+                  <p className="font-roboto-slab text-sm text-gray-500">
+                    Supplier is preparing your order
+                  </p>
                 </div>
               </div>
-              
+
               <div className="relative">
-                <div className={`absolute -left-[25px] flex h-12 w-12 items-center justify-center rounded-full border-4 border-white ${['shipped', 'delivered'].includes(order.status) ? 'bg-green-100' : 'bg-gray-100'}`}>
-                  <Truck size={20} className={['shipped', 'delivered'].includes(order.status) ? 'text-green-600' : 'text-gray-400'} />
+                <div
+                  className={`absolute -left-[25px] flex h-12 w-12 items-center justify-center rounded-full border-4 border-white ${["shipped", "delivered"].includes(order.status) ? "bg-green-100" : "bg-gray-100"}`}
+                >
+                  <Truck
+                    size={20}
+                    className={
+                      ["shipped", "delivered"].includes(order.status)
+                        ? "text-green-600"
+                        : "text-gray-400"
+                    }
+                  />
                 </div>
                 <div className="ml-10">
-                  <h3 className={`font-roboto-slab font-bold ${['shipped', 'delivered'].includes(order.status) ? 'text-gray-900' : 'text-gray-400'}`}>Shipped</h3>
+                  <h3
+                    className={`font-roboto-slab font-bold ${["shipped", "delivered"].includes(order.status) ? "text-gray-900" : "text-gray-400"}`}
+                  >
+                    Shipped
+                  </h3>
                   <p className="font-roboto-slab text-sm text-gray-500">Your order is on the way</p>
                 </div>
               </div>
 
               <div className="relative">
-                <div className={`absolute -left-[25px] flex h-12 w-12 items-center justify-center rounded-full border-4 border-white ${order.status === 'delivered' ? 'bg-green-100' : 'bg-gray-100'}`}>
-                  <CheckCircle size={20} className={order.status === 'delivered' ? 'text-green-600' : 'text-gray-400'} />
+                <div
+                  className={`absolute -left-[25px] flex h-12 w-12 items-center justify-center rounded-full border-4 border-white ${order.status === "delivered" ? "bg-green-100" : "bg-gray-100"}`}
+                >
+                  <CheckCircle
+                    size={20}
+                    className={order.status === "delivered" ? "text-green-600" : "text-gray-400"}
+                  />
                 </div>
                 <div className="ml-10">
-                  <h3 className={`font-roboto-slab font-bold ${order.status === 'delivered' ? 'text-gray-900' : 'text-gray-400'}`}>Delivered</h3>
-                  <p className="font-roboto-slab text-sm text-gray-500">Order successfully delivered</p>
+                  <h3
+                    className={`font-roboto-slab font-bold ${order.status === "delivered" ? "text-gray-900" : "text-gray-400"}`}
+                  >
+                    Delivered
+                  </h3>
+                  <p className="font-roboto-slab text-sm text-gray-500">
+                    Order successfully delivered
+                  </p>
                 </div>
               </div>
-
             </div>
           </motion.div>
 
           {/* Delivery Confirmation */}
           {order.status === "delivered" && (
-            <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <motion.div
+              variants={FADE_IN_VARIANT}
+              className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+            >
               <div className="flex flex-col gap-4">
                 <div>
                   <h2 className="font-ubuntu text-xl font-bold text-gray-900">Confirm Delivery</h2>
                   <p className="font-roboto-slab text-sm text-gray-500">
-                    Confirm you received your delivery in good condition to start the 24-hour payout window.
+                    Confirm you received your delivery in good condition to start the 24-hour payout
+                    window.
                   </p>
                 </div>
 
@@ -286,13 +349,13 @@ export default function OrderDetailsPage() {
                   <div className="flex flex-col gap-3 sm:flex-row">
                     <button
                       onClick={() => setPayoutDropdownOpen((prev) => !prev)}
-                      className="flex flex-1 items-center justify-center rounded-full border border-green-600 px-6 py-3 font-roboto-slab text-sm font-semibold text-green-700 transition hover:bg-green-50"
+                      className="font-roboto-slab flex flex-1 items-center justify-center rounded-full border border-green-600 px-6 py-3 text-sm font-semibold text-green-700 transition hover:bg-green-50"
                     >
                       Yes, received in good condition
                     </button>
                     <button
                       onClick={() => toast.info("We’ve noted your issue and will follow up.")}
-                      className="flex flex-1 items-center justify-center rounded-full border border-gray-200 px-6 py-3 font-roboto-slab text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                      className="font-roboto-slab flex flex-1 items-center justify-center rounded-full border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
                     >
                       Report an Issue
                     </button>
@@ -354,7 +417,10 @@ export default function OrderDetailsPage() {
 
         {/* Sidebar Info */}
         <div className="flex flex-col gap-6">
-          <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          >
             <h2 className="font-ubuntu mb-4 text-xl font-bold text-gray-900">Order Details</h2>
             <div className="flex flex-col gap-4">
               <div>
@@ -364,18 +430,29 @@ export default function OrderDetailsPage() {
               <div>
                 <p className="font-roboto-slab mb-1 text-sm text-gray-500">Date Placed</p>
                 <p className="font-roboto-slab font-medium text-gray-900">
-                  {new Date(order.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                  {new Date(order.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
                 </p>
               </div>
               <div>
                 <p className="font-roboto-slab mb-1 text-sm text-gray-500">Supplier</p>
-                <p className="font-roboto-slab font-medium text-gray-900">{order.clusterFarmerName}</p>
+                <p className="font-roboto-slab font-medium text-gray-900">
+                  {order.clusterFarmerName}
+                </p>
               </div>
             </div>
           </motion.div>
 
-          <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 className="font-ubuntu mb-4 text-xl font-bold text-gray-900">Delivery Information</h2>
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          >
+            <h2 className="font-ubuntu mb-4 text-xl font-bold text-gray-900">
+              Delivery Information
+            </h2>
             <div className="flex flex-col gap-4">
               <div>
                 <p className="font-roboto-slab mb-1 text-sm text-gray-500">Delivery Type</p>
@@ -383,28 +460,37 @@ export default function OrderDetailsPage() {
               </div>
               <div>
                 <p className="font-roboto-slab mb-1 text-sm text-gray-500">Shipping Address</p>
-                <p className="font-roboto-slab font-medium text-gray-900 leading-relaxed">
+                <p className="font-roboto-slab leading-relaxed font-medium text-gray-900">
                   {order.deliveryAddress}
                 </p>
               </div>
             </div>
           </motion.div>
 
-          <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          >
             <h2 className="font-ubuntu mb-4 text-xl font-bold text-gray-900">Payment Check</h2>
             <div className="flex flex-col gap-4">
               <div>
                 <p className="font-roboto-slab mb-1 text-sm text-gray-500">Payment Status</p>
-                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                  order.paymentStatus === "paid" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-                }`}>
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                    order.paymentStatus === "paid"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
                   {order.paymentStatus.toUpperCase()}
                 </span>
               </div>
               {order.paymentMethod && (
                 <div>
                   <p className="font-roboto-slab mb-1 text-sm text-gray-500">Payment Method</p>
-                  <p className="font-roboto-slab font-medium text-gray-900">{order.paymentMethod}</p>
+                  <p className="font-roboto-slab font-medium text-gray-900">
+                    {order.paymentMethod}
+                  </p>
                 </div>
               )}
             </div>

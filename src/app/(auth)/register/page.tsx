@@ -11,24 +11,31 @@ import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
 import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
 import { kadunaLga } from "~/models/models";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "~/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "~/components/ui/input-otp";
 import { cn } from "~/lib/utils";
 
 // === Zod Schema
-const registerSchema = z.object({
-  fullName: z.string().min(3, "Name must be at least 3 characters"),
-  phone: z
-    .string()
-    .min(10, "Phone number is too short")
-    .regex(/^(0|\+234)[789][01]\d{8}$/, "Invalid Nigerian phone number (+234 or 0 prefix)"),
-  email: z.string().email("Invalid email address"),
-  location: z.string().min(2, "Location is required").optional(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Confirm your password"),
-}).refine((values) => values.password === values.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const registerSchema = z
+  .object({
+    fullName: z.string().min(3, "Name must be at least 3 characters"),
+    phone: z
+      .string()
+      .min(10, "Phone number is too short")
+      .regex(/^(0|\+234)[789][01]\d{8}$/, "Invalid Nigerian phone number (+234 or 0 prefix)"),
+    email: z.string().email("Invalid email address"),
+    location: z.string().min(2, "Location is required").optional(),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Confirm your password"),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
@@ -77,6 +84,13 @@ function RegisterFormContent() {
     setSubmitting(true);
     setStatusModal({ open: true, variant: "loading" });
     try {
+      // Set the role cookie on the backend before registering
+      await fetch("/api/auth/role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -135,19 +149,33 @@ function RegisterFormContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ emailAddress: getValues("email"), registerOtp: Number(otp) }),
+        credentials: "include",
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as {
+        message?: string;
+        data?: { user?: { role?: string; is_cluster_farmer?: boolean } };
+      };
+
       if (!response.ok) {
         throw new Error(data.message || "OTP verification failed");
       }
 
-      // Registration OTP verify does NOT return a token — user must login next
       setStatusModal({ open: true, variant: "success" });
-      toast.success("Account verified! Please log in to continue.");
+      toast.success("Account verified! Taking you to your dashboard.");
+
+      const role = data.data?.user?.role;
+      const dashboardRoute =
+        role === "farmer"
+          ? "/farmers-dashboard"
+          : role === "cluster"
+            ? "/cluster-dashboard"
+            : role === "buyer"
+              ? "/buyers-dashboard"
+              : "/login";
 
       setTimeout(() => {
-        router.push("/login");
+        router.push(dashboardRoute);
       }, 1800);
     } catch (error) {
       const message =
@@ -210,9 +238,9 @@ function RegisterFormContent() {
         {step === 1 ? (
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex w-full flex-col gap-(--gap-lg) default-page-max-width"
+            className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
           >
-            <div className=" flex w-full flex-col gap-(--gap-base)">
+            <div className="flex w-full flex-col gap-(--gap-base)">
               <DynamicInput
                 label="Full Name"
                 error={errors.fullName?.message}
@@ -275,7 +303,7 @@ function RegisterFormContent() {
             </div>
           </form>
         ) : (
-          <div className="flex flex-col gap-(--section-gap) default-page-max-width">
+          <div className="default-page-max-width flex flex-col gap-(--section-gap)">
             <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
               Enter the OTP sent to your email
             </p>
@@ -348,7 +376,7 @@ function RegisterFormContent() {
             ? step === 1
               ? "Creating your account..."
               : "Verifying your OTP..."
-            : "Account Verified! Redirecting to Login..."
+            : "Account Verified! Redirecting to your dashboard..."
         }
         description={
           statusModal.variant === "success" ? "We're preparing your dashboard now." : undefined

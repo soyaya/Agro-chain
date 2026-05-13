@@ -1,6 +1,6 @@
 import { apiFetch } from "~/lib/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// === Types
 
 export interface BackendUser {
   id: string;
@@ -21,13 +21,21 @@ export interface BackendUser {
   farming_capacity_kg?: number;
   years_of_experience?: number;
   business_name?: string;
+  company_name?: string;
+  business_type?: string;
   cac_number?: string;
   warehouse_location?: string;
   distribution_capacity?: number;
+  logistics_available?: boolean;
+  bvn_doc_url?: string;
+  proof_of_address_url?: string;
+  cac_registration_url?: string;
+  business_license_url?: string;
+  tax_clearance_url?: string;
+  is_active: boolean;
+  last_login?: string;
   created_at: string;
   updated_at: string;
-  last_login?: string;
-  is_active: boolean;
 }
 
 export interface MeResponse {
@@ -40,7 +48,7 @@ export interface RefreshResponse {
   data: { access_token: string; refresh_token: string };
 }
 
-// ─── Auth Service ─────────────────────────────────────────────────────────────
+// === Auth Service
 
 export const authService = {
   /** Fetch the currently authenticated user's profile. */
@@ -65,11 +73,9 @@ export const authService = {
   },
 
   /** Logout from the current device. */
-  logout(refreshToken?: string) {
-    return apiFetch("/auth/logout", {
-      method: "POST",
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+  logout() {
+    // Calls the Next.js proxy which clears httpOnly cookies server-side
+    return fetch("/api/auth/logout", { method: "POST", credentials: "include" });
   },
 
   /** Logout from all devices. */

@@ -1,7 +1,7 @@
 import { apiFetch } from "~/lib/api";
 import type { BackendListing } from "./farmer.service";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// === Types
 
 export interface BackendClusterOrder {
   orderId: string;
@@ -67,7 +67,27 @@ export interface UpdateClusterProfilePayload {
   location?: string;
 }
 
-// ─── Cluster Service ──────────────────────────────────────────────────────────
+export type DemandStatus = "pending" | "assigned" | "accepted" | "declined" | "fulfilled" | "cancelled";
+
+export interface BackendDemand {
+  id: string;
+  buyerName: string;
+  buyerPhone?: string;
+  fishType: string;
+  weightKg: number;
+  fishVariant: string;
+  locationState: string;
+  locationLga: string;
+  deliveryAddress: string;
+  notes?: string;
+  status: DemandStatus;
+  assignedAt?: string;
+  acceptedAt?: string;
+  fulfilledAt?: string;
+  createdAt: string;
+}
+
+// === Cluster Service
 
 export const clusterService = {
   /** Update the cluster manager's profile. */
@@ -94,17 +114,21 @@ export const clusterService = {
 
   /** Get pending farmer listing submissions awaiting approval. */
   getPendingApprovals() {
-    return apiFetch<{ status: string; data: { listings: Array<{
-      id: string;
-      fishType: string;
-      farmerName: string;
-      harvestDate: string;
-      listedDate: string;
-      totalFishAvailable: number;
-      packaging: { weightKg: number; quantity: number };
-      createdAt: string;
-      updatedAt: string;
-    }> } }>(
+    return apiFetch<{
+      status: string; data: {
+        listings: Array<{
+          id: string;
+          fishType: string;
+          farmerName: string;
+          harvestDate: string;
+          listedDate: string;
+          totalFishAvailable: number;
+          packaging: { weightKg: number; quantity: number };
+          createdAt: string;
+          updatedAt: string;
+        }>
+      }
+    }>(
       "/cluster/pending-approvals",
     );
   },
@@ -149,5 +173,30 @@ export const clusterService = {
         pendingPayouts: number;
       };
     }>("/cluster/payouts");
+  },
+
+  // === Demands
+
+  /** Get demands assigned to this cluster farmer. */
+  getDemands() {
+    return apiFetch<{ status: string; data: { demands: BackendDemand[] } }>("/cluster/demands");
+  },
+
+  /** Accept a demand. */
+  acceptDemand(demandId: string) {
+    return apiFetch(`/cluster/demands/${demandId}/accept`, { method: "PATCH" });
+  },
+
+  /** Decline a demand with optional reason. */
+  declineDemand(demandId: string, reason?: string) {
+    return apiFetch(`/cluster/demands/${demandId}/decline`, {
+      method: "PATCH",
+      body: JSON.stringify({ reason }),
+    });
+  },
+
+  /** Mark a demand as fulfilled. */
+  fulfillDemand(demandId: string) {
+    return apiFetch(`/cluster/demands/${demandId}/fulfill`, { method: "PATCH" });
   },
 };

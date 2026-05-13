@@ -10,7 +10,12 @@ import { motion } from "framer-motion";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "~/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "~/components/ui/input-otp";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
 
@@ -24,21 +29,20 @@ export default function LoginPage() {
   const router = useRouter();
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [emailAddress, setEmailAddress] = useState<string>("");
-  const [loginOtp, setLoginOtp] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [emailAddress, setEmailAddress] = useState("");
+  const [loginOtp, setLoginOtp] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
+  const [success, setSuccess] = useState(false);
   const [resendAttempts, setResendAttempts] = useState(0);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [resendLocked, setResendLocked] = useState(false);
-  const [statusModal, setStatusModal] = useState<{
-    open: boolean;
-    variant: "loading" | "success";
-  }>({
-    open: false,
-    variant: "loading",
-  });
+  const [statusModal, setStatusModal] = useState<{ open: boolean; variant: "loading" | "success" }>(
+    {
+      open: false,
+      variant: "loading",
+    },
+  );
 
   const {
     register,
@@ -50,23 +54,20 @@ export default function LoginPage() {
     defaultValues: { email: "" },
   });
 
-  // Step 1: Send OTP
+  // Step 1: send OTP
   const onSendOtp = async (data: EmailForm) => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ emailAddress: data.email, password: data.password }),
       });
-
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || "Login failed");
+        throw new Error((err as { message?: string }).message || "Login failed");
       }
-
       toast.success(`OTP sent to ${data.email}`);
       setEmailAddress(data.email);
       setStep(2);
@@ -74,70 +75,51 @@ export default function LoginPage() {
       setResendLocked(false);
       setCooldownSeconds(60);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to send OTP. Please try again.";
-      toast.error(msg);
+      toast.error(err instanceof Error ? err.message : "Failed to send OTP. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Step 2: Verify OTP
+  // Step 2: verify OTP — proxy sets httpOnly cookies, we just redirect
   const handleVerify = useCallback(async () => {
     if (loading || success) return;
-
     setLoading(true);
     setError(null);
     setStatusModal({ open: true, variant: "loading" });
 
     try {
-      await new Promise((r) => setTimeout(r, 1600));
-
       const response = await fetch("/api/auth/login/otp", {
         method: "POST",
-        body: JSON.stringify({ emailAddress, loginOtp: Number(loginOtp) }),
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emailAddress, loginOtp: Number(loginOtp) }),
+        credentials: "include",
       });
 
-      const json = await response.json();
+      const json = (await response.json()) as {
+        message?: string;
+        data?: { user?: { role?: string; is_cluster_farmer?: boolean } };
+      };
 
       if (!response.ok) {
         throw new Error(json.message || "OTP verification failed");
       }
 
-      // Backend returns: { status, message, data: { user, access_token, refresh_token, expires_at } }
-      const { access_token, refresh_token, user } = json.data ?? {};
+      // Cookies are set by the proxy — just determine where to redirect
+      const user = json.data?.user;
+      const role = user?.role ?? "";
+      const isCluster = user?.is_cluster_farmer === true || role === "cluster";
 
-      if (access_token) {
-        sessionStorage.setItem("auth_token", access_token);
-      }
-      if (refresh_token) {
-        localStorage.setItem("refresh_token", refresh_token);
-      }
-      if (user) {
-        localStorage.setItem("auth_user", JSON.stringify(user));
-        document.cookie = `currentUser=${encodeURIComponent(JSON.stringify({ email: user.email, role: user.role }))}; path=/; max-age=604800; samesite=lax`;
-      }
+      let dashboardPath = "/buyers-dashboard";
+      if (role === "admin") dashboardPath = "/admin-dashboard";
+      else if (isCluster) dashboardPath = "/cluster-dashboard";
+      else if (role === "farmer") dashboardPath = "/farmers-dashboard";
 
       setSuccess(true);
       setStatusModal({ open: true, variant: "success" });
       toast.success("Login successful!");
 
-      // Backend role values: farmer, buyer, cluster, admin
-      const role: string = user?.role ?? "";
-      const isCluster = user?.is_cluster_farmer === true || role === "cluster";
-
-      let dashboardPath = "/buyers-dashboard";
-      if (role === "admin") {
-        dashboardPath = "/admin-dashboard";
-      } else if (isCluster) {
-        dashboardPath = "/cluster-dashboard";
-      } else if (role === "farmer") {
-        dashboardPath = "/farmers-dashboard";
-      }
-
-      setTimeout(() => {
-        router.push(dashboardPath);
-      }, 2200);
+      setTimeout(() => router.push(dashboardPath), 800);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Invalid or expired code";
       setError(msg);
@@ -157,13 +139,10 @@ export default function LoginPage() {
 
   // Cooldown timer
   useEffect(() => {
-    if (step !== 2 || resendLocked) return;
-    if (cooldownSeconds <= 0) return;
-
+    if (step !== 2 || resendLocked || cooldownSeconds <= 0) return;
     const timer = setInterval(() => {
       setCooldownSeconds((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
-
     return () => clearInterval(timer);
   }, [step, cooldownSeconds, resendLocked]);
 
@@ -173,7 +152,6 @@ export default function LoginPage() {
       setResendLocked(true);
       return;
     }
-
     try {
       setLoading(true);
       const response = await fetch("/api/auth/login/otp/resend", {
@@ -181,33 +159,23 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ emailAddress }),
       });
-
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || "Failed to resend OTP");
+        throw new Error((err as { message?: string }).message || "Failed to resend OTP");
       }
-
       const nextAttempts = resendAttempts + 1;
-      const attemptsLeft = 2 - nextAttempts;
       setResendAttempts(nextAttempts);
       setCooldownSeconds(60);
-      if (nextAttempts >= 2) {
-        setResendLocked(true);
-      }
+      if (nextAttempts >= 2) setResendLocked(true);
       toast.success(
-        attemptsLeft >= 0
-          ? `OTP resent. ${attemptsLeft} resend${attemptsLeft === 1 ? "" : "s"} left.`
-          : "OTP resent.",
+        `OTP resent. ${Math.max(0, 2 - nextAttempts)} resend${2 - nextAttempts === 1 ? "" : "s"} left.`,
       );
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to resend OTP";
-      toast.error(msg);
+      toast.error(err instanceof Error ? err.message : "Failed to resend OTP");
     } finally {
       setLoading(false);
     }
   };
-
-  const hasOtpError = !!error;
 
   return (
     <>
@@ -222,10 +190,7 @@ export default function LoginPage() {
           className="default-page-max-width flex w-full flex-col gap-(--section-gap)"
           initial="hidden"
           animate="visible"
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.15 } },
-          }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
         >
           {step === 1 ? (
             <form
@@ -259,7 +224,6 @@ export default function LoginPage() {
                 <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
                   Send OTP
                 </SubmitPrimaryButton>
-
                 <p className="text-center text-sm text-(--text-colour)">
                   Forgot your password?{" "}
                   <Link
@@ -269,7 +233,6 @@ export default function LoginPage() {
                     Reset it
                   </Link>
                 </p>
-
                 <p className="text-center text-sm text-(--text-colour)">
                   Don&apos;t have an account?{" "}
                   <Link
@@ -292,20 +255,18 @@ export default function LoginPage() {
                   maxLength={6}
                   value={loginOtp}
                   onChange={setLoginOtp}
-                  containerClassName={cn("gap-3", hasOtpError && "animate-shake")}
+                  containerClassName={cn("gap-3", !!error && "animate-shake")}
                 >
                   <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
-                    <InputOTPSlot index={0} aria-invalid={hasOtpError} />
-                    <InputOTPSlot index={1} aria-invalid={hasOtpError} />
-                    <InputOTPSlot index={2} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={0} aria-invalid={!!error} />
+                    <InputOTPSlot index={1} aria-invalid={!!error} />
+                    <InputOTPSlot index={2} aria-invalid={!!error} />
                   </InputOTPGroup>
-
                   <InputOTPSeparator />
-
                   <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
-                    <InputOTPSlot index={3} aria-invalid={hasOtpError} />
-                    <InputOTPSlot index={4} aria-invalid={hasOtpError} />
-                    <InputOTPSlot index={5} aria-invalid={hasOtpError} />
+                    <InputOTPSlot index={3} aria-invalid={!!error} />
+                    <InputOTPSlot index={4} aria-invalid={!!error} />
+                    <InputOTPSlot index={5} aria-invalid={!!error} />
                   </InputOTPGroup>
                 </InputOTP>
 
@@ -318,7 +279,7 @@ export default function LoginPage() {
                     onClick={handleVerify}
                     disabled={loginOtp.length < 6 || loading || success}
                     loading={loading}
-                    className={cn(success && "mt-16 bg-(--theme-green-dark) hover:opacity-96")}
+                    className={cn(success && "bg-(--theme-green-dark) hover:opacity-96")}
                   >
                     {success
                       ? "Verified! Redirecting..."
@@ -345,9 +306,7 @@ export default function LoginPage() {
                   <p className="text-center text-xs text-(--text-colour)">
                     {resendLocked
                       ? "You've reached the resend limit. Try again after 24 hours."
-                      : `${Math.max(0, 2 - resendAttempts)} resend${
-                          2 - resendAttempts === 1 ? "" : "s"
-                        } left`}
+                      : `${Math.max(0, 2 - resendAttempts)} resend${2 - resendAttempts === 1 ? "" : "s"} left`}
                   </p>
                 </div>
               </div>

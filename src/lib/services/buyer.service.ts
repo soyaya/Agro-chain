@@ -1,6 +1,34 @@
 import { apiFetch } from "~/lib/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// === Types
+
+export type DemandStatus = "pending" | "assigned" | "accepted" | "declined" | "fulfilled" | "cancelled";
+
+export interface BackendDemand {
+  id: string;
+  fishType: string;
+  weightKg: number;
+  fishVariant: string;
+  locationState: string;
+  locationLga: string;
+  deliveryAddress: string;
+  notes?: string;
+  status: DemandStatus;
+  assignedAt?: string;
+  acceptedAt?: string;
+  fulfilledAt?: string;
+  createdAt: string;
+}
+
+export interface CreateDemandPayload {
+  fishType: string;
+  weightKg: number;
+  fishVariant: string;
+  locationState: string;
+  locationLga: string;
+  deliveryAddress: string;
+  notes?: string;
+}
 
 export interface BackendOrder {
   orderId: string;
@@ -53,7 +81,7 @@ export interface UpdateBuyerProfilePayload {
   state?: string;
 }
 
-// ─── Buyer Service ────────────────────────────────────────────────────────────
+// === Buyer Service
 
 export const buyerService = {
   /** Update the buyer's account profile. */
@@ -103,5 +131,25 @@ export const buyerService = {
       method: "POST",
       body: JSON.stringify({ amount }),
     });
+  },
+
+  // === Demands
+
+  /** Get all demands created by this buyer. */
+  getDemands() {
+    return apiFetch<{ status: string; data: { demands: BackendDemand[] } }>("/buyers/demands");
+  },
+
+  /** Create a new demand. */
+  createDemand(data: CreateDemandPayload) {
+    return apiFetch("/buyers/demands", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /** Cancel a pending demand. */
+  cancelDemand(demandId: string) {
+    return apiFetch(`/buyers/demands/${demandId}`, { method: "DELETE" });
   },
 };

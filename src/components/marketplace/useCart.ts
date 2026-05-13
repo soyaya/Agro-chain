@@ -39,15 +39,66 @@ const computePricePerUnit = (pkg: PackagingOption) => pkg.pricePerUnit ?? pkg.we
 
 export function useCart() {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [synced, setSynced] = useState(false);
 
+  // Hydrate from localStorage first, then sync with backend cart if logged in
   useEffect(() => {
     setItems(getInitialCart());
+
+    const syncWithBackend = async () => {
+      try {
+        const response = await apiFetch<{
+          status: string;
+          data: {
+            cartId: string; items: Array<{
+              cartItemId: string;
+              listingId: string;
+              fishType: string;
+              variant: string;
+              processed: boolean;
+              weightKg: number;
+              quantity: number;
+              pricePerUnit: number;
+              totalPrice: number;
+            }>; cartTotal: number
+          };
+        }>("/marketplace/cart");
+
+        const serverItems = response.data.items ?? [];
+        if (serverItems.length > 0) {
+          // Server cart takes precedence over stale localStorage
+          const mapped: CartItem[] = serverItems.map((item) => ({
+            cartItemId: item.cartItemId,
+            listingId: item.listingId,
+            fishType: item.fishType,
+            variant: item.variant as FishVariant,
+            processed: item.processed,
+            deliveryType: "pickup" as const,
+            weightKg: Number(item.weightKg),
+            quantity: item.quantity,
+            pricePerUnit: Number(item.pricePerUnit),
+            totalPrice: Number(item.totalPrice),
+            businessName: "",
+            clusterFarmerName: "",
+          }));
+          setItems(mapped);
+        }
+      } catch {
+        // Not logged in or backend unreachable — keep local cart
+      } finally {
+        setSynced(true);
+      }
+    };
+
+    void syncWithBackend();
   }, []);
 
+  // Only persist to localStorage after the initial backend sync is done
   useEffect(() => {
+    if (!synced) return;
     if (typeof window === "undefined") return;
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+  }, [items, synced]);
 
   const totalItems = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
@@ -80,10 +131,10 @@ export function useCart() {
           return prev.map((item) =>
             item === existing
               ? {
-                  ...item,
-                  quantity: item.quantity + 1,
-                  totalPrice: (item.quantity + 1) * item.pricePerUnit,
-                }
+                ...item,
+                quantity: item.quantity + 1,
+                totalPrice: (item.quantity + 1) * item.pricePerUnit,
+              }
               : item,
           );
         }
@@ -108,7 +159,7 @@ export function useCart() {
       });
       void (async () => {
         try {
-          const response = await apiFetch<{ cartItemId?: string } | { id?: string }>(
+          const response = await apiFetch<{ status: string; data: { cartItemId: string } }>(
             "/marketplace/cart",
             {
               method: "POST",
@@ -118,10 +169,11 @@ export function useCart() {
                 processed: options.processed,
                 weightKg: pkg.weightKg,
                 quantity: 1,
+                pricePerUnit,
               }),
             },
           );
-          const serverId = (response as { cartItemId?: string }).cartItemId ?? response.id;
+          const serverId = response.data?.cartItemId;
           if (serverId) {
             setItems((prev) =>
               prev.map((item) =>
@@ -178,6 +230,7 @@ export function useCart() {
     items,
     totalItems,
     subtotal,
+    synced,
     addToCart,
     updateQuantity,
     updateDeliveryType,

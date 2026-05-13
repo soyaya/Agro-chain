@@ -17,7 +17,13 @@ import {
   Minus,
 } from "lucide-react";
 import type { MarketplaceListing, PackagingOption } from "~/types";
-import { FADE_IN_VARIANT, SLIDE_UP_VARIANT, BASE_PRICE_PER_KG_NAIRA, FISH_VARIANTS } from "~/types/constants";
+import {
+  FADE_IN_VARIANT,
+  SLIDE_UP_VARIANT,
+  BASE_PRICE_PER_KG_NAIRA,
+  FISH_VARIANTS,
+  type FishVariant,
+} from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
 
@@ -25,13 +31,19 @@ type MarketplaceDetailResponse =
   | MarketplaceListing
   | { listing?: MarketplaceListing; data?: MarketplaceListing };
 
+function extractListing(response: MarketplaceDetailResponse): MarketplaceListing | null {
+  if ("id" in response) return response as MarketplaceListing;
+  const r = response as { listing?: MarketplaceListing; data?: MarketplaceListing };
+  return r.listing ?? r.data ?? null;
+}
+
 export default function ListingDetailPage() {
   const router = useRouter();
   const params = useParams();
   const listingId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [listing, setListing] = useState<MarketplaceListing | null>(null);
   const [selectedDelivery, setSelectedDelivery] = useState<string>("");
-  const [selectedVariant, setSelectedVariant] = useState(FISH_VARIANTS[0]);
+  const [selectedVariant, setSelectedVariant] = useState<FishVariant>(FISH_VARIANTS[0]);
   const [processed, setProcessed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -45,10 +57,7 @@ export default function ListingDetailPage() {
       setErrorMessage(null);
       try {
         const response = await apiFetch<MarketplaceDetailResponse>(`/marketplace/${listingId}`);
-        const payload =
-          "id" in (response as MarketplaceListing)
-            ? (response as MarketplaceListing)
-            : response.listing ?? response.data ?? null;
+        const payload = extractListing(response);
 
         if (payload && mounted) {
           setListing({
@@ -108,7 +117,7 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-(--gray-bg) flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-(--gray-bg)">
         <p className="text-(--text-colour)">Loading listing...</p>
       </div>
     );
@@ -116,7 +125,7 @@ export default function ListingDetailPage() {
 
   if (errorMessage || !listing) {
     return (
-      <div className="min-h-screen bg-(--gray-bg) flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-(--gray-bg)">
         <p className="text-(--error-red)">{errorMessage ?? "Listing not found"}</p>
       </div>
     );
@@ -299,7 +308,9 @@ export default function ListingDetailPage() {
                           {cartItem ? (
                             <div className="flex items-center justify-between rounded-full border border-(--border-gray) p-1">
                               <button
-                                onClick={() => cart.updateQuantity(cartItemIndex, cartItem.quantity - 1)}
+                                onClick={() =>
+                                  cart.updateQuantity(cartItemIndex, cartItem.quantity - 1)
+                                }
                                 className="flex h-8 w-8 items-center justify-center rounded-full bg-(--gray-bg) transition hover:bg-(--border-gray)"
                               >
                                 <Minus size={16} />
@@ -308,7 +319,9 @@ export default function ListingDetailPage() {
                                 {cartItem.quantity}
                               </span>
                               <button
-                                onClick={() => cart.updateQuantity(cartItemIndex, cartItem.quantity + 1)}
+                                onClick={() =>
+                                  cart.updateQuantity(cartItemIndex, cartItem.quantity + 1)
+                                }
                                 className="flex h-8 w-8 items-center justify-center rounded-full bg-(--gray-bg) transition hover:bg-(--border-gray)"
                               >
                                 <Plus size={16} />

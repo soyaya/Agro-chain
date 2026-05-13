@@ -18,40 +18,40 @@ export const sideNavLinks: NavLink[] = [
   { label: "Contact", href: "/contact", icon: Phone, },
 ];
 
-import { 
+import {
   FacebookIcon, XIcon,
   Instagram, Linkedin,
   MessageCircleCodeIcon, Mail,
 } from 'lucide-react';
 
 export const socialLinks: NavLink[] = [
-  { 
-    label: "Facebook", href: "https://facebook.com/yourpage", 
-    icon: FacebookIcon, color: "hover:text-[#1877F2]" 
+  {
+    label: "Facebook", href: "https://facebook.com/yourpage",
+    icon: FacebookIcon, color: "hover:text-[#1877F2]"
   }, // Facebook Blue
-  { 
-    label: "X", href: "https://x.com/Debridgers", 
-    icon: XIcon, color: "hover:text-black" 
+  {
+    label: "X", href: "https://x.com/Debridgers",
+    icon: XIcon, color: "hover:text-black"
   }, // X Black
-  { 
-    label: "Instagram", href: "https://instagram.com/yourhandle", 
-    icon: Instagram, color: "hover:text-[#E4405F]" 
+  {
+    label: "Instagram", href: "https://instagram.com/yourhandle",
+    icon: Instagram, color: "hover:text-[#E4405F]"
   }, // Instagram Pink
   // { 
   //   label: "WhatsApp", href: "https://wa.me/2347012288798", 
   //   icon: Instagram, color: "hover:text-[#25D366]"
   // }, // Whatsapp Green
-  { 
-    label: "WhatsApp", href: "https://wa.me/2347012288798?text=Hello%20from%20your%20website!", 
+  {
+    label: "WhatsApp", href: "https://wa.me/2347012288798?text=Hello%20from%20your%20website!",
     icon: MessageCircleCodeIcon, color: "hover:text-[#25D366]"
   }, // Whatsapp Green
   {
-    label: "LinkedIn", href: "https://www.linkedin.com/company/debridger/", 
+    label: "LinkedIn", href: "https://www.linkedin.com/company/debridger/",
     icon: Linkedin, color: "hover:text-[#0A66C2]"
   }, // LinkedIn Blue
-  { 
-    label: "Gmail", href: "mailto:Debridger@yahoo.com", 
-    icon: Mail, color: "hover:text-[#EA4335]" 
+  {
+    label: "Gmail", href: "mailto:Debridger@yahoo.com",
+    icon: Mail, color: "hover:text-[#EA4335]"
   }, // Gmail Red
 ];
 
@@ -86,10 +86,10 @@ export const kadunaLga: Object[] = [
 // DASHBOARD NAVIGATION
 // ============================================
 
-import { 
-  LayoutDashboard, User, FileText, Package, 
-  ShoppingCart, Users as UsersIcon, Settings, 
-  CheckSquare, Clock, BarChart3, CreditCard, 
+import {
+  LayoutDashboard, User, FileText, Package,
+  ShoppingCart, Users as UsersIcon, Settings,
+  CheckSquare, Clock, BarChart3, CreditCard,
   DollarSign, Receipt, Wallet, TrendingUp
 } from 'lucide-react';
 import type { DashboardConfig, EnhancedDashboardConfig } from '~/types/index';
@@ -152,6 +152,7 @@ export const buyerDashboardConfig: DashboardConfig = {
     { label: "Profile", href: "/buyers-dashboard/profile", icon: User },
     { label: "Marketplace", href: "/marketplace", icon: ShoppingCart },
     { label: "My Orders", href: "/buyers-dashboard/orders", icon: Package },
+    { label: "My Demands", href: "/buyers-dashboard/demands", icon: FileText },
     { label: "Saved Listings", href: "/buyers-dashboard/saved", icon: CheckSquare },
   ],
 };
@@ -165,6 +166,8 @@ export const adminDashboardConfig: DashboardConfig = {
     { label: "Farmers", href: "/admin-dashboard/farmers", icon: UsersIcon },
     { label: "Cluster Applications", href: "/admin-dashboard/applications", icon: CheckSquare },
     { label: "Listings", href: "/admin-dashboard/listings", icon: FileText },
+    { label: "Demands", href: "/admin-dashboard/demands", icon: Receipt },
+    { label: "Orders", href: "/admin-dashboard/orders", icon: Package },
     { label: "Settings", href: "/admin-dashboard/settings", icon: Settings },
   ],
 };
@@ -182,9 +185,9 @@ export const enhancedFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "My Listings", href: "/farmers-dashboard/listings", icon: FileText },
     { label: "Create Listing", href: "/farmers-dashboard/listings/create", icon: Package },
     // Financial Services Navigation
-    { 
-      label: "Financial Services", 
-      href: "/farmers-dashboard/financial", 
+    {
+      label: "Financial Services",
+      href: "/farmers-dashboard/financial",
       icon: CreditCard,
       submenu: [
         { label: "Loan Applications", href: "/farmers-dashboard/financial/loans", icon: DollarSign },
@@ -216,13 +219,14 @@ export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "Dashboard", href: "/cluster-dashboard", icon: LayoutDashboard },
     { label: "Profile", href: "/cluster-dashboard/profile", icon: User },
     { label: "Pending Approvals", href: "/cluster-dashboard/pending-approvals", icon: Clock },
+    { label: "Demands", href: "/cluster-dashboard/demands", icon: Receipt },
     { label: "Orders", href: "/cluster-dashboard/orders", icon: Package },
     { label: "My Listings", href: "/cluster-dashboard/listings", icon: FileText },
     { label: "Farmers", href: "/cluster-dashboard/farmers", icon: UsersIcon },
     // Financial Services Navigation
-    { 
-      label: "Financial Services", 
-      href: "/cluster-dashboard/financial", 
+    {
+      label: "Financial Services",
+      href: "/cluster-dashboard/financial",
       icon: CreditCard,
       submenu: [
         { label: "Loan Applications", href: "/cluster-dashboard/financial/loans", icon: DollarSign },

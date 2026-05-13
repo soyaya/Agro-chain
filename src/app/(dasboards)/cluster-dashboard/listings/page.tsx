@@ -1,25 +1,125 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Plus, Filter, MapPin, Package, Truck, Eye, Calendar } from "lucide-react";
-import { useRouter } from "next/navigation";
-import type { ClusterFarmerListing, ListingStatus } from "~/types/index";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle, XCircle, AlertCircle, Package, MapPin, Calendar, Filter } from "lucide-react";
+import { toast } from "sonner";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
-import { clusterService } from "~/lib/services/cluster.service";
+import { apiFetch } from "~/lib/api";
+import { LoadingState } from "~/components/ui/LoadingState";
+import { EmptyState } from "~/components/ui/EmptyState";
 
-const STATUS_STYLES: Record<ListingStatus, string> = {
-  approved: "bg-green-50 text-green-700 border-green-200",
-  pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
-  rejected: "bg-red-50 text-red-700 border-red-200",
-};
+// === Types
+
+interface PendingListing {
+  id: string;
+  fishType: string;
+  farmerName: string;
+  harvestDate: string;
+  listedDate: string;
+  totalFishAvailable: number;
+  packaging: { weightKg: number; quantity: number };
+  createdAt: string;
+  updatedAt: string;
+}
+
+// === Reject Modal
+
+interface RejectModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+  loading: boolean;
+}
+
+function RejectModal({ isOpen, onClose, onConfirm, loading }: RejectModalProps) {
+  const [reason, setReason] = useState("");
+
+  const handleSubmit = () => {
+    if (!reason.trim()) {
+      toast.error("Please provide a rejection reason");
+      return;
+    }
+    onConfirm(reason);
+  };
+
+  const handleClose = () => {
+    setReason("");
+    onClose();
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleClose}
+            className="fixed inset-0 z-50 bg-black/50"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="fixed top-1/2 left-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-(--white) p-(--space-xl) shadow-lg"
+          >
+            <div className="flex flex-col gap-(--gap-base)">
+              <div className="flex items-center gap-(--gap-base)">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                  <XCircle size={24} className="text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                    Reject Listing
+                  </h3>
+                  <p className="font-roboto-slab text-sm text-(--text-colour)">
+                    Please provide a reason for rejection
+                  </p>
+                </div>
+              </div>
+
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Enter rejection reason..."
+                className="font-roboto-slab h-32 w-full rounded-2xl border border-(--border-input) p-(--space-md) text-base text-(--text-colour) transition outline-none focus:border-(--border-gray)"
+              />
+
+              <div className="grid grid-cols-2 gap-(--gap-base)">
+                <button
+                  onClick={handleClose}
+                  disabled={loading}
+                  className="font-roboto-slab flex h-12 items-center justify-center rounded-full border border-(--border-gray) text-sm font-medium text-(--text-colour) transition hover:bg-(--bg-pink) disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading || !reason.trim()}
+                  className="font-roboto-slab flex h-12 items-center justify-center rounded-full bg-red-600 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+                >
+                  {loading ? "Rejecting..." : "Reject Listing"}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// === Main Page
 
 export default function ClusterListingsPage() {
-  const router = useRouter();
-  const [listings, setListings] = useState<ClusterFarmerListing[]>([]);
+  const [listings, setListings] = useState<PendingListing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<ListingStatus | "all">("all");
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -27,37 +127,14 @@ export default function ClusterListingsPage() {
       setLoading(true);
       setErrorMessage(null);
       try {
-        const response = await clusterService.getListings();
-        if (!mounted) return;
-        setListings(
-          response.data.listings.map((item) => ({
-            id: item.id,
-            clusterFarmerId: "self",
-            clusterFarmerName: "Cluster",
-            businessName: "Cluster Listing",
-            fishType: item.fishType,
-            harvestDate: new Date(item.harvestDate),
-            totalAvailableKg: item.totalFishAvailable,
-            packaging: [
-              {
-                weightKg: item.packaging.weightKg,
-                quantity: item.packaging.quantity,
-                pricePerUnit: 0,
-              },
-            ],
-            location: item.location,
-            state: item.location.split(", ")[1] ?? "",
-            localGovernment: item.location.split(", ")[0] ?? "",
-            pricePerKg: 0,
-            deliveryOptions: ["Pickup"],
-            visibleOnMarketplace: item.status === "approved",
-            status: item.status,
-            createdAt: new Date(item.listedDate),
-            updatedAt: new Date(item.listedDate),
-          })),
-        );
+        const response = await apiFetch<{
+          status: string;
+          data: { listings: PendingListing[] };
+        }>("/listings/cluster-pending");
+        if (mounted) setListings(response.data.listings ?? []);
       } catch (error) {
-        if (mounted) setErrorMessage(error instanceof Error ? error.message : "Failed to load listings");
+        if (mounted)
+          setErrorMessage(error instanceof Error ? error.message : "Failed to load listings");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -68,14 +145,60 @@ export default function ClusterListingsPage() {
     };
   }, []);
 
-  const filtered = filterStatus === "all" ? listings : listings.filter((l) => l.status === filterStatus);
-
-  const counts = {
-    all: listings.length,
-    pending: listings.filter((l) => l.status === "pending").length,
-    approved: listings.filter((l) => l.status === "approved").length,
-    rejected: listings.filter((l) => l.status === "rejected").length,
+  const handleApprove = async (id: string) => {
+    setActionLoading(true);
+    try {
+      await apiFetch(`/listings/${id}/cluster-approve`, {
+        method: "PUT",
+        body: JSON.stringify({ action: "approve" }),
+      });
+      setListings((prev) => prev.filter((l) => l.id !== id));
+      toast.success("Listing approved — it will now appear on the marketplace under your name.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to approve listing");
+    } finally {
+      setActionLoading(false);
+    }
   };
+
+  const handleRejectClick = (id: string) => {
+    setSelectedId(id);
+    setRejectModalOpen(true);
+  };
+
+  const handleRejectConfirm = async (reason: string) => {
+    if (!selectedId) return;
+    setActionLoading(true);
+    try {
+      await apiFetch(`/listings/${selectedId}/cluster-approve`, {
+        method: "PUT",
+        body: JSON.stringify({ action: "reject", reason }),
+      });
+      setListings((prev) => prev.filter((l) => l.id !== selectedId));
+      toast.success("Listing rejected.");
+      setRejectModalOpen(false);
+      setSelectedId(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to reject listing");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  if (loading) return <LoadingState message="Loading pending listings..." size="lg" />;
+
+  if (errorMessage) {
+    return (
+      <EmptyState
+        icon={Package}
+        title="Unable to load listings"
+        description={errorMessage}
+        actionLabel="Retry"
+        onAction={() => window.location.reload()}
+        size="lg"
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
@@ -84,75 +207,57 @@ export default function ClusterListingsPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        className="flex flex-col gap-2"
       >
-        <div>
-          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">My Listings</h1>
-          <p className="font-roboto-slab text-(--text-colour)">
-            Manage your marketplace listings and track approval status
-          </p>
-        </div>
-        <button
-          onClick={() => router.push("/cluster-dashboard/listings/create")}
-          className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) font-roboto-slab text-white cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90"
+        <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">Pending Listings</h1>
+        <p className="font-roboto-slab text-(--text-colour)">
+          Review and approve farmer supply listings. Approved listings appear on the marketplace
+          under your name.
+        </p>
+      </motion.div>
+
+      {/* Info Banner */}
+      {listings.length > 0 && (
+        <motion.div
+          variants={FADE_IN_VARIANT}
+          initial="hidden"
+          animate="visible"
+          className="flex items-center gap-(--gap-base) rounded-2xl bg-yellow-50 p-(--space-lg)"
         >
-          <Plus size={18} />
-          Create Listing
-        </button>
-      </motion.div>
-
-      {/* Status Filter Tabs */}
-      <motion.div
-        variants={FADE_IN_VARIANT}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-2 gap-(--gap-base) md:grid-cols-4"
-      >
-        {(["all", "pending", "approved", "rejected"] as const).map((status) => (
-          <button
-            key={status}
-            onClick={() => setFilterStatus(status)}
-            className={`flex flex-col gap-2 rounded-2xl border p-(--space-lg) cursor-pointer ease-in-out transition-all duration-300 ${
-              filterStatus === status
-                ? "border-(--theme-green-dark) bg-green-50"
-                : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
-            }`}
-          >
-            <span className="font-ubuntu text-2xl font-bold text-(--heading-colour)">{counts[status]}</span>
-            <span className="font-roboto-slab text-sm capitalize text-(--text-colour)">{status}</span>
-          </button>
-        ))}
-      </motion.div>
-
-      {loading ? (
-        <motion.div variants={FADE_IN_VARIANT} initial="hidden" animate="visible" className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap) text-center text-(--text-colour)">
-          Loading listings...
+          <AlertCircle size={22} className="shrink-0 text-yellow-600" />
+          <p className="font-roboto-slab text-sm text-yellow-800">
+            <span className="font-semibold">{listings.length}</span> listing
+            {listings.length !== 1 ? "s" : ""} awaiting your review
+          </p>
         </motion.div>
-      ) : errorMessage ? (
-        <motion.div variants={FADE_IN_VARIANT} initial="hidden" animate="visible" className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap) text-center text-(--error-red)">
-          {errorMessage}
-        </motion.div>
-      ) : filtered.length > 0 ? (
+      )}
+
+      {/* Listings Grid */}
+      {listings.length > 0 ? (
         <motion.div
           variants={STAGGER_CONTAINER_VARIANT}
           initial="hidden"
           animate="visible"
           className="grid grid-cols-1 gap-(--gap-lg) md:grid-cols-2 lg:grid-cols-3"
         >
-          {filtered.map((listing) => (
+          {listings.map((listing) => (
             <motion.div
               key={listing.id}
               variants={FADE_IN_VARIANT}
-              className="flex flex-col gap-4 rounded-3xl border border-(--border-gray) bg-(--white) p-6 shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
+              className="flex flex-col gap-4 rounded-3xl border border-(--border-gray) bg-(--white) p-6 shadow-sm"
             >
-              {/* Top row */}
+              {/* Top */}
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-ubuntu text-lg font-bold text-(--heading-colour)">{listing.fishType}</h3>
-                  <p className="font-roboto-slab text-sm text-(--text-colour)">{listing.businessName}</p>
+                  <h3 className="font-ubuntu text-lg font-bold text-(--heading-colour) capitalize">
+                    {listing.fishType}
+                  </h3>
+                  <p className="font-roboto-slab text-sm text-(--text-colour)">
+                    by {listing.farmerName}
+                  </p>
                 </div>
-                <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[listing.status]}`}>
-                  {listing.status}
+                <span className="font-roboto-slab rounded-full border border-yellow-200 bg-yellow-50 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
+                  Pending
                 </span>
               </div>
 
@@ -160,43 +265,56 @@ export default function ClusterListingsPage() {
 
               {/* Details */}
               <div className="flex flex-col gap-2.5">
-                <div className="flex items-center gap-2 text-sm text-(--text-colour)">
+                <div className="font-roboto-slab flex items-center gap-2 text-sm text-(--text-colour)">
                   <Package size={15} className="shrink-0 text-gray-400" />
-                  <span>{listing.totalAvailableKg.toLocaleString()} kg available</span>
+                  <span>
+                    {listing.totalFishAvailable.toLocaleString()} fish ·{" "}
+                    {listing.packaging.weightKg}kg/unit
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-(--text-colour)">
-                  <MapPin size={15} className="shrink-0 text-gray-400" />
-                  <span>{listing.localGovernment}, {listing.state}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-(--text-colour)">
+                <div className="font-roboto-slab flex items-center gap-2 text-sm text-(--text-colour)">
                   <Calendar size={15} className="shrink-0 text-gray-400" />
-                  <span>Harvest: {listing.harvestDate.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</span>
+                  <span>
+                    Harvest:{" "}
+                    {new Date(listing.harvestDate).toLocaleDateString("en-NG", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-(--text-colour)">
-                  <Truck size={15} className="shrink-0 text-gray-400" />
-                  <span>{listing.deliveryOptions.join(", ")}</span>
+                <div className="font-roboto-slab flex items-center gap-2 text-sm text-(--text-colour)">
+                  <MapPin size={15} className="shrink-0 text-gray-400" />
+                  <span>
+                    Listed:{" "}
+                    {new Date(listing.listedDate).toLocaleDateString("en-NG", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between rounded-xl bg-(--bg-pink) px-4 py-2.5">
-                <span className="text-xs font-medium text-(--text-colour)">Marketplace Status</span>
-                <span
-                  className={`text-xs font-medium ${
-                    listing.visibleOnMarketplace ? "text-green-600" : "text-gray-400"
-                  }`}
+              {/* Actions */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  onClick={() => handleApprove(listing.id)}
+                  disabled={actionLoading}
+                  className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
                 >
-                  {listing.visibleOnMarketplace ? "● Live on marketplace" : "○ Not listed"}
-                </span>
+                  <CheckCircle size={16} />
+                  Approve
+                </button>
+                <button
+                  onClick={() => handleRejectClick(listing.id)}
+                  disabled={actionLoading}
+                  className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                >
+                  <XCircle size={16} />
+                  Reject
+                </button>
               </div>
-
-              {/* Action */}
-              <button
-                onClick={() => router.push(`/cluster-dashboard/listings/${listing.id}`)}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-(--border-gray) py-2.5 font-roboto-slab text-sm font-semibold text-(--heading-colour) cursor-pointer ease-in-out transition-all duration-300 hover:bg-(--bg-pink)"
-              >
-                <Eye size={16} />
-                View Details
-              </button>
             </motion.div>
           ))}
         </motion.div>
@@ -207,26 +325,27 @@ export default function ClusterListingsPage() {
           animate="visible"
           className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
         >
-          <Filter size={48} className="text-(--text-colour)" />
+          <CheckCircle size={48} className="text-green-600" />
           <div className="flex flex-col items-center gap-2 text-center">
-            <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">No listings found</h3>
+            <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+              All caught up!
+            </h3>
             <p className="font-roboto-slab text-(--text-colour)">
-              {filterStatus === "all"
-                ? "Create your first marketplace listing to get started"
-                : `No ${filterStatus} listings at the moment`}
+              No pending listings to review at the moment
             </p>
           </div>
-          {filterStatus === "all" && (
-            <button
-              onClick={() => router.push("/cluster-dashboard/listings/create")}
-              className="flex items-center gap-2 rounded-full bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) font-roboto-slab text-white cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90"
-            >
-              <Plus size={18} />
-              Create Listing
-            </button>
-          )}
         </motion.div>
       )}
+
+      <RejectModal
+        isOpen={rejectModalOpen}
+        onClose={() => {
+          setRejectModalOpen(false);
+          setSelectedId(null);
+        }}
+        onConfirm={handleRejectConfirm}
+        loading={actionLoading}
+      />
     </div>
   );
 }

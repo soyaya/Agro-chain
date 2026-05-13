@@ -1,11 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Receipt, CheckCircle, Clock, AlertCircle, Calendar, DollarSign, TrendingUp } from "lucide-react";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
-import type { PaymentHistoryRecord, PaymentStatus } from "~/types/index";
+// === Coming Soon — existing content preserved below
+// import { motion } from "framer-motion";
+// import { Receipt, CheckCircle, Clock, AlertCircle, Calendar, DollarSign, TrendingUp } from "lucide-react";
+// import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+// import type { PaymentHistoryRecord, PaymentStatus } from "~/types/index";
+
+import { ComingSoon } from "~/components/shared/ComingSoon";
 
 export default function PaymentHistoryPage() {
+  return <ComingSoon />;
+
+  /* === Original content (preserved, not deleted)
   // Mock data - replace with actual data fetching
   const paymentHistory: PaymentHistoryRecord[] = [
     {
@@ -111,7 +117,6 @@ export default function PaymentHistoryPage() {
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -125,7 +130,6 @@ export default function PaymentHistoryPage() {
         </p>
       </motion.div>
 
-      {/* Stats Grid */}
       <motion.div
         variants={STAGGER_CONTAINER_VARIANT}
         initial="hidden"
@@ -154,7 +158,6 @@ export default function PaymentHistoryPage() {
         })}
       </motion.div>
 
-      {/* Upcoming Payments */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -164,7 +167,6 @@ export default function PaymentHistoryPage() {
         <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
           Upcoming Payments
         </h2>
-        
         {upcomingPayments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-(--space-xl) text-center">
             <Calendar size={48} className="text-gray-300 mb-(--space-md)" />
@@ -177,7 +179,6 @@ export default function PaymentHistoryPage() {
             {upcomingPayments.map((payment, index) => {
               const daysUntilDue = Math.ceil((payment.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
               const isUrgent = daysUntilDue <= 7;
-              
               return (
                 <div
                   key={index}
@@ -221,7 +222,6 @@ export default function PaymentHistoryPage() {
         )}
       </motion.div>
 
-      {/* Payment History */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -231,7 +231,6 @@ export default function PaymentHistoryPage() {
         <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
           Payment History
         </h2>
-        
         {paymentHistory.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-(--space-xl) text-center">
             <Receipt size={48} className="text-gray-300 mb-(--space-md)" />
@@ -244,7 +243,6 @@ export default function PaymentHistoryPage() {
             {paymentHistory.map((payment, index) => {
               const statusConfig = getStatusConfig(payment.status);
               const StatusIcon = statusConfig.icon;
-              
               return (
                 <div
                   key={index}
@@ -279,4 +277,5 @@ export default function PaymentHistoryPage() {
       </motion.div>
     </div>
   );
+  */
 }

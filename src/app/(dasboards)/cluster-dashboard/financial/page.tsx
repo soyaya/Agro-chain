@@ -1,11 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { DollarSign, ShoppingCart, Receipt, TrendingUp, ArrowRight, AlertCircle } from "lucide-react";
-import Link from "next/link";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+// === Coming Soon — existing content preserved below
+// import { motion } from "framer-motion";
+// import { DollarSign, ShoppingCart, Receipt, TrendingUp, ArrowRight, AlertCircle } from "lucide-react";
+// import Link from "next/link";
+// import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+
+import { ComingSoon } from "~/components/shared/ComingSoon";
 
 export default function FinancialServicesPage() {
+  return <ComingSoon />;
+
+  /* === Original content (preserved, not deleted)
   // Mock data - replace with actual data fetching
   const financialStats = [
     {
@@ -75,7 +81,6 @@ export default function FinancialServicesPage() {
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      {/* Welcome Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -89,7 +94,6 @@ export default function FinancialServicesPage() {
         </p>
       </motion.div>
 
-      {/* Financial Stats Grid */}
       <motion.div
         variants={STAGGER_CONTAINER_VARIANT}
         initial="hidden"
@@ -119,7 +123,6 @@ export default function FinancialServicesPage() {
         })}
       </motion.div>
 
-      {/* Important Notice */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -139,7 +142,6 @@ export default function FinancialServicesPage() {
         </div>
       </motion.div>
 
-      {/* Quick Actions Grid */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -180,7 +182,6 @@ export default function FinancialServicesPage() {
         </div>
       </motion.div>
 
-      {/* Recent Activity */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -216,4 +217,5 @@ export default function FinancialServicesPage() {
       </motion.div>
     </div>
   );
+  */
 }

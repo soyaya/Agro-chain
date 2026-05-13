@@ -1,12 +1,18 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Plus, ShoppingCart, Package, Truck, CheckCircle, Clock, CreditCard } from "lucide-react";
-import Link from "next/link";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
-import type { CreditPurchase, CreditPurchaseStatus } from "~/types/index";
+// === Coming Soon — existing content preserved below
+// import { motion } from "framer-motion";
+// import { Plus, ShoppingCart, Package, Truck, CheckCircle, Clock, CreditCard } from "lucide-react";
+// import Link from "next/link";
+// import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+// import type { CreditPurchase, CreditPurchaseStatus } from "~/types/index";
+
+import { ComingSoon } from "~/components/shared/ComingSoon";
 
 export default function CreditPurchasesPage() {
+  return <ComingSoon />;
+
+  /* === Original content (preserved, not deleted)
   // Mock data - replace with actual data fetching
   const creditPurchases: CreditPurchase[] = [
     {
@@ -160,7 +166,6 @@ export default function CreditPurchasesPage() {
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -184,7 +189,6 @@ export default function CreditPurchasesPage() {
         </Link>
       </motion.div>
 
-      {/* Stats Grid */}
       <motion.div
         variants={STAGGER_CONTAINER_VARIANT}
         initial="hidden"
@@ -213,7 +217,6 @@ export default function CreditPurchasesPage() {
         })}
       </motion.div>
 
-      {/* Credit Usage Progress */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -244,7 +247,6 @@ export default function CreditPurchasesPage() {
         </p>
       </motion.div>
 
-      {/* Purchases List */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -293,12 +295,10 @@ export default function CreditPurchasesPage() {
                             {statusConfig.label}
                           </span>
                         </div>
-                        
                         <p className="font-roboto-slab text-xs text-gray-500 mb-(--space-md)">
                           Ordered on {purchase.createdAt.toLocaleDateString()}
                         </p>
                       </div>
-                      
                       <div className="text-right">
                         <p className="font-roboto-slab text-xs text-gray-500">Total Amount</p>
                         <p className="font-ubuntu text-xl font-bold text-(--heading-colour)">
@@ -306,8 +306,6 @@ export default function CreditPurchasesPage() {
                         </p>
                       </div>
                     </div>
-                    
-                    {/* Items */}
                     <div className="rounded-lg bg-gray-50 p-(--space-md)">
                       <p className="font-roboto-slab text-xs text-gray-600 mb-2">Items ({purchase.items.length})</p>
                       <div className="flex flex-col gap-2">
@@ -328,8 +326,6 @@ export default function CreditPurchasesPage() {
                         ))}
                       </div>
                     </div>
-                    
-                    {/* Payment Progress */}
                     <div className="rounded-lg bg-blue-50 p-(--space-md)">
                       <div className="flex items-center justify-between mb-2">
                         <p className="font-roboto-slab text-xs text-blue-800">Payment Progress</p>
@@ -344,7 +340,6 @@ export default function CreditPurchasesPage() {
                         />
                       </div>
                     </div>
-                    
                     <Link
                       href={`/farmers-dashboard/financial/credit/${purchase.id}`}
                       className="font-roboto-slab rounded-lg border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-sm) text-center text-sm font-medium text-(--heading-colour) cursor-pointer ease-in-out transition-all duration-300 hover:bg-(--bg-pink) focus:ring-2 focus:ring-(--border-gray) focus:ring-offset-2 focus:outline-none"
@@ -360,4 +355,5 @@ export default function CreditPurchasesPage() {
       </motion.div>
     </div>
   );
+  */
 }
