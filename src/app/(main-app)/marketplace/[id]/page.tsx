@@ -20,12 +20,13 @@ import type { MarketplaceListing, PackagingOption } from "~/types";
 import {
   FADE_IN_VARIANT,
   SLIDE_UP_VARIANT,
-  BASE_PRICE_PER_KG_NAIRA,
   FISH_VARIANTS,
   type FishVariant,
+  type FishType,
 } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
+import { usePlatformSettings } from "~/context/PlatformSettingsContext";
 
 type MarketplaceDetailResponse =
   | MarketplaceListing
@@ -48,6 +49,7 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const cart = useCart();
+  const { pricePerKg } = usePlatformSettings();
 
   useEffect(() => {
     let mounted = true;
@@ -60,12 +62,13 @@ export default function ListingDetailPage() {
         const payload = extractListing(response);
 
         if (payload && mounted) {
+          const fishPricePerKg = pricePerKg[payload.fishType as FishType] ?? pricePerKg.catfish;
           setListing({
             ...payload,
-            pricePerKg: payload.pricePerKg ?? BASE_PRICE_PER_KG_NAIRA,
+            pricePerKg: payload.pricePerKg ?? fishPricePerKg,
             packaging: payload.packaging?.map((pkg) => ({
               ...pkg,
-              pricePerUnit: pkg.pricePerUnit ?? pkg.weightKg * BASE_PRICE_PER_KG_NAIRA,
+              pricePerUnit: pkg.pricePerUnit ?? pkg.weightKg * fishPricePerKg,
             })),
           });
           setSelectedDelivery(payload.deliveryOptions?.[0] ?? "");

@@ -8,6 +8,8 @@ Marketplace listing endpoints are public (no authentication required). Cart and 
 
 Returns all active, cluster-approved, non-expired listings. Supports filtering and pagination.
 
+`pricePerUnit` in the packaging array is backend-computed as `weightKg * pricePerKg[fishType]` using the platform settings set by the admin. It is never farmer-supplied.
+
 **GET /marketplace**
 
 ```typescript
@@ -40,12 +42,12 @@ Returns all active, cluster-approved, non-expired listings. Supports filtering a
       packaging: Array<{
         weightKg: number,
         quantity: number,
-        pricePerUnit: number
+        pricePerUnit: number    // Backend-computed: weightKg * pricePerKg[fishType]
       }>,
       location: string,
       state: string,
       localGovernment: string,
-      pricePerKg: number,
+      pricePerKg: number,       // Platform price for this fish type from admin settings
       deliveryOptions: Array<"pickup" | "delivery">,
       visibleOnMarketplace: boolean,
       status: "approved",
@@ -89,12 +91,12 @@ Returns full details of a single marketplace listing including images.
       packaging: Array<{
         weightKg: number,
         quantity: number,
-        pricePerUnit: number
+        pricePerUnit: number    // Backend-computed: weightKg * pricePerKg[fishType]
       }>,
       location: string,
       state: string,
       localGovernment: string,
-      pricePerKg: number,
+      pricePerKg: number,       // Platform price for this fish type from admin settings
       deliveryOptions: Array<"pickup" | "delivery">,
       images: Array<{
         id: string,
@@ -133,7 +135,7 @@ Returns the current buyer's cart with all items. Requires authentication.
       processed: boolean,
       weightKg: number,
       quantity: number,
-      pricePerUnit: number,
+      pricePerUnit: number,   // Snapshotted at time of cart addition
       totalPrice: number
     }>,
     cartTotal: number
@@ -147,6 +149,8 @@ Returns the current buyer's cart with all items. Requires authentication.
 
 Adds a listing item to the buyer's cart. Requires authentication.
 
+`pricePerUnit` here is read from the listing's packaging array (backend-computed) and passed through as a price snapshot. It is not user input.
+
 **POST /marketplace/cart**
 
 ```typescript
@@ -157,7 +161,7 @@ Adds a listing item to the buyer's cart. Requires authentication.
   processed: boolean,
   weightKg: number,
   quantity: number,
-  pricePerUnit: number
+  pricePerUnit: number    // Read from listing.packaging[n].pricePerUnit — price snapshot
 }
 
 // Response
@@ -190,8 +194,7 @@ Updates the quantity or weight of an existing cart item. Requires authentication
 // Request body — all fields optional
 {
   quantity: number,
-  weightKg: number,
-  pricePerUnit: number
+  weightKg: number
 }
 
 // Response

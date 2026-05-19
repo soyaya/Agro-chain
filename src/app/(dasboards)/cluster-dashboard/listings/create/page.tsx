@@ -27,7 +27,6 @@ const schema = z.object({
   location: z.string().min(3, "Location is required"),
   state: z.string().min(1, "State is required"),
   localGovernment: z.string().min(2, "Local government is required"),
-  pricePerKg: z.number().min(1, "Price per kg is required"),
   visibleOnMarketplace: z.boolean(),
 });
 
@@ -58,7 +57,7 @@ export default function CreateClusterListingPage() {
   const visibleOnMarketplace = watch("visibleOnMarketplace");
 
   const addPackaging = () => {
-    setPackaging((prev) => [...prev, { weightKg: 1, quantity: 0, pricePerUnit: 0 }]);
+    setPackaging((prev) => [...prev, { weightKg: 1, quantity: 0 }]);
     setPackagingError("");
   };
 
@@ -67,14 +66,12 @@ export default function CreateClusterListingPage() {
   };
 
   const updatePackaging = (index: number, field: keyof PackagingOption, value: number) => {
-    setPackaging((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, [field]: value } : p))
-    );
+    setPackaging((prev) => prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
   };
 
   const toggleDelivery = (option: DeliveryOptionValue) => {
     setSelectedDelivery((prev) =>
-      prev.includes(option) ? prev.filter((d) => d !== option) : [...prev, option]
+      prev.includes(option) ? prev.filter((d) => d !== option) : [...prev, option],
     );
     setDeliveryError("");
   };
@@ -112,7 +109,10 @@ export default function CreateClusterListingPage() {
         <motion.div
           initial="hidden"
           animate="visible"
-          variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.12 } } }}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
+          }}
           className="flex flex-col gap-(--section-gap)"
         >
           {/* Header */}
@@ -128,7 +128,7 @@ export default function CreateClusterListingPage() {
               <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) lg:text-4xl">
                 Create Marketplace Listing
               </h1>
-              <p className="mt-2 font-roboto-slab text-(--text-colour)">
+              <p className="font-roboto-slab mt-2 text-(--text-colour)">
                 List your aggregated fish supply on the marketplace
               </p>
             </div>
@@ -167,14 +167,6 @@ export default function CreateClusterListingPage() {
                     placeholder={`Minimum ${MIN_SUPPLY_KG}kg`}
                     error={errors.totalAvailableKg?.message}
                     {...register("totalAvailableKg", { valueAsNumber: true })}
-                    required
-                  />
-                  <DynamicInput
-                    label="Price per kg (₦)"
-                    type="number"
-                    placeholder="e.g. 1800"
-                    error={errors.pricePerKg?.message}
-                    {...register("pricePerKg", { valueAsNumber: true })}
                     required
                   />
                 </div>
@@ -224,7 +216,7 @@ export default function CreateClusterListingPage() {
                   <button
                     type="button"
                     onClick={addPackaging}
-                    className="flex items-center gap-1.5 rounded-xl border border-(--border-gray) px-(--space-lg) py-(--space-sm) font-roboto-slab text-sm font-medium text-(--heading-colour) transition hover:bg-(--bg-pink)"
+                    className="font-roboto-slab flex items-center gap-1.5 rounded-xl border border-(--border-gray) px-(--space-lg) py-(--space-sm) text-sm font-medium text-(--heading-colour) transition hover:bg-(--bg-pink)"
                   >
                     <Plus size={16} />
                     Add Option
@@ -246,7 +238,7 @@ export default function CreateClusterListingPage() {
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -8 }}
-                          className="grid grid-cols-3 gap-(--gap-base) rounded-2xl border border-(--border-gray) p-(--space-lg)"
+                          className="grid grid-cols-2 gap-(--gap-base) rounded-2xl border border-(--border-gray) p-(--space-lg)"
                         >
                           <div>
                             <label className="font-roboto-slab mb-1.5 block text-xs font-medium text-(--heading-colour)">
@@ -256,11 +248,13 @@ export default function CreateClusterListingPage() {
                               type="number"
                               value={pkg.weightKg}
                               min={1}
-                              onChange={(e) => updatePackaging(i, "weightKg", Number(e.target.value))}
-                              className="w-full rounded-lg border border-(--border-input) px-(--space-md) py-(--space-sm) font-roboto-slab text-sm focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
+                              onChange={(e) =>
+                                updatePackaging(i, "weightKg", Number(e.target.value))
+                              }
+                              className="font-roboto-slab w-full rounded-lg border border-(--border-input) px-(--space-md) py-(--space-sm) text-sm focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
                             />
                           </div>
-                          <div>
+                          <div className="relative">
                             <label className="font-roboto-slab mb-1.5 block text-xs font-medium text-(--heading-colour)">
                               Quantity
                             </label>
@@ -268,25 +262,15 @@ export default function CreateClusterListingPage() {
                               type="number"
                               value={pkg.quantity}
                               min={0}
-                              onChange={(e) => updatePackaging(i, "quantity", Number(e.target.value))}
-                              className="w-full rounded-lg border border-(--border-input) px-(--space-md) py-(--space-sm) font-roboto-slab text-sm focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
-                            />
-                          </div>
-                          <div className="relative">
-                            <label className="font-roboto-slab mb-1.5 block text-xs font-medium text-(--heading-colour)">
-                              Price / Unit (₦)
-                            </label>
-                            <input
-                              type="number"
-                              value={pkg.pricePerUnit}
-                              min={0}
-                              onChange={(e) => updatePackaging(i, "pricePerUnit", Number(e.target.value))}
-                              className="w-full rounded-lg border border-(--border-input) px-(--space-md) py-(--space-sm) font-roboto-slab text-sm focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
+                              onChange={(e) =>
+                                updatePackaging(i, "quantity", Number(e.target.value))
+                              }
+                              className="font-roboto-slab w-full rounded-lg border border-(--border-input) px-(--space-md) py-(--space-sm) text-sm focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
                             />
                             <button
                               type="button"
                               onClick={() => removePackaging(i)}
-                              className="absolute -right-2 -top-2 rounded-full bg-red-50 p-1 text-red-500 transition hover:bg-red-100"
+                              className="absolute -top-2 -right-2 rounded-full bg-red-50 p-1 text-red-500 transition hover:bg-red-100"
                               aria-label="Remove packaging option"
                             >
                               <Trash2 size={14} />
@@ -298,7 +282,7 @@ export default function CreateClusterListingPage() {
                   </div>
                 )}
                 {packagingError && (
-                  <p className="mt-2 font-roboto-slab text-sm text-red-500">{packagingError}</p>
+                  <p className="font-roboto-slab mt-2 text-sm text-red-500">{packagingError}</p>
                 )}
               </div>
 
@@ -313,7 +297,7 @@ export default function CreateClusterListingPage() {
                       key={option}
                       type="button"
                       onClick={() => toggleDelivery(option)}
-                      className={`rounded-xl border px-(--space-lg) py-(--space-sm) font-roboto-slab text-sm font-medium transition ${
+                      className={`font-roboto-slab rounded-xl border px-(--space-lg) py-(--space-sm) text-sm font-medium transition ${
                         selectedDelivery.includes(option)
                           ? "border-(--theme-green-dark) bg-green-50 text-(--theme-green-dark)"
                           : "border-(--border-gray) bg-(--white) text-(--heading-colour) hover:bg-(--bg-pink)"
@@ -324,7 +308,7 @@ export default function CreateClusterListingPage() {
                   ))}
                 </div>
                 {deliveryError && (
-                  <p className="mt-2 font-roboto-slab text-sm text-red-500">{deliveryError}</p>
+                  <p className="font-roboto-slab mt-2 text-sm text-red-500">{deliveryError}</p>
                 )}
               </div>
 
@@ -341,20 +325,31 @@ export default function CreateClusterListingPage() {
                   aria-label="Toggle marketplace visibility"
                 >
                   {visibleOnMarketplace && (
-                    <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg
+                      className="h-3.5 w-3.5 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   )}
                 </button>
                 <div>
                   <div className="flex items-center gap-2">
-                    {visibleOnMarketplace ? <Eye size={16} className="text-(--theme-green-dark)" /> : <EyeOff size={16} className="text-gray-400" />}
+                    {visibleOnMarketplace ? (
+                      <Eye size={16} className="text-(--theme-green-dark)" />
+                    ) : (
+                      <EyeOff size={16} className="text-gray-400" />
+                    )}
                     <span className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
                       Visible on marketplace
                     </span>
                   </div>
                   <p className="font-roboto-slab mt-1 text-xs text-(--text-colour)">
-                    When enabled, this listing will be publicly visible to buyers on the marketplace after approval.
+                    When enabled, this listing will be publicly visible to buyers on the marketplace
+                    after approval.
                   </p>
                 </div>
               </div>
@@ -362,8 +357,9 @@ export default function CreateClusterListingPage() {
               {/* Info box */}
               <div className="rounded-2xl bg-blue-50 p-(--space-lg)">
                 <p className="font-roboto-slab text-sm text-blue-800">
-                  <span className="font-medium">Note: </span>
-                  Your listing will be reviewed before going live. You will be notified once it is approved or if changes are needed.
+                  <span className="font-medium">Pricing note: </span>
+                  Price per unit is set platform-wide by the admin based on fish type and weight.
+                  You do not need to enter a price.
                 </p>
               </div>
 

@@ -58,7 +58,7 @@ export interface AddToCartPayload {
   processed?: boolean;
   weightKg: number;
   quantity: number;
-  pricePerUnit: number;
+  pricePerUnit: number;   // Price snapshot — read from listing.packaging[n].pricePerUnit, not user input
 }
 
 export interface CheckoutPayload {
@@ -114,7 +114,7 @@ export const marketplaceService = {
   /** Update quantity of a cart item. */
   updateCartItem(
     cartItemId: string,
-    updates: { quantity?: number; weightKg?: number; pricePerUnit?: number },
+    updates: { quantity?: number; weightKg?: number },
   ) {
     return apiFetch(`/marketplace/cart/${cartItemId}`, {
       method: "PATCH",

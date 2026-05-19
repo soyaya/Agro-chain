@@ -2,13 +2,125 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Settings, User, Shield, Bell } from "lucide-react";
+import { Settings, User, Shield, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import { authService, type BackendUser } from "~/lib/services/auth.service";
+import { adminService, type FishPriceConfig } from "~/lib/services/admin.service";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { LoadingState } from "~/components/ui/LoadingState";
-import { FADE_IN_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, FISH_TYPES, FISH_TYPE_LABELS, type FishType } from "~/types/constants";
+
+// === Fish price form
+
+function FishPricingSection() {
+  const [prices, setPrices] = useState<FishPriceConfig | null>(null);
+  const [draft, setDraft] = useState<FishPriceConfig | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [lastUpdatedBy, setLastUpdatedBy] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res = await adminService.getSettings();
+        if (mounted) {
+          setPrices(res.data.settings.pricePerKg);
+          setDraft(res.data.settings.pricePerKg);
+          setLastUpdated(res.data.settings.updatedAt);
+          setLastUpdatedBy(res.data.settings.updatedBy);
+        }
+      } catch {
+        toast.error("Failed to load fish prices.");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleChange = (fishType: FishType, value: string) => {
+    const num = parseFloat(value);
+    if (isNaN(num)) return;
+    setDraft((prev) => (prev ? { ...prev, [fishType]: num } : prev));
+  };
+
+  const handleSave = async () => {
+    if (!draft) return;
+    setSaving(true);
+    try {
+      const res = await adminService.updatePrices(draft);
+      setPrices(res.data.settings.pricePerKg);
+      setDraft(res.data.settings.pricePerKg);
+      setLastUpdated(res.data.settings.updatedAt);
+      setLastUpdatedBy(res.data.settings.updatedBy);
+      toast.success("Fish prices updated successfully.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update prices.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const isDirty = draft && prices && JSON.stringify(draft) !== JSON.stringify(prices);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <p className="font-roboto-slab text-sm text-(--text-colour)">Loading prices...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {FISH_TYPES.map((fishType) => (
+          <div key={fishType} className="flex flex-col gap-1.5">
+            <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+              {FISH_TYPE_LABELS[fishType as FishType]}
+              <span className="ml-1 text-xs font-normal text-(--text-colour)">(₦ per kg)</span>
+            </label>
+            <input
+              type="number"
+              min={1}
+              step={50}
+              value={draft?.[fishType as FishType] ?? ""}
+              onChange={(e) => handleChange(fishType as FishType, e.target.value)}
+              className="font-roboto-slab h-10 w-full rounded-lg border border-(--border-input) px-3 text-sm text-(--heading-colour) focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
+            />
+          </div>
+        ))}
+      </div>
+
+      {lastUpdated && (
+        <p className="font-roboto-slab text-xs text-gray-400">
+          Last updated: {new Date(lastUpdated).toLocaleString("en-NG")}
+          {lastUpdatedBy ? ` · by admin ${lastUpdatedBy.slice(0, 8)}...` : ""}
+        </p>
+      )}
+
+      <div className="flex justify-end">
+        <SubmitPrimaryButton
+          loading={saving}
+          disabled={!isDirty || saving}
+          type="button"
+          onClick={handleSave}
+        >
+          Save Prices
+        </SubmitPrimaryButton>
+      </div>
+    </div>
+  );
+}
+
+// === Main page
 
 export default function AdminSettingsPage() {
   const [user, setUser] = useState<BackendUser | null>(null);
@@ -47,6 +159,30 @@ export default function AdminSettingsPage() {
         <p className="font-roboto-slab text-(--text-colour)">
           Manage your admin account and platform configuration.
         </p>
+      </motion.div>
+
+      {/* Fish Pricing */}
+      <motion.div
+        variants={FADE_IN_VARIANT}
+        initial="hidden"
+        animate="visible"
+        className="rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-xl) shadow-sm"
+      >
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+            <DollarSign size={20} className="text-(--theme-green-dark)" />
+          </div>
+          <div>
+            <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">
+              Fish Pricing
+            </h2>
+            <p className="font-roboto-slab text-xs text-(--text-colour)">
+              Set the platform-wide price per kg for each fish type. All listings and orders use
+              these values automatically.
+            </p>
+          </div>
+        </div>
+        <FishPricingSection />
       </motion.div>
 
       {/* Admin Profile */}

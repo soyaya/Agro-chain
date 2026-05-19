@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { MarketplaceListing, PackagingOption } from "~/types";
-import { BASE_PRICE_PER_KG_NAIRA } from "~/types/constants";
-import type { FishVariant } from "~/types/constants";
+import { FALLBACK_PRICES_PER_KG, type FishType, type FishVariant } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
+import { usePlatformSettings } from "~/context/PlatformSettingsContext";
 
 export interface CartItem {
   cartItemId?: string;
@@ -30,14 +30,19 @@ const getInitialCart = (): CartItem[] => {
   try {
     const stored = localStorage.getItem(CART_STORAGE_KEY);
     return stored ? (JSON.parse(stored) as CartItem[]) : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 };
 
-const computePricePerUnit = (pkg: PackagingOption) => pkg.pricePerUnit ?? pkg.weightKg * BASE_PRICE_PER_KG_NAIRA;
-
 export function useCart() {
+  const { pricePerKg } = usePlatformSettings();
+
+  const computePricePerUnit = (pkg: PackagingOption, fishType: string): number => {
+    if (pkg.pricePerUnit != null) return pkg.pricePerUnit;
+    const rate = pricePerKg[fishType as FishType] ?? FALLBACK_PRICES_PER_KG.catfish;
+    return pkg.weightKg * rate;
+  };
   const [items, setItems] = useState<CartItem[]>([]);
   const [synced, setSynced] = useState(false);
 
@@ -116,7 +121,7 @@ export function useCart() {
       pkg: PackagingOption,
       options: { variant: FishVariant; processed: boolean },
     ) => {
-      const pricePerUnit = computePricePerUnit(pkg);
+      const pricePerUnit = computePricePerUnit(pkg, listing.fishType);
       const localId = createLocalId();
       setItems((prev) => {
         const existing = prev.find(

@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { LocationProvider } from "~/lib/location-context";
 import { AuthProvider } from "~/lib/auth-context";
+import { PlatformSettingsProvider } from "~/context/PlatformSettingsContext";
 
 export const metadata = {
   metadataBase: new URL("https://agro-chain-bom-vercel.vercel.app"),
@@ -76,16 +77,17 @@ export const metadata = {
   },
 };
 
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${inter.variable} ${openSans.variable} antialiased`}>
         <AuthProvider>
-          <LocationProvider>
-            {children}
-            <Toaster position="top-center" richColors closeButton />
-          </LocationProvider>
+          <PlatformSettingsProvider>
+            <LocationProvider>
+              {children}
+              <Toaster position="top-center" richColors closeButton />
+            </LocationProvider>
+          </PlatformSettingsProvider>
         </AuthProvider>
       </body>
     </html>

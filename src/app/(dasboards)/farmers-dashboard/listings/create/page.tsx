@@ -17,19 +17,11 @@ export default function CreateListingPage() {
   const handleSubmit = async (data: SupplyListingFormData) => {
     setIsLoading(true);
     try {
-      const firstPackage = data.packaging[0];
-      if (!firstPackage) {
-        throw new Error("At least one packaging option is required");
-      }
-
       await farmerService.createListing({
         fishType: data.fishType,
         harvestDate: data.harvestDate.toISOString(),
         totalFishAvailable: data.totalAvailableKg,
-        packaging: {
-          weightKg: firstPackage.weightKg,
-          pricePerUnit: firstPackage.pricePerUnit,
-        },
+        weightKg: data.weightKg,
       });
 
       toast.success("Listing submitted successfully.");
@@ -51,12 +43,7 @@ export default function CreateListingPage() {
           animate="visible"
           variants={{
             hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.15,
-              },
-            },
+            visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
           }}
           className="flex flex-col gap-(--section-gap)"
         >

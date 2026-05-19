@@ -8,10 +8,12 @@ import { Store, ShoppingBag } from "lucide-react";
 import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import { MarketplaceFilters } from "~/components/marketplace/MarketplaceFilters";
 import type { MarketplaceListing, MarketplaceFilters as Filters } from "~/types";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, BASE_PRICE_PER_KG_NAIRA } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
 import { CartDrawer } from "~/components/marketplace/CartDrawer";
+import { usePlatformSettings } from "~/context/PlatformSettingsContext";
+import type { FishType } from "~/types/constants";
 
 type MarketplaceResponse = {
   status: string;
@@ -33,7 +35,8 @@ export default function MarketplacePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const cart = useCart();
-  
+  const { pricePerKg } = usePlatformSettings();
+
   useEffect(() => {
     const saved = localStorage.getItem("liked_listings");
     if (saved) {
@@ -55,10 +58,13 @@ export default function MarketplacePage() {
 
         const normalized = payload.map((listing) => ({
           ...listing,
-          pricePerKg: listing.pricePerKg ?? BASE_PRICE_PER_KG_NAIRA,
+          pricePerKg:
+            listing.pricePerKg ?? pricePerKg[listing.fishType as FishType] ?? pricePerKg.catfish,
           packaging: listing.packaging?.map((pkg) => ({
             ...pkg,
-            pricePerUnit: pkg.pricePerUnit ?? pkg.weightKg * BASE_PRICE_PER_KG_NAIRA,
+            pricePerUnit:
+              pkg.pricePerUnit ??
+              pkg.weightKg * (pricePerKg[listing.fishType as FishType] ?? pricePerKg.catfish),
           })),
         }));
 
@@ -87,7 +93,7 @@ export default function MarketplacePage() {
   const handleToggleLike = (listing: MarketplaceListing) => {
     setLikedListings((prev) => {
       const isLiked = prev.includes(listing.id);
-      const newLikes = isLiked ? prev.filter(id => id !== listing.id) : [...prev, listing.id];
+      const newLikes = isLiked ? prev.filter((id) => id !== listing.id) : [...prev, listing.id];
       localStorage.setItem("liked_listings", JSON.stringify(newLikes));
       if (!isLiked) {
         toast.success("Added to liked listings!");
@@ -117,12 +123,12 @@ export default function MarketplacePage() {
   const filteredListings = listings.filter((listing) => {
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      const matchesSearch = 
+      const matchesSearch =
         listing.fishType.toLowerCase().includes(searchLower) ||
         listing.businessName.toLowerCase().includes(searchLower) ||
         listing.clusterFarmerName.toLowerCase().includes(searchLower) ||
         listing.state.toLowerCase().includes(searchLower);
-      
+
       if (!matchesSearch) return false;
     }
     if (filters.fishType && listing.fishType !== filters.fishType) return false;
@@ -180,7 +186,7 @@ export default function MarketplacePage() {
                   <ShoppingBag size={18} />
                   Cart
                   {cart.totalItems > 0 && (
-                    <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-(--theme-green-dark) text-xs font-semibold text-white">
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-(--theme-green-dark) text-xs font-semibold text-white">
                       {cart.totalItems}
                     </span>
                   )}

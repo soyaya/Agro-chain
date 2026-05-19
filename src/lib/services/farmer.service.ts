@@ -37,7 +37,8 @@ export interface FarmerListingRecord {
   listedDate: string;
   totalFishAvailable: number;
   totalAvailableKg: number;
-  packaging: { weightKg: number; quantity: number; pricePerUnit: number };
+  weightKg: number;     // Weight per fish in kg
+  quantity: number;     // Derived: floor(totalAvailableKg / weightKg)
   status: "approved" | "pending" | "rejected";
   isApproved: boolean;
   createdAt: string;
@@ -55,7 +56,7 @@ export interface CreateListingPayload {
   harvestDate: string;
   listedDate?: string;
   totalFishAvailable: number;
-  packaging: { weightKg: number; pricePerUnit: number };
+  weightKg: number;   // Weight per fish in kg — pricePerUnit is computed by backend from admin config
 }
 
 export interface UpdateFarmerProfilePayload {

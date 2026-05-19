@@ -245,7 +245,7 @@ export interface BuyerProfile {
 export interface PackagingOption {
   weightKg: number;
   quantity: number;
-  pricePerUnit: number;
+  pricePerUnit?: number;   // Backend-computed on marketplace responses; absent on farmer-side listing data
 }
 
 export interface FarmerSupplyListing {
@@ -557,7 +557,7 @@ export interface SupplyListingFormData {
   fishType: string;
   harvestDate: Date;
   totalAvailableKg: number;
-  packaging: PackagingOption[];
+  weightKg: number;   // Weight per fish in kg — replaces packaging array
 }
 
 export interface ClusterApplicationFormData {

@@ -16,22 +16,23 @@ interface PackagingSelectorProps {
 
 export function PackagingSelector({ totalKg, packaging, onChange, error }: PackagingSelectorProps) {
   const [selectedWeight, setSelectedWeight] = useState<number>(1);
-  const [pricePerUnit, setPricePerUnit] = useState<number>(0);
 
   const addPackaging = () => {
-    if (selectedWeight <= 0 || pricePerUnit <= 0) return;
+    if (selectedWeight <= 0) return;
 
     const quantity = Math.floor(totalKg / selectedWeight);
     if (quantity <= 0) return;
 
+    // Avoid duplicate weight entries
+    if (packaging.some((p) => p.weightKg === selectedWeight)) return;
+
     const newPackaging: PackagingOption = {
       weightKg: selectedWeight,
       quantity,
-      pricePerUnit,
+      // pricePerUnit is intentionally omitted — computed by backend from admin config
     };
 
     onChange([...packaging, newPackaging]);
-    setPricePerUnit(0);
   };
 
   const removePackaging = (index: number) => {
@@ -56,7 +57,7 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
       {/* Add Packaging Form */}
       <motion.div
         variants={FADE_IN_VARIANT}
-        className="grid grid-cols-1 gap-(--gap-base) rounded-2xl border border-(--border-gray) bg-(--white)/50 p-(--space-lg) backdrop-blur-sm md:grid-cols-3"
+        className="grid grid-cols-1 gap-(--gap-base) rounded-2xl border border-(--border-gray) bg-(--white)/50 p-(--space-lg) backdrop-blur-sm md:grid-cols-2"
         role="form"
         aria-label="Add packaging option"
       >
@@ -69,21 +70,13 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
           aria-label="Select package weight in kilograms"
         />
 
-        <NumberInput
-          label="Price per unit"
-          placeholder="0"
-          value={pricePerUnit}
-          onChange={(e) => setPricePerUnit(Number(e.target.value))}
-          aria-label="Enter price per unit in Naira"
-        />
-
         <div className="flex items-end">
           <button
             type="button"
             onClick={addPackaging}
-            disabled={!totalKg || pricePerUnit <= 0}
+            disabled={!totalKg || selectedWeight <= 0}
             aria-label="Add packaging option"
-            aria-disabled={!totalKg || pricePerUnit <= 0}
+            aria-disabled={!totalKg || selectedWeight <= 0}
             className="font-roboto-slab flex h-12 w-full items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) font-medium text-white transition-all duration-200 hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Plus size={18} aria-hidden="true" />
@@ -114,14 +107,14 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
                     {pkg.weightKg}kg packages
                   </p>
                   <p className="text-sm text-(--text-colour)">
-                    {pkg.quantity} units × ₦{pkg.pricePerUnit.toLocaleString()} = ₦
-                    {(pkg.quantity * pkg.pricePerUnit).toLocaleString()}
+                    {pkg.quantity} units · price set by platform
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => removePackaging(index)}
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-(--error-red) transition hover:bg-red-100"
+                  aria-label={`Remove ${pkg.weightKg}kg packaging option`}
                 >
                   <Trash2 size={18} />
                 </button>

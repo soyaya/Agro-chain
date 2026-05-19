@@ -5,15 +5,41 @@
 // FISH TYPES
 // ============================================
 
-export const FISH_TYPES = ["Catfish"] as const;
+export const FISH_TYPES = [
+  "catfish",
+  "fingerlings",
+  "juveniles",
+  "table_size",
+  "jumbo",
+  "parent_stocks",
+] as const;
 
 export type FishType = typeof FISH_TYPES[number];
+
+export const FISH_TYPE_LABELS: Record<FishType, string> = {
+  catfish: "Catfish",
+  fingerlings: "Fingerlings",
+  juveniles: "Juveniles",
+  table_size: "Table Size",
+  jumbo: "Jumbo",
+  parent_stocks: "Parent Stocks",
+};
 
 export const FISH_VARIANTS = ["Dried", "Jumbo", "Table Size", "Broodstock"] as const;
 
 export type FishVariant = typeof FISH_VARIANTS[number];
 
-export const BASE_PRICE_PER_KG_NAIRA = 3500;
+// Fallback prices used before platform settings are fetched from the backend.
+// The admin sets the live values via PATCH /admin/settings/price.
+// These are dev-time defaults only — do not rely on them in production logic.
+export const FALLBACK_PRICES_PER_KG: Record<FishType, number> = {
+  catfish: 3500,
+  fingerlings: 1200,
+  juveniles: 800,
+  table_size: 3500,
+  jumbo: 5000,
+  parent_stocks: 8000,
+};
 
 export const BASE_DELIVERY_FEE_NAIRA = 1500;
 

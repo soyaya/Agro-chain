@@ -8,6 +8,8 @@ All farmer endpoints require authentication. The authenticated user must have `r
 
 The farmer submits a new supply listing. If the farmer is assigned to a cluster farmer, the listing is held for cluster approval before appearing on the marketplace. If the farmer has no cluster farmer assigned, it is auto-approved.
 
+`pricePerUnit` is NOT accepted here. The backend computes it from the platform-wide `pricePerKg` config set by the admin (`pricePerUnit = weightKg * pricePerKg[fishType]`).
+
 **POST /farmers/listings/create**
 
 ```typescript
@@ -17,10 +19,7 @@ The farmer submits a new supply listing. If the farmer is assigned to a cluster 
   harvestDate: string,          // ISO date string e.g. "2026-03-15"
   listedDate: string,           // ISO date string, optional, defaults to today
   totalFishAvailable: number,   // Total number of fish e.g. 200
-  packaging: {
-    weightKg: number,           // Weight per fish in kg e.g. 1.5
-    pricePerUnit: number        // Price per fish in Naira
-  }
+  weightKg: number              // Weight per fish in kg e.g. 1.5
 }
 
 // Response
@@ -33,8 +32,8 @@ The farmer submits a new supply listing. If the farmer is assigned to a cluster 
       farmer_id: string,
       fish_type: string,
       quantity_available: number,
-      price_per_fish: number,
-      price_per_kg: number,
+      price_per_fish: number,       // Computed: weightKg * pricePerKg[fishType]
+      price_per_kg: number,         // From platform settings for this fish type
       packaging_weight_kg: number,
       total_available_kg: number,
       harvest_date: string,
@@ -79,11 +78,8 @@ Returns all listings belonging to the logged-in farmer along with summary stats.
       listedDate: string,
       totalFishAvailable: number,
       totalAvailableKg: number,
-      packaging: {
-        weightKg: number,
-        quantity: number,
-        pricePerUnit: number
-      },
+      weightKg: number,           // Weight per fish in kg
+      quantity: number,           // Derived: floor(totalAvailableKg / weightKg)
       status: "approved" | "pending" | "rejected",
       isApproved: boolean,
       createdAt: string

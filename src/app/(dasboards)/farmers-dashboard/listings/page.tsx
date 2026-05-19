@@ -36,9 +36,8 @@ export default function FarmerListingsPage() {
             totalAvailableKg: item.totalAvailableKg,
             packaging: [
               {
-                weightKg: item.packaging.weightKg,
-                quantity: item.packaging.quantity,
-                pricePerUnit: item.packaging.pricePerUnit,
+                weightKg: item.weightKg,
+                quantity: item.quantity,
               },
             ],
             status: item.status,

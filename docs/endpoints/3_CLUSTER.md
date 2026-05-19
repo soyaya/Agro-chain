@@ -66,6 +66,40 @@ The cluster farmer updates their personal, farm, and business information. All f
 
 ---
 
+## Create Listing
+
+The cluster farmer creates a marketplace listing directly. Unlike regular farmers, cluster farmers post listings themselves without an approval step.
+
+`pricePerUnit` is NOT accepted here. The backend computes it from the platform-wide `pricePerKg` config set by the admin (`pricePerUnit = weightKg * pricePerKg[fishType]`).
+
+**POST /cluster/listings/create**
+
+```typescript
+// Request body
+{
+  fishType: "catfish" | "fingerlings" | "juveniles" | "table_size" | "jumbo" | "parent_stocks",
+  harvestDate: string,          // ISO date string e.g. "2026-03-15"
+  totalFishAvailable: number,   // Total number of fish
+  weightKg: number,             // Weight per fish in kg e.g. 1.5
+  location: string,             // Warehouse / pickup address
+  state: string,
+  localGovernment: string,
+  deliveryOptions: Array<"pickup" | "delivery">,
+  visibleOnMarketplace: boolean
+}
+
+// Response
+{
+  status: "success",
+  message: "Listing created successfully.",
+  data: {
+    listing: { /* full listing object */ }
+  }
+}
+```
+
+---
+
 ## Listings Overview
 
 Returns a summary of all listings from farmers under this cluster farmer, along with the full list. This is the cluster farmer's view of all supply under their management.
@@ -91,10 +125,8 @@ Returns a summary of all listings from farmers under this cluster farmer, along 
       harvestDate: string,
       listedDate: string,
       totalFishAvailable: number,
-      packaging: {
-        weightKg: number,
-        quantity: number
-      },
+      weightKg: number,         // Weight per fish in kg
+      quantity: number,         // Derived: floor(totalAvailableKg / weightKg)
       status: "approved" | "pending" | "rejected"
     }>
   }
@@ -147,10 +179,8 @@ Returns all listings from farmers under this cluster farmer that are waiting for
       harvestDate: string,
       listedDate: string,
       totalFishAvailable: number,
-      packaging: {
-        weightKg: number,
-        quantity: number
-      },
+      weightKg: number,         // Weight per fish in kg
+      quantity: number,         // Derived: floor(totalAvailableKg / weightKg)
       createdAt: string,
       updatedAt: string
     }>

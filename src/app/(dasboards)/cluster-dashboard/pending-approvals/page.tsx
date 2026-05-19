@@ -122,7 +122,6 @@ export default function PendingApprovalsPage() {
                 {
                   weightKg: item.packaging.weightKg,
                   quantity: item.packaging.quantity,
-                  pricePerUnit: 0,
                 },
               ],
               status: "pending",
@@ -210,7 +209,7 @@ export default function PendingApprovalsPage() {
             <AlertCircle size={24} className="text-yellow-600" />
             <div>
               <p className="font-roboto-slab flex items-center text-sm font-medium text-yellow-800">
-                <span className="font-semibold">{listings.length}{" "}</span> listing
+                <span className="font-semibold">{listings.length} </span> listing
                 {listings.length !== 1 ? "s" : ""} awaiting review
               </p>
               <p className="text-sm text-yellow-700">

@@ -1,4 +1,29 @@
 import { apiFetch } from "~/lib/api";
+import type { FishType } from "~/types/constants";
+
+// === Platform Settings types
+
+export interface FishPriceConfig {
+  catfish: number;
+  fingerlings: number;
+  juveniles: number;
+  table_size: number;
+  jumbo: number;
+  parent_stocks: number;
+}
+
+export interface PlatformSettings {
+  pricePerKg: FishPriceConfig;
+  updatedAt: string;
+  updatedBy: string | null;
+}
+
+export interface PlatformSettingsResponse {
+  status: string;
+  data: {
+    settings: PlatformSettings;
+  };
+}
 
 export interface AdminMetricResponse {
   status: string;
@@ -136,6 +161,19 @@ export interface AdminListing {
 }
 
 export const adminService = {
+  // === Platform Settings
+
+  getSettings() {
+    return apiFetch<PlatformSettingsResponse>("/admin/settings");
+  },
+
+  updatePrices(pricePerKg: Partial<FishPriceConfig>) {
+    return apiFetch<PlatformSettingsResponse>("/admin/settings/price", {
+      method: "PATCH",
+      body: JSON.stringify({ pricePerKg }),
+    });
+  },
+
   getMetrics() {
     return apiFetch<AdminMetricResponse>("/admin/dashboard/metrics");
   },

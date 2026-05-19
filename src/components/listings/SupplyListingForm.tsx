@@ -8,20 +8,20 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
-import { PackagingSelector } from "./PackagingSelector";
-import type { FarmerSupplyListing, SupplyListingFormData, PackagingOption } from "~/types";
+import type { FarmerSupplyListing, SupplyListingFormData } from "~/types";
 import {
   FISH_TYPES,
+  FISH_TYPE_LABELS,
   MIN_SUPPLY_KG,
   FADE_IN_VARIANT,
+  type FishType,
 } from "~/types/constants";
 
 const supplyListingSchema = z.object({
   fishType: z.string().min(1, "Fish type is required"),
   harvestDate: z.string().min(1, "Harvest date is required"),
-  totalAvailableKg: z
-    .number()
-    .min(MIN_SUPPLY_KG, `Minimum supply is ${MIN_SUPPLY_KG}kg`),
+  totalAvailableKg: z.number().min(MIN_SUPPLY_KG, `Minimum supply is ${MIN_SUPPLY_KG}kg`),
+  weightKg: z.number().min(0.1, "Weight must be at least 0.1kg"),
 });
 
 type SupplyListingFormValues = z.infer<typeof supplyListingSchema>;
@@ -37,60 +37,42 @@ export function SupplyListingForm({
   onSubmit,
   isLoading = false,
 }: SupplyListingFormProps) {
-  const [packaging, setPackaging] = useState<PackagingOption[]>(
-    initialData?.packaging || []
-  );
-  const [packagingError, setPackagingError] = useState<string>("");
+  const [selectedFishType, setSelectedFishType] = useState(initialData?.fishType ?? "");
 
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     setValue,
-    watch,
   } = useForm<SupplyListingFormValues>({
     resolver: zodResolver(supplyListingSchema),
     mode: "onChange",
     defaultValues: initialData
       ? {
           fishType: initialData.fishType,
-          harvestDate: new Date(initialData.harvestDate)
-            .toISOString()
-            .split("T")[0],
+          harvestDate: new Date(initialData.harvestDate).toISOString().split("T")[0],
           totalAvailableKg: initialData.totalAvailableKg,
+          weightKg: initialData.packaging?.[0]?.weightKg ?? 1,
         }
-      : undefined,
+      : { weightKg: 1 },
   });
 
-  // Use getValues instead of watch to avoid React Compiler warnings
-  const [selectedFishType, setSelectedFishType] = useState(initialData?.fishType || "");
-  const [totalKg, setTotalKg] = useState(initialData?.totalAvailableKg || 0);
-
   const handleFormSubmit = async (data: SupplyListingFormValues) => {
-    if (packaging.length === 0) {
-      setPackagingError("Please add at least one packaging option");
-      return;
-    }
-
-    setPackagingError("");
-
     try {
       await onSubmit({
         fishType: data.fishType,
         harvestDate: new Date(data.harvestDate),
         totalAvailableKg: data.totalAvailableKg,
-        packaging,
+        weightKg: data.weightKg,
       });
-      toast.success("Listing submitted successfully!");
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to submit listing";
+      const message = error instanceof Error ? error.message : "Failed to submit listing";
       toast.error(message);
     }
   };
 
   const fishTypeOptions = FISH_TYPES.map((fish) => ({
-    label: fish,
+    label: FISH_TYPE_LABELS[fish as FishType],
     value: fish,
   }));
 
@@ -100,12 +82,7 @@ export function SupplyListingForm({
       animate="visible"
       variants={{
         hidden: { opacity: 0 },
-        visible: {
-          opacity: 1,
-          transition: {
-            staggerChildren: 0.1,
-          },
-        },
+        visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
       }}
       onSubmit={handleSubmit(handleFormSubmit)}
       className="flex w-full flex-col gap-(--gap-lg)"
@@ -139,45 +116,43 @@ export function SupplyListingForm({
           label="Total Available (kg)"
           type="number"
           error={errors.totalAvailableKg?.message}
-          {...register("totalAvailableKg", { 
-            valueAsNumber: true,
-            onChange: (e) => setTotalKg(Number(e.target.value) || 0)
-          })}
+          {...register("totalAvailableKg", { valueAsNumber: true })}
           placeholder={`Minimum ${MIN_SUPPLY_KG}kg`}
+          required
+        />
+
+        <DynamicInput
+          label="Weight per fish (kg)"
+          type="number"
+          step="0.1"
+          error={errors.weightKg?.message}
+          {...register("weightKg", { valueAsNumber: true })}
+          placeholder="e.g. 1.5"
           required
         />
       </motion.div>
 
-      {/* Packaging Selector */}
-      <motion.div variants={FADE_IN_VARIANT}>
-        <PackagingSelector
-          totalKg={totalKg}
-          packaging={packaging}
-          onChange={setPackaging}
-          error={packagingError}
-        />
-      </motion.div>
-
-      {/* Information Box */}
-      <motion.div
-        variants={FADE_IN_VARIANT}
-        className="rounded-2xl bg-blue-50 p-(--space-lg)"
-      >
+      {/* Info Box */}
+      <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl bg-blue-50 p-(--space-lg)">
         <p className="text-sm text-blue-800">
-          <span className="font-medium">Note: </span>
-          Your listing will be reviewed by a cluster farmer. Once approved, it
-          will appear on the marketplace under their name. You will be notified
-          of the approval status.
+          <span className="font-medium">Pricing note: </span>
+          Price per unit is set platform-wide by the admin and applied automatically based on your
+          fish type and weight. You do not need to enter a price.
         </p>
       </motion.div>
 
-      {/* Submit Button */}
+      {/* Approval note */}
+      <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl bg-yellow-50 p-(--space-lg)">
+        <p className="text-sm text-yellow-800">
+          <span className="font-medium">Note: </span>
+          Your listing will be reviewed by a cluster farmer. Once approved, it will appear on the
+          marketplace under their name. You will be notified of the approval status.
+        </p>
+      </motion.div>
+
+      {/* Submit */}
       <motion.div variants={FADE_IN_VARIANT} className="mt-(--submit-button-mt)">
-        <SubmitPrimaryButton
-          loading={isLoading}
-          disabled={!isValid || isLoading || packaging.length === 0}
-          type="submit"
-        >
+        <SubmitPrimaryButton loading={isLoading} disabled={!isValid || isLoading} type="submit">
           {initialData ? "Update Listing" : "Submit Listing"}
         </SubmitPrimaryButton>
       </motion.div>

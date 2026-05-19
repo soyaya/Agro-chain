@@ -4,6 +4,81 @@ All admin endpoints require authentication and the user must have `role: "admin"
 
 ---
 
+## Platform Settings
+
+These endpoints manage platform-wide configuration. The price config is the source of truth for all `pricePerUnit` calculations across the entire app. The admin sets it once and it propagates everywhere — listings, marketplace, cart, orders, and demand estimates.
+
+### Get Platform Settings
+
+Public endpoint — no authentication required. The frontend fetches this once on app load and makes it available via `PlatformSettingsContext`. Both the farmer app and the buyer/marketplace app use the same context.
+
+**GET /admin/settings**
+
+```typescript
+// Response
+{
+  status: "success",
+  data: {
+    settings: {
+      pricePerKg: {
+        catfish: number,
+        fingerlings: number,
+        juveniles: number,
+        table_size: number,
+        jumbo: number,
+        parent_stocks: number
+      },
+      updatedAt: string,
+      updatedBy: string | null    // Admin user id who last changed it
+    }
+  }
+}
+```
+
+### Update Fish Prices
+
+Admin only. Partial update — only send the fish types you want to change. Unspecified types keep their current values.
+
+**PATCH /admin/settings/price**
+
+```typescript
+// Request body — all fields optional, only send what changed
+{
+  pricePerKg: {
+    catfish?: number,
+    fingerlings?: number,
+    juveniles?: number,
+    table_size?: number,
+    jumbo?: number,
+    parent_stocks?: number
+  }
+}
+
+// Response
+{
+  status: "success",
+  message: "Prices updated successfully.",
+  data: {
+    settings: {
+      pricePerKg: {
+        catfish: number,
+        fingerlings: number,
+        juveniles: number,
+        table_size: number,
+        jumbo: number,
+        parent_stocks: number
+      },
+      updatedAt: string,
+      updatedBy: string
+    }
+  }
+}
+```
+
+Status: Not implemented. Needs to be created.
+
+---
+
 ## Dashboard Metrics
 
 Returns platform-wide summary numbers used to populate the stat cards on the admin dashboard home page.
@@ -586,6 +661,8 @@ Status: Not implemented. Depends on the Get All Users endpoint being created fir
 
 | Endpoint                                | Method | Status                                                      |
 | --------------------------------------- | ------ | ----------------------------------------------------------- |
+| /admin/settings                         | GET    | Not implemented                                             |
+| /admin/settings/price                   | PATCH  | Not implemented                                             |
 | /admin/dashboard/metrics                | GET    | Implemented                                                 |
 | /admin/dashboard/charts                 | GET    | Implemented                                                 |
 | /admin/dashboard/activities             | GET    | Implemented                                                 |
