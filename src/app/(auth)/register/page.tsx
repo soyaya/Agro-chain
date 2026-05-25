@@ -10,7 +10,7 @@ import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
 import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
-import { kadunaLga } from "~/models/models";
+import { NIGERIAN_STATES } from "~/types/constants";
 import {
   InputOTP,
   InputOTPGroup,
@@ -28,7 +28,8 @@ const registerSchema = z
       .min(10, "Phone number is too short")
       .regex(/^(0|\+234)[789][01]\d{8}$/, "Invalid Nigerian phone number (+234 or 0 prefix)"),
     email: z.string().email("Invalid email address"),
-    location: z.string().min(2, "Location is required").optional(),
+    state: z.string().min(1, "State is required"),
+    localGovernment: z.string().min(2, "Local government is required"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(8, "Confirm your password"),
   })
@@ -46,7 +47,7 @@ function RegisterFormContent() {
   const searchParams = useSearchParams();
   const role = (searchParams.get("role")?.toLowerCase() || "") as Role;
 
-  const [isLga, setSelectedLga] = useState<string>("off");
+  const [selectedState, setSelectedState] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [otp, setOtp] = useState("");
@@ -71,13 +72,12 @@ function RegisterFormContent() {
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     mode: "onChange",
-    defaultValues: { location: "" },
+    defaultValues: { state: "", localGovernment: "" },
   });
 
-  // Sync LGA selection with form location field
-  const handleLgaChange = (value: string) => {
-    setSelectedLga(value);
-    setValue("location", value, { shouldValidate: true });
+  const handleStateChange = (value: string) => {
+    setSelectedState(value);
+    setValue("state", value, { shouldValidate: true });
   };
 
   const onSubmit = async (data: RegisterForm) => {
@@ -98,7 +98,8 @@ function RegisterFormContent() {
           fullName: data.fullName,
           phone: data.phone,
           email: data.email,
-          location: data.location,
+          state: data.state,
+          localGovernment: data.localGovernment,
           password: data.password,
           role,
         }),
@@ -125,7 +126,7 @@ function RegisterFormContent() {
     }
   };
 
-  const isFormComplete = isValid && isLga !== "off";
+  const isFormComplete = isValid;
 
   useEffect(() => {
     if (step !== 2 || resendLocked) return;
@@ -282,10 +283,19 @@ function RegisterFormContent() {
               />
 
               <SelectInput
-                label="Location"
-                value={isLga}
-                onValueChange={handleLgaChange}
-                options={kadunaLga}
+                label="State"
+                value={selectedState}
+                onValueChange={handleStateChange}
+                options={NIGERIAN_STATES.map((s) => ({ label: s, value: s }))}
+                error={errors.state?.message}
+                required
+              />
+
+              <DynamicInput
+                label="Local Government"
+                error={errors.localGovernment?.message}
+                {...register("localGovernment")}
+                placeholder="Enter your local government area"
                 required
               />
             </div>

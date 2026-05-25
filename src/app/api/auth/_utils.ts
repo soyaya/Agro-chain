@@ -13,6 +13,43 @@ const buildUrl = (path: string) => {
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 const IS_PROD = process.env.NODE_ENV === "production";
 
+// === GET passthrough — forwards auth cookie to backend and returns response as-is
+
+export async function forwardAuthGet(req: Request, path: string) {
+  const baseUrl = getBaseUrl();
+  if (!baseUrl) {
+    return NextResponse.json(
+      { status: "error", message: "Backend base URL not configured. Set BASE_BACKEND_URL." },
+      { status: 500 },
+    );
+  }
+
+  const url = buildUrl(path);
+  const headers = new Headers();
+
+  const cookie = req.headers.get("cookie");
+  if (cookie) headers.set("cookie", cookie);
+
+  const authorization = req.headers.get("authorization");
+  if (authorization) headers.set("authorization", authorization);
+
+  let response: Response;
+  try {
+    response = await fetch(url, { method: "GET", headers });
+  } catch (error) {
+    return NextResponse.json(
+      { status: "error", message: "Unable to reach backend service." },
+      { status: 502 },
+    );
+  }
+
+  const responseBody = await response.text();
+  const nextResponse = new NextResponse(responseBody, { status: response.status });
+  const contentType = response.headers.get("content-type");
+  if (contentType) nextResponse.headers.set("content-type", contentType);
+  return nextResponse;
+}
+
 // === Dumb passthrough — used for non-session endpoints (login step 1, register, forgot-password, etc.)
 
 export async function forwardAuthRequest(req: Request, path: string) {
@@ -141,9 +178,11 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
   }
 
   if (user) {
-    // Non-httpOnly — readable by Next.js middleware for route guarding
+    // Non-httpOnly — readable by JS for header display and route guarding
     const currentUser = {
+      id: user.id,
       role: user.role,
+      fullName: user.full_name,
       isClusterFarmer: user.is_cluster_farmer === true || user.role === "cluster",
     };
     nextResponse.cookies.set("current_user", JSON.stringify(currentUser), {

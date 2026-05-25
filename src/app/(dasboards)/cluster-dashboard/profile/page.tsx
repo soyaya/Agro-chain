@@ -102,17 +102,22 @@ export default function ClusterProfilePage() {
             ["Cluster Name", "clusterName"],
             ["Location", "location"],
           ] as const
-        ).map(([label, key]) => (
-          <label key={key} className="text-sm text-(--text-colour)">
-            <span className="mb-1 block font-medium text-(--heading-colour)">{label}</span>
-            <input
-              value={form[key]}
-              disabled={!editing}
-              onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
-              className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
-            />
-          </label>
-        ))}
+        ).map(([label, key]) => {
+          const isNa = form[key] === "N/A" || form[key] === "";
+          const locked = key === "fullName" || key === "phoneNumber" || key === "email" ||
+            (key === "location" && !isNa);
+          return (
+            <label key={key} className="text-sm text-(--text-colour)">
+              <span className="mb-1 block font-medium text-(--heading-colour)">{label}</span>
+              <input
+                value={form[key]}
+                disabled={locked || !editing}
+                onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
+                className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
+              />
+            </label>
+          );
+        })}
       </div>
     </div>
   );

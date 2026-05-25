@@ -315,16 +315,21 @@ export default function FarmerProfilePage() {
               ["State", "state"],
               ["Local Government", "localGovernment"],
             ] as [string, keyof ProfileForm][]
-          ).map(([label, key]) => (
-            <DynamicInput
-              key={key}
-              label={label}
-              fieldType={key === "email" ? "email" : key === "phoneNumber" ? "tel" : "text"}
-              value={String(form[key])}
-              disabled={!isEditing}
-              onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
-            />
-          ))}
+          ).map(([label, key]) => {
+            const isNa = String(form[key]) === "N/A" || String(form[key]) === "";
+            const locked = key === "fullName" || key === "phoneNumber" || key === "email" ||
+              ((key === "state" || key === "localGovernment") && !isNa);
+            return (
+              <DynamicInput
+                key={key}
+                label={label}
+                fieldType={key === "email" ? "email" : key === "phoneNumber" ? "tel" : "text"}
+                value={String(form[key])}
+                disabled={locked || !isEditing}
+                onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
+              />
+            );
+          })}
 
           {/* Fish Type select */}
           <div className="flex flex-col gap-1.5">

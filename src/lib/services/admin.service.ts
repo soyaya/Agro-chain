@@ -68,9 +68,24 @@ export interface AdminActivityResponse {
 export interface AdminClusterApplication {
   id: string;
   full_name: string;
+  email: string;
   phone_number: string;
   location_state: string;
   location_lga: string;
+  location_address: string;
+  business_name: string | null;
+  cac_number: string | null;
+  warehouse_location: string | null;
+  distribution_capacity: number | null;
+  logistics_available: boolean | null;
+  bvn_doc_url: string | null;
+  proof_of_address_url: string | null;
+  cac_registration_url: string | null;
+  business_license_url: string | null;
+  tax_clearance_url: string | null;
+  fish_type_preference: string | null;
+  farming_capacity_kg: number | null;
+  years_of_experience: number | null;
   created_at: string;
 }
 
@@ -251,6 +266,17 @@ export const adminService = {
   getListings(params?: { status?: string; fishType?: string; state?: string }) {
     const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : "";
     return apiFetch<{ status: string; data: { listings: AdminListing[]; total: number } }>(`/admin/listings${query}`);
+  },
+
+  approveListing(id: string) {
+    return apiFetch(`/admin/listings/${id}/approve`, { method: "PUT" });
+  },
+
+  rejectListing(id: string, reason?: string) {
+    return apiFetch(`/admin/listings/${id}/reject`, {
+      method: "PUT",
+      body: JSON.stringify({ reason: reason ?? "Rejected by admin" }),
+    });
   },
 
   flagListing(id: string) {

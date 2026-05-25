@@ -11,12 +11,15 @@ import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { apiFetch } from "~/lib/api";
 
-type OrderResponse = Order | { order?: Order; data?: Order };
-
-function extractOrder(response: OrderResponse): Order | null {
-  if ("id" in response) return response as Order;
-  const r = response as { order?: Order; data?: Order };
-  return r.order ?? r.data ?? null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function extractOrder(response: any): Order | null {
+  if (response && typeof response === "object") {
+    if ("id" in response) return response as Order;
+    if (response.data?.order) return response.data.order as Order;
+    if (response.order) return response.order as Order;
+    if (response.data) return response.data as Order;
+  }
+  return null;
 }
 
 const statusIcons: Record<OrderStatus, typeof Package> = {
@@ -47,7 +50,7 @@ export default function OrderDetailsPage() {
       setLoading(true);
       setErrorMessage(null);
       try {
-        const response = await apiFetch<OrderResponse>(`/buyers/orders/${orderId}`);
+        const response = await apiFetch(`/buyers/orders/${orderId}`);
         const payload = extractOrder(response);
         if (mounted) {
           setOrder(payload ?? null);

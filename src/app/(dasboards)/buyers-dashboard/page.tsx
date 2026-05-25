@@ -28,34 +28,10 @@ export default function BuyersDashboardPage() {
   }, []);
 
   const stats = useMemo(() => [
-    {
-      label: "Total Orders",
-      value: orders.length.toLocaleString(),
-      icon: ShoppingCart,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      label: "Pending Orders",
-      value: orders.filter((o) => ["pending", "payment_pending", "confirmed", "processing"].includes(o.status)).length.toLocaleString(),
-      icon: Clock,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-    },
-    {
-      label: "Completed",
-      value: orders.filter((o) => ["completed", "delivered"].includes(o.status)).length.toLocaleString(),
-      icon: CheckCircle,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      label: "Saved Listings",
-      value: "-",
-      icon: Package,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
+    { label: "Total Orders", value: orders.length.toLocaleString(), icon: ShoppingCart },
+    { label: "Pending Orders", value: orders.filter((o) => ["pending", "payment_pending", "confirmed", "processing"].includes(o.status)).length.toLocaleString(), icon: Clock },
+    { label: "Completed", value: orders.filter((o) => ["completed", "delivered"].includes(o.status)).length.toLocaleString(), icon: CheckCircle },
+    { label: "Saved Listings", value: "-", icon: Package },
   ], [orders]);
 
   return (
@@ -67,7 +43,7 @@ export default function BuyersDashboardPage() {
         transition={{ duration: 0.4 }}
       >
         <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
-          Welcome back, Buyer! 👋
+          Welcome back, Buyer!
         </h1>
         <p className="font-roboto-slab text-(--text-colour)">
           Here&apos;s an overview of your orders and activities
@@ -87,12 +63,10 @@ export default function BuyersDashboardPage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm transition-shadow duration-300 hover:shadow-md"
+              className="rounded-2xl border border-(--border-gray) bg-(--white) p-6 shadow-sm"
             >
-              <div className="mb-(--space-lg) flex items-center gap-(--space-md)">
-                <div className={`rounded-xl p-(--space-md) ${stat.bgColor}`}>
-                  <Icon size={24} className={stat.color} />
-                </div>
+              <div className="mb-4 flex items-center justify-between">
+                <Icon size={22} className="text-green-700" />
               </div>
               <p className="font-ubuntu mb-1 text-3xl font-bold text-(--heading-colour)">{loading ? "..." : stat.value}</p>
               <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>

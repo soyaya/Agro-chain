@@ -84,8 +84,8 @@ export default function BuyerOrdersPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-gray-900">My Orders</h1>
-        <p className="font-roboto-slab text-gray-600">Track and manage your fish orders</p>
+        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">My Orders</h1>
+        <p className="font-roboto-slab text-(--text-colour)">Track and manage your fish orders</p>
       </motion.div>
 
       {/* Stats */}
@@ -110,16 +110,16 @@ export default function BuyerOrdersPage() {
             key={status}
             variants={FADE_IN_VARIANT}
             onClick={() => setFilterStatus(status)}
-            className={`flex flex-col gap-2 rounded-xl border p-4 transition-all duration-200 ${
+            className={`flex flex-col gap-1 rounded-2xl border p-4 transition-all duration-200 ${
               filterStatus === status
-                ? "border-green-600 bg-green-50 shadow-md"
-                : "border-gray-200 bg-(--white) hover:bg-gray-50 hover:shadow-sm"
+                ? "border-(--theme-green-dark) bg-green-50"
+                : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
             }`}
           >
-            <span className="font-ubuntu text-2xl font-bold text-gray-900">
+            <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">
               {statusCounts[status]}
             </span>
-            <span className="font-roboto-slab text-xs text-gray-600 capitalize">{status}</span>
+            <span className="font-roboto-slab text-xs capitalize text-(--text-colour)">{status}</span>
           </motion.button>
         ))}
       </motion.div>
@@ -141,70 +141,53 @@ export default function BuyerOrdersPage() {
               <motion.div
                 key={order.orderId}
                 variants={FADE_IN_VARIANT}
-                className="rounded-2xl border border-gray-200 bg-(--white) p-6 transition-all duration-200 hover:shadow-lg"
+                className="rounded-2xl border border-(--border-gray) bg-(--white) p-5 shadow-sm transition hover:shadow-md"
               >
                 <div className="flex flex-col gap-4">
                   {/* Header */}
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-xl bg-green-50 p-3">
-                        <Package size={24} className="text-green-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-ubuntu text-lg font-bold text-gray-900">
-                          {order.orderNumber}
-                        </h3>
-                        <p className="font-roboto-slab text-sm text-gray-600">
-                          {new Date(order.createdAt).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </p>
-                      </div>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="font-ubuntu text-base font-semibold text-(--heading-colour)">
+                        {order.orderNumber}
+                      </h3>
+                      <p className="font-roboto-slab text-sm text-(--text-colour)">
+                        {new Date(order.createdAt).toLocaleDateString("en-NG", {
+                          day: "numeric", month: "short", year: "numeric",
+                        })}
+                      </p>
                     </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className={`rounded-full px-4 py-2 text-sm font-medium ${statusColor}`}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </span>
-                    </div>
+                    <span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${statusColor}`}>
+                      {order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : "—"}
+                    </span>
                   </div>
 
                   {/* Details */}
-                  <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+                  <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
                     <div>
-                      <p className="font-roboto-slab mb-1 text-gray-600">Supplier</p>
-                      <p className="font-roboto-slab font-medium text-gray-900">
-                        {order.clusterFarmerName}
-                      </p>
+                      <p className="font-roboto-slab mb-0.5 text-xs text-(--text-colour)">Supplier</p>
+                      <p className="font-roboto-slab font-medium text-(--heading-colour)">{order.clusterFarmerName ?? "—"}</p>
                     </div>
                     <div>
-                      <p className="font-roboto-slab mb-1 text-gray-600">Delivery</p>
-                      <p className="font-roboto-slab font-medium text-gray-900">
-                        {order.deliveryOption ?? "—"}
-                      </p>
+                      <p className="font-roboto-slab mb-0.5 text-xs text-(--text-colour)">Delivery</p>
+                      <p className="font-roboto-slab font-medium text-(--heading-colour)">{order.deliveryOption ?? "—"}</p>
                     </div>
                     <div>
-                      <p className="font-roboto-slab mb-1 text-gray-600">Payment Status</p>
-                      <p
-                        className={`font-roboto-slab font-medium ${
-                          order.payment_status === "paid" ? "text-green-600" : "text-yellow-600"
-                        }`}
-                      >
-                        {order.payment_status.charAt(0).toUpperCase() +
-                          order.payment_status.slice(1)}
+                      <p className="font-roboto-slab mb-0.5 text-xs text-(--text-colour)">Payment</p>
+                      <p className={`font-roboto-slab font-medium ${order.payment_status === "paid" ? "text-green-700" : "text-amber-600"}`}>
+                        {order.payment_status
+                          ? order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)
+                          : "—"}
                       </p>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex flex-col gap-3 border-t border-gray-200 pt-4 sm:flex-row">
+                  <div className="flex border-t border-gray-100 pt-3">
                     <button
                       onClick={() => router.push(`/buyers-dashboard/orders/${order.orderId}`)}
-                      className="font-roboto-slab flex flex-1 items-center justify-center gap-2 rounded-full bg-green-600 px-6 py-3 font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+                      className="font-roboto-slab flex items-center gap-2 rounded-xl bg-(--theme-green-dark) px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
                     >
-                      <Eye size={18} />
+                      <Eye size={15} />
                       View Details
                     </button>
                   </div>

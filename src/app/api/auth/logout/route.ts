@@ -23,6 +23,15 @@ export async function POST(req: Request) {
     path: "/",
   });
 
+  // Clear old access_token cookie (set by backend in earlier sessions before proxy was added)
+  response.cookies.set("access_token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
+
   response.cookies.set("current_user", "", {
     httpOnly: false,
     secure: process.env.NODE_ENV === "production",

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Store, ShoppingBag } from "lucide-react";
+import { Store, ShoppingBag, ArrowLeft } from "lucide-react";
 import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import { MarketplaceFilters } from "~/components/marketplace/MarketplaceFilters";
 import type { MarketplaceListing, MarketplaceFilters as Filters } from "~/types";
@@ -58,13 +58,16 @@ export default function MarketplacePage() {
 
         const normalized = payload.map((listing) => ({
           ...listing,
+          totalAvailableKg: Number(listing.totalAvailableKg),
           pricePerKg:
-            listing.pricePerKg ?? pricePerKg[listing.fishType as FishType] ?? pricePerKg.catfish,
+            Number(listing.pricePerKg) ||
+            (pricePerKg[listing.fishType as FishType] ?? pricePerKg.catfish),
           packaging: listing.packaging?.map((pkg) => ({
             ...pkg,
+            weightKg: Number(pkg.weightKg),
             pricePerUnit:
-              pkg.pricePerUnit ??
-              pkg.weightKg * (pricePerKg[listing.fishType as FishType] ?? pricePerKg.catfish),
+              Number(pkg.pricePerUnit) ||
+              Number(pkg.weightKg) * (pricePerKg[listing.fishType as FishType] ?? pricePerKg.catfish),
           })),
         }));
 
@@ -165,10 +168,15 @@ export default function MarketplacePage() {
         >
           {/* Header */}
           <motion.div variants={FADE_IN_VARIANT}>
+            <button
+              onClick={() => router.back()}
+              className="mb-4 flex items-center gap-2 text-sm text-(--text-colour) transition hover:text-(--heading-colour)"
+            >
+              <ArrowLeft size={18} />
+              Back
+            </button>
             <div className="flex items-center gap-(--gap-base)">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-(--theme-green-dark)">
-                <Store size={32} className="text-white" />
-              </div>
+              <Store size={28} className="text-green-700" />
               <div>
                 <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) lg:text-4xl">
                   Fish Marketplace

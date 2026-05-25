@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CartProvider } from "~/context/CartContext";
 
 export const metadata: Metadata = {
   title: "Fish Marketplace",
@@ -29,5 +30,5 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <CartProvider>{children}</CartProvider>;
 }

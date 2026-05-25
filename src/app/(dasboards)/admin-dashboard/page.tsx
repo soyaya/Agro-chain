@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, ShoppingBag, Users, Wheat } from "lucide-react";
+import { ShoppingCart, Package, Users, UserPlus } from "lucide-react";
 import { adminService } from "~/lib/services/admin.service";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 
@@ -39,9 +39,9 @@ export default function AdminDashboardPage() {
   const stats = useMemo(
     () => [
       { label: "Total Users", value: metrics.totalUsers.toLocaleString(), icon: Users },
-      { label: "New Users Today", value: metrics.newUsersToday.toLocaleString(), icon: Wheat },
-      { label: "Active Listings", value: metrics.activeListings.toLocaleString(), icon: ShoppingBag },
-      { label: "Orders Today", value: metrics.ordersToday.toLocaleString(), icon: BarChart3 },
+      { label: "New Users Today", value: metrics.newUsersToday.toLocaleString(), icon: UserPlus },
+      { label: "Active Listings", value: metrics.activeListings.toLocaleString(), icon: Package },
+      { label: "Orders Today", value: metrics.ordersToday.toLocaleString(), icon: ShoppingCart },
     ],
     [metrics],
   );

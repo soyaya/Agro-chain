@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { authService } from "~/lib/services/auth.service";
 import { buyerService } from "~/lib/services/buyer.service";
+import { useAuth } from "~/lib/auth-context";
 
 type BuyerForm = {
   fullName: string;
@@ -18,6 +19,7 @@ type BuyerForm = {
 };
 
 export default function BuyerProfilePage() {
+  const { updateUser } = useAuth();
   const [form, setForm] = useState<BuyerForm>({
     fullName: "",
     companyName: "",
@@ -49,6 +51,17 @@ export default function BuyerProfilePage() {
           state: user.location_state ?? "",
           localGovernment: user.location_lga ?? "",
           businessType: user.business_type ?? "",
+        });
+        updateUser({
+          id: user.id,
+          fullName: user.full_name,
+          phoneNumber: user.phone_number,
+          email: user.email,
+          role: (user.role === "cluster" || user.role === "pending" ? "farmer" : user.role) as "farmer" | "buyer" | "admin",
+          isClusterFarmer: user.is_cluster_farmer || user.role === "cluster",
+          profileComplete: user.profile_completed,
+          createdAt: new Date(user.created_at),
+          updatedAt: new Date(user.updated_at),
         });
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to load profile");
@@ -116,17 +129,22 @@ export default function BuyerProfilePage() {
             ["Local Government", "localGovernment"],
             ["Business Type", "businessType"],
           ] as const
-        ).map(([label, key]) => (
-          <label key={key} className="text-sm text-(--text-colour)">
-            <span className="mb-1 block font-medium text-(--heading-colour)">{label}</span>
-            <input
-              value={form[key]}
-              disabled={!editing}
-              onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
-              className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
-            />
-          </label>
-        ))}
+        ).map(([label, key]) => {
+          const isNa = form[key] === "N/A" || form[key] === "";
+          const locked = key === "fullName" || key === "phoneNumber" || key === "email" ||
+            ((key === "state" || key === "localGovernment") && !isNa);
+          return (
+            <label key={key} className="text-sm text-(--text-colour)">
+              <span className="mb-1 block font-medium text-(--heading-colour)">{label}</span>
+              <input
+                value={form[key]}
+                disabled={locked || !editing}
+                onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
+                className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
+              />
+            </label>
+          );
+        })}
       </div>
     </div>
   );

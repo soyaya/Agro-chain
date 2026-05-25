@@ -23,7 +23,7 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
     });
   };
 
-  const packagePrices = listing.packaging?.map((p) => p.pricePerUnit) ?? [];
+  const packagePrices = (listing.packaging?.map((p) => p.pricePerUnit ?? 0) ?? []).filter((p) => p > 0);
   const lowestPrice = packagePrices.length > 0 ? Math.min(...packagePrices) : listing.pricePerKg ?? 0;
   const highestPrice = packagePrices.length > 0 ? Math.max(...packagePrices) : lowestPrice;
   const displayPricePerKg = listing.pricePerKg ?? lowestPrice;

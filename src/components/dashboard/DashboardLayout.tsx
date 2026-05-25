@@ -19,41 +19,26 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
+  const displayName = user?.fullName ?? "User";
+  const roleLabel = user?.isClusterFarmer
+    ? "Cluster Farmer"
+    : user?.role === "buyer"
+      ? "Buyer"
+      : user?.role === "admin"
+        ? "Admin"
+        : "Farmer";
+  const initials = displayName
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
 
   const handleLogout = () => void logout();
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-linear-to-br from-gray-50 via-white to-gray-100">
-      {/* Animated Background Elements */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            opacity: [0.03, 0.05, 0.03],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute -top-1/4 -right-1/4 h-1/2 w-1/2 rounded-full bg-linear-to-br from-green-400 to-blue-500 blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-            opacity: [0.03, 0.06, 0.03],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute -bottom-1/4 -left-1/4 h-1/2 w-1/2 rounded-full bg-linear-to-tr from-purple-400 to-pink-500 blur-3xl"
-        />
-      </div>
+    <div className="relative min-h-screen w-full bg-gray-50">
 
       {/* Mobile Sidebar Backdrop */}
       <AnimatePresence>
@@ -87,7 +72,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
             <div className="flex items-center justify-between border-b border-gray-200/50 px-(--space-base) sm:px-(--space-xl) py-(--space-lg)">
               <Link
                 href="/"
-                className="font-ubuntu bg-linear-to-r from-green-600 to-green-800 bg-clip-text text-2xl font-bold text-transparent transition-all hover:from-green-700 hover:to-green-900"
+                className="font-ubuntu text-2xl font-bold text-green-700 hover:text-green-800 transition-colors"
                 aria-label="Go to home"
               >
                 AgroChain
@@ -127,29 +112,21 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                         href={link.href}
                         onClick={() => setIsSidebarOpen(false)}
                         className={cn(
-                          "font-roboto-slab group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
+                          "font-roboto-slab group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
                           isParentActive
-                            ? "bg-linear-to-r cursor-default from-green-600 to-green-700 text-white shadow-lg shadow-green-600/30"
+                            ? "bg-green-700 cursor-default text-white"
                             : "text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900",
                         )}
                         aria-current={isParentActive ? "page" : undefined}
                       >
-                        {isParentActive && (
-                          <motion.div
-                            layoutId="activeTab"
-                            className="absolute inset-0 rounded-xl bg-linear-to-r from-green-600 to-green-700"
-                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                          />
-                        )}
                         <Icon
                           size={20}
                           className={cn(
-                            "relative z-10 group-hover:scale-105 transition-all ease-in-out duration-300",
                             isParentActive ? "text-white" : "text-gray-500 group-hover:text-gray-700",
                           )}
                         />
-                        <span className="relative z-10 flex-1">{link.label}</span>
-                        {isParentActive && <ChevronRight size={16} className="relative z-10" />}
+                        <span className="flex-1">{link.label}</span>
+                        {isParentActive && <ChevronRight size={16} />}
                       </Link>
                       
                       {/* Submenu */}
@@ -192,7 +169,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
             </nav>
 
             {/* Logout Button */}
-            <div className="border-t border-gray-200/50 bg-linear-to-br from-red-50/30 to-transparent px-4 py-5">
+            <div className="border-t border-gray-200/50 px-4 py-5">
               <button
                 onClick={handleLogout}
                 className={cn(
@@ -236,17 +213,16 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                   <div className="flex cursor-pointer items-center gap-3 rounded-full px-3 py-2 transition-colors hover:bg-gray-100">
                     {/* User Avatar */}
                     <div className="relative">
-                      <div className="font-ubuntu flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-linear-to-br from-green-600 to-green-800 text-sm font-semibold text-white">
-                        {/* Placeholder - will show initials or uploaded image */}
-                        <span>JD</span>
+                      <div className="font-ubuntu flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-green-700 text-sm font-semibold text-white">
+                        <span>{initials || "U"}</span>
                       </div>
                       <div className="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
                     </div>
 
                     {/* User Name - Hidden on mobile */}
                     <div className="hidden lg:block">
-                      <p className="font-roboto-slab text-sm font-medium text-gray-900">John Doe</p>
-                      <p className="font-roboto-slab text-xs text-gray-600">Farmer</p>
+                      <p className="font-roboto-slab text-sm font-medium text-gray-900">{displayName}</p>
+                      <p className="font-roboto-slab text-xs text-gray-600">{roleLabel}</p>
                     </div>
                   </div>
                 </div>

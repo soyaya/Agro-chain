@@ -1,9 +1,27 @@
 import type { NextConfig } from "next";
 import withSerwistInit from "@serwist/next";
 
+const BACKEND_ORIGIN = (process.env.BASE_BACKEND_URL ?? "http://localhost:5002")
+  .replace(/\/+$/, "")
+  .replace(/\/api$/, "");
+
 const nextConfig: NextConfig = {
   turbopack: {},
   reactStrictMode: true,
+
+  // Proxy /api/* to the backend so httpOnly auth_token cookie stays same-origin.
+  // afterFiles means Next.js API routes (e.g. /api/auth/*) are matched first;
+  // everything else falls through to this rewrite and is forwarded to the backend.
+  async rewrites() {
+    return {
+      afterFiles: [
+        {
+          source: "/api/:path*",
+          destination: `${BACKEND_ORIGIN}/api/:path*`,
+        },
+      ],
+    };
+  },
 
   // Security headers (applied globally)
   async headers() {

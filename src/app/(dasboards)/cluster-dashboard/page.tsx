@@ -46,34 +46,10 @@ export default function ClusterDashboardPage() {
   }, []);
 
   const stats = useMemo(() => [
-    {
-      label: "Farmers Under Me",
-      value: summary.farmersUnderMe.toLocaleString(),
-      icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      label: "Pending Approvals",
-      value: summary.pendingApproval.toLocaleString(),
-      icon: Clock,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-    },
-    {
-      label: "Active Listings",
-      value: summary.allListings.toLocaleString(),
-      icon: CheckCircle,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      label: "Total Supply (kg)",
-      value: summary.totalSupply.toLocaleString(),
-      icon: FileText,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
+    { label: "Farmers Under Me", value: summary.farmersUnderMe.toLocaleString(), icon: Users },
+    { label: "Pending Approvals", value: summary.pendingApproval.toLocaleString(), icon: Clock },
+    { label: "Active Listings", value: summary.allListings.toLocaleString(), icon: CheckCircle },
+    { label: "Total Supply (kg)", value: summary.totalSupply.toLocaleString(), icon: FileText },
   ], [summary]);
 
   return (
@@ -105,12 +81,10 @@ export default function ClusterDashboardPage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm transition-shadow duration-300 hover:shadow-md"
+              className="rounded-2xl border border-(--border-gray) bg-(--white) p-6 shadow-sm"
             >
-              <div className="mb-(--space-lg) flex items-center gap-(--space-md)">
-                <div className={`rounded-xl p-(--space-md) ${stat.bgColor}`}>
-                  <Icon size={24} className={stat.color} />
-                </div>
+              <div className="mb-4 flex items-center justify-between">
+                <Icon className="text-green-700" size={22} />
               </div>
               <p className="font-ubuntu mb-1 text-3xl font-bold text-(--heading-colour)">{loading ? "..." : stat.value}</p>
               <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>

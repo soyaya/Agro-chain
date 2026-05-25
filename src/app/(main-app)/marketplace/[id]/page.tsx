@@ -65,10 +65,12 @@ export default function ListingDetailPage() {
           const fishPricePerKg = pricePerKg[payload.fishType as FishType] ?? pricePerKg.catfish;
           setListing({
             ...payload,
-            pricePerKg: payload.pricePerKg ?? fishPricePerKg,
+            totalAvailableKg: Number(payload.totalAvailableKg),
+            pricePerKg: Number(payload.pricePerKg) || fishPricePerKg,
             packaging: payload.packaging?.map((pkg) => ({
               ...pkg,
-              pricePerUnit: pkg.pricePerUnit ?? pkg.weightKg * fishPricePerKg,
+              weightKg: Number(pkg.weightKg),
+              pricePerUnit: Number(pkg.pricePerUnit) || Number(pkg.weightKg) * fishPricePerKg,
             })),
           });
           setSelectedDelivery(payload.deliveryOptions?.[0] ?? "");
@@ -301,7 +303,7 @@ export default function ListingDetailPage() {
                               {pkg.weightKg}kg Package
                             </span>
                             <span className="font-ubuntu text-lg font-bold text-(--theme-green-dark)">
-                              ₦{pkg.pricePerUnit.toLocaleString()}
+                              ₦{(pkg.pricePerUnit ?? 0).toLocaleString()}
                             </span>
                           </div>
                           <p className="text-sm text-(--text-colour)">

@@ -15,11 +15,41 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function readCurrentUserCookie(): AuthUser | null {
+  if (typeof document === "undefined") return null;
+  try {
+    const match = document.cookie.match(/(?:^|; )current_user=([^;]*)/);
+    if (!match) return null;
+    const parsed = JSON.parse(decodeURIComponent(match[1]!)) as {
+      id?: string; role?: string; fullName?: string; isClusterFarmer?: boolean;
+    };
+    if (!parsed.role) return null;
+    const mappedRole = (parsed.role === "cluster" || parsed.role === "pending" ? "farmer" : parsed.role) as AuthUser["role"];
+    return {
+      id: parsed.id ?? "",
+      fullName: parsed.fullName ?? "",
+      phoneNumber: "",
+      email: "",
+      role: mappedRole,
+      isClusterFarmer: parsed.isClusterFarmer ?? false,
+      profileComplete: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Seed from cookie immediately so the header never flashes "User"
+    const cookieUser = readCurrentUserCookie();
+    if (cookieUser) setUser(cookieUser);
+
     const fetchUser = async () => {
       try {
         // Always attempt getMe — the auth_token httpOnly cookie is sent automatically.
@@ -35,7 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!isExpected) {
           console.error("Failed to fetch user session:", error);
         }
-        setUser(null);
+        // Only clear if we couldn't get a cookie fallback either
+        if (!cookieUser) setUser(null);
       } finally {
         setIsLoading(false);
       }

@@ -2,34 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Flag, Trash2, Search } from "lucide-react";
+import { FileText, Flag, Trash2, Search, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { adminService, type AdminListing } from "~/lib/services/admin.service";
 import { FADE_IN_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
-// === Status styles
-
 const STATUS_STYLES: Record<string, string> = {
-  active: "bg-green-50 text-green-700 border-green-200",
-  sold: "bg-blue-50 text-blue-700 border-blue-200",
+  active:  "bg-green-50 text-green-700 border-green-200",
+  pending: "bg-amber-50 text-amber-700 border-amber-200",
+  sold:    "bg-blue-50 text-blue-700 border-blue-200",
   flagged: "bg-red-50 text-red-700 border-red-200",
   expired: "bg-gray-50 text-gray-500 border-gray-200",
-  draft: "bg-yellow-50 text-yellow-700 border-yellow-200",
-  archived: "bg-gray-50 text-gray-500 border-gray-200",
+  draft:   "bg-yellow-50 text-yellow-700 border-yellow-200",
+  archived:"bg-gray-50 text-gray-500 border-gray-200",
   deleted: "bg-red-50 text-red-400 border-red-100",
 };
 
-type StatusFilter = "all" | "active" | "sold" | "flagged" | "expired";
-
-// === Page
+type StatusFilter = "all" | "pending" | "active" | "sold" | "flagged" | "expired";
 
 export default function AdminListingsPage() {
   const [listings, setListings] = useState<AdminListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<StatusFilter>("all");
+  const [filterStatus, setFilterStatus] = useState<StatusFilter>("pending");
   const [search, setSearch] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -49,16 +46,40 @@ export default function AdminListingsPage() {
       }
     };
     void load();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
+
+  const handleApprove = async (id: string) => {
+    setActionLoading(id);
+    try {
+      await adminService.approveListing(id);
+      setListings((prev) => prev.map((l) => l.id === id ? { ...l, status: "active", clusterApproved: true } : l));
+      toast.success("Listing approved and now live on the marketplace.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to approve listing");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    setActionLoading(id);
+    try {
+      await adminService.rejectListing(id);
+      setListings((prev) => prev.map((l) => l.id === id ? { ...l, status: "flagged" } : l));
+      toast.success("Listing rejected.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to reject listing");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const handleFlag = async (id: string) => {
     setActionLoading(id);
     try {
       await adminService.flagListing(id);
-      setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: "flagged" } : l)));
+      setListings((prev) => prev.map((l) => l.id === id ? { ...l, status: "flagged" } : l));
       toast.success("Listing flagged.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to flag listing");
@@ -90,10 +111,11 @@ export default function AdminListingsPage() {
     return matchStatus && matchSearch;
   });
 
-  const counts = {
-    all: listings.length,
-    active: listings.filter((l) => l.status === "active").length,
-    sold: listings.filter((l) => l.status === "sold").length,
+  const counts: Record<StatusFilter, number> = {
+    all:     listings.length,
+    pending: listings.filter((l) => l.status === "pending").length,
+    active:  listings.filter((l) => l.status === "active").length,
+    sold:    listings.filter((l) => l.status === "sold").length,
     flagged: listings.filter((l) => l.status === "flagged").length,
     expired: listings.filter((l) => l.status === "expired").length,
   };
@@ -123,12 +145,8 @@ export default function AdminListingsPage() {
         className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
-            Listing Oversight
-          </h1>
-          <p className="font-roboto-slab text-(--text-colour)">
-            Monitor and moderate all marketplace listings.
-          </p>
+          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">Listing Oversight</h1>
+          <p className="font-roboto-slab text-(--text-colour)">Review pending listings and moderate the marketplace.</p>
         </div>
         <div className="relative w-full max-w-xs">
           <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
@@ -142,14 +160,14 @@ export default function AdminListingsPage() {
         </div>
       </motion.div>
 
-      {/* Status filter tabs */}
+      {/* Filter tabs */}
       <motion.div
         variants={FADE_IN_VARIANT}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-3 gap-(--gap-base) sm:grid-cols-5"
+        className="grid grid-cols-3 gap-(--gap-base) sm:grid-cols-6"
       >
-        {(["all", "active", "sold", "flagged", "expired"] as const).map((status) => (
+        {(["all", "pending", "active", "sold", "flagged", "expired"] as const).map((status) => (
           <button
             key={status}
             onClick={() => setFilterStatus(status)}
@@ -159,12 +177,8 @@ export default function AdminListingsPage() {
                 : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
             }`}
           >
-            <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">
-              {counts[status]}
-            </span>
-            <span className="font-roboto-slab text-xs text-(--text-colour) capitalize">
-              {status}
-            </span>
+            <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">{counts[status]}</span>
+            <span className="font-roboto-slab text-xs capitalize text-(--text-colour)">{status}</span>
           </button>
         ))}
       </motion.div>
@@ -181,21 +195,8 @@ export default function AdminListingsPage() {
             <table className="w-full">
               <thead className="border-b border-(--border-gray) bg-(--bg-pink)">
                 <tr>
-                  {[
-                    "Fish Type",
-                    "Qty / Kg",
-                    "Price/kg",
-                    "Cluster Farmer",
-                    "Location",
-                    "Status",
-                    "Approved",
-                    "Listed",
-                    "Actions",
-                  ].map((h) => (
-                    <th
-                      key={h}
-                      className="font-roboto-slab px-4 py-3 text-left text-xs font-semibold text-(--text-colour)"
-                    >
+                  {["Fish Type", "Qty / Kg", "Price/kg", "Farmer", "Location", "Status", "Actions"].map((h) => (
+                    <th key={h} className="font-roboto-slab px-4 py-3 text-left text-xs font-semibold text-(--text-colour)">
                       {h}
                     </th>
                   ))}
@@ -203,12 +204,8 @@ export default function AdminListingsPage() {
               </thead>
               <tbody className="divide-y divide-(--border-gray)">
                 {filtered.map((listing) => (
-                  <motion.tr
-                    key={listing.id}
-                    variants={FADE_IN_VARIANT}
-                    className="transition hover:bg-(--bg-pink)"
-                  >
-                    <td className="font-roboto-slab px-4 py-3 text-sm font-medium text-(--heading-colour) capitalize">
+                  <motion.tr key={listing.id} variants={FADE_IN_VARIANT} className="transition hover:bg-(--bg-pink)">
+                    <td className="font-roboto-slab px-4 py-3 text-sm font-medium capitalize text-(--heading-colour)">
                       {listing.fishType}
                     </td>
                     <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
@@ -226,31 +223,35 @@ export default function AdminListingsPage() {
                       {listing.locationLga}, {listing.locationState}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`font-roboto-slab rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[listing.status] ?? STATUS_STYLES.draft}`}
-                      >
+                      <span className={`font-roboto-slab rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[listing.status] ?? STATUS_STYLES.draft}`}>
                         {listing.status}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`font-roboto-slab text-xs font-medium ${listing.clusterApproved ? "text-green-600" : "text-yellow-600"}`}
-                      >
-                        {listing.clusterApproved ? "Yes" : "Pending"}
-                      </span>
-                    </td>
-                    <td className="font-roboto-slab px-4 py-3 text-xs text-gray-400">
-                      {new Date(listing.createdAt).toLocaleDateString("en-NG", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        {listing.status !== "flagged" && (
+                        {listing.status === "pending" && (
+                          <>
+                            <button
+                              onClick={() => void handleApprove(listing.id)}
+                              disabled={actionLoading === listing.id}
+                              className="font-roboto-slab flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                            >
+                              <CheckCircle size={12} />
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => void handleReject(listing.id)}
+                              disabled={actionLoading === listing.id}
+                              className="font-roboto-slab flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                            >
+                              <XCircle size={12} />
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {listing.status === "active" && (
                           <button
-                            onClick={() => handleFlag(listing.id)}
+                            onClick={() => void handleFlag(listing.id)}
                             disabled={actionLoading === listing.id}
                             className="font-roboto-slab flex items-center gap-1 rounded-lg border border-yellow-200 bg-yellow-50 px-2.5 py-1.5 text-xs font-medium text-yellow-700 transition hover:bg-yellow-100 disabled:opacity-50"
                           >
@@ -259,7 +260,7 @@ export default function AdminListingsPage() {
                           </button>
                         )}
                         <button
-                          onClick={() => handleRemove(listing.id)}
+                          onClick={() => void handleRemove(listing.id)}
                           disabled={actionLoading === listing.id}
                           className="font-roboto-slab flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
                         >
@@ -281,7 +282,9 @@ export default function AdminListingsPage() {
           description={
             search
               ? "No listings match your search."
-              : `No ${filterStatus === "all" ? "" : filterStatus} listings.`
+              : filterStatus === "pending"
+                ? "No listings awaiting approval."
+                : `No ${filterStatus === "all" ? "" : filterStatus} listings.`
           }
           size="lg"
         />

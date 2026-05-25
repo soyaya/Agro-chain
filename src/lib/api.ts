@@ -7,7 +7,9 @@ const normalizePath = (path: string) => (path.startsWith("/") ? path : `/${path}
 export const buildApiUrl = (path: string) => {
   const base = normalizeBase(BASE_BACKEND_URL).replace(/\/api$/, "");
   const normalizedPath = normalizePath(path);
-  return base ? `${base}/api${normalizedPath}` : normalizedPath;
+  // With no base URL the browser makes a same-origin request: /api/<path>
+  // Next.js rewrites /api/* to the backend, so the httpOnly cookie is forwarded.
+  return base ? `${base}/api${normalizedPath}` : `/api${normalizedPath}`;
 };
 
 export class ApiError extends Error {
