@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,17 +9,64 @@ import { cn } from "~/lib/utils";
 import type { DashboardConfig, EnhancedDashboardConfig } from "~/types/index";
 import { FADE_IN_VARIANT } from "~/types/constants";
 import { useAuth } from "~/lib/auth-context";
+import Onboarding from "~/components/Onboarding";
+import { NotificationsBell, NotificationsPanel } from "~/components/notifications/NotificationsPanel";
 
 interface DashboardLayoutProps {
   children: ReactNode;
   config: DashboardConfig | EnhancedDashboardConfig;
 }
 
+const ONBOARDING_STEPS: Record<string, { heading: string; description: string }[]> = {
+  farmer: [
+    { heading: "Welcome to Agro-chain", description: "You're now part of Nigeria's verified catfish marketplace. Let's get your farm set up." },
+    { heading: "Complete Your Profile", description: "Add your farm name, location, fish type, and capacity so your cluster farmer can verify you." },
+    { heading: "Create Your First Listing", description: "Once your profile is complete, list your available fish supply. Your cluster farmer will review and approve it within 24–48 hours." },
+    { heading: "You're Ready", description: "After approval, your listing goes live on the marketplace. Sit back and earn." },
+  ],
+  "cluster-farmer": [
+    { heading: "Welcome, Cluster Farmer", description: "You manage farmers and fulfill orders on Agro-chain. Here's a quick overview." },
+    { heading: "Manage Your Farmers", description: "Farmers in your area are assigned to you. Review and approve their supply listings from the Pending Approvals page." },
+    { heading: "List on the Marketplace", description: "Once you approve farmer supply, create marketplace listings on their behalf. Buyers order directly from you." },
+    { heading: "Fulfill Orders", description: "When orders come in, process, pack, and ship. Update order status in your dashboard as it progresses." },
+  ],
+  buyer: [
+    { heading: "Welcome to Agro-chain", description: "Browse and buy verified catfish directly from cluster farmers across Nigeria." },
+    { heading: "Browse the Marketplace", description: "All listings show verified sellers, fish type, weight, and admin-set pricing. No surprises." },
+    { heading: "Secure Checkout", description: "Pay via Paystack. Funds are held in escrow until you confirm delivery — your money is protected." },
+    { heading: "You're Ready to Buy", description: "Head to the marketplace and place your first order. Contact support if you need help." },
+  ],
+  admin: [
+    { heading: "Admin Panel", description: "You have full platform access. Manage users, listings, orders, and pricing from here." },
+    { heading: "Set Fish Prices", description: "All marketplace prices are derived from your per-kg config in Settings. Update them anytime." },
+    { heading: "Approve Cluster Applications", description: "Review and approve cluster farmer applications under Cluster Applications." },
+    { heading: "You're Set", description: "Monitor the platform health from Analytics and act on any flagged items." },
+  ],
+};
+
 export function DashboardLayout({ children, config }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
 
-  const { logout, user } = useAuth();
+  const { logout, user, dashboardType } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+    if (user.profileComplete) return;
+    const key = `onboarding_done_${user.id}`;
+    if (!localStorage.getItem(key)) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
+
+  const handleOnboardingFinish = () => {
+    if (user?.id) {
+      localStorage.setItem(`onboarding_done_${user.id}`, "1");
+    }
+    setShowOnboarding(false);
+  };
 
   const displayName = user?.fullName ?? "User";
   const roleLabel = user?.isClusterFarmer
@@ -37,8 +84,39 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
 
   const handleLogout = () => void logout();
 
+  const onboardingSteps = ONBOARDING_STEPS[dashboardType] ?? ONBOARDING_STEPS.buyer;
+
   return (
     <div className="relative min-h-screen w-full bg-gray-50">
+      {/* Onboarding Modal */}
+      <AnimatePresence>
+        {showOnboarding && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-100 flex items-center justify-center bg-(--black)/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ type: "spring", damping: 22, stiffness: 200 }}
+              className="relative mx-4 w-full max-w-lg rounded-3xl border border-gray-200 bg-(--white) shadow-2xl"
+            >
+              <button
+                onClick={handleOnboardingFinish}
+                className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                aria-label="Skip onboarding"
+              >
+                <X size={18} />
+              </button>
+              <Onboarding steps={onboardingSteps} onFinish={handleOnboardingFinish} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mobile Sidebar Backdrop */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -217,18 +295,22 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                   </div>
                 </div>
 
-                {/* Header Actions - User Profile */}
-                <div className="flex items-center gap-3">
+                {/* Header Actions */}
+                <div className="flex items-center gap-2">
+                  {/* Notifications */}
+                  <div className="relative">
+                    <NotificationsBell onClick={() => setNotifOpen((o) => !o)} />
+                    <NotificationsPanel isOpen={notifOpen} onClose={() => setNotifOpen(false)} />
+                  </div>
+
+                  {/* User Profile */}
                   <div className="flex cursor-pointer items-center gap-3 rounded-full px-3 py-2 transition-colors hover:bg-gray-100">
-                    {/* User Avatar */}
                     <div className="relative">
                       <div className="font-ubuntu flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-green-700 text-sm font-semibold text-white">
                         <span>{initials || "U"}</span>
                       </div>
                       <div className="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
                     </div>
-
-                    {/* User Name - Hidden on mobile */}
                     <div className="hidden lg:block">
                       <p className="font-roboto-slab text-sm font-medium text-gray-900">
                         {displayName}

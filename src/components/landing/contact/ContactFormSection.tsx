@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, ChevronDown } from "lucide-react";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 
 const subjects = [
@@ -32,11 +32,28 @@ export default function ContactFormSection() {
   });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
 
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  function handleSubjectSelect(subject: Subject) {
+    setForm((prev) => ({ ...prev, subject }));
+    setDropdownOpen(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -52,7 +69,7 @@ export default function ContactFormSection() {
 
   return (
     <section aria-label="Contact Form" className="bg-gray-bg">
-      <div className="content-width px-4 py-16 lg:px-25 lg:py-20">
+      <div className="content-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         <div className="mx-auto max-w-2xl">
           <AnimatePresence mode="wait">
           {sent ? (
@@ -79,7 +96,7 @@ export default function ContactFormSection() {
               </p>
               <button
                 onClick={() => setSent(false)}
-                className="font-ubuntu mt-2 text-sm font-medium text-theme-green-dark underline underline-offset-4 transition hover:opacity-75"
+                className="font-ubuntu mt-2 text-sm font-medium text-theme-green-dark underline underline-offset-4 transition-all ease-in-out duration-300 cursor-default hover:cursor-pointer hover:opacity-75"
               >
                 Send another message
               </button>
@@ -131,27 +148,57 @@ export default function ContactFormSection() {
               />
             </motion.div>
 
-            <motion.div variants={SLIDE_UP_VARIANT} className="flex flex-col gap-1.5">
-              <label className="font-ubuntu text-sm font-medium text-heading-colour" htmlFor="subject">
+            <motion.div variants={SLIDE_UP_VARIANT} className="relative z-10 flex flex-col gap-1.5">
+              <label className="font-ubuntu text-sm font-medium text-heading-colour">
                 Subject
               </label>
-              <select
-                id="subject"
-                name="subject"
-                required
-                value={form.subject}
-                onChange={handleChange}
-                className="rounded-2xl border border-input-border bg-white px-4 py-3 font-roboto-slab text-sm text-heading-colour focus:border-theme-green-dark focus:outline-none"
-              >
-                <option value="" disabled>
-                  Select a subject
-                </option>
-                {subjects.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+              <div ref={dropdownRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setDropdownOpen((prev) => !prev)}
+                  className={`flex w-full items-center justify-between rounded-2xl border bg-white px-4 py-3 font-roboto-slab text-sm transition-all ease-in-out duration-300 cursor-default hover:cursor-pointer focus:outline-none ${
+                    dropdownOpen
+                      ? "border-theme-green-dark"
+                      : "border-input-border"
+                  } ${form.subject ? "text-heading-colour" : "text-text-input"}`}
+                >
+                  <span>{form.subject || "Select a subject"}</span>
+                  <motion.span
+                    animate={{ rotate: dropdownOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                  >
+                    <ChevronDown className="h-4 w-4 text-text-input" />
+                  </motion.span>
+                </button>
+
+                <AnimatePresence>
+                  {dropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scaleY: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                      exit={{ opacity: 0, y: -6, scaleY: 0.95 }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ transformOrigin: "top" }}
+                      className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 overflow-hidden rounded-2xl border border-input-border bg-white shadow-lg"
+                    >
+                      {subjects.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => handleSubjectSelect(s)}
+                          className={`w-full px-4 py-3 text-left font-roboto-slab text-sm transition-all ease-in-out duration-300 cursor-default hover:cursor-pointer hover:bg-gray-50 ${
+                            form.subject === s
+                              ? "font-medium text-theme-green-dark"
+                              : "text-heading-colour"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
 
             <motion.div variants={SLIDE_UP_VARIANT} className="flex flex-col gap-1.5">
@@ -174,7 +221,7 @@ export default function ContactFormSection() {
               variants={SLIDE_UP_VARIANT}
               type="submit"
               disabled={sending}
-              className="font-ubuntu self-start rounded-full bg-theme-green-dark px-8 py-3 text-sm font-semibold text-white transition hover:bg-theme-green-light disabled:opacity-60"
+              className="font-ubuntu self-start rounded-full bg-theme-green-dark px-8 py-3 text-sm font-semibold text-white transition-all ease-in-out duration-300 cursor-default hover:cursor-pointer hover:bg-theme-green-light disabled:opacity-60"
             >
               {sending ? "Sending…" : "Send Message"}
             </motion.button>

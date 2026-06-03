@@ -1,10 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, type TargetAndTransition } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { fishCategories } from "~/models/models";
-import ArrowRightIcon from "lucide-react";
+
+const CARD_HOVER: TargetAndTransition = {
+  y: -5,
+  scale: 1.04,
+  transition: { duration: 0.22, ease: "easeOut" },
+};
+
+const CARD_TAP: TargetAndTransition = { scale: 0.96, transition: { duration: 0.1 } };
 
 export default function FishCategoriesSection() {
   return (
@@ -28,14 +36,16 @@ export default function FishCategoriesSection() {
           variants={STAGGER_CONTAINER_VARIANT}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-60px" }}
           className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
         >
           {fishCategories.map(({ key, name, description, fishTypeParam }) => (
             <motion.div
               key={key}
               variants={SLIDE_UP_VARIANT}
-              className="border-gray-border flex flex-col items-center gap-3 rounded-2xl border bg-white p-6 text-center shadow-sm transition hover:shadow-md"
+              whileHover={CARD_HOVER}
+              whileTap={CARD_TAP}
+              className="border-gray-border flex flex-col items-center gap-3 rounded-2xl border bg-white p-6 text-center shadow-sm cursor-pointer"
             >
               <span className="text-4xl" aria-hidden="true">
                 🐟
@@ -44,10 +54,9 @@ export default function FishCategoriesSection() {
               <p className="font-roboto-slab text-text-colour text-xs">{description}</p>
               <Link
                 href={`/marketplace?fishType=${fishTypeParam}`}
-                className="font-ubuntu text-theme-green-dark text-xs font-medium transition hover:underline"
+                className="font-ubuntu text-theme-green-dark text-xs font-medium flex items-center gap-1 transition hover:underline"
               >
-                Browse <ArrowRightIcon size={12} />
-
+                Browse <ArrowRight size={11} />
               </Link>
             </motion.div>
           ))}

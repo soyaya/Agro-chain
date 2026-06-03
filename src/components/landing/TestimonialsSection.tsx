@@ -1,9 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import { motion, type TargetAndTransition } from "framer-motion";
+import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { testimonials } from "~/models/models";
+
+const CARD_HOVER: TargetAndTransition = {
+  y: -5,
+  scale: 1.02,
+  transition: { duration: 0.25, ease: "easeOut" },
+};
+
+const CARD_TAP: TargetAndTransition = { scale: 0.98, transition: { duration: 0.1 } };
 
 export default function TestimonialsSection() {
   return (
@@ -21,17 +29,19 @@ export default function TestimonialsSection() {
 
         {/* Cards */}
         <motion.div
-          variants={STAGGER_CONTAINER_VARIANT}
+          variants={SLOW_STAGGER_CONTAINER_VARIANT}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-80px" }}
           className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3"
         >
           {testimonials.map(({ quote, name, role }) => (
             <motion.div
               key={name}
               variants={SLIDE_UP_VARIANT}
-              className="flex flex-col gap-4 rounded-2xl border border-white/20 bg-white/10 p-6"
+              whileHover={CARD_HOVER}
+              whileTap={CARD_TAP}
+              className="flex flex-col gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 cursor-default"
             >
               <span className="font-serif text-6xl leading-none text-white/20" aria-hidden="true">
                 &quot;
@@ -47,7 +57,7 @@ export default function TestimonialsSection() {
         <div className="mt-10 flex justify-center">
           <Link
             href="/register"
-            className="font-ubuntu text-theme-green-dark rounded-full bg-white px-8 py-3 text-sm font-semibold transition hover:bg-white/90"
+            className="font-ubuntu text-theme-green-dark rounded-full bg-white px-8 py-3 text-sm font-semibold transition hover:bg-white/90 active:scale-95"
           >
             Join them →
           </Link>

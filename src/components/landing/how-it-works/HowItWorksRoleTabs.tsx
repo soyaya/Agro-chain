@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FADE_IN_VARIANT } from "~/types/constants";
+import { EASE_OUT_EXPO } from "~/types/constants";
 import type { FAQ } from "~/types/types";
 import SectionFAQ from "~/components/SectionFAQ";
 
@@ -109,6 +109,38 @@ const roles: RoleData[] = [
   },
 ];
 
+const PANEL_VARIANTS = {
+  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.45, ease: EASE_OUT_EXPO },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    filter: "blur(2px)",
+    transition: { duration: 0.25, ease: "easeIn" },
+  },
+};
+
+const STEP_CONTAINER_VARIANTS = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
+};
+
+const STEP_ITEM_VARIANTS = {
+  hidden: { opacity: 0, x: -16 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.5, ease: EASE_OUT_EXPO },
+  },
+};
+
 interface HowItWorksRoleTabsProps {
   farmerFaqs: FAQ[];
   clusterFarmerFaqs: FAQ[];
@@ -159,36 +191,46 @@ export default function HowItWorksRoleTabs({
               key={activeRole}
               id={`role-panel-${activeRole}`}
               role="tabpanel"
-              variants={FADE_IN_VARIANT}
+              variants={PANEL_VARIANTS}
               initial="hidden"
               animate="visible"
-              exit="hidden"
-              transition={{ duration: 0.3 }}
-              className="mt-10 flex flex-col gap-0"
+              exit="exit"
+              className="mt-10"
             >
-              {roles[activeRole].steps.map(({ title, description }, stepIndex) => (
-                <div key={title} className="flex gap-6">
-                  {/* Step indicator */}
-                  <div className="flex flex-col items-center">
-                    <div className="bg-theme-green-dark flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-                      {stepIndex + 1}
+              <motion.div
+                variants={STEP_CONTAINER_VARIANTS}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-col gap-0"
+              >
+                {roles[activeRole].steps.map(({ title, description }, stepIndex) => (
+                  <motion.div
+                    key={title}
+                    variants={STEP_ITEM_VARIANTS}
+                    className="flex gap-6"
+                  >
+                    {/* Step indicator */}
+                    <div className="flex flex-col items-center">
+                      <div className="bg-theme-green-dark flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+                        {stepIndex + 1}
+                      </div>
+                      {stepIndex < roles[activeRole].steps.length - 1 && (
+                        <div className="bg-gray-border mt-1 w-0.5 flex-1" />
+                      )}
                     </div>
-                    {stepIndex < roles[activeRole].steps.length - 1 && (
-                      <div className="bg-gray-border mt-1 w-0.5 flex-1" />
-                    )}
-                  </div>
 
-                  {/* Step content */}
-                  <div className="pb-8">
-                    <h3 className="font-ubuntu text-heading-colour text-lg font-semibold">
-                      {title}
-                    </h3>
-                    <p className="font-roboto-slab text-text-colour mt-1 text-base">
-                      {description}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                    {/* Step content */}
+                    <div className="pb-8">
+                      <h3 className="font-ubuntu text-heading-colour text-lg font-semibold">
+                        {title}
+                      </h3>
+                      <p className="font-roboto-slab text-text-colour mt-1 text-base">
+                        {description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
             </motion.div>
           </AnimatePresence>
         </div>

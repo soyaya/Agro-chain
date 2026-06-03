@@ -152,4 +152,24 @@ export const buyerService = {
   cancelDemand(demandId: string) {
     return apiFetch(`/buyers/demands/${demandId}`, { method: "DELETE" });
   },
+
+  // === Saved Listings
+
+  /** Get all listings saved/bookmarked by this buyer. */
+  getSavedListings() {
+    return apiFetch<{ status: string; data: { listings: unknown[] } }>("/buyers/saved");
+  },
+
+  /** Save a listing. */
+  saveListing(listingId: string) {
+    return apiFetch("/buyers/saved", {
+      method: "POST",
+      body: JSON.stringify({ listingId }),
+    });
+  },
+
+  /** Remove a listing from saved. */
+  unsaveListing(listingId: string) {
+    return apiFetch(`/buyers/saved/${listingId}`, { method: "DELETE" });
+  },
 };

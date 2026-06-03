@@ -31,6 +31,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  if (isDashboardRoute && hasSession) {
+    const correctDashboard = getDashboardFromCookie(request);
+    if (!pathname.startsWith(correctDashboard)) {
+      return NextResponse.redirect(new URL(correctDashboard, request.url));
+    }
+  }
+
   if (
     hasSession &&
     (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname === "/")

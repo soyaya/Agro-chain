@@ -16,43 +16,28 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     icons: [
       {
-        src: "/icons/icon-72x72.png",
-        sizes: "72x72",
+        src: "/favicon_io/favicon-16x16.png",
+        sizes: "16x16",
         type: "image/png",
       },
       {
-        src: "/icons/icon-96x96.png",
-        sizes: "96x96",
+        src: "/favicon_io/favicon-32x32.png",
+        sizes: "32x32",
         type: "image/png",
       },
       {
-        src: "/icons/icon-128x128.png",
-        sizes: "128x128",
+        src: "/favicon_io/apple-touch-icon.png",
+        sizes: "180x180",
         type: "image/png",
       },
       {
-        src: "/icons/icon-144x144.png",
-        sizes: "144x144",
-        type: "image/png",
-      },
-      {
-        src: "/icons/icon-152x152.png",
-        sizes: "152x152",
-        type: "image/png",
-      },
-      {
-        src: "/icons/icon-192x192.png",
+        src: "/favicon_io/android-chrome-192x192.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/icon-384x384.png",
-        sizes: "384x384",
-        type: "image/png",
-      },
-      {
-        src: "/icons/icon-512x512.png",
+        src: "/favicon_io/android-chrome-512x512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
@@ -60,8 +45,8 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     screenshots: [
       {
-        src: "/screenshots/marketplace.png",
-        sizes: "1280x720",
+        src: "/images/og-hero.png",
+        sizes: "1200x630",
         type: "image/png",
       },
     ],

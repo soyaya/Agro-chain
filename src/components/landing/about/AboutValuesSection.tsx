@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { FADE_IN_VARIANT } from "~/types/constants";
+import { EASE_OUT_EXPO } from "~/types/constants";
 
 const values = [
   {
@@ -48,22 +48,32 @@ export default function AboutValuesSection() {
           {values.map(({ title, body, image, imageAlt }, i) => {
             const isEven = i % 2 === 0;
             return (
-              <motion.div
+              <div
                 key={title}
-                variants={FADE_IN_VARIANT}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.5 }}
                 className={`flex flex-col items-center gap-10 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 ${
                   isEven ? "" : "lg:[&>*:first-child]:order-2"
                 }`}
               >
-                <div className="flex flex-col gap-4">
+                {/* Text — slides in from the leading side */}
+                <motion.div
+                  initial={{ opacity: 0, x: isEven ? -40 : 40, filter: "blur(4px)" }}
+                  whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.75, ease: EASE_OUT_EXPO }}
+                  className="flex flex-col gap-4"
+                >
                   <h3 className="font-ubuntu text-heading-colour text-2xl font-bold">{title}</h3>
                   <p className="font-roboto-slab text-text-colour text-lg">{body}</p>
-                </div>
-                <div className="relative h-64 w-full overflow-hidden rounded-2xl lg:h-80">
+                </motion.div>
+
+                {/* Image — scales in from opposite side */}
+                <motion.div
+                  initial={{ opacity: 0, x: isEven ? 40 : -40, scale: 0.96 }}
+                  whileInView={{ opacity: 1, x: 0, scale: 1 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.75, ease: EASE_OUT_EXPO, delay: 0.08 }}
+                  className="relative h-64 w-full overflow-hidden rounded-2xl lg:h-80"
+                >
                   <Image
                     src={image}
                     alt={imageAlt}
@@ -71,8 +81,8 @@ export default function AboutValuesSection() {
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                   />
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             );
           })}
         </div>

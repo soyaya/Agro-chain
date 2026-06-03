@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import type { MarketplaceListing } from "~/types/index";
 
@@ -42,27 +42,32 @@ export default function MarketplacePreviewSection() {
 
         {/* Cards */}
         <motion.div
-          variants={STAGGER_CONTAINER_VARIANT}
+          variants={SLOW_STAGGER_CONTAINER_VARIANT}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-80px" }}
           className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {loading
             ? Array.from({ length: 3 }).map((_, i) => (
-                <div
+                <motion.div
                   key={i}
+                  variants={SLIDE_UP_VARIANT}
                   className="bg-gray-bg h-64 animate-pulse rounded-2xl"
                   aria-hidden="true"
                 />
               ))
-            : listings.map((listing) => <MarketplaceCard key={listing.id} listing={listing} />)}
+            : listings.map((listing) => (
+                <motion.div key={listing.id} variants={SLIDE_UP_VARIANT}>
+                  <MarketplaceCard listing={listing} />
+                </motion.div>
+              ))}
         </motion.div>
 
         <div className="mt-10 flex justify-center">
           <Link
             href="/marketplace"
-            className="font-ubuntu border-theme-green-dark text-theme-green-dark hover:bg-theme-green-dark rounded-full border px-8 py-3 text-sm font-semibold transition hover:text-white"
+            className="font-ubuntu border-theme-green-dark text-theme-green-dark hover:bg-theme-green-dark rounded-full border px-8 py-3 text-sm font-semibold transition hover:text-white active:scale-95"
           >
             View All Listings →
           </Link>

@@ -45,3 +45,4 @@ next-env.d.ts
 .codex
 docker-compose.override.yml
 .turbo/
+.claude/

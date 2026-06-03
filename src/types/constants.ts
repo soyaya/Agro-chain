@@ -191,27 +191,66 @@ export const STATUS_COLORS = {
 // ANIMATION VARIANTS
 // ============================================
 
+// Expo-out: snappy start, silky settle — the signature of premium motion
+export const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
 export const FADE_IN_VARIANT = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
-};
-
-export const SLIDE_UP_VARIANT = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
-export const SCALE_IN_VARIANT = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1 },
-};
-
-export const STAGGER_CONTAINER_VARIANT = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
+    transition: { duration: 0.6, ease: EASE_OUT_EXPO },
+  },
+};
+
+// Blur-in slide: the hero effect — elements emerge from below the fold
+export const SLIDE_UP_VARIANT = {
+  hidden: { opacity: 0, y: 40, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.7, ease: EASE_OUT_EXPO },
+  },
+};
+
+export const SCALE_IN_VARIANT = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.6, ease: EASE_OUT_EXPO },
+  },
+};
+
+// Spring pop: for stat numbers and icons — feels alive
+export const STAT_ITEM_VARIANT = {
+  hidden: { opacity: 0, scale: 0.5, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 220, damping: 22 },
+  },
+};
+
+// Fast stagger: for dense grids (6+ items) — no awkward wait between tiles
+export const STAGGER_CONTAINER_VARIANT = {
+  hidden: {},
+  visible: {
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.07,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+// Slower stagger: for 3-column feature/testimonial cards — more theatrical
+export const SLOW_STAGGER_CONTAINER_VARIANT = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1,
     },
   },
 };

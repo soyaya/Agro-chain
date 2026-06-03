@@ -13,6 +13,8 @@ import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
 import { CartDrawer } from "~/components/marketplace/CartDrawer";
 import { usePlatformSettings } from "~/context/PlatformSettingsContext";
+import { buyerService } from "~/lib/services/buyer.service";
+import { useAuth } from "~/lib/auth-context";
 import type { FishType } from "~/types/constants";
 
 type MarketplaceResponse = {
@@ -43,6 +45,7 @@ export default function MarketplacePage() {
   const [cartOpen, setCartOpen] = useState(false);
   const cart = useCart();
   const { pricePerKg } = usePlatformSettings();
+  const { user } = useAuth();
 
 
   useEffect(() => {
@@ -94,15 +97,26 @@ export default function MarketplacePage() {
   }, [pricePerKg]);
 
   const handleToggleLike = (listing: MarketplaceListing) => {
+    const isLiked = likedListings.includes(listing.id);
+
+    // Optimistic local update
     setLikedListings((prev) => {
-      const isLiked = prev.includes(listing.id);
       const newLikes = isLiked ? prev.filter((id) => id !== listing.id) : [...prev, listing.id];
       localStorage.setItem("liked_listings", JSON.stringify(newLikes));
-      if (!isLiked) {
-        toast.success("Added to liked listings!");
-      }
       return newLikes;
     });
+
+    if (user?.role === "buyer") {
+      if (isLiked) {
+        buyerService.unsaveListing(listing.id).catch(() => null);
+      } else {
+        buyerService.saveListing(listing.id)
+          .then(() => toast.success("Saved to your listings!"))
+          .catch(() => null);
+      }
+    } else if (!isLiked) {
+      toast.success("Added to liked listings!");
+    }
   };
 
   const handleAddToCart = (listing: MarketplaceListing) => {

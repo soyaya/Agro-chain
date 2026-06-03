@@ -1,11 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, type TargetAndTransition } from "framer-motion";
 import { Linkedin } from "lucide-react";
 import Link from "next/link";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import type { TeamMember } from "~/types/types";
+
+const CARD_HOVER: TargetAndTransition = {
+  y: -6,
+  scale: 1.02,
+  boxShadow: "var(--card-hover-shadow)",
+  transition: { duration: 0.25, ease: "easeOut" },
+};
+
+const CARD_TAP: TargetAndTransition = { scale: 0.97, transition: { duration: 0.1 } };
 
 export default function AboutTeamSection() {
   const team: TeamMember[] = [
@@ -45,17 +54,19 @@ export default function AboutTeamSection() {
         </div>
 
         <motion.div
-          variants={STAGGER_CONTAINER_VARIANT}
+          variants={SLOW_STAGGER_CONTAINER_VARIANT}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-80px" }}
           className="mt-12 flex flex-wrap justify-center gap-8"
         >
           {team.map(({ name, role, bio, linkedin, photo }) => (
             <motion.div
               key={name}
               variants={SLIDE_UP_VARIANT}
-              className="border-gray-border flex w-full max-w-xs flex-col items-center gap-4 rounded-2xl border bg-white p-6 text-center shadow-sm transition hover:shadow-md"
+              whileHover={CARD_HOVER}
+              whileTap={CARD_TAP}
+              className="border-gray-border flex w-full max-w-xs flex-col items-center gap-4 rounded-2xl border bg-white p-6 text-center shadow-sm"
             >
               {/* Headshot */}
               <div className="ring-gray-bg relative h-24 w-24 overflow-hidden rounded-full ring-4">

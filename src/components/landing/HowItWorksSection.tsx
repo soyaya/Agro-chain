@@ -1,8 +1,16 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import { motion, type TargetAndTransition } from "framer-motion";
+import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { howItWorksCards } from "~/models/models";
+
+const CARD_HOVER: TargetAndTransition = {
+  y: -5,
+  scale: 1.02,
+  transition: { duration: 0.25, ease: "easeOut" },
+};
+
+const CARD_TAP: TargetAndTransition = { scale: 0.97, transition: { duration: 0.1 } };
 
 export default function HowItWorksSection() {
   return (
@@ -28,17 +36,19 @@ export default function HowItWorksSection() {
 
         {/* Cards */}
         <motion.div
-          variants={STAGGER_CONTAINER_VARIANT}
+          variants={SLOW_STAGGER_CONTAINER_VARIANT}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-80px" }}
           className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3"
         >
           {howItWorksCards.map(({ number, icon: Icon, title, steps }) => (
             <motion.div
               key={title}
               variants={SLIDE_UP_VARIANT}
-              className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/5 p-6"
+              whileHover={CARD_HOVER}
+              whileTap={CARD_TAP}
+              className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/5 p-6 cursor-default"
             >
               <div className="flex items-center gap-3">
                 <span className="bg-theme-green-dark flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white">

@@ -15,6 +15,7 @@ import {
   ShoppingCart,
   Plus,
   Minus,
+  Heart,
 } from "lucide-react";
 import type { MarketplaceListing, PackagingOption } from "~/types";
 import {
@@ -27,6 +28,8 @@ import {
 import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
 import { usePlatformSettings } from "~/context/PlatformSettingsContext";
+import { buyerService } from "~/lib/services/buyer.service";
+import { useAuth } from "~/lib/auth-context";
 
 type MarketplaceDetailResponse =
   | MarketplaceListing
@@ -50,6 +53,9 @@ export default function ListingDetailPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const cart = useCart();
   const { pricePerKg } = usePlatformSettings();
+  const { user } = useAuth();
+  const [saved, setSaved] = useState(false);
+  const [savingListing, setSavingListing] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -99,6 +105,30 @@ export default function ListingDetailPage() {
   const addToCart = (pkg: PackagingOption) => {
     if (!listing) return;
     cart.addToCart(listing, pkg, { variant: selectedVariant, processed });
+  };
+
+  const handleSave = async () => {
+    if (!listing) return;
+    if (user?.role !== "buyer") {
+      toast.info("Please log in as a buyer to save listings.");
+      return;
+    }
+    setSavingListing(true);
+    try {
+      if (saved) {
+        await buyerService.unsaveListing(listing.id);
+        setSaved(false);
+        toast.success("Removed from saved listings.");
+      } else {
+        await buyerService.saveListing(listing.id);
+        setSaved(true);
+        toast.success("Saved to your listings!");
+      }
+    } catch {
+      toast.error("Could not update saved listings.");
+    } finally {
+      setSavingListing(false);
+    }
   };
 
   const totalAmount = cart.subtotal;
@@ -173,9 +203,23 @@ export default function ListingDetailPage() {
               >
                 {/* Header */}
                 <div className="flex flex-col gap-(--gap-base)">
-                  <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
-                    {listing.fishType}
-                  </h1>
+                  <div className="flex items-start justify-between gap-4">
+                    <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+                      {listing.fishType}
+                    </h1>
+                    <button
+                      onClick={handleSave}
+                      disabled={savingListing}
+                      aria-label={saved ? "Remove from saved" : "Save listing"}
+                      className={`shrink-0 rounded-full border p-2.5 transition disabled:opacity-50 ${
+                        saved
+                          ? "border-red-200 bg-red-50 text-red-500"
+                          : "border-gray-border text-text-colour hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+                      }`}
+                    >
+                      <Heart size={20} fill={saved ? "currentColor" : "none"} />
+                    </button>
+                  </div>
                   <div className="flex items-center gap-(--gap-base)">
                     <Building size={20} className="text-text-colour" />
                     <span className="font-roboto-slab text-text-colour text-lg">

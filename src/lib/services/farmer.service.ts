@@ -87,6 +87,33 @@ export interface ClusterApplicationPayload {
   taxClearance?: string;
 }
 
+export interface BackendFarmerOrder {
+  orderId: string;
+  orderNumber: string;
+  buyerName: string;
+  buyerPhone?: string;
+  fishType: string;
+  variant?: string;
+  weightKg: number;
+  quantity: number;
+  processed?: boolean;
+  deliveryOption: string;
+  status: string;
+  paymentStatus?: string;
+  totalAmount?: number;
+  createdAt: string;
+}
+
+export interface FarmerPayout {
+  id: string;
+  orderId?: string;
+  orderNumber?: string;
+  amount: number;
+  status: "pending" | "processing" | "completed" | "failed";
+  createdAt: string;
+  paidAt?: string;
+}
+
 // === Farmer Service
 
 export const farmerService = {
@@ -130,14 +157,14 @@ export const farmerService = {
 
   /** Get all orders for the farmer's listings. */
   getOrders() {
-    return apiFetch<{ status: string; data: { orders: unknown[] } }>("/farmers/orders");
+    return apiFetch<{ status: string; data: { orders: BackendFarmerOrder[] } }>("/farmers/orders");
   },
 
   /** Get payout history. */
   getPayouts() {
     return apiFetch<{
       status: string;
-      data: { payouts: unknown[]; totalEarnings: number; pendingPayouts: number };
+      data: { payouts: FarmerPayout[]; totalEarnings: number; pendingPayouts: number };
     }>("/farmers/payouts");
   },
 };

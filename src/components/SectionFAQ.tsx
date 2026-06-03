@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -27,7 +27,9 @@ export default function SectionFAQ({
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    setOpenIndex(null);
+    startTransition(() => {
+      setOpenIndex(null);
+    });
   }, [pathname]);
 
   const visibleFaqs = showAll ? faqs : faqs.slice(0, 5);

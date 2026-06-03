@@ -45,11 +45,11 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://agro-chain-bom-vercel.vercel.app",
+    canonical: "https://agro-chain.com",
   },
   openGraph: {
     type: "website",
-    url: "https://agro-chain-bom-vercel.vercel.app",
+    url: "https://agro-chain.com",
     title: "Agro-chain | Nigeria's Catfish Marketplace",
     description:
       "Connecting verified catfish farmers to bulk buyers across Nigeria. Admin-set pricing, Paystack escrow, coordinated delivery.",
@@ -65,8 +65,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Agro-chain | Nigeria's Catfish Marketplace",
-    description:
-      "Connecting verified catfish farmers to bulk buyers across Nigeria.",
+    description: "Connecting verified catfish farmers to bulk buyers across Nigeria.",
     images: ["/images/og-hero.png"],
   },
 };

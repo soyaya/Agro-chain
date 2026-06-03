@@ -125,6 +125,7 @@ function FishPricingSection() {
 export default function AdminSettingsPage() {
   const [user, setUser] = useState<BackendUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOutAll, setLoggingOutAll] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -299,10 +300,22 @@ export default function AdminSettingsPage() {
               </p>
             </div>
             <button
-              onClick={() => toast.info("Use the logout button in the nav to log out.")}
-              className="font-roboto-slab rounded-xl border border-red-200 bg-(--white) px-4 py-2 text-sm text-red-600 transition hover:bg-red-100"
+              disabled={loggingOutAll}
+              onClick={async () => {
+                setLoggingOutAll(true);
+                try {
+                  await authService.logoutAll();
+                  toast.success("All sessions invalidated.");
+                  window.location.href = "/login";
+                } catch {
+                  toast.error("Failed to logout all devices.");
+                } finally {
+                  setLoggingOutAll(false);
+                }
+              }}
+              className="font-roboto-slab rounded-xl border border-red-200 bg-(--white) px-4 py-2 text-sm text-red-600 transition hover:bg-red-100 disabled:opacity-50"
             >
-              Logout All
+              {loggingOutAll ? "Logging out..." : "Logout All"}
             </button>
           </div>
         </div>

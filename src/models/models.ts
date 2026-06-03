@@ -467,6 +467,7 @@ export const enhancedFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "Profile", href: "/farmers-dashboard/profile", icon: User },
     { label: "My Listings", href: "/farmers-dashboard/listings", icon: FileText },
     { label: "Create Listing", href: "/farmers-dashboard/listings/create", icon: Package },
+    { label: "My Orders", href: "/farmers-dashboard/orders", icon: ShoppingCart },
     // Financial Services Navigation
     {
       label: "Financial Services",

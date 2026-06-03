@@ -38,11 +38,11 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://agro-chain-bom-vercel.vercel.app/about",
+    canonical: "https://agro-chain.com/about",
   },
   openGraph: {
     type: "website",
-    url: "https://agro-chain-bom-vercel.vercel.app/about",
+    url: "https://agro-chain.com/about",
     title: "About Agro-chain | Building Nigeria's Catfish Infrastructure",
     description:
       "We're building the digital infrastructure for Nigeria's ₦500B+ catfish industry - transparent, secure, and fair for every participant.",
@@ -68,22 +68,19 @@ export default function AboutPage() {
   return (
     <div className="layout-max-width">
       {/* Section 1: Hero */}
-      <section
-        aria-label="About Hero"
-        className="bg-green-50 border-b border-gray-border"
-      >
+      <section aria-label="About Hero" className="border-gray-border border-b bg-green-50">
         <div className="content-width px-4 py-20 lg:px-25 lg:py-28">
-          <div className="max-w-3xl border-l-4 border-theme-green-dark pl-6">
-            <span className="font-ubuntu text-xs font-semibold tracking-widest text-theme-green-dark uppercase">
+          <div className="border-theme-green-dark max-w-3xl border-l-4 pl-6">
+            <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
               About Agro-chain
             </span>
-            <h1 className="font-ubuntu mt-4 text-3xl font-bold text-heading-colour lg:text-5xl">
+            <h1 className="font-ubuntu text-heading-colour mt-4 text-3xl font-bold lg:text-5xl">
               We&apos;re Building the Infrastructure for Nigeria&apos;s Catfish Industry.
             </h1>
-            <p className="font-roboto-slab mt-6 text-lg text-text-colour">
-              Agro-chain is a digital marketplace that connects verified catfish farmers and
-              cluster aggregators with bulk buyers - bringing transparency, security, and
-              efficiency to a ₦500B+ industry.
+            <p className="font-roboto-slab text-text-colour mt-6 text-lg">
+              Agro-chain is a digital marketplace that connects verified catfish farmers and cluster
+              aggregators with bulk buyers - bringing transparency, security, and efficiency to a
+              ₦500B+ industry.
             </p>
           </div>
         </div>
@@ -93,18 +90,18 @@ export default function AboutPage() {
       <section aria-label="Our Story" className="bg-white">
         <div className="content-width px-4 py-16 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-25 lg:py-25">
           <div className="flex flex-col gap-6">
-            <span className="font-ubuntu text-xs font-semibold tracking-widest text-theme-green-dark uppercase">
+            <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
               Our Story
             </span>
-            <h2 className="font-ubuntu text-3xl font-bold text-heading-colour lg:text-4xl">
+            <h2 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
               Built to solve a real problem.
             </h2>
-            <div className="font-roboto-slab flex flex-col gap-4 text-lg text-text-colour">
+            <div className="font-roboto-slab text-text-colour flex flex-col gap-4 text-lg">
               <p>
                 Nigeria produces over 300,000 metric tonnes of catfish annually, yet most
-                transactions happen informally - through phone calls, cash payments, and
-                unverified middlemen. Prices are opaque. Logistics are unreliable. Farmers get
-                underpaid. Buyers get inconsistent quality.
+                transactions happen informally - through phone calls, cash payments, and unverified
+                middlemen. Prices are opaque. Logistics are unreliable. Farmers get underpaid.
+                Buyers get inconsistent quality.
               </p>
               <p>
                 Agro-chain was built to change that. We created a three-sided marketplace where
@@ -137,15 +134,15 @@ export default function AboutPage() {
       {/* Section 6: CTA */}
       <section aria-label="About CTA" className="bg-white">
         <div className="content-width flex flex-col items-center gap-6 px-4 py-16 text-center lg:px-25 lg:py-20">
-          <h2 className="font-ubuntu text-3xl font-bold text-heading-colour lg:text-4xl">
+          <h2 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
             Want to be part of this?
           </h2>
-          <p className="font-roboto-slab max-w-xl text-lg text-text-colour">
+          <p className="font-roboto-slab text-text-colour max-w-xl text-lg">
             Join as a farmer, cluster farmer, or buyer today.
           </p>
           <Link
             href="/register"
-            className="font-ubuntu rounded-full bg-theme-green-dark px-8 py-3 text-sm font-semibold text-white transition hover:bg-theme-green-light"
+            className="font-ubuntu bg-theme-green-dark hover:bg-theme-green-light rounded-full px-8 py-3 text-sm font-semibold text-white transition"
           >
             Get Started →
           </Link>

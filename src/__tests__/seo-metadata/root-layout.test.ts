@@ -15,10 +15,8 @@ describe("Root layout metadata", () => {
       expect(metadata.metadataBase).toBeDefined();
     });
 
-    it("equals https://agro-chain-bom-vercel.vercel.app", () => {
-      expect(metadata.metadataBase?.toString()).toBe(
-        "https://agro-chain-bom-vercel.vercel.app/"
-      );
+    it("equals https://agro-chain.com", () => {
+      expect(metadata.metadataBase?.toString()).toBe("https://agro-chain.com/");
     });
   });
 
@@ -30,9 +28,7 @@ describe("Root layout metadata", () => {
     });
 
     it('template equals "%s | Agro-chain"', () => {
-      expect((metadata.title as { template: string }).template).toBe(
-        "%s | Agro-chain"
-      );
+      expect((metadata.title as { template: string }).template).toBe("%s | Agro-chain");
     });
 
     it("has a non-empty default", () => {

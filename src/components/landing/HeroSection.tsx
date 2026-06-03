@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FADE_IN_VARIANT } from "~/types/constants";
-import { ArrowRightIcon } from 'lucide-react';
+import { ArrowRightIcon } from "lucide-react";
+import { EASE_OUT_EXPO } from "~/types/constants";
+
+const TRUST_BADGES = ["Paystack Secured", "Verified Sellers", "Admin-Set Pricing", "Traceable Supply"];
 
 export default function HeroSection() {
   return (
@@ -24,62 +26,77 @@ export default function HeroSection() {
         aria-hidden="true"
       />
 
-      <div className="content-width relative z-10 flex flex-col items-center gap-8 px-section-px sm:px-section-px-sm  text-center lg:px-25 py-section-py sm:py-section-py-sm lg:py-section-py-lg">
-        <motion.div
-          variants={FADE_IN_VARIANT}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.6 }}
-          className="flex flex-col items-center gap-6"
+      <div className="content-width relative z-10 flex flex-col items-center gap-8 px-section-px sm:px-section-px-sm lg:px-section-px-lg text-center py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+        {/* Label */}
+        <motion.span
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: EASE_OUT_EXPO, delay: 0 }}
+          className="font-ubuntu text-xs font-semibold tracking-widest text-green-300 uppercase"
         >
-          {/* Label */}
-          <span className="font-ubuntu text-xs font-semibold tracking-widest text-green-300 uppercase">
-            Nigeria&apos;s Catfish Marketplace
-          </span>
+          Nigeria&apos;s Catfish Marketplace
+        </motion.span>
 
-          {/* H1 */}
-          <h1 className="font-ubuntu text-4xl font-bold text-white sm:text-5xl lg:text-6xl lg:leading-tight">
-            Connecting Verified Farmers
-            <br className="hidden sm:block" /> to Bulk Buyers, Seamlessly.
-          </h1>
+        {/* H1 */}
+        <motion.h1
+          initial={{ opacity: 0, y: 32, filter: "blur(6px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.8, ease: EASE_OUT_EXPO, delay: 0.12 }}
+          className="font-ubuntu text-4xl font-bold text-white sm:text-5xl lg:text-6xl lg:leading-tight"
+        >
+          Connecting Verified Farmers
+          <br className="hidden sm:block" /> to Bulk Buyers, Seamlessly.
+        </motion.h1>
 
-          {/* Subheading */}
-          <p className="font-roboto-slab max-w-2xl text-lg text-white/80">
-            Agro-chain digitises the catfish supply chain: farm listing, secure
-            payment, and coordinated delivery. No middlemen. No price
-            opacity. Just fresh fish, fair prices, and reliable logistics.
-          </p>
+        {/* Subheading */}
+        <motion.p
+          initial={{ opacity: 0, y: 24, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.7, ease: EASE_OUT_EXPO, delay: 0.26 }}
+          className="font-roboto-slab max-w-2xl text-lg text-white/80"
+        >
+          Agro-chain digitises the catfish supply chain: farm listing, secure
+          payment, and coordinated delivery. No middlemen. No price
+          opacity. Just fresh fish, fair prices, and reliable logistics.
+        </motion.p>
 
-          {/* CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/marketplace"
-              className="font-ubuntu rounded-full bg-white px-8 py-3 gap-3 flex items-center text-sm font-semibold text-theme-green-dark shadow-md transition hover:bg-white/90"
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE_OUT_EXPO, delay: 0.4 }}
+          className="flex flex-wrap items-center justify-center gap-4"
+        >
+          <Link
+            href="/marketplace"
+            className="font-ubuntu rounded-full bg-white px-8 py-3 gap-3 flex items-center text-sm font-semibold text-theme-green-dark shadow-md transition hover:bg-white/90 active:scale-95"
+          >
+            Browse Marketplace <ArrowRightIcon size={16} />
+          </Link>
+          <Link
+            href="/register?role=farmer"
+            className="font-ubuntu rounded-full border border-white px-8 py-3 text-sm font-semibold text-white transition hover:bg-white/10 active:scale-95"
+          >
+            Join as a Farmer
+          </Link>
+        </motion.div>
+
+        {/* Trust badges */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: EASE_OUT_EXPO, delay: 0.56 }}
+          className="flex flex-wrap items-center justify-center gap-4 pt-2"
+        >
+          {TRUST_BADGES.map((badge) => (
+            <span
+              key={badge}
+              className="font-roboto-slab flex items-center gap-1.5 text-sm text-white/60"
             >
-              Browse Marketplace <ArrowRightIcon size={16} />
-            </Link>
-            <Link
-              href="/register?role=farmer"
-              className="font-ubuntu rounded-full border border-white px-8 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-            >
-              Join as a Farmer
-            </Link>
-          </div>
-
-          {/* Trust badges */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            {["Paystack Secured", "Verified Sellers", "Admin-Set Pricing", "Traceable Supply"].map(
-              (badge) => (
-                <span
-                  key={badge}
-                  className="font-roboto-slab flex items-center gap-1.5 text-sm text-white/60"
-                >
-                  <span className="text-green-400">✓</span>
-                  {badge}
-                </span>
-              )
-            )}
-          </div>
+              <span className="text-green-400">✓</span>
+              {badge}
+            </span>
+          ))}
         </motion.div>
       </div>
     </section>

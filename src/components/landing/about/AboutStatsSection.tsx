@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import { STAGGER_CONTAINER_VARIANT, STAT_ITEM_VARIANT } from "~/types/constants";
 import type { ImpactStat } from "~/types/types";
 
 const aboutStats: ImpactStat[] = [
@@ -14,18 +14,18 @@ const aboutStats: ImpactStat[] = [
 export default function AboutStatsSection() {
   return (
     <section aria-label="About Impact Numbers" className="bg-theme-green-dark">
-      <div className="content-width px-4 py-16 lg:px-25 lg:py-20">
+      <div className="content-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         <motion.div
           variants={STAGGER_CONTAINER_VARIANT}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-60px" }}
           className="grid grid-cols-2 gap-8 lg:grid-cols-4"
         >
           {aboutStats.map(({ value, label }) => (
             <motion.div
               key={label}
-              variants={SLIDE_UP_VARIANT}
+              variants={STAT_ITEM_VARIANT}
               className="flex flex-col items-center gap-2 text-center"
             >
               <span

@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import { motion, type TargetAndTransition } from "framer-motion";
+import { ArrowRightIcon } from "lucide-react";
+import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { featureCards } from "~/models/models";
-import { ArrowRightIcon } from 'lucide-react';
+
+const CARD_HOVER: TargetAndTransition = {
+  y: -6,
+  scale: 1.02,
+  boxShadow: "var(--card-hover-shadow)",
+  transition: { duration: 0.25, ease: "easeOut" },
+};
+
+const CARD_TAP: TargetAndTransition = { scale: 0.98, transition: { duration: 0.1 } };
 
 export default function FeaturesSection() {
   return (
@@ -25,18 +34,19 @@ export default function FeaturesSection() {
 
         {/* Cards grid */}
         <motion.div
-          variants={STAGGER_CONTAINER_VARIANT}
+          variants={SLOW_STAGGER_CONTAINER_VARIANT}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-80px" }}
           className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {featureCards.map(({ icon: Icon, title, description }) => (
             <motion.div
               key={title}
               variants={SLIDE_UP_VARIANT}
-              className="border-gray-border flex flex-col gap-4 rounded-2xl border bg-white p-6 shadow-sm transition hover:shadow-md"
-              style={{ "--tw-shadow": "var(--card-hover-shadow)" } as React.CSSProperties}
+              whileHover={CARD_HOVER}
+              whileTap={CARD_TAP}
+              className="border-gray-border flex flex-col gap-4 rounded-2xl border bg-white p-6 shadow-sm"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50">
                 <Icon className="text-theme-green-dark h-6 w-6" />
@@ -50,10 +60,9 @@ export default function FeaturesSection() {
         <div className="mt-10 flex justify-center">
           <Link
             href="/register"
-            className="font-ubuntu bg-theme-green-dark hover:bg-theme-green-light rounded-full px-8 py-3 text-sm font-semibold text-white transition"
+            className="font-ubuntu bg-theme-green-dark hover:bg-theme-green-light rounded-full px-8 py-3 text-sm font-semibold text-white transition inline-flex items-center gap-2"
           >
             Get Started Free <ArrowRightIcon size={16} />
-
           </Link>
         </div>
       </div>

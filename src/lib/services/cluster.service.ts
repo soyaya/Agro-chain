@@ -18,6 +18,7 @@ export interface BackendClusterOrder {
 }
 
 export interface BackendClusterFarmer {
+  id?: string;          // Needs to be added to GET /cluster/farmers response — see TASKS.md B4a
   farmerName: string;
   fishType: string;
   totalListings: number;
@@ -31,6 +32,34 @@ export interface BackendClusterFarmer {
   experience?: number;
   memberSince: string;
   lastActive: string;
+}
+
+export interface BackendFarmerDetail {
+  id: string;
+  fullName: string;
+  email: string | null;
+  phoneNumber: string;
+  profilePhotoUrl: string | null;
+  farmName: string | null;
+  state: string;
+  localGovernment: string;
+  farmingCapacityKg: number | null;
+  yearsOfExperience: number | null;
+  verificationStatus: string;
+  stats: {
+    totalListings: number;
+    approvedListings: number;
+    pendingListings: number;
+    totalSupplyKg: number;
+  };
+  recentListings: Array<{
+    id: string;
+    fishType: string;
+    totalAvailableKg: number;
+    status: string;
+    createdAt: string;
+  }>;
+  memberSince: string;
 }
 
 export interface BackendActivity {
@@ -85,6 +114,16 @@ export interface BackendDemand {
   acceptedAt?: string;
   fulfilledAt?: string;
   createdAt: string;
+}
+
+export interface ClusterPayout {
+  id: string;
+  orderId?: string;
+  orderNumber?: string;
+  amount: number;
+  status: "pending" | "processing" | "completed" | "failed";
+  createdAt: string;
+  paidAt?: string;
 }
 
 // === Cluster Service
@@ -168,7 +207,7 @@ export const clusterService = {
     return apiFetch<{
       status: string;
       data: {
-        payouts: unknown[];
+        payouts: ClusterPayout[];
         totalClusterEarnings: number;
         pendingPayouts: number;
       };
@@ -198,5 +237,12 @@ export const clusterService = {
   /** Mark a demand as fulfilled. */
   fulfillDemand(demandId: string) {
     return apiFetch(`/cluster/demands/${demandId}/fulfill`, { method: "PATCH" });
+  },
+
+  /** Get a single farmer's full profile and stats. */
+  getFarmerById(farmerId: string) {
+    return apiFetch<{ status: string; data: { farmer: BackendFarmerDetail } }>(
+      `/cluster/farmers/${farmerId}`,
+    );
   },
 };

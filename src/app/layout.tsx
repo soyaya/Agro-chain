@@ -5,8 +5,15 @@ import { LocationProvider } from "~/lib/location-context";
 import { AuthProvider } from "~/lib/auth-context";
 import { PlatformSettingsProvider } from "~/context/PlatformSettingsContext";
 
+export const viewport = {
+  themeColor: "#1b4332",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata = {
-  metadataBase: new URL("https://agro-chain-bom-vercel.vercel.app"),
+  metadataBase: new URL("https://agro-chain.com"),
 
   title: {
     template: "%s | Agro-chain",
@@ -32,9 +39,9 @@ export const metadata = {
   ],
 
   authors: [
-    { name: "Olorunshogo M. Bamtefa", url: "https://agro-chain-bom-vercel.vercel.app" },
-    { name: "Stephanie Nwankwo", url: "https://agro-chain-bom-vercel.vercel.app" },
-    { name: "David David", url: "https://agro-chain-bom-vercel.vercel.app" },
+    { name: "Olorunshogo M. Bamtefa", url: "https://agro-chain.com" },
+    { name: "Stephanie Nwankwo", url: "https://agro-chain.com" },
+    { name: "David David", url: "https://agro-chain.com" },
   ],
 
   creator: "Agro-chain",
@@ -57,13 +64,13 @@ export const metadata = {
   },
 
   alternates: {
-    canonical: "https://agro-chain-bom-vercel.vercel.app",
+    canonical: "https://agro-chain.com",
   },
 
   openGraph: {
     type: "website",
     locale: "en_NG",
-    url: "https://agro-chain-bom-vercel.vercel.app",
+    url: "https://agro-chain.com",
     siteName: "Agro-chain",
     title: "Agro-chain | Nigeria's Catfish Marketplace",
     description:
@@ -102,8 +109,9 @@ export const metadata = {
 
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default" as const,
+    statusBarStyle: "black-translucent" as const,
     title: "Agro-chain",
+    startupImage: "/favicon_io/apple-touch-icon.png",
   },
 
   formatDetection: {

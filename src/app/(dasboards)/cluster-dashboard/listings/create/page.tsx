@@ -10,6 +10,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
+import { farmerService } from "~/lib/services/farmer.service";
 import type { PackagingOption } from "~/types";
 import {
   FISH_TYPES,
@@ -88,13 +89,16 @@ export default function CreateClusterListingPage() {
 
     setIsLoading(true);
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Cluster listing:", { ...data, packaging, deliveryOptions: selectedDelivery });
+      await farmerService.createListing({
+        fishType: data.fishType,
+        harvestDate: new Date(data.harvestDate).toISOString(),
+        totalFishAvailable: data.totalAvailableKg,
+        weightKg: packaging[0]!.weightKg,
+      });
       toast.success("Listing submitted for review!");
       router.push("/cluster-dashboard/listings");
-    } catch {
-      toast.error("Failed to submit listing");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to submit listing");
     } finally {
       setIsLoading(false);
     }
