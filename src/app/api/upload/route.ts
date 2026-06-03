@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 // === Cloudinary unsigned upload
-// Uses Cloudinary's unsigned upload preset — no server-side secret needed.
+// Uses Cloudinary's unsigned upload preset - no server-side secret needed.
 // The upload preset must be set to "unsigned" in your Cloudinary dashboard.
 // Set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET in .env
 

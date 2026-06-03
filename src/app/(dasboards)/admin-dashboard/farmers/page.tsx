@@ -55,10 +55,8 @@ function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDe
             className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col bg-(--white) shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-(--border-gray) p-(--space-xl)">
-              <h2 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
-                User Profile
-              </h2>
+            <div className="border-gray-border flex items-center justify-between border-b p-(--space-xl)">
+              <h2 className="font-ubuntu text-heading-colour text-xl font-bold">User Profile</h2>
               <button
                 onClick={onClose}
                 className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100"
@@ -72,14 +70,12 @@ function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDe
               {/* Name + role */}
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-ubuntu text-2xl font-bold text-(--heading-colour)">
+                  <h3 className="font-ubuntu text-heading-colour text-2xl font-bold">
                     {user.full_name}
                   </h3>
-                  <p className="font-roboto-slab text-sm text-(--text-colour)">
-                    {user.phone_number}
-                  </p>
+                  <p className="font-roboto-slab text-text-colour text-sm">{user.phone_number}</p>
                   {user.email && (
-                    <p className="font-roboto-slab text-sm text-(--text-colour)">{user.email}</p>
+                    <p className="font-roboto-slab text-text-colour text-sm">{user.email}</p>
                   )}
                 </div>
                 <span
@@ -90,12 +86,12 @@ function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDe
               </div>
 
               {/* Details grid */}
-              <div className="grid grid-cols-2 gap-4 rounded-2xl border border-(--border-gray) p-4">
+              <div className="border-gray-border grid grid-cols-2 gap-4 rounded-2xl border p-4">
                 {[
                   ["Location", `${user.location_lga}, ${user.location_state}`],
                   ["Verification", user.verification_status],
-                  ["Farm Name", user.farm_name ?? "—"],
-                  ["Business Name", user.business_name ?? "—"],
+                  ["Farm Name", user.farm_name ?? "-"],
+                  ["Business Name", user.business_name ?? "-"],
                   ["Cluster Farmer", user.is_cluster_farmer ? "Yes" : "No"],
                   ["Cluster Approved", user.cluster_approved ? "Yes" : "No"],
                   [
@@ -114,7 +110,7 @@ function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDe
                       className={`font-roboto-slab text-sm font-medium capitalize ${
                         label === "Verification"
                           ? VERIFICATION_STYLES[value ?? "unverified"]
-                          : "text-(--heading-colour)"
+                          : "text-heading-colour"
                       }`}
                     >
                       {value}
@@ -241,12 +237,10 @@ export default function AdminFarmersPage() {
         className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+          <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
             User Management
           </h1>
-          <p className="font-roboto-slab text-(--text-colour)">
-            View and manage all platform users.
-          </p>
+          <p className="font-roboto-slab text-text-colour">View and manage all platform users.</p>
         </div>
         {/* Search */}
         <div className="relative w-full max-w-xs">
@@ -256,7 +250,7 @@ export default function AdminFarmersPage() {
             placeholder="Search name, phone, email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="font-roboto-slab h-10 w-full rounded-xl border border-(--border-input) pr-4 pl-9 text-sm transition outline-none focus:border-(--border-gray)"
+            className="font-roboto-slab focus:border-gray-border border-input-border h-10 w-full rounded-xl border pr-4 pl-9 text-sm transition outline-none"
           />
         </div>
       </motion.div>
@@ -274,14 +268,14 @@ export default function AdminFarmersPage() {
             onClick={() => setRoleFilter(role)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
               roleFilter === role
-                ? "border-(--theme-green-dark) bg-green-50"
-                : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
+                ? "border-theme-green-dark bg-green-50"
+                : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
-            <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+            <span className="font-ubuntu text-heading-colour text-xl font-bold">
               {counts[role]}
             </span>
-            <span className="font-roboto-slab text-xs text-(--text-colour) capitalize">
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">
               {role === "all" ? "All Users" : role === "cluster" ? "Cluster Farmers" : role + "s"}
             </span>
           </button>
@@ -294,11 +288,11 @@ export default function AdminFarmersPage() {
           variants={FADE_IN_VARIANT}
           initial="hidden"
           animate="visible"
-          className="overflow-hidden rounded-2xl border border-(--border-gray) bg-(--white) shadow-sm"
+          className="border-gray-border overflow-hidden rounded-2xl border bg-(--white) shadow-sm"
         >
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b border-(--border-gray) bg-(--bg-pink)">
+              <thead className="border-gray-border bg-pink-bg border-b">
                 <tr>
                   {[
                     "Name",
@@ -312,29 +306,29 @@ export default function AdminFarmersPage() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="font-roboto-slab px-4 py-3 text-left text-xs font-semibold text-(--text-colour)"
+                      className="font-roboto-slab text-text-colour px-4 py-3 text-left text-xs font-semibold"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-(--border-gray)">
+              <tbody className="divide-border-gray divide-y">
                 {filtered.map((user) => (
                   <motion.tr
                     key={user.id}
                     variants={FADE_IN_VARIANT}
-                    className="transition hover:bg-(--bg-pink)"
+                    className="hover:bg-pink-bg transition"
                   >
                     <td className="px-4 py-3">
-                      <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                      <p className="font-roboto-slab text-heading-colour text-sm font-medium">
                         {user.full_name}
                       </p>
                       {user.email && (
                         <p className="font-roboto-slab text-xs text-gray-400">{user.email}</p>
                       )}
                     </td>
-                    <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
+                    <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                       {user.phone_number}
                     </td>
                     <td className="px-4 py-3">
@@ -344,7 +338,7 @@ export default function AdminFarmersPage() {
                         {user.role}
                       </span>
                     </td>
-                    <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
+                    <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                       {user.location_lga}, {user.location_state}
                     </td>
                     <td className="px-4 py-3">
@@ -372,7 +366,7 @@ export default function AdminFarmersPage() {
                     <td className="px-4 py-3">
                       <button
                         onClick={() => setSelectedUser(user)}
-                        className="font-roboto-slab flex items-center gap-1.5 rounded-xl border border-(--border-gray) px-3 py-1.5 text-xs font-medium text-(--heading-colour) transition hover:bg-(--bg-pink)"
+                        className="font-roboto-slab border-gray-border text-heading-colour hover:bg-pink-bg flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition"
                       >
                         <Eye size={13} />
                         View

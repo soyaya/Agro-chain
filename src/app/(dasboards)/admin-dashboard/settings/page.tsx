@@ -73,7 +73,7 @@ function FishPricingSection() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <p className="font-roboto-slab text-sm text-(--text-colour)">Loading prices...</p>
+        <p className="font-roboto-slab text-text-colour text-sm">Loading prices...</p>
       </div>
     );
   }
@@ -83,9 +83,9 @@ function FishPricingSection() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {FISH_TYPES.map((fishType) => (
           <div key={fishType} className="flex flex-col gap-1.5">
-            <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+            <label className="font-roboto-slab text-heading-colour text-sm font-medium">
               {FISH_TYPE_LABELS[fishType as FishType]}
-              <span className="ml-1 text-xs font-normal text-(--text-colour)">(₦ per kg)</span>
+              <span className="text-text-colour ml-1 text-xs font-normal">(₦ per kg)</span>
             </label>
             <input
               type="number"
@@ -93,7 +93,7 @@ function FishPricingSection() {
               step={50}
               value={draft?.[fishType as FishType] ?? ""}
               onChange={(e) => handleChange(fishType as FishType, e.target.value)}
-              className="font-roboto-slab h-10 w-full rounded-lg border border-(--border-input) px-3 text-sm text-(--heading-colour) focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
+              className="font-roboto-slab text-heading-colour border-input-border focus:ring-theme-green-dark h-10 w-full rounded-lg border px-3 text-sm focus:ring-2 focus:outline-none"
             />
           </div>
         ))}
@@ -134,7 +134,7 @@ export default function AdminSettingsPage() {
         const res = await authService.getMe();
         if (mounted) setUser(res.data.user);
       } catch {
-        // silently fail — settings still renders
+        // silently fail - settings still renders
       } finally {
         if (mounted) setLoading(false);
       }
@@ -155,8 +155,8 @@ export default function AdminSettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">Settings</h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">Settings</h1>
+        <p className="font-roboto-slab text-text-colour">
           Manage your admin account and platform configuration.
         </p>
       </motion.div>
@@ -166,17 +166,15 @@ export default function AdminSettingsPage() {
         variants={FADE_IN_VARIANT}
         initial="hidden"
         animate="visible"
-        className="rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-gray-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
-            <DollarSign size={20} className="text-(--theme-green-dark)" />
+            <DollarSign size={20} className="text-theme-green-dark" />
           </div>
           <div>
-            <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">
-              Fish Pricing
-            </h2>
-            <p className="font-roboto-slab text-xs text-(--text-colour)">
+            <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">Fish Pricing</h2>
+            <p className="font-roboto-slab text-text-colour text-xs">
               Set the platform-wide price per kg for each fish type. All listings and orders use
               these values automatically.
             </p>
@@ -190,15 +188,13 @@ export default function AdminSettingsPage() {
         variants={FADE_IN_VARIANT}
         initial="hidden"
         animate="visible"
-        className="rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-gray-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
-            <User size={20} className="text-(--theme-green-dark)" />
+            <User size={20} className="text-theme-green-dark" />
           </div>
-          <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">
-            Admin Profile
-          </h2>
+          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">Admin Profile</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -206,11 +202,9 @@ export default function AdminSettingsPage() {
           <DynamicInput label="Email" fieldType="email" value={user?.email ?? ""} disabled />
           <DynamicInput label="Phone" fieldType="tel" value={user?.phone_number ?? ""} disabled />
           <div className="flex flex-col gap-1.5">
-            <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
-              Role
-            </label>
-            <div className="flex h-10 items-center rounded-lg border border-(--border-input) bg-gray-50 px-3">
-              <span className="font-roboto-slab text-sm text-(--text-colour) capitalize">
+            <label className="font-roboto-slab text-heading-colour text-sm font-medium">Role</label>
+            <div className="border-input-border flex h-10 items-center rounded-lg border bg-gray-50 px-3">
+              <span className="font-roboto-slab text-text-colour text-sm capitalize">
                 {user?.role ?? "admin"}
               </span>
             </div>
@@ -228,13 +222,13 @@ export default function AdminSettingsPage() {
         variants={FADE_IN_VARIANT}
         initial="hidden"
         animate="visible"
-        className="rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-gray-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
             <Settings size={20} className="text-blue-600" />
           </div>
-          <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">
+          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">
             Platform Configuration
           </h2>
         </div>
@@ -248,9 +242,9 @@ export default function AdminSettingsPage() {
             ["Cluster Re-application Window", "6 months"],
             ["Listing Expiry", "30 days"],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-xl border border-(--border-gray) p-4">
+            <div key={label} className="border-gray-border rounded-xl border p-4">
               <p className="font-roboto-slab text-xs text-gray-400">{label}</p>
-              <p className="font-roboto-slab mt-1 text-sm font-medium text-(--heading-colour)">
+              <p className="font-roboto-slab text-heading-colour mt-1 text-sm font-medium">
                 {value}
               </p>
             </div>
@@ -268,19 +262,19 @@ export default function AdminSettingsPage() {
         variants={FADE_IN_VARIANT}
         initial="hidden"
         animate="visible"
-        className="rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-gray-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
             <Shield size={20} className="text-red-600" />
           </div>
-          <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">Security</h2>
+          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">Security</h2>
         </div>
 
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between rounded-xl border border-(--border-gray) p-4">
+          <div className="border-gray-border flex items-center justify-between rounded-xl border p-4">
             <div>
-              <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+              <p className="font-roboto-slab text-heading-colour text-sm font-medium">
                 Active Sessions
               </p>
               <p className="font-roboto-slab text-xs text-gray-400">
@@ -289,7 +283,7 @@ export default function AdminSettingsPage() {
             </div>
             <button
               onClick={() => toast.info("Session management coming soon.")}
-              className="font-roboto-slab rounded-xl border border-(--border-gray) px-4 py-2 text-sm text-(--text-colour) transition hover:bg-(--bg-pink)"
+              className="font-roboto-slab border-gray-border text-text-colour hover:bg-pink-bg rounded-xl border px-4 py-2 text-sm transition"
             >
               View Sessions
             </button>

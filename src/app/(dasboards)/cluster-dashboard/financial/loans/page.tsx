@@ -1,6 +1,6 @@
 "use client";
 
-// === Coming Soon — existing content preserved below
+// === Coming Soon - existing content preserved below
 // import { motion } from "framer-motion";
 // import { Plus, FileText, Clock, CheckCircle, XCircle, DollarSign, Calendar } from "lucide-react";
 // import Link from "next/link";
@@ -125,16 +125,16 @@ export default function LoanApplicationsPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-heading-colour">
             Loan Applications 📋
           </h1>
-          <p className="font-roboto-slab text-(--text-colour)">
+          <p className="font-roboto-slab text-text-colour">
             Apply for agricultural loans and track your applications
           </p>
         </div>
         <Link
           href="/cluster-dashboard/financial/loans/apply"
-          className="font-roboto-slab flex items-center gap-2 rounded-xl bg-(--theme-green-dark) px-(--space-lg) py-(--space-md) text-white hover:cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90 focus:ring-2 focus:ring-(--theme-green-dark) focus:ring-offset-2 focus:outline-none"
+          className="font-roboto-slab flex items-center gap-2 rounded-xl bg-theme-green-dark px-(--space-lg) py-(--space-md) text-white hover:cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90 focus:ring-2 focus:ring-theme-green-dark focus:ring-offset-2 focus:outline-none"
         >
           <Plus size={20} />
           <span>New Application</span>
@@ -153,17 +153,17 @@ export default function LoanApplicationsPage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
+              className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
             >
               <div className="mb-(--space-lg) flex items-center gap-(--space-md)">
                 <div className={`rounded-xl p-(--space-md) ${stat.bgColor}`}>
                   <Icon size={24} className={stat.color} />
                 </div>
               </div>
-              <p className="font-ubuntu mb-1 text-2xl font-bold text-(--heading-colour)">
+              <p className="font-ubuntu mb-1 text-2xl font-bold text-heading-colour">
                 {stat.value}
               </p>
-              <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>
+              <p className="font-roboto-slab text-sm text-text-colour">{stat.label}</p>
             </motion.div>
           );
         })}
@@ -173,9 +173,9 @@ export default function LoanApplicationsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-heading-colour">
           Your Loan Applications
         </h2>
         {loanApplications.length === 0 ? (
@@ -186,7 +186,7 @@ export default function LoanApplicationsPage() {
             </p>
             <Link
               href="/cluster-dashboard/financial/loans/apply"
-              className="font-roboto-slab rounded-xl bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-white hover:cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90"
+              className="font-roboto-slab rounded-xl bg-theme-green-dark px-(--space-xl) py-(--space-md) text-white hover:cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90"
             >
               Apply for Your First Loan
             </Link>
@@ -199,12 +199,12 @@ export default function LoanApplicationsPage() {
               return (
                 <div
                   key={application.id}
-                  className="rounded-xl border border-(--border-input) p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-105"
+                  className="rounded-xl border border-input-border p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-105"
                 >
                   <div className="flex flex-col gap-(--space-md) sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-(--space-md) mb-(--space-sm)">
-                        <h3 className="font-ubuntu text-lg font-semibold text-(--heading-colour)">
+                        <h3 className="font-ubuntu text-lg font-semibold text-heading-colour">
                           {application.applicationNumber}
                         </h3>
                         <span className={`flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${statusConfig.bgColor} ${statusConfig.color}`}>
@@ -215,19 +215,19 @@ export default function LoanApplicationsPage() {
                       <div className="grid grid-cols-1 gap-(--space-sm) sm:grid-cols-2 mb-(--space-md)">
                         <div>
                           <p className="font-roboto-slab text-xs text-gray-500">Loan Type</p>
-                          <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                          <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                             {getLoanTypeLabel(application.loanType)}
                           </p>
                         </div>
                         <div>
                           <p className="font-roboto-slab text-xs text-gray-500">Requested Amount</p>
-                          <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                          <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                             ₦{application.requestedAmount.toLocaleString()}
                           </p>
                         </div>
                         <div>
                           <p className="font-roboto-slab text-xs text-gray-500">Submitted</p>
-                          <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                          <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                             {application.submittedAt.toLocaleDateString()}
                           </p>
                         </div>
@@ -240,7 +240,7 @@ export default function LoanApplicationsPage() {
                           </div>
                         )}
                       </div>
-                      <p className="font-roboto-slab text-sm text-(--text-colour)">
+                      <p className="font-roboto-slab text-sm text-text-colour">
                         <span className="font-medium">Purpose:</span> {application.purpose}
                       </p>
                       {application.repaymentTerms && (
@@ -271,7 +271,7 @@ export default function LoanApplicationsPage() {
                     </div>
                     <Link
                       href={`/cluster-dashboard/financial/loans/${application.id}`}
-                      className="font-roboto-slab rounded-lg border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-sm) text-center text-sm font-medium text-(--heading-colour) hover:cursor-pointer ease-in-out transition-all duration-300 hover:bg-(--bg-pink) focus:ring-2 focus:ring-(--border-gray) focus:ring-offset-2 focus:outline-none"
+                      className="font-roboto-slab rounded-lg border border-gray-border bg-(--white) px-(--space-lg) py-(--space-sm) text-center text-sm font-medium text-heading-colour hover:cursor-pointer ease-in-out transition-all duration-300 hover:bg-pink-bg focus:ring-2 focus:ring-border-gray focus:ring-offset-2 focus:outline-none"
                     >
                       View Details
                     </Link>

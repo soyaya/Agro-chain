@@ -30,21 +30,20 @@ export default function MarketplacePage() {
     sortBy: "date",
     sortOrder: "desc",
   });
-  const [likedListings, setLikedListings] = useState<string[]>([]);
+  const [likedListings, setLikedListings] = useState<string[]>(() => {
+    try {
+      const saved = typeof window !== "undefined" ? localStorage.getItem("liked_listings") : null;
+      return saved ? (JSON.parse(saved) as string[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const cart = useCart();
   const { pricePerKg } = usePlatformSettings();
 
-  useEffect(() => {
-    const saved = localStorage.getItem("liked_listings");
-    if (saved) {
-      try {
-        setLikedListings(JSON.parse(saved));
-      } catch (e) {}
-    }
-  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -67,7 +66,8 @@ export default function MarketplacePage() {
             weightKg: Number(pkg.weightKg),
             pricePerUnit:
               Number(pkg.pricePerUnit) ||
-              Number(pkg.weightKg) * (pricePerKg[listing.fishType as FishType] ?? pricePerKg.catfish),
+              Number(pkg.weightKg) *
+                (pricePerKg[listing.fishType as FishType] ?? pricePerKg.catfish),
           })),
         }));
 
@@ -91,7 +91,7 @@ export default function MarketplacePage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [pricePerKg]);
 
   const handleToggleLike = (listing: MarketplaceListing) => {
     setLikedListings((prev) => {
@@ -158,8 +158,8 @@ export default function MarketplacePage() {
   });
 
   return (
-    <div className="min-h-screen bg-(--gray-bg)">
-      <div className="container-max-width px-(--section-px) py-(--section-py) sm:px-(--section-px-sm) sm:py-(--section-py-sm) lg:px-(--section-px-lg) lg:py-(--section-py-lg)">
+    <div className="bg-gray-bg min-h-screen">
+      <div className="container-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -170,7 +170,7 @@ export default function MarketplacePage() {
           <motion.div variants={FADE_IN_VARIANT}>
             <button
               onClick={() => router.back()}
-              className="mb-4 flex items-center gap-2 text-sm text-(--text-colour) transition hover:text-(--heading-colour)"
+              className="text-text-colour hover:text-heading-colour mb-4 flex items-center gap-2 text-sm transition"
             >
               <ArrowLeft size={18} />
               Back
@@ -178,23 +178,23 @@ export default function MarketplacePage() {
             <div className="flex items-center gap-(--gap-base)">
               <Store size={28} className="text-green-700" />
               <div>
-                <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) lg:text-4xl">
+                <h1 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
                   Fish Marketplace
                 </h1>
-                <p className="mt-1 text-(--text-colour)">
+                <p className="text-text-colour mt-1">
                   Browse fresh fish supplies from verified cluster farmers
                 </p>
               </div>
               <div className="ml-auto">
                 <button
                   onClick={() => setCartOpen(true)}
-                  className="relative flex items-center gap-2 rounded-full border border-(--border-gray) bg-(--white) px-4 py-2 text-sm font-medium text-(--heading-colour) shadow-sm transition hover:bg-(--gray-bg)"
+                  className="border-gray-border text-heading-colour hover:bg-gray-bg relative flex items-center gap-2 rounded-full border bg-(--white) px-4 py-2 text-sm font-medium shadow-sm transition"
                   aria-label="Open cart"
                 >
                   <ShoppingBag size={18} />
                   Cart
                   {cart.totalItems > 0 && (
-                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-(--theme-green-dark) text-xs font-semibold text-white">
+                    <span className="bg-theme-green-dark absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold text-white">
                       {cart.totalItems}
                     </span>
                   )}
@@ -208,33 +208,33 @@ export default function MarketplacePage() {
             variants={FADE_IN_VARIANT}
             className="grid grid-cols-2 gap-(--gap-base) md:grid-cols-4"
           >
-            <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
-              <span className="text-2xl font-bold text-(--heading-colour)">
+            <div className="border-gray-border flex flex-col gap-2 rounded-2xl border bg-(--white) p-(--space-lg)">
+              <span className="text-heading-colour text-2xl font-bold">
                 {sortedListings.length}
               </span>
-              <span className="text-sm text-(--text-colour)">Available Listings</span>
+              <span className="text-text-colour text-sm">Available Listings</span>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
-              <span className="text-2xl font-bold text-(--heading-colour)">
+            <div className="border-gray-border flex flex-col gap-2 rounded-2xl border bg-(--white) p-(--space-lg)">
+              <span className="text-heading-colour text-2xl font-bold">
                 {new Set(sortedListings.map((l) => l.fishType)).size}
               </span>
-              <span className="text-sm text-(--text-colour)">Fish Types</span>
+              <span className="text-text-colour text-sm">Fish Types</span>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
-              <span className="text-2xl font-bold text-(--heading-colour)">
+            <div className="border-gray-border flex flex-col gap-2 rounded-2xl border bg-(--white) p-(--space-lg)">
+              <span className="text-heading-colour text-2xl font-bold">
                 {new Set(sortedListings.map((l) => l.state)).size}
               </span>
-              <span className="text-sm text-(--text-colour)">States</span>
+              <span className="text-text-colour text-sm">States</span>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
-              <span className="text-2xl font-bold text-(--heading-colour)">
+            <div className="border-gray-border flex flex-col gap-2 rounded-2xl border bg-(--white) p-(--space-lg)">
+              <span className="text-heading-colour text-2xl font-bold">
                 {sortedListings.reduce((sum, l) => sum + l.totalAvailableKg, 0).toLocaleString()}
                 kg
               </span>
-              <span className="text-sm text-(--text-colour)">Total Available</span>
+              <span className="text-text-colour text-sm">Total Available</span>
             </div>
           </motion.div>
 
@@ -254,21 +254,21 @@ export default function MarketplacePage() {
               {loading ? (
                 <motion.div
                   variants={FADE_IN_VARIANT}
-                  className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+                  className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
                 >
-                  <ShoppingBag size={48} className="text-(--text-colour)" />
-                  <p className="text-(--text-colour)">Loading marketplace listings...</p>
+                  <ShoppingBag size={48} className="text-text-colour" />
+                  <p className="text-text-colour">Loading marketplace listings...</p>
                 </motion.div>
               ) : errorMessage ? (
                 <motion.div
                   variants={FADE_IN_VARIANT}
-                  className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+                  className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
                 >
-                  <ShoppingBag size={48} className="text-(--text-colour)" />
-                  <p className="text-(--error-red)">{errorMessage}</p>
+                  <ShoppingBag size={48} className="text-text-colour" />
+                  <p className="text-error-red">{errorMessage}</p>
                   <button
                     onClick={() => window.location.reload()}
-                    className="rounded-full border border-(--border-gray) px-(--space-xl) py-(--space-md) text-(--heading-colour) transition hover:bg-(--gray-bg)"
+                    className="border-gray-border text-heading-colour hover:bg-gray-bg rounded-full border px-(--space-xl) py-(--space-md) transition"
                   >
                     Retry
                   </button>
@@ -292,20 +292,20 @@ export default function MarketplacePage() {
               ) : (
                 <motion.div
                   variants={FADE_IN_VARIANT}
-                  className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+                  className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
                 >
-                  <ShoppingBag size={48} className="text-(--text-colour)" />
+                  <ShoppingBag size={48} className="text-text-colour" />
                   <div className="flex flex-col items-center gap-2 text-center">
-                    <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                    <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                       No listings found
                     </h3>
-                    <p className="text-(--text-colour)">
+                    <p className="text-text-colour">
                       Try adjusting your filters to see more results
                     </p>
                   </div>
                   <button
                     onClick={handleResetFilters}
-                    className="rounded-full bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
+                    className="bg-theme-green-dark rounded-full px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
                   >
                     Reset Filters
                   </button>

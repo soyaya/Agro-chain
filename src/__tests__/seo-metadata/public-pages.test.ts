@@ -32,7 +32,7 @@ const pageNames = [
   "terms (/terms)",
 ];
 
-describe("Public page metadata — Property 1: completeness", () => {
+describe("Public page metadata - Property 1: completeness", () => {
   it(
     "every public page metadata object has all required SEO and social fields",
     () => {

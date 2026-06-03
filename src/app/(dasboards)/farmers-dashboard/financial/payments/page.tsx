@@ -1,6 +1,6 @@
 "use client";
 
-// === Coming Soon — existing content preserved below
+// === Coming Soon - existing content preserved below
 // import { motion } from "framer-motion";
 // import { Receipt, CheckCircle, Clock, AlertCircle, Calendar, DollarSign, TrendingUp } from "lucide-react";
 // import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
@@ -122,10 +122,10 @@ export default function PaymentHistoryPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-heading-colour">
           Payment History 💳
         </h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <p className="font-roboto-slab text-text-colour">
           Track your payment history and upcoming dues
         </p>
       </motion.div>
@@ -142,17 +142,17 @@ export default function PaymentHistoryPage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
+              className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
             >
               <div className="mb-(--space-lg) flex items-center gap-(--space-md)">
                 <div className={`rounded-xl p-(--space-md) ${stat.bgColor}`}>
                   <Icon size={24} className={stat.color} />
                 </div>
               </div>
-              <p className="font-ubuntu mb-1 text-2xl font-bold text-(--heading-colour)">
+              <p className="font-ubuntu mb-1 text-2xl font-bold text-heading-colour">
                 {stat.value}
               </p>
-              <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>
+              <p className="font-roboto-slab text-sm text-text-colour">{stat.label}</p>
             </motion.div>
           );
         })}
@@ -162,9 +162,9 @@ export default function PaymentHistoryPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-heading-colour">
           Upcoming Payments
         </h2>
         {upcomingPayments.length === 0 ? (
@@ -183,7 +183,7 @@ export default function PaymentHistoryPage() {
                 <div
                   key={index}
                   className={`rounded-xl border p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105 ${
-                    isUrgent ? "border-orange-300 bg-orange-50" : "border-(--border-input) bg-(--white)"
+                    isUrgent ? "border-orange-300 bg-orange-50" : "border-input-border bg-(--white)"
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -199,7 +199,7 @@ export default function PaymentHistoryPage() {
                           </span>
                         )}
                       </div>
-                      <h3 className="font-ubuntu text-lg font-semibold text-(--heading-colour) mb-1">
+                      <h3 className="font-ubuntu text-lg font-semibold text-heading-colour mb-1">
                         {payment.description}
                       </h3>
                       <p className="font-roboto-slab text-sm text-gray-600">
@@ -207,10 +207,10 @@ export default function PaymentHistoryPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                      <p className="font-ubuntu text-xl font-bold text-heading-colour">
                         ₦{payment.amount.toLocaleString()}
                       </p>
-                      <button className="mt-2 rounded-lg bg-(--theme-green-dark) px-(--space-lg) py-(--space-sm) text-sm font-medium text-white cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90">
+                      <button className="mt-2 rounded-lg bg-theme-green-dark px-(--space-lg) py-(--space-sm) text-sm font-medium text-white cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90">
                         Pay Now
                       </button>
                     </div>
@@ -226,9 +226,9 @@ export default function PaymentHistoryPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-heading-colour">
           Payment History
         </h2>
         {paymentHistory.length === 0 ? (
@@ -246,14 +246,14 @@ export default function PaymentHistoryPage() {
               return (
                 <div
                   key={index}
-                  className="flex items-center justify-between rounded-lg border border-(--border-input) p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-105"
+                  className="flex items-center justify-between rounded-lg border border-input-border p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-105"
                 >
                   <div className="flex items-center gap-(--space-lg)">
                     <div className={`rounded-xl p-(--space-md) ${statusConfig.bgColor}`}>
                       <StatusIcon size={20} className={statusConfig.color} />
                     </div>
                     <div>
-                      <h3 className="font-ubuntu text-base font-semibold text-(--heading-colour) mb-1">
+                      <h3 className="font-ubuntu text-base font-semibold text-heading-colour mb-1">
                         {payment.type === "loan_payment" ? "Loan Payment" : "Credit Payment"}
                       </h3>
                       <p className="font-roboto-slab text-sm text-gray-600">
@@ -262,7 +262,7 @@ export default function PaymentHistoryPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-ubuntu text-lg font-bold text-(--heading-colour) mb-1">
+                    <p className="font-ubuntu text-lg font-bold text-heading-colour mb-1">
                       ₦{payment.amount.toLocaleString()}
                     </p>
                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${statusConfig.bgColor} ${statusConfig.color}`}>

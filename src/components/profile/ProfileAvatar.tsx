@@ -52,7 +52,7 @@ export function ProfileAvatar({
     <div className="relative">
       <motion.div
         className={cn(
-          "relative overflow-hidden rounded-full border-2 border-(--border-gray)",
+          "border-gray-border relative overflow-hidden rounded-full border-2",
           sizeClasses[size],
         )}
         onHoverStart={() => setIsHovered(true)}
@@ -63,13 +63,11 @@ export function ProfileAvatar({
         {imageUrl ? (
           <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-(--gray-bg)">
+          <div className="bg-gray-bg flex h-full w-full items-center justify-center">
             {initials ? (
-              <span className="font-ubuntu text-lg font-bold text-(--heading-colour)">
-                {initials}
-              </span>
+              <span className="font-ubuntu text-heading-colour text-lg font-bold">{initials}</span>
             ) : (
-              <User size={iconSizes[size]} className="text-(--text-colour)" />
+              <User size={iconSizes[size]} className="text-text-colour" />
             )}
           </div>
         )}

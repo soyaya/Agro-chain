@@ -51,6 +51,46 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* === Brand color tokens
+   * These map CSS vars → Tailwind utilities.
+   * e.g. --color-heading-colour → text-heading-colour, bg-heading-colour, border-heading-colour
+   */
+  --color-heading-colour: var(--heading-colour);
+  --color-text-colour: var(--text-colour);
+  --color-text-colour-2: var(--text-colour-2);
+  --color-text-input: var(--text-input);
+  --color-gray-bg: var(--gray-bg);
+  --color-light-gray: var(--light-gray);
+  --color-gray-border: var(--border-gray);
+  --color-black-border: var(--border-black);
+  --color-input-border: var(--border-input);
+  --color-team-border: var(--border-team);
+  --color-review-border: var(--border-review);
+  --color-hover-black: var(--hover-black);
+  --color-theme-green-dark: var(--theme-green-dark);
+  --color-theme-green-light: var(--theme-green-light);
+  --color-debridger-green-dark: var(--debridger-green-dark);
+  --color-debridger-green-light: var(--debridger-green-light);
+  --color-section-dark: var(--section-dark-bg);
+  --color-error-red: var(--error-red);
+  --color-pink-bg: var(--bg-pink);
+  --color-input-field-green: var(--input-field-green);
+  --color-navbar-bg: var(--navbar-bg);
+
+  /* === Spacing tokens
+   * These map CSS vars → Tailwind spacing utilities.
+   * e.g. --spacing-section-px → px-section-px, p-section-px, gap-section-px
+   * e.g. --spacing-navbar-h   → h-navbar-h, mt-navbar-h, pt-navbar-h
+   */
+  --spacing-navbar-h: var(--navbar-h);
+  --spacing-dash-sidebar: var(--dash-sidebar-width);
+  --spacing-section-px: var(--section-px);
+  --spacing-section-px-sm: var(--section-px-sm);
+  --spacing-section-px-lg: var(--section-px-lg);
+  --spacing-section-py: var(--section-py);
+  --spacing-section-py-sm: var(--section-py-sm);
+  --spacing-section-py-lg: var(--section-py-lg);
 }
 
 :root {
@@ -131,14 +171,15 @@
   --section-px-sm: 1.5rem;
   --section-px-lg: 2rem;
 
-  --section-py: 1.5rem;
-  --section-py-sm: 2rem;
-  --section-py-lg: 2.5rem;
+  --section-py: 2rem;
+  --section-py-sm: 2.5rem;
+  --section-py-lg: 6.25rem;
 
   --white: #ffffff;
   --black: #000000;
   --hover-black: #010101;
-  --gray-bg: #f7f7f7;
+  --gray-bg: #f0faf4;
+  --light-gray: #e8f5ee;
 
   --border-gray: #e0e0e0;
   --border-black: #1b1b1b;
@@ -155,27 +196,27 @@
   --text-colour-2: #393939;
 
   /* Spacing System - Modular Scale */
-  --space-xs: 0.25rem;    /* 4px */
-  --space-sm: 0.5rem;     /* 8px */
-  --space-md: 0.75rem;    /* 12px */
-  --space-base: 1rem;     /* 16px */
-  --space-lg: 1.25rem;    /* 20px */
-  --space-xl: 1.5rem;     /* 24px */
-  --space-2xl: 2rem;      /* 32px */
-  --space-3xl: 2.5rem;    /* 40px */
-  --space-4xl: 3rem;      /* 48px */
-  --space-5xl: 4rem;      /* 64px */
-  --space-6xl: 5rem;      /* 80px */
+  --space-xs: 0.25rem; /* 4px */
+  --space-sm: 0.5rem; /* 8px */
+  --space-md: 0.75rem; /* 12px */
+  --space-base: 1rem; /* 16px */
+  --space-lg: 1.25rem; /* 20px */
+  --space-xl: 1.5rem; /* 24px */
+  --space-2xl: 2rem; /* 32px */
+  --space-3xl: 2.5rem; /* 40px */
+  --space-4xl: 3rem; /* 48px */
+  --space-5xl: 4rem; /* 64px */
+  --space-6xl: 5rem; /* 80px */
 
   /* Gap System */
-  --gap-xs: 0.25rem;      /* 4px */
-  --gap-sm: 0.5rem;       /* 8px */
-  --gap-md: 0.75rem;      /* 12px */
-  --gap-base: 1rem;       /* 16px */
-  --gap-lg: 1.25rem;      /* 20px */
-  --gap-xl: 1.5rem;       /* 24px */
-  --gap-2xl: 2rem;        /* 32px */
-  --gap-3xl: 2.5rem;      /* 40px */
+  --gap-xs: 0.25rem; /* 4px */
+  --gap-sm: 0.5rem; /* 8px */
+  --gap-md: 0.75rem; /* 12px */
+  --gap-base: 1rem; /* 16px */
+  --gap-lg: 1.25rem; /* 20px */
+  --gap-xl: 1.5rem; /* 24px */
+  --gap-2xl: 2rem; /* 32px */
+  --gap-3xl: 2.5rem; /* 40px */
 
   --section-gap: 3rem;
 
@@ -183,7 +224,14 @@
   --input-field-green: #1b4332;
 
   --theme-green-dark: #1b4332;
-  --theme-green-light: #1b4332;
+  --theme-green-light: #2d6a4f;
+  --navbar-bg: #1b4332;
+  --debridger-green-dark: #1b4332;
+  --debridger-green-light: #2d6a4f;
+  --section-dark-bg: #0f1f17;
+  --hero-overlay: rgba(27, 67, 50, 0.85);
+  --card-hover-shadow: 0 8px 30px rgba(27, 67, 50, 0.12);
+  --stat-number-size: clamp(2.5rem, 5vw, 4rem);
 
   --space-forty: 40px;
   --submit-button-mt: 4rem;
@@ -202,10 +250,35 @@
   }
 }
 
-/* @apply mx-auto w-full max-w-[1440px]; */
 @layer components {
+  /* Wide layout wrapper: 1440px. Use at the top of every page layout. */
+  .layout-max-width {
+    @apply mx-auto w-full max-w-360;
+  }
+
+  /* Content area inside a layout: 1200px. Replaces container-max-width. */
+  .content-width {
+    @apply mx-auto w-full max-w-300;
+  }
+
+  /* Legacy alias kept for backwards compat — prefer .content-width on new code. */
   .container-max-width {
     @apply mx-auto w-full max-w-300;
+  }
+
+  /* Standalone form containers: Use on auth pages and modal forms. */
+  .form-width {
+    @apply mx-auto w-full max-w-lg;
+  }
+
+  /* Cards and small panels: 384px. */
+  .card-width {
+    @apply mx-auto w-full max-w-[384px];
+  }
+
+  /* Tight containers and narrow sidebars: 320px. */
+  .narrow-width {
+    @apply mx-auto w-full max-w-[320px];
   }
 
   .default-page-max-width {
@@ -239,7 +312,7 @@
 }
 
 /* Tailwindcss Size Guide */
-/* 
+/*
 text-xs    | 0.833rem   | 10px
 text-sm    | 0.0.857rem   | 12px
 text-md    | 0.875rem  | 14px

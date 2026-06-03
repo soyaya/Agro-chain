@@ -38,7 +38,7 @@ export function PlatformSettingsProvider({ children }: { children: ReactNode }) 
         setIsLoaded(true);
       })
       .catch(() => {
-        // Backend not yet available — fallback prices remain active
+        // Backend not yet available - fallback prices remain active
         setIsLoaded(true);
       });
   }, []);

@@ -9,9 +9,11 @@ This directory contains modular, type-safe profile components that can be reused
 ## Components
 
 ### ProfileAvatar
+
 Displays user profile image with optional edit functionality.
 
 **Props:**
+
 ```typescript
 interface ProfileAvatarProps {
   imageUrl?: string;
@@ -23,6 +25,7 @@ interface ProfileAvatarProps {
 ```
 
 **Usage:**
+
 ```typescript
 <ProfileAvatar
   imageUrl={user.profileImage}
@@ -34,6 +37,7 @@ interface ProfileAvatarProps {
 ```
 
 **Features:**
+
 - Three sizes: sm (64px), md (96px), lg (128px)
 - Shows initials when no image
 - Hover animation with scale effect
@@ -43,9 +47,11 @@ interface ProfileAvatarProps {
 ---
 
 ### ProfileDetails
+
 Displays user profile information in a grid layout.
 
 **Props:**
+
 ```typescript
 interface ProfileDetailsProps {
   profile: FarmerProfile;
@@ -53,11 +59,13 @@ interface ProfileDetailsProps {
 ```
 
 **Usage:**
+
 ```typescript
 <ProfileDetails profile={farmerProfile} />
 ```
 
 **Features:**
+
 - Responsive grid (1 column mobile, 2 columns desktop)
 - Icon-based detail items
 - Staggered fade-in animation
@@ -66,9 +74,11 @@ interface ProfileDetailsProps {
 ---
 
 ### FarmerProfileForm
+
 Complete form for creating/editing farmer profiles.
 
 **Props:**
+
 ```typescript
 interface FarmerProfileFormProps {
   initialData?: FarmerProfile;
@@ -78,6 +88,7 @@ interface FarmerProfileFormProps {
 ```
 
 **Usage:**
+
 ```typescript
 <FarmerProfileForm
   initialData={existingProfile}
@@ -87,6 +98,7 @@ interface FarmerProfileFormProps {
 ```
 
 **Features:**
+
 - Full form validation with Zod
 - React Hook Form integration
 - Profile image upload with preview
@@ -96,6 +108,7 @@ interface FarmerProfileFormProps {
 - Error handling with toast notifications
 
 **Validation Rules:**
+
 - Full name: min 3 characters
 - Phone: Nigerian format (+234 or 0)
 - Email: valid email format
@@ -109,9 +122,11 @@ interface FarmerProfileFormProps {
 ## Page Implementation
 
 ### Farmer Profile Page
+
 Located at: `/farmer-dashboard/profile`
 
 **Features:**
+
 - View/Edit mode toggle
 - Animated transitions between modes
 - Profile avatar with cluster farmer badge
@@ -121,6 +136,7 @@ Located at: `/farmer-dashboard/profile`
 - Success/error notifications
 
 **State Management:**
+
 ```typescript
 const [isEditing, setIsEditing] = useState(false);
 const [profile, setProfile] = useState<FarmerProfile | null>(null);
@@ -134,17 +150,20 @@ const [isLoading, setIsLoading] = useState(false);
 All components follow the existing design system:
 
 **Spacing:**
+
 - `gap-(--gap-base)` - 1rem
 - `gap-(--gap-lg)` - 2rem
 - `gap-(--section-gap)` - 3rem
 
 **Colors:**
-- `text-(--heading-colour)` - Headings
-- `text-(--text-colour)` - Body text
-- `bg-(--gray-bg)` - Background
-- `bg-(--theme-green-dark)` - Primary buttons
+
+- `text-heading-colour` - Headings
+- `text-text-colour` - Body text
+- `bg-gray-bg` - Background
+- `bg-theme-green-dark` - Primary buttons
 
 **Typography:**
+
 - `font-ubuntu` - Headings
 - `font-roboto-slab` - Body text
 
@@ -155,11 +174,13 @@ All components follow the existing design system:
 All components use Framer Motion for smooth animations:
 
 **Variants Used:**
+
 - `FADE_IN_VARIANT` - Opacity fade
 - `SLIDE_UP_VARIANT` - Slide from bottom
 - `STAGGER_CONTAINER_VARIANT` - Staggered children
 
 **Example:**
+
 ```typescript
 <motion.div
   initial="hidden"
@@ -177,10 +198,7 @@ All components use Framer Motion for smooth animations:
 All components are fully typed with TypeScript:
 
 ```typescript
-import type {
-  FarmerProfile,
-  FarmerProfileFormData,
-} from "~/types";
+import type { FarmerProfile, FarmerProfileFormData } from "~/types";
 ```
 
 No `any` types are used. All props are strictly typed.
@@ -192,12 +210,14 @@ No `any` types are used. All props are strictly typed.
 These components can be adapted for other user roles:
 
 ### For Buyer Profile:
+
 1. Create `BuyerProfileForm.tsx` using same structure
 2. Replace `FarmerProfile` with `BuyerProfile` type
 3. Adjust form fields for buyer-specific data
 4. Reuse `ProfileAvatar` and `ProfileDetails` (with type adjustments)
 
 ### For Cluster Farmer:
+
 1. Extend `FarmerProfileForm` with additional fields
 2. Add business name, CAC number, warehouse location
 3. Reuse all existing components

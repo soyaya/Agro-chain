@@ -46,7 +46,7 @@ const allImageEntries: ImageEntry[] = [
   ...extractImageUrls(marketplaceIdMetadata as AnyMetadata, "marketplace/[id] layout"),
 ];
 
-describe("Image paths — Property 4: OG and Twitter image paths are relative", () => {
+describe("Image paths - Property 4: OG and Twitter image paths are relative", () => {
   it("all OG and Twitter image urls start with '/' and not 'http'", () => {
     // Ensure we have at least some image entries to test
     expect(allImageEntries.length).toBeGreaterThan(0);

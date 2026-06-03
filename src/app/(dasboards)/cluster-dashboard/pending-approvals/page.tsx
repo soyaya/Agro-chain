@@ -51,15 +51,13 @@ function RejectModal({ isOpen, onClose, onConfirm }: RejectModalProps) {
             <div className="flex flex-col gap-(--gap-base)">
               <div className="flex items-center gap-(--gap-base)">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                  <XCircle size={24} className="text-(--error-red)" />
+                  <XCircle size={24} className="text-error-red" />
                 </div>
                 <div>
-                  <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                  <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                     Reject Listing
                   </h3>
-                  <p className="text-sm text-(--text-colour)">
-                    Please provide a reason for rejection
-                  </p>
+                  <p className="text-text-colour text-sm">Please provide a reason for rejection</p>
                 </div>
               </div>
 
@@ -67,13 +65,13 @@ function RejectModal({ isOpen, onClose, onConfirm }: RejectModalProps) {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Enter rejection reason..."
-                className="font-roboto-slab h-32 w-full rounded-2xl border border-(--border-input) p-(--space-md) text-base text-(--text-colour) transition outline-none focus:border-(--border-gray)"
+                className="font-roboto-slab focus:border-gray-border text-text-colour border-input-border h-32 w-full rounded-2xl border p-(--space-md) text-base transition outline-none"
               />
 
               <div className="grid grid-cols-2 gap-(--gap-base)">
                 <button
                   onClick={onClose}
-                  className="flex h-12 items-center justify-center rounded-full border border-(--border-gray) text-sm font-medium text-(--text-colour) transition hover:bg-(--gray-bg)"
+                  className="border-gray-border text-text-colour hover:bg-gray-bg flex h-12 items-center justify-center rounded-full border text-sm font-medium transition"
                 >
                   Cancel
                 </button>
@@ -183,8 +181,8 @@ export default function PendingApprovalsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-(--gray-bg)">
-      <div className="container-max-width px-(--section-px) py-(--section-py) sm:px-(--section-px-sm) sm:py-(--section-py-sm) lg:px-(--section-px-lg) lg:py-(--section-py-lg)">
+    <div className="bg-gray-bg min-h-screen">
+      <div className="container-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-(--section-py-lg)">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -193,10 +191,10 @@ export default function PendingApprovalsPage() {
         >
           {/* Header */}
           <motion.div variants={FADE_IN_VARIANT} className="flex flex-col gap-(--gap-sm)">
-            <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) lg:text-4xl">
+            <h1 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
               Pending Approvals
             </h1>
-            <p className="font-roboto-slab text-(--text-colour)">
+            <p className="font-roboto-slab text-text-colour">
               Review and approve farmer supply listings
             </p>
           </motion.div>
@@ -220,12 +218,12 @@ export default function PendingApprovalsPage() {
 
           {/* Listings Grid */}
           {loading ? (
-            <div className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap) text-center">
-              <p className="text-(--text-colour)">Loading pending approvals...</p>
+            <div className="border-gray-border rounded-3xl border bg-(--white) p-(--section-gap) text-center">
+              <p className="text-text-colour">Loading pending approvals...</p>
             </div>
           ) : errorMessage ? (
-            <div className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap) text-center">
-              <p className="text-(--error-red)">{errorMessage}</p>
+            <div className="border-gray-border rounded-3xl border bg-(--white) p-(--section-gap) text-center">
+              <p className="text-error-red">{errorMessage}</p>
             </div>
           ) : listings.length > 0 ? (
             <motion.div
@@ -245,14 +243,14 @@ export default function PendingApprovalsPage() {
           ) : (
             <motion.div
               variants={FADE_IN_VARIANT}
-              className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+              className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
             >
               <CheckCircle size={48} className="text-green-600" />
               <div className="flex flex-col items-center gap-2 text-center">
-                <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                   All caught up!
                 </h3>
-                <p className="text-(--text-colour)">No pending listings to review at the moment</p>
+                <p className="text-text-colour">No pending listings to review at the moment</p>
               </div>
             </motion.div>
           )}

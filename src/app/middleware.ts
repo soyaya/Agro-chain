@@ -6,7 +6,7 @@ import { verifyToken } from '~/lib/auth-sdk';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Public routes – allow
+  // Public routes - allow
   if (pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/register')) {
     return NextResponse.next();
   }

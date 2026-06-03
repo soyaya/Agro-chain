@@ -41,7 +41,7 @@ type RecentListing = {
   createdAt: Date;
 };
 
-// Mock data — replace with API call using params.id
+// Mock data - replace with API call using params.id
 const mockFarmerData: Record<string, FarmerWithStats> = {
   "farmer-1": {
     id: "farmer-1",
@@ -68,14 +68,35 @@ const mockFarmerData: Record<string, FarmerWithStats> = {
     createdAt: new Date("2024-06-01"),
     updatedAt: new Date("2026-03-10"),
     recentListings: [
-      { id: "l-1", fishType: "Catfish", totalAvailableKg: 2000, status: "approved", createdAt: new Date("2026-03-05") },
-      { id: "l-2", fishType: "Catfish", totalAvailableKg: 1500, status: "pending", createdAt: new Date("2026-03-10") },
-      { id: "l-3", fishType: "Catfish", totalAvailableKg: 1000, status: "rejected", createdAt: new Date("2026-02-20") },
+      {
+        id: "l-1",
+        fishType: "Catfish",
+        totalAvailableKg: 2000,
+        status: "approved",
+        createdAt: new Date("2026-03-05"),
+      },
+      {
+        id: "l-2",
+        fishType: "Catfish",
+        totalAvailableKg: 1500,
+        status: "pending",
+        createdAt: new Date("2026-03-10"),
+      },
+      {
+        id: "l-3",
+        fishType: "Catfish",
+        totalAvailableKg: 1000,
+        status: "rejected",
+        createdAt: new Date("2026-02-20"),
+      },
     ],
   },
 };
 
-const STATUS_CONFIG: Record<ListingStatus, { icon: React.ReactNode; className: string; label: string }> = {
+const STATUS_CONFIG: Record<
+  ListingStatus,
+  { icon: React.ReactNode; className: string; label: string }
+> = {
   approved: {
     icon: <CheckCircle2 size={14} />,
     className: "bg-green-50 text-green-700 border-green-200",
@@ -118,14 +139,16 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
       >
         <button
           onClick={() => router.back()}
-          className="flex w-fit items-center gap-2 font-roboto-slab text-sm text-(--text-colour) transition hover:text-(--heading-colour)"
+          className="font-roboto-slab text-text-colour hover:text-heading-colour flex w-fit items-center gap-2 text-sm transition"
         >
           <ArrowLeft size={18} />
           Back to Farmers
         </button>
         <div>
-          <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">Farmer Profile</h1>
-          <p className="font-roboto-slab text-(--text-colour)">Full profile details for this cluster farmer</p>
+          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Farmer Profile</h1>
+          <p className="font-roboto-slab text-text-colour">
+            Full profile details for this cluster farmer
+          </p>
         </div>
       </motion.div>
 
@@ -136,58 +159,74 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
         animate="visible"
         className="grid grid-cols-1 gap-(--gap-lg) lg:grid-cols-3"
       >
-        {/* Left — avatar + quick stats */}
+        {/* Left - avatar + quick stats */}
         <motion.div
           variants={FADE_IN_VARIANT}
-          className="flex flex-col items-center gap-(--space-lg) rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm text-center"
+          className="border-input-border flex flex-col items-center gap-(--space-lg) rounded-2xl border bg-(--white) p-(--space-xl) text-center shadow-sm"
         >
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-green-100 font-ubuntu text-3xl font-bold text-green-700">
+          <div className="font-ubuntu flex h-24 w-24 items-center justify-center rounded-full bg-green-100 text-3xl font-bold text-green-700">
             {initials}
           </div>
           <div>
-            <h2 className="font-ubuntu text-2xl font-bold text-(--heading-colour)">{farmer.fullName}</h2>
+            <h2 className="font-ubuntu text-heading-colour text-2xl font-bold">
+              {farmer.fullName}
+            </h2>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-0.5 text-xs font-medium text-green-700">
               <Fish size={12} />
               {farmer.fishType} Farmer
             </span>
           </div>
 
-          <div className="w-full rounded-2xl bg-(--gray-bg) p-(--space-lg)">
+          <div className="bg-gray-bg w-full rounded-2xl p-(--space-lg)">
             <div className="grid grid-cols-2 gap-(--gap-base)">
               {[
-                { label: "Total Listings", value: farmer.totalListings, color: "text-(--heading-colour)" },
+                {
+                  label: "Total Listings",
+                  value: farmer.totalListings,
+                  color: "text-heading-colour",
+                },
                 { label: "Approved", value: farmer.approvedListings, color: "text-green-600" },
                 { label: "Pending", value: farmer.pendingListings, color: "text-yellow-600" },
                 { label: "Rejected", value: farmer.rejectedListings, color: "text-red-500" },
               ].map(({ label, value, color }) => (
                 <div key={label} className="text-center">
                   <p className={`font-ubuntu text-2xl font-bold ${color}`}>{value}</p>
-                  <p className="font-roboto-slab text-xs text-(--text-colour)">{label}</p>
+                  <p className="font-roboto-slab text-text-colour text-xs">{label}</p>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="w-full space-y-2 text-left">
-            <div className="flex items-center gap-2 text-sm text-(--text-colour)">
+            <div className="text-text-colour flex items-center gap-2 text-sm">
               <Calendar size={15} className="shrink-0 text-gray-400" />
-              <span>Member since {farmer.memberSince.toLocaleDateString("en-NG", { month: "long", year: "numeric" })}</span>
+              <span>
+                Member since{" "}
+                {farmer.memberSince.toLocaleDateString("en-NG", { month: "long", year: "numeric" })}
+              </span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-(--text-colour)">
+            <div className="text-text-colour flex items-center gap-2 text-sm">
               <Clock size={15} className="shrink-0 text-gray-400" />
-              <span>Last active {farmer.lastActive.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</span>
+              <span>
+                Last active{" "}
+                {farmer.lastActive.toLocaleDateString("en-NG", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
             </div>
           </div>
         </motion.div>
 
-        {/* Right — details */}
+        {/* Right - details */}
         <motion.div
           variants={FADE_IN_VARIANT}
           className="flex flex-col gap-(--gap-lg) lg:col-span-2"
         >
           {/* Personal & Farm Info */}
-          <div className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm">
-            <h3 className="font-ubuntu mb-(--space-lg) text-lg font-semibold text-(--heading-colour)">
+          <div className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm">
+            <h3 className="font-ubuntu text-heading-colour mb-(--space-lg) text-lg font-semibold">
               Farm & Personal Information
             </h3>
             <div className="grid grid-cols-1 gap-(--space-lg) sm:grid-cols-2">
@@ -196,27 +235,44 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                 { icon: <Phone size={16} />, label: "Phone", value: farmer.phoneNumber },
                 { icon: <Mail size={16} />, label: "Email", value: farmer.email },
                 { icon: <Building2 size={16} />, label: "Farm Name", value: farmer.farmName },
-                { icon: <MapPin size={16} />, label: "Farm Address", value: farmer.farmAddress, full: true },
+                {
+                  icon: <MapPin size={16} />,
+                  label: "Farm Address",
+                  value: farmer.farmAddress,
+                  full: true,
+                },
                 { icon: <MapPinned size={16} />, label: "State", value: farmer.state },
-                { icon: <MapPinned size={16} />, label: "Local Government", value: farmer.localGovernment },
+                {
+                  icon: <MapPinned size={16} />,
+                  label: "Local Government",
+                  value: farmer.localGovernment,
+                },
                 { icon: <Fish size={16} />, label: "Fish Type", value: farmer.fishType },
-                { icon: <Package size={16} />, label: "Farming Capacity", value: `${farmer.farmingCapacityKg.toLocaleString()} kg` },
-                { icon: <TrendingUp size={16} />, label: "Experience", value: `${farmer.yearsOfExperience} years` },
+                {
+                  icon: <Package size={16} />,
+                  label: "Farming Capacity",
+                  value: `${farmer.farmingCapacityKg.toLocaleString()} kg`,
+                },
+                {
+                  icon: <TrendingUp size={16} />,
+                  label: "Experience",
+                  value: `${farmer.yearsOfExperience} years`,
+                },
               ].map(({ icon, label, value, full }) => (
                 <div key={label} className={full ? "sm:col-span-2" : ""}>
-                  <p className="font-roboto-slab mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <p className="font-roboto-slab mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-gray-500 uppercase">
                     {icon}
                     {label}
                   </p>
-                  <p className="font-roboto-slab text-sm text-(--heading-colour)">{value}</p>
+                  <p className="font-roboto-slab text-heading-colour text-sm">{value}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Recent Listings */}
-          <div className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm">
-            <h3 className="font-ubuntu mb-(--space-lg) text-lg font-semibold text-(--heading-colour)">
+          <div className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm">
+            <h3 className="font-ubuntu text-heading-colour mb-(--space-lg) text-lg font-semibold">
               Recent Listings
             </h3>
             {farmer.recentListings.length > 0 ? (
@@ -226,17 +282,23 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                   return (
                     <div
                       key={listing.id}
-                      className="flex items-center justify-between rounded-xl border border-(--border-gray) p-(--space-md)"
+                      className="border-gray-border flex items-center justify-between rounded-xl border p-(--space-md)"
                     >
                       <div className="flex flex-col gap-0.5">
-                        <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
-                          {listing.fishType} — {listing.totalAvailableKg.toLocaleString()} kg
+                        <p className="font-roboto-slab text-heading-colour text-sm font-medium">
+                          {listing.fishType} - {listing.totalAvailableKg.toLocaleString()} kg
                         </p>
-                        <p className="font-roboto-slab text-xs text-(--text-colour)">
-                          {listing.createdAt.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}
+                        <p className="font-roboto-slab text-text-colour text-xs">
+                          {listing.createdAt.toLocaleDateString("en-NG", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </p>
                       </div>
-                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${config.className}`}>
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${config.className}`}
+                      >
                         {config.icon}
                         {config.label}
                       </span>
@@ -245,7 +307,7 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                 })}
               </div>
             ) : (
-              <p className="font-roboto-slab text-sm text-(--text-colour)">No listings yet.</p>
+              <p className="font-roboto-slab text-text-colour text-sm">No listings yet.</p>
             )}
           </div>
         </motion.div>

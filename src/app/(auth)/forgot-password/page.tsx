@@ -1,13 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "~/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "~/components/ui/input-otp";
 import { cn } from "~/lib/utils";
 
 const emailSchema = z.object({
@@ -16,13 +22,15 @@ const emailSchema = z.object({
 
 type EmailForm = z.infer<typeof emailSchema>;
 
-const resetSchema = z.object({
-  newPassword: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Confirm your password"),
-}).refine((values) => values.newPassword === values.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const resetSchema = z
+  .object({
+    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Confirm your password"),
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type ResetForm = z.infer<typeof resetSchema>;
 
@@ -168,8 +176,14 @@ export default function ForgotPasswordPage() {
         Forgot Password
       </h2>
 
+      <AnimatePresence mode="wait">
       {step === 1 ? (
-        <form
+        <motion.form
+          key="step-1"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -30 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           onSubmit={handleSubmit(onSendOtp)}
           className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
         >
@@ -185,13 +199,18 @@ export default function ForgotPasswordPage() {
           <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
             Send OTP
           </SubmitPrimaryButton>
-        </form>
+        </motion.form>
       ) : (
-        <form
+        <motion.form
+          key="step-2"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -30 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           onSubmit={handleResetSubmit(handleResetPassword)}
           className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
         >
-          <p className="text-center text-sm text-(--text-colour)">
+          <p className="text-text-colour text-center text-sm">
             Enter the OTP sent to {emailAddress}
           </p>
           <div className="flex flex-col items-center gap-6">
@@ -238,7 +257,7 @@ export default function ForgotPasswordPage() {
             Reset Password
           </SubmitPrimaryButton>
 
-          <p className="text-center text-sm text-(--text-colour)">
+          <p className="text-text-colour text-center text-sm">
             Didn&apos;t receive a code?{" "}
             <button
               type="button"
@@ -253,15 +272,16 @@ export default function ForgotPasswordPage() {
                   : "Resend OTP"}
             </button>
           </p>
-          <p className="text-center text-xs text-(--text-colour)">
+          <p className="text-text-colour text-center text-xs">
             {resendLocked
               ? "You’ve reached the resend limit. Try again after 24 hours."
               : `${Math.max(0, 2 - resendAttempts)} resend${
                   2 - resendAttempts === 1 ? "" : "s"
                 } left`}
           </p>
-        </form>
+        </motion.form>
       )}
+      </AnimatePresence>
     </div>
   );
 }

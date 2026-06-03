@@ -5,6 +5,7 @@ Supply listing components for the AgroChainMarketPlace farmer → cluster farmer
 ## Overview
 
 This directory contains modular, type-safe listing components that handle the complete supply listing workflow:
+
 1. Farmer creates listing
 2. Farmer submits for approval
 3. Cluster farmer reviews listing
@@ -14,9 +15,11 @@ This directory contains modular, type-safe listing components that handle the co
 ## Components
 
 ### PackagingSelector
+
 Interactive component for configuring packaging options.
 
 **Props:**
+
 ```typescript
 interface PackagingSelectorProps {
   totalKg: number;
@@ -27,6 +30,7 @@ interface PackagingSelectorProps {
 ```
 
 **Usage:**
+
 ```typescript
 <PackagingSelector
   totalKg={2000}
@@ -37,6 +41,7 @@ interface PackagingSelectorProps {
 ```
 
 **Features:**
+
 - Standard weight options (1kg, 2kg, 3kg, 5kg, 10kg, 25kg, 50kg)
 - Price per unit input
 - Auto-calculate quantity based on total kg
@@ -46,6 +51,7 @@ interface PackagingSelectorProps {
 - Validation for remaining kg
 
 **Packaging Logic:**
+
 ```typescript
 // If total = 2000kg and weight = 5kg
 quantity = Math.floor(2000 / 5) = 400 units
@@ -60,9 +66,11 @@ quantity = Math.floor(2000 / 5) = 400 units
 ---
 
 ### ListingCard
+
 Display component for supply listings with status and actions.
 
 **Props:**
+
 ```typescript
 interface ListingCardProps {
   listing: FarmerSupplyListing;
@@ -74,6 +82,7 @@ interface ListingCardProps {
 ```
 
 **Usage:**
+
 ```typescript
 // Farmer view (no actions)
 <ListingCard
@@ -91,6 +100,7 @@ interface ListingCardProps {
 ```
 
 **Features:**
+
 - Status badge (pending, approved, rejected)
 - Fish type and farmer name
 - Total available kg
@@ -103,6 +113,7 @@ interface ListingCardProps {
 - Click to view details
 
 **Status Colors:**
+
 - Pending: Yellow
 - Approved: Green
 - Rejected: Red
@@ -110,9 +121,11 @@ interface ListingCardProps {
 ---
 
 ### SupplyListingForm
+
 Complete form for creating/editing supply listings.
 
 **Props:**
+
 ```typescript
 interface SupplyListingFormProps {
   initialData?: FarmerSupplyListing;
@@ -122,6 +135,7 @@ interface SupplyListingFormProps {
 ```
 
 **Usage:**
+
 ```typescript
 <SupplyListingForm
   initialData={existingListing}
@@ -131,6 +145,7 @@ interface SupplyListingFormProps {
 ```
 
 **Features:**
+
 - Fish type dropdown (from constants)
 - Harvest date picker
 - Total available kg input (min 1000kg)
@@ -142,6 +157,7 @@ interface SupplyListingFormProps {
 - Error handling with toast notifications
 
 **Validation Rules:**
+
 - Fish type: required
 - Harvest date: required
 - Total kg: min 1000kg
@@ -152,9 +168,11 @@ interface SupplyListingFormProps {
 ## Pages
 
 ### Farmer Listings Page
+
 `/farmers-dashboard/listings`
 
 **Features:**
+
 - View all listings (pending, approved, rejected)
 - Filter by status
 - Status count cards
@@ -164,6 +182,7 @@ interface SupplyListingFormProps {
 - Click card to view details
 
 **Status Filters:**
+
 - All listings
 - Pending (awaiting approval)
 - Approved (on marketplace)
@@ -172,9 +191,11 @@ interface SupplyListingFormProps {
 ---
 
 ### Create Listing Page
+
 `/farmers-dashboard/listings/create`
 
 **Features:**
+
 - Back navigation
 - Complete listing form
 - Submission flow
@@ -185,9 +206,11 @@ interface SupplyListingFormProps {
 ---
 
 ### Pending Approvals Page (Cluster Farmer)
+
 `/cluster-dashboard/pending-approvals`
 
 **Features:**
+
 - View all pending farmer listings
 - Approve/Reject actions on each card
 - Rejection modal with reason input
@@ -197,6 +220,7 @@ interface SupplyListingFormProps {
 - Toast notifications
 
 **Approval Flow:**
+
 1. Cluster farmer views pending listing
 2. Reviews details (fish type, quantity, packaging, price)
 3. Clicks "Approve" or "Reject"
@@ -209,6 +233,7 @@ interface SupplyListingFormProps {
 ## Workflow
 
 ### Farmer Submission Flow
+
 ```
 1. Farmer navigates to /farmers-dashboard/listings/create
 2. Fills out form:
@@ -223,18 +248,19 @@ interface SupplyListingFormProps {
 ```
 
 ### Cluster Farmer Approval Flow
+
 ```
 1. Cluster farmer navigates to /cluster-dashboard/pending-approvals
 2. Views pending farmer listings
 3. Reviews listing details
 4. Approves or rejects:
-   
+
    If APPROVE:
    - Listing status = "approved"
    - Listing owner = cluster farmer
    - Listing visible on marketplace
    - Farmer notified
-   
+
    If REJECT:
    - Modal opens for rejection reason
    - Listing status = "rejected"
@@ -249,6 +275,7 @@ interface SupplyListingFormProps {
 All components follow the existing design system:
 
 **Spacing:**
+
 - `gap-(--gap-base)` - 1rem
 - `gap-(--gap-lg)` - 2rem
 - `gap-(--section-gap)` - 3rem
@@ -256,19 +283,21 @@ All components follow the existing design system:
 - `p-(--space-xl)` - 2rem
 
 **Colors:**
-- `text-(--heading-colour)` - Headings
-- `text-(--text-colour)` - Body text
-- `bg-(--gray-bg)` - Background
-- `bg-(--theme-green-dark)` - Primary buttons
-- `border-(--border-gray)` - Borders
+
+- `text-heading-colour` - Headings
+- `text-text-colour` - Body text
+- `bg-gray-bg` - Background
+- `bg-theme-green-dark` - Primary buttons
+- `border-gray-border` - Borders
 
 **Status Colors (from constants):**
+
 ```typescript
 STATUS_COLORS = {
   pending: "bg-yellow-100 text-yellow-800",
   approved: "bg-green-100 text-green-800",
   rejected: "bg-red-100 text-red-800",
-}
+};
 ```
 
 ---
@@ -278,17 +307,20 @@ STATUS_COLORS = {
 All components use Framer Motion:
 
 **Variants Used:**
+
 - `FADE_IN_VARIANT` - Opacity fade
 - `SCALE_IN_VARIANT` - Scale with fade
 - `STAGGER_CONTAINER_VARIANT` - Staggered children
 
 **Card Hover:**
+
 ```typescript
 whileHover={{ scale: 1.02, y: -4 }}
 transition={{ duration: 0.2 }}
 ```
 
 **List Animations:**
+
 ```typescript
 <AnimatePresence>
   {items.map(item => (
@@ -327,6 +359,7 @@ No `any` types used. All props strictly typed.
 Replace mock data with actual API calls:
 
 ### Create Listing
+
 ```typescript
 const handleSubmit = async (data: SupplyListingFormData) => {
   const response = await fetch("/api/farmer/listings", {
@@ -343,6 +376,7 @@ const handleSubmit = async (data: SupplyListingFormData) => {
 ```
 
 ### Approve Listing
+
 ```typescript
 const handleApprove = async (id: string) => {
   const response = await fetch(`/api/cluster/listings/${id}/approve`, {
@@ -357,6 +391,7 @@ const handleApprove = async (id: string) => {
 ```
 
 ### Reject Listing
+
 ```typescript
 const handleReject = async (id: string, reason: string) => {
   const response = await fetch(`/api/cluster/listings/${id}/reject`, {

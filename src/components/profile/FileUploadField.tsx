@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { Upload as UploadIcon, X, Dot, CheckCircle2, Trash2, Loader, FileUp } from 'lucide-react';
-import { cn } from '~/lib/utils';
+import { useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import { Upload as UploadIcon, X, Dot, CheckCircle2, Trash2, Loader, FileUp } from "lucide-react";
+import { cn } from "~/lib/utils";
 
 type FileUploadFieldProps = {
   label: string;
@@ -19,7 +19,7 @@ type FileUploadFieldProps = {
 
 export function FileUploadField({
   label,
-  accept = '.pdf,.jpg,.jpeg,.png',
+  accept = ".pdf,.jpg,.jpeg,.png",
   maxSizeMB = 5,
   required = false,
   isOpen,
@@ -27,7 +27,7 @@ export function FileUploadField({
   onFileChange,
   onUploadComplete,
 }: FileUploadFieldProps) {
-  const [state, setState] = useState<'idle' | 'uploading' | 'success'>('idle');
+  const [state, setState] = useState<"idle" | "uploading" | "success">("idle");
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -36,15 +36,15 @@ export function FileUploadField({
   const openFileDialog = () => fileInputRef.current?.click();
 
   const formattedTypes = accept
-    .split(',')
-    .map((ext) => ext.replace('.', '').toUpperCase())
-    .join(', ');
+    .split(",")
+    .map((ext) => ext.replace(".", "").toUpperCase())
+    .join(", ");
 
-  const formatSize = (bytes: number) => (bytes / 1024).toFixed(0) + 'KB';
+  const formatSize = (bytes: number) => (bytes / 1024).toFixed(0) + "KB";
 
   const reset = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setState('idle');
+    setState("idle");
     setFile(null);
     setProgress(0);
     setError(null);
@@ -67,7 +67,7 @@ export function FileUploadField({
 
       if (isOpen) onToggle();
 
-      setState('uploading');
+      setState("uploading");
       let pct = 0;
       const interval = setInterval(() => {
         pct += Math.random() * 15 + 5;
@@ -75,7 +75,7 @@ export function FileUploadField({
           clearInterval(interval);
           setProgress(100);
           setTimeout(() => {
-            setState('success');
+            setState("success");
             onUploadComplete?.(f);
           }, 400);
         } else {
@@ -101,11 +101,11 @@ export function FileUploadField({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => {
-              if (state !== 'uploading') onToggle();
+              if (state !== "uploading") onToggle();
             }}
             className={cn(
-              'relative cursor-pointer overflow-hidden rounded-lg border border-(--border-input) shadow-sm transition-all duration-300 ease-in-out hover:shadow-md',
-              state === 'success' ? 'bg-green-50/40' : 'bg-(--white)',
+              "border-input-border relative cursor-pointer overflow-hidden rounded-lg border shadow-sm transition-all duration-300 ease-in-out hover:shadow-md",
+              state === "success" ? "bg-green-50/40" : "bg-(--white)",
             )}
           >
             <div className="flex flex-col gap-(--gap-xl) p-(--space-base)">
@@ -115,18 +115,18 @@ export function FileUploadField({
                     <FileUp size={20} className="text-blue-600" />
                   </span>
                   <div className="flex flex-col justify-center gap-0.5">
-                    <p className="font-roboto-slab text-base font-medium text-(--heading-colour)">
+                    <p className="font-roboto-slab text-heading-colour text-base font-medium">
                       {label}
-                      {required && <span className="text-red-500 ml-1">*</span>}
+                      {required && <span className="ml-1 text-red-500">*</span>}
                     </p>
                     <div className="flex h-4 items-center">
-                      {state === 'idle' && (
-                        <span className="font-roboto-slab text-xs text-(--text-colour)">
+                      {state === "idle" && (
+                        <span className="font-roboto-slab text-text-colour text-xs">
                           No file selected
                         </span>
                       )}
-                      {state === 'uploading' && file && (
-                        <div className="flex items-center gap-2 text-xs text-(--text-colour)">
+                      {state === "uploading" && file && (
+                        <div className="text-text-colour flex items-center gap-2 text-xs">
                           <span>
                             {formatSize((file.size * progress) / 100)} of {formatSize(file.size)}
                           </span>
@@ -134,18 +134,18 @@ export function FileUploadField({
                             <Loader
                               strokeWidth={3}
                               size={12}
-                              className="animate-spin text-(--theme-green-dark)"
+                              className="text-theme-green-dark animate-spin"
                             />
                             <span className="font-roboto-slab">Uploading...</span>
                           </span>
                         </div>
                       )}
-                      {state === 'success' && file && (
+                      {state === "success" && file && (
                         <div className="flex items-center gap-2 text-xs">
-                          <span className="font-roboto-slab text-(--text-colour)">
+                          <span className="font-roboto-slab text-text-colour">
                             {formatSize(file.size)}
                           </span>
-                          <Dot className="text-(--text-colour)" />
+                          <Dot className="text-text-colour" />
                           <span className="flex items-center gap-1 font-medium text-green-600">
                             <CheckCircle2
                               fill="currentColor"
@@ -161,17 +161,17 @@ export function FileUploadField({
                   </div>
                 </div>
                 <div className="flex items-center gap-(--gap-md)">
-                  {state === 'success' ? (
+                  {state === "success" ? (
                     <button
                       type="button"
                       onClick={reset}
-                      className="p-(--space-sm) text-gray-500 cursor-pointer ease-in-out transition-all duration-300 hover:text-(--error-red)"
+                      className="hover:text-error-red cursor-pointer p-(--space-sm) text-gray-500 transition-all duration-300 ease-in-out"
                     >
                       <Trash2 size={18} />
                     </button>
                   ) : (
-                    state !== 'uploading' && (
-                      <div className="flex items-center gap-(--gap-sm) rounded-xl border border-(--border-input) bg-gray-50 px-(--space-sm) py-1.5 text-(--heading-colour) shadow-sm">
+                    state !== "uploading" && (
+                      <div className="text-heading-colour border-input-border flex items-center gap-(--gap-sm) rounded-xl border bg-gray-50 px-(--space-sm) py-1.5 shadow-sm">
                         <UploadIcon size={18} strokeWidth={3} />
                         <span className="font-roboto-slab text-sm font-semibold">Upload</span>
                       </div>
@@ -179,14 +179,14 @@ export function FileUploadField({
                   )}
                 </div>
               </div>
-              {state === 'uploading' && (
+              {state === "uploading" && (
                 <div className="relative">
                   <div className="absolute bottom-0 left-0 h-1 w-full rounded-full bg-gray-200">
                     <motion.div
-                      className="h-full rounded-full bg-(--theme-green-dark)"
+                      className="bg-theme-green-dark h-full rounded-full"
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
-                      transition={{ ease: 'linear' }}
+                      transition={{ ease: "linear" }}
                     />
                   </div>
                 </div>
@@ -197,18 +197,16 @@ export function FileUploadField({
           <motion.div
             key="expanded"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             className="flex flex-col gap-(--space-sm) rounded-xl"
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-ubuntu font-semibold text-(--heading-colour)">
-                Upload {label}
-              </h3>
+              <h3 className="font-ubuntu text-heading-colour font-semibold">Upload {label}</h3>
               <button
                 type="button"
                 onClick={onToggle}
-                className="cursor-pointer text-(--text-colour) ease-in-out transition-all duration-300 hover:text-(--black)"
+                className="text-text-colour cursor-pointer transition-all duration-300 ease-in-out hover:text-(--black)"
               >
                 <X size={16} />
               </button>
@@ -217,29 +215,29 @@ export function FileUploadField({
               onDrop={onDrop}
               onDragOver={(e) => e.preventDefault()}
               onClick={openFileDialog}
-              className="cursor-pointer rounded-lg border-2 border-dashed border-(--border-input) bg-(--white) p-(--space-3xl) text-center shadow-sm ease-in-out transition-all duration-300 hover:border-gray-400"
+              className="border-input-border cursor-pointer rounded-lg border-2 border-dashed bg-(--white) p-(--space-3xl) text-center shadow-sm transition-all duration-300 ease-in-out hover:border-gray-400"
             >
-              {state === 'uploading' ? (
+              {state === "uploading" ? (
                 <div className="flex flex-col gap-(--gap-md) py-(--space-base)">
-                  <Loader className="mx-auto h-8 w-8 animate-spin text-(--theme-green-dark)" />
+                  <Loader className="text-theme-green-dark mx-auto h-8 w-8 animate-spin" />
                   <p className="font-roboto-slab text-base font-medium">
                     Uploading... {Math.round(progress)}%
                   </p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-(--gap-md) bg-(--white)">
-                  <FileUp className="mx-auto h-10 w-10 text-(--text-colour)" />
+                  <FileUp className="text-text-colour mx-auto h-10 w-10" />
                   <div className="flex flex-col gap-(--gap-md)">
-                    <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                    <p className="font-roboto-slab text-heading-colour text-sm font-medium">
                       Browse for a file or drag &amp; drop it here
                     </p>
-                    <p className="font-roboto-slab text-xs text-(--text-colour)">
+                    <p className="font-roboto-slab text-text-colour text-xs">
                       {formattedTypes} formats, up to {maxSizeMB}MB
                     </p>
                   </div>
                   <button
                     type="button"
-                    className="mx-auto h-12 w-full max-w-40 rounded-full border border-(--border-gray) bg-(--theme-green-dark) font-ubuntu font-bold text-(--white) shadow-sm cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90"
+                    className="border-gray-border font-ubuntu bg-theme-green-dark mx-auto h-12 w-full max-w-40 cursor-pointer rounded-full border font-bold text-(--white) shadow-sm transition-all duration-300 ease-in-out hover:opacity-90"
                   >
                     Browse for a file
                   </button>
@@ -256,7 +254,7 @@ export function FileUploadField({
           </motion.div>
         )}
       </AnimatePresence>
-      {error && <p className="font-roboto-slab text-xs text-(--error-red)">{error}</p>}
+      {error && <p className="font-roboto-slab text-error-red text-xs">{error}</p>}
     </div>
   );
 }

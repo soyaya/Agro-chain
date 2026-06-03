@@ -39,7 +39,6 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
 
   return (
     <div className="relative min-h-screen w-full bg-gray-50">
-
       {/* Mobile Sidebar Backdrop */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -48,7 +47,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 cursor-pointer z-40 bg-(--black)/50 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-40 cursor-pointer bg-(--black)/50 backdrop-blur-sm lg:hidden"
             aria-hidden="true"
           />
         )}
@@ -69,10 +68,10 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
             )}
           >
             {/* Sidebar Header */}
-            <div className="flex items-center justify-between border-b border-gray-200/50 px-(--space-base) sm:px-(--space-xl) py-(--space-lg)">
+            <div className="flex items-center justify-between border-b border-gray-200/50 px-(--space-base) py-(--space-lg) sm:px-(--space-xl)">
               <Link
                 href="/"
-                className="font-ubuntu text-2xl font-bold text-green-700 hover:text-green-800 transition-colors"
+                className="font-ubuntu text-2xl font-bold text-green-700 transition-colors hover:text-green-800"
                 aria-label="Go to home"
               >
                 AgroChain
@@ -103,7 +102,8 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                   const Icon = link.icon;
                   const isActive = pathname === link.href;
                   const hasSubmenu = link.submenu && link.submenu.length > 0;
-                  const isSubmenuActive = hasSubmenu && link.submenu?.some(subLink => pathname === subLink.href);
+                  const isSubmenuActive =
+                    hasSubmenu && link.submenu?.some((subLink) => pathname === subLink.href);
                   const isParentActive = isActive || isSubmenuActive;
 
                   return (
@@ -114,28 +114,30 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                         className={cn(
                           "font-roboto-slab group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
                           isParentActive
-                            ? "bg-green-700 cursor-default text-white"
-                            : "text-gray-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900",
+                            ? "cursor-default bg-green-700 text-white"
+                            : "cursor-pointer text-gray-700 hover:bg-gray-100 hover:text-gray-900",
                         )}
                         aria-current={isParentActive ? "page" : undefined}
                       >
                         <Icon
                           size={20}
                           className={cn(
-                            isParentActive ? "text-white" : "text-gray-500 group-hover:text-gray-700",
+                            isParentActive
+                              ? "text-white"
+                              : "text-gray-500 group-hover:text-gray-700",
                           )}
                         />
                         <span className="flex-1">{link.label}</span>
                         {isParentActive && <ChevronRight size={16} />}
                       </Link>
-                      
+
                       {/* Submenu */}
                       {hasSubmenu && (
                         <ul className="mt-2 ml-6 space-y-1">
                           {link.submenu?.map((subLink) => {
                             const SubIcon = subLink.icon;
                             const isSubActive = pathname === subLink.href;
-                            
+
                             return (
                               <li key={subLink.href}>
                                 <Link
@@ -144,12 +146,19 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                                   className={cn(
                                     "font-roboto-slab group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
                                     isSubActive
-                                      ? "bg-green-100 text-green-800 cursor-default"
-                                      : "text-gray-600 cursor-pointer hover:bg-gray-50 hover:text-gray-800"
+                                      ? "cursor-default bg-green-100 text-green-800"
+                                      : "cursor-pointer text-gray-600 hover:bg-gray-50 hover:text-gray-800",
                                   )}
                                   aria-current={isSubActive ? "page" : undefined}
                                 >
-                                  <SubIcon size={16} className={cn(isSubActive ? "text-green-700" : "text-gray-400 group-hover:text-gray-600")} />
+                                  <SubIcon
+                                    size={16}
+                                    className={cn(
+                                      isSubActive
+                                        ? "text-green-700"
+                                        : "text-gray-400 group-hover:text-gray-600",
+                                    )}
+                                  />
                                   <span className="flex-1">{subLink.label}</span>
                                   {subLink.badge && (
                                     <span className="rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
@@ -174,7 +183,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                 onClick={handleLogout}
                 className={cn(
                   "font-roboto-slab flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
-                  "text-(--error-red) hover:bg-red-50 hover:text-red-700",
+                  "text-error-red hover:bg-red-50 hover:text-red-700",
                   "focus:ring-1 focus:ring-red-500 focus:ring-offset-2 focus:outline-none",
                 )}
                 aria-label="Logout"
@@ -193,7 +202,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setIsSidebarOpen(true)}
-                    className="rounded-lg p-2 cursor-pointer transition-colors hover:bg-gray-100 lg:hidden"
+                    className="cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-100 lg:hidden"
                     aria-label="Open sidebar"
                   >
                     <Menu size={24} className="text-gray-700" />
@@ -221,7 +230,9 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
 
                     {/* User Name - Hidden on mobile */}
                     <div className="hidden lg:block">
-                      <p className="font-roboto-slab text-sm font-medium text-gray-900">{displayName}</p>
+                      <p className="font-roboto-slab text-sm font-medium text-gray-900">
+                        {displayName}
+                      </p>
                       <p className="font-roboto-slab text-xs text-gray-600">{roleLabel}</p>
                     </div>
                   </div>

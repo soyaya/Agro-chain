@@ -148,7 +148,7 @@ export default function TermsPage() {
             <section className="mb-8">
               <div className="mb-4 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                  <AlertCircle size={20} className="text-(--error-red)" />
+                  <AlertCircle size={20} className="text-error-red" />
                 </div>
                 <h2 className="font-ubuntu text-2xl font-bold text-gray-900">
                   Limitation of Liability

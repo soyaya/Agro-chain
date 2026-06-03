@@ -9,9 +9,11 @@ This directory contains marketplace components that allow buyers to browse appro
 ## Components
 
 ### MarketplaceCard
+
 Display component for marketplace listings with purchase actions.
 
 **Props:**
+
 ```typescript
 interface MarketplaceCardProps {
   listing: MarketplaceListing;
@@ -21,6 +23,7 @@ interface MarketplaceCardProps {
 ```
 
 **Usage:**
+
 ```typescript
 <MarketplaceCard
   listing={listing}
@@ -30,6 +33,7 @@ interface MarketplaceCardProps {
 ```
 
 **Features:**
+
 - Fish type and business name
 - Price range display (lowest - highest)
 - Available quantity
@@ -43,6 +47,7 @@ interface MarketplaceCardProps {
 - Hover animation with scale effect
 
 **Price Display:**
+
 - Shows lowest price prominently
 - Shows range if multiple packaging options
 - Example: ₦1,500 - ₦13,500
@@ -50,9 +55,11 @@ interface MarketplaceCardProps {
 ---
 
 ### MarketplaceFilters
+
 Comprehensive filtering component for marketplace listings.
 
 **Props:**
+
 ```typescript
 interface MarketplaceFiltersProps {
   filters: MarketplaceFilters;
@@ -62,6 +69,7 @@ interface MarketplaceFiltersProps {
 ```
 
 **Usage:**
+
 ```typescript
 <MarketplaceFilters
   filters={filters}
@@ -71,6 +79,7 @@ interface MarketplaceFiltersProps {
 ```
 
 **Features:**
+
 - Search input (with icon)
 - Fish type dropdown
 - State dropdown
@@ -81,6 +90,7 @@ interface MarketplaceFiltersProps {
 - Smooth animations
 
 **Filter Options:**
+
 - Fish Type: All types from constants
 - State: All Nigerian states
 - Price Range: Min and max in Naira
@@ -98,9 +108,11 @@ interface MarketplaceFiltersProps {
 ## Pages
 
 ### Marketplace Page
+
 `/marketplace`
 
 **Features:**
+
 - Header with marketplace icon
 - Stats cards (listings, fish types, states, total kg)
 - Sidebar filters (desktop) / top filters (mobile)
@@ -115,12 +127,14 @@ interface MarketplaceFiltersProps {
 - Click card to view details
 
 **Stats Display:**
+
 - Available Listings count
 - Unique Fish Types count
 - States represented count
 - Total Available kg sum
 
 **Grid Layout:**
+
 ```
 Desktop (lg):
 ┌─────────┬──────────────────────┐
@@ -141,9 +155,11 @@ Mobile:
 ---
 
 ### Listing Detail Page
+
 `/marketplace/[id]`
 
 **Features:**
+
 - Back navigation
 - Listing header (fish type, business name)
 - Details grid (available, harvest date, location, contact)
@@ -156,6 +172,7 @@ Mobile:
 - Responsive layout
 
 **Layout:**
+
 ```
 Desktop:
 ┌────────────────────┬──────────┐
@@ -175,6 +192,7 @@ Mobile:
 ```
 
 **Cart Functionality:**
+
 - Add package to cart
 - Increase/decrease quantity
 - Remove from cart (quantity = 0)
@@ -183,6 +201,7 @@ Mobile:
 - Total weight calculation
 
 **Order Summary:**
+
 - List of cart items
 - Quantity × Price per item
 - Total weight
@@ -195,6 +214,7 @@ Mobile:
 ## Workflow
 
 ### Browse Marketplace
+
 ```
 1. User navigates to /marketplace
 2. Views all approved cluster farmer listings
@@ -208,6 +228,7 @@ Mobile:
 ```
 
 ### View Listing Details
+
 ```
 1. User clicks marketplace card
 2. Navigates to /marketplace/[id]
@@ -221,6 +242,7 @@ Mobile:
 ```
 
 ### Purchase Flow
+
 ```
 1. Add packages to cart
 2. Select delivery option
@@ -236,23 +258,20 @@ Mobile:
 ## Filtering Logic
 
 ### Client-Side Filtering
+
 ```typescript
 const filteredListings = listings.filter((listing) => {
-  if (filters.fishType && listing.fishType !== filters.fishType) 
-    return false;
-  if (filters.state && listing.state !== filters.state) 
-    return false;
-  if (filters.minPrice && listing.pricePerKg < filters.minPrice) 
-    return false;
-  if (filters.maxPrice && listing.pricePerKg > filters.maxPrice) 
-    return false;
-  if (filters.minQuantity && listing.totalAvailableKg < filters.minQuantity)
-    return false;
+  if (filters.fishType && listing.fishType !== filters.fishType) return false;
+  if (filters.state && listing.state !== filters.state) return false;
+  if (filters.minPrice && listing.pricePerKg < filters.minPrice) return false;
+  if (filters.maxPrice && listing.pricePerKg > filters.maxPrice) return false;
+  if (filters.minQuantity && listing.totalAvailableKg < filters.minQuantity) return false;
   return true;
 });
 ```
 
 ### Sorting Logic
+
 ```typescript
 const sortedListings = [...filteredListings].sort((a, b) => {
   const order = filters.sortOrder === "asc" ? 1 : -1;
@@ -276,6 +295,7 @@ const sortedListings = [...filteredListings].sort((a, b) => {
 All components follow the existing design system:
 
 **Spacing:**
+
 - `gap-(--gap-base)` - 1rem
 - `gap-(--gap-lg)` - 2rem
 - `gap-(--section-gap)` - 3rem
@@ -283,14 +303,16 @@ All components follow the existing design system:
 - `p-(--space-xl)` - 2rem
 
 **Colors:**
-- `text-(--heading-colour)` - Headings
-- `text-(--text-colour)` - Body text
-- `bg-(--gray-bg)` - Background
-- `bg-(--theme-green-dark)` - Primary buttons
-- `text-(--theme-green-dark)` - Price highlights
-- `border-(--border-gray)` - Borders
+
+- `text-heading-colour` - Headings
+- `text-text-colour` - Body text
+- `bg-gray-bg` - Background
+- `bg-theme-green-dark` - Primary buttons
+- `text-theme-green-dark` - Price highlights
+- `border-gray-border` - Borders
 
 **Responsive Breakpoints:**
+
 - Mobile: < 768px (1 column)
 - Tablet: 768px - 1024px (2 columns)
 - Desktop: > 1024px (3-4 columns)
@@ -302,18 +324,21 @@ All components follow the existing design system:
 All components use Framer Motion:
 
 **Variants Used:**
+
 - `FADE_IN_VARIANT` - Opacity fade
 - `SCALE_IN_VARIANT` - Scale with fade
 - `SLIDE_UP_VARIANT` - Slide from bottom
 - `STAGGER_CONTAINER_VARIANT` - Staggered children
 
 **Card Hover:**
+
 ```typescript
 whileHover={{ scale: 1.02, y: -4 }}
 transition={{ duration: 0.2 }}
 ```
 
 **Staggered Grid:**
+
 ```typescript
 <motion.div variants={STAGGER_CONTAINER_VARIANT}>
   {listings.map(listing => (
@@ -331,11 +356,7 @@ transition={{ duration: 0.2 }}
 All components are fully typed:
 
 ```typescript
-import type {
-  MarketplaceListing,
-  MarketplaceFilters,
-  PackagingOption,
-} from "~/types";
+import type { MarketplaceListing, MarketplaceFilters, PackagingOption } from "~/types";
 ```
 
 No `any` types used. All props strictly typed.
@@ -347,6 +368,7 @@ No `any` types used. All props strictly typed.
 Replace mock data with actual API calls:
 
 ### Fetch Listings
+
 ```typescript
 const fetchListings = async (filters: MarketplaceFilters) => {
   const queryParams = new URLSearchParams({
@@ -368,6 +390,7 @@ const fetchListings = async (filters: MarketplaceFilters) => {
 ```
 
 ### Fetch Listing Detail
+
 ```typescript
 const fetchListing = async (id: string) => {
   const response = await fetch(`/api/marketplace/${id}`);
@@ -379,6 +402,7 @@ const fetchListing = async (id: string) => {
 ```
 
 ### Create Order
+
 ```typescript
 const createOrder = async (orderData: {
   listingId: string;

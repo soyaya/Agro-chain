@@ -1,271 +1,96 @@
-"use client";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import SectionFAQ from "~/components/SectionFAQ";
+import HeroSection from "~/components/landing/HeroSection";
+import ImpactStatsSection from "~/components/landing/ImpactStatsSection";
+import HowItWorksSection from "~/components/landing/HowItWorksSection";
+import FeaturesSection from "~/components/landing/FeaturesSection";
+import FishCategoriesSection from "~/components/landing/FishCategoriesSection";
+import MarketplacePreviewSection from "~/components/landing/MarketplacePreviewSection";
+import TestimonialsSection from "~/components/landing/TestimonialsSection";
+import CTABannerSection from "~/components/landing/CTABannerSection";
+import { homeFaqs } from "~/models/models";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
-import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
-
-const metadata = {
-  title: "Agro-chain | Connecting Catfish Farmers & Bulk Buyers",
+export const metadata: Metadata = {
+  title: "Nigeria's Catfish Marketplace",
   description:
-    "Agro-chain is a trusted marketplace connecting cluster catfish farmers with verified buyers. Secure payments, transparent pricing, and reliable logistics — all in one platform.",
-
+    "Agro-chain connects verified catfish farmers to bulk buyers across Nigeria. Admin-set pricing, Paystack escrow, and coordinated delivery - no middlemen.",
   keywords: [
-    "catfish marketplace",
-    "catfish farmers",
-    "bulk fish buyers",
+    "catfish marketplace Nigeria",
+    "buy catfish online Nigeria",
+    "sell catfish online",
+    "fresh catfish supply chain",
+    "verified catfish farmers",
+    "bulk catfish buyers Nigeria",
+    "cluster farmers Nigeria",
+    "catfish fingerlings for sale",
+    "table size catfish Nigeria",
+    "jumbo catfish Nigeria",
+    "Paystack catfish payment",
+    "catfish escrow payment",
+    "agro-chain marketplace",
+    "catfish delivery Nigeria",
     "aquaculture Nigeria",
-    "fish supply chain",
-    "cluster farming",
-    "fresh catfish vendors",
   ],
-
-  openGraph: {
-    url: "/",
-    title: "Agro-chain | Farm-to-Buyer Catfish Marketplace",
-    description:
-      "Buy and sell catfish with confidence. We connect cluster farmers to bulk buyers with secure payments and coordinated delivery.",
-    siteName: "Agro-chain",
-    locale: "en_NG",
-    type: "website",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large" as const,
+      "max-snippet": -1,
+    },
   },
-
+  alternates: {
+    canonical: "https://agro-chain-bom-vercel.vercel.app",
+  },
+  openGraph: {
+    type: "website",
+    url: "https://agro-chain-bom-vercel.vercel.app",
+    title: "Agro-chain | Nigeria's Catfish Marketplace",
+    description:
+      "Connecting verified catfish farmers to bulk buyers across Nigeria. Admin-set pricing, Paystack escrow, coordinated delivery.",
+    images: [
+      {
+        url: "/images/og-hero.png",
+        width: 1200,
+        height: 630,
+        alt: "Agro-chain - Nigeria's catfish marketplace",
+      },
+    ],
+  },
   twitter: {
     card: "summary_large_image",
-    title: "Agro-chain | Connecting Farmers to Buyers",
+    title: "Agro-chain | Nigeria's Catfish Marketplace",
     description:
-      "A digital marketplace for cluster catfish farmers and verified buyers. Secure transactions and seamless logistics.",
+      "Connecting verified catfish farmers to bulk buyers across Nigeria.",
+    images: ["/images/og-hero.png"],
   },
-
-  alternates: {
-    canonical: "/",
-  },
-
-  category: "Agriculture",
 };
 
-export default function Home() {
-  const router = useRouter();
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-
-  const steps = [
-    {
-      heading: "Explore",
-      description: "We guarantee total satisfaction",
-    },
-    {
-      heading: "Order It",
-      description:
-        "Welcome! We're here to simplify your life. Sit back, relax, and let's get started.",
-    },
-    {
-      heading: "You Got It",
-      description: "New Users, score big! Grab FREE delivery on us with this exclusive offer!",
-    },
-  ];
-
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const [direction, setDirection] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const headingRef = useRef<HTMLHeadingElement | null>(null);
-
-  const isLastStep = currentStep === steps.length - 1;
-
-  // === Focus on step change
-  useEffect(() => {
-    headingRef.current?.focus();
-  }, [currentStep]);
-
-  // === Handle Enter key press
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && !loading) {
-        e.preventDefault();
-        buttonRef.current?.click();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [loading]);
-
-  const goToStep = useCallback((index: number) => {
-    if (loading || index === currentStep) return;
-
-    setLoading(true);
-    setDirection(index > currentStep ? 1 : -1);
-
-    setTimeout(() => {
-      setCurrentStep(index);
-      setLoading(false);
-    }, 400);
-  }, [loading, currentStep]);
-
-  // === Handle Next
-  const handleNext = useCallback(() => {
-    if (loading) return;
-
-    if (isLastStep) {
-      localStorage.setItem("onboarding-completed", "true");
-      router.push("/authentication");
-      return;
-    }
-
-    goToStep(currentStep + 1);
-  }, [currentStep, goToStep, isLastStep, loading, router]);
-
-  useEffect(() => {
-    if (loading || isLastStep) return;
-
-    const timer = setTimeout(() => {
-      goToStep(currentStep + 1);
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [currentStep, goToStep, loading, isLastStep]);
-
-  useEffect(() => {
-    if (loading || !isLastStep) return;
-
-    const timer = setTimeout(() => {
-      handleNext();
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [handleNext, isLastStep, loading]);
-
-  const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 80 : -80,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      x: direction > 0 ? -80 : 80,
-      opacity: 0,
-    }),
-  };
-
+export default function HomePage() {
   return (
-    <div className="flex h-full w-full overflow-hidden bg-zinc-100" role="application" aria-label="Agro-chain onboarding">
-      <main
-        className="relative flex min-h-screen w-full flex-col items-center justify-center text-center"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {/* Step Content */}
-        <div className="flex flex-1 items-center justify-center" role="region" aria-label="Onboarding content">
-          <div className="relative flex w-full max-w-md flex-col items-center justify-center">
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={currentStep}
-                id={`step-panel-${currentStep}`}
-                role="tabpanel"
-                aria-labelledby={`step-tab-${currentStep}`}
-                aria-live="polite"
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  duration: 0.45,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="flex w-full flex-col gap-6"
-              >
-                <h1
-                  ref={headingRef}
-                  tabIndex={-1}
-                  className="text-3xl font-semibold focus:outline-none sm:text-4xl"
-                  aria-label={`Step ${currentStep + 1} of ${steps.length}: ${steps[currentStep].heading}`}
-                >
-                  {steps[currentStep].heading}
-                </h1>
-
-                <p className="text-lg text-zinc-600" aria-label={steps[currentStep].description}>
-                  {steps[currentStep].description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* Controls */}
-        <div className="flex w-full max-w-md flex-col items-center gap-6 pb-8" role="region" aria-label="Onboarding navigation">
-          {/* Dots */}
-          <div className="flex items-center gap-3" role="tablist" aria-label="Onboarding steps navigation">
-            {steps.map((step, index) => {
-              const isActive = index === currentStep;
-
-              return (
-                <motion.button
-                  key={index}
-                  id={`step-tab-${index}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  aria-controls={`step-panel-${index}`}
-                  aria-label={`Go to step ${index + 1} of ${steps.length}: ${step.heading}`}
-                  tabIndex={isActive ? 0 : -1}
-                  disabled={loading}
-                  data-active={isActive}
-                  whileTap={{ scale: 0.9 }}
-                  whileHover={{ scale: 1.15 }}
-                  onClick={() => goToStep(index)}
-                  onKeyDown={(e) => {
-                    if (loading) return;
-
-                    switch (e.key) {
-                      case "ArrowRight":
-                        e.preventDefault();
-                        goToStep((index + 1) % steps.length);
-                        break;
-                      case "ArrowLeft":
-                        e.preventDefault();
-                        goToStep((index - 1 + steps.length) % steps.length);
-                        break;
-                      case "Home":
-                        e.preventDefault();
-                        goToStep(0);
-                        break;
-                      case "End":
-                        e.preventDefault();
-                        goToStep(steps.length - 1);
-                        break;
-                    }
-                  }}
-                  animate={{
-                    scale: isActive ? 1.2 : 1,
-                    opacity: isActive ? 1 : 0.5,
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="h-3 w-3 rounded-full bg-(--black) transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2 focus:ring-black focus:outline-none disabled:opacity-60 data-[active=true]:scale-120 data-[active=true]:opacity-100"
-                />
-              );
-            })}
-          </div>
-
-          {/* Button */}
-          <div className="w-full max-w-xs">
-            <SubmitPrimaryButton
-              ref={buttonRef}
-              type="button"
-              loading={loading}
-              loadingText="Loading next step"
-              onClick={handleNext}
-              aria-disabled={loading}
-              aria-label={isLastStep ? "Get started with Agro-chain" : `Continue to step ${currentStep + 2} of ${steps.length}`}
-            >
-              {isLastStep ? "Get Started" : "Next"}
-            </SubmitPrimaryButton>
-          </div>
-        </div>
-      </main>
+    <div className="layout-max-width">
+      <HeroSection />
+      <ImpactStatsSection />
+      <HowItWorksSection />
+      <FeaturesSection />
+      <FishCategoriesSection />
+      <Suspense fallback={null}>
+        <MarketplacePreviewSection />
+      </Suspense>
+      <TestimonialsSection />
+      <CTABannerSection />
+      <SectionFAQ
+        faqs={homeFaqs}
+        heading="Simplifying complex farming questions."
+        subtext="Can't find your answer? Reach us directly and we'll respond within 24 hours."
+        ctaLabel="Contact Support"
+        ctaHref="/contact"
+      />
     </div>
   );
 }

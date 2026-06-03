@@ -13,7 +13,13 @@ interface CartDrawerProps {
   onUpdateQuantity: (index: number, quantity: number) => void;
 }
 
-export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity }: CartDrawerProps) {
+export function CartDrawer({
+  isOpen,
+  items,
+  subtotal,
+  onClose,
+  onUpdateQuantity,
+}: CartDrawerProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -30,13 +36,13 @@ export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity 
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 320, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-(--white) shadow-xl"
+            className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col bg-(--white) shadow-xl"
             aria-label="Shopping cart"
           >
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
               <div className="flex items-center gap-2">
-                <ShoppingBag size={20} className="text-(--theme-green-dark)" />
-                <h2 className="font-ubuntu text-lg font-bold text-(--heading-colour)">Your Cart</h2>
+                <ShoppingBag size={20} className="text-theme-green-dark" />
+                <h2 className="font-ubuntu text-heading-colour text-lg font-bold">Your Cart</h2>
               </div>
               <button
                 onClick={onClose}
@@ -54,26 +60,30 @@ export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity 
                   <p className="text-sm text-gray-500">Your cart is empty.</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <motion.div layout className="flex flex-col gap-4">
+                  <AnimatePresence initial={false}>
                   {items.map((item, index) => (
-                    <div
+                    <motion.div
                       key={`${item.listingId}-${item.weightKg}-${item.variant}-${item.processed}-${index}`}
+                      layout
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: 40, transition: { duration: 0.2 } }}
+                      transition={{ duration: 0.25 }}
                       className="rounded-2xl border border-gray-200 bg-gray-50 p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-roboto-slab font-semibold text-(--heading-colour)">
+                          <p className="font-roboto-slab text-heading-colour font-semibold">
                             {item.fishType} • {item.variant}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {item.processed ? "Processed" : "Unprocessed"} • {item.weightKg}kg pack •{" "}
-                            {item.deliveryType === "delivery" ? "Delivery" : "Pickup"}
+                            {item.processed ? "Processed" : "Unprocessed"} • {item.weightKg}kg pack
+                            • {item.deliveryType === "delivery" ? "Delivery" : "Pickup"}
                           </p>
-                          <p className="mt-1 text-xs text-gray-500">
-                            {item.clusterFarmerName}
-                          </p>
+                          <p className="mt-1 text-xs text-gray-500">{item.clusterFarmerName}</p>
                         </div>
-                        <p className="text-sm font-semibold text-(--heading-colour)">
+                        <p className="text-heading-colour text-sm font-semibold">
                           ₦{item.totalPrice.toLocaleString()}
                         </p>
                       </div>
@@ -86,7 +96,7 @@ export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity 
                           >
                             <Minus size={14} />
                           </button>
-                          <span className="text-sm font-medium text-(--heading-colour)">
+                          <span className="text-heading-colour text-sm font-medium">
                             {item.quantity}
                           </span>
                           <button
@@ -101,16 +111,17 @@ export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity 
                           ₦{item.pricePerUnit.toLocaleString()} per pack
                         </p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                  </AnimatePresence>
+                </motion.div>
               )}
             </div>
 
             <div className="border-t border-gray-200 px-6 py-4">
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <span>Subtotal</span>
-                <span className="font-semibold text-(--heading-colour)">
+                <span className="text-heading-colour font-semibold">
                   ₦{subtotal.toLocaleString()}
                 </span>
               </div>
@@ -124,7 +135,7 @@ export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity 
                 className={`mt-4 flex h-12 items-center justify-center rounded-full text-sm font-semibold text-white transition ${
                   items.length === 0
                     ? "cursor-not-allowed bg-gray-300"
-                    : "bg-(--theme-green-dark) hover:opacity-90"
+                    : "bg-theme-green-dark hover:opacity-90"
                 }`}
                 aria-disabled={items.length === 0}
               >

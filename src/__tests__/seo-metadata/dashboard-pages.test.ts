@@ -111,7 +111,7 @@ const pageNames = [
   "cluster-dashboard/financial/farmers/[id]",
 ];
 
-describe("Dashboard page metadata — Property 3: correctness", () => {
+describe("Dashboard page metadata - Property 3: correctness", () => {
   it("every dashboard page metadata has robots noindex/nofollow, title, description, and no openGraph or twitter", () => {
     fc.assert(
       fc.property(

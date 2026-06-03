@@ -38,17 +38,15 @@ export function ListingCard({
       role="article"
       aria-label={`${listing.fishType} supply listing from ${listing.farmerName}, status: ${listing.status}`}
       className={cn(
-        "flex flex-col gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--space-lg) shadow-sm transition",
+        "border-gray-border flex flex-col gap-(--gap-base) rounded-3xl border bg-(--white) p-(--space-lg) shadow-sm transition",
         onClick && "cursor-pointer hover:shadow-md",
       )}
     >
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
-          <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
-            {listing.fishType}
-          </h3>
-          <p className="text-sm text-(--text-colour)">{listing.farmerName}</p>
+          <h3 className="font-ubuntu text-heading-colour text-xl font-bold">{listing.fishType}</h3>
+          <p className="text-text-colour text-sm">{listing.farmerName}</p>
         </div>
         <span
           className={cn(
@@ -62,28 +60,28 @@ export function ListingCard({
 
       {/* Details */}
       <div className="flex flex-col gap-(--space-md)">
-        <div className="flex items-center gap-2 text-sm text-(--text-colour)">
+        <div className="text-text-colour flex items-center gap-2 text-sm">
           <Package size={16} />
           <span>{listing.totalAvailableKg}kg available</span>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-(--text-colour)">
+        <div className="text-text-colour flex items-center gap-2 text-sm">
           <Calendar size={16} />
           <span>Harvest: {formatDate(listing.harvestDate)}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-(--text-colour)">
+        <div className="text-text-colour flex items-center gap-2 text-sm">
           <Clock size={16} />
           <span>Listed: {formatDate(listing.createdAt)}</span>
         </div>
       </div>
 
       {/* Packaging Options */}
-      <div className="flex flex-col gap-(--space-md) rounded-2xl bg-(--gray-bg) p-(--space-md)">
-        <p className="text-sm font-medium text-(--heading-colour)">Packaging Options:</p>
+      <div className="bg-gray-bg flex flex-col gap-(--space-md) rounded-2xl p-(--space-md)">
+        <p className="text-heading-colour text-sm font-medium">Packaging Options:</p>
         <div className="flex flex-col gap-1">
           {listing.packaging.map((pkg, index) => (
-            <div key={index} className="text-sm text-(--text-colour)">
+            <div key={index} className="text-text-colour text-sm">
               {pkg.weightKg}kg × {pkg.quantity}
             </div>
           ))}
@@ -103,7 +101,7 @@ export function ListingCard({
               onReject?.(listing.id);
             }}
             aria-label={`Reject ${listing.fishType} listing from ${listing.farmerName}`}
-            className="flex h-10 items-center justify-center rounded-full border border-(--border-gray) text-sm font-medium text-(--text-colour) transition hover:bg-(--gray-bg)"
+            className="border-gray-border text-text-colour hover:bg-gray-bg flex h-10 items-center justify-center rounded-full border text-sm font-medium transition"
           >
             Reject
           </button>
@@ -113,7 +111,7 @@ export function ListingCard({
               onApprove?.(listing.id);
             }}
             aria-label={`Approve ${listing.fishType} listing from ${listing.farmerName}`}
-            className="flex h-10 items-center justify-center rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90"
+            className="bg-theme-green-dark flex h-10 items-center justify-center rounded-full text-sm font-medium text-white transition hover:opacity-90"
           >
             Approve
           </button>
@@ -123,7 +121,7 @@ export function ListingCard({
       {/* Rejection Reason */}
       {listing.status === "rejected" && listing.rejectionReason && (
         <div className="rounded-2xl bg-red-50 p-(--space-md)">
-          <p className="text-sm text-(--error-red)">
+          <p className="text-error-red text-sm">
             <span className="font-medium">Reason: </span>
             {listing.rejectionReason}
           </p>

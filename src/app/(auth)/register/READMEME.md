@@ -2,57 +2,57 @@
 
 ## Project Overview
 
-+ AgroChainMarketPlace is a **digital fish supply marketplace** connecting farmers and buyers.
+- AgroChainMarketPlace is a **digital fish supply marketplace** connecting farmers and buyers.
 
-+ The platform introduces **cluster farmers** who aggregate supplies from smaller farmers and publish them to the marketplace.
+- The platform introduces **cluster farmers** who aggregate supplies from smaller farmers and publish them to the marketplace.
 
-+ The platform must be **modular, scalable, and strongly typed**.
+- The platform must be **modular, scalable, and strongly typed**.
 
-+ The system must prioritize **component reusability and modular architecture**.
+- The system must prioritize **component reusability and modular architecture**.
 
 The platform contains **four roles**:
 
-+ Farmer
+- Farmer
 
-+ Cluster Farmer
+- Cluster Farmer
 
-+ Buyer
+- Buyer
 
-+ Admin
+- Admin
 
 The system flow:
 
-+ Farmers produce fish
+- Farmers produce fish
 
-+ Farmers submit supply listings
+- Farmers submit supply listings
 
-+ Cluster Farmers approve farmer supplies
+- Cluster Farmers approve farmer supplies
 
-+ Approved supplies appear as **Cluster Farmer listings**
+- Approved supplies appear as **Cluster Farmer listings**
 
-+ Buyers browse and purchase from the marketplace
+- Buyers browse and purchase from the marketplace
 
-+ Admin verifies cluster farmers and monitors the platform
+- Admin verifies cluster farmers and monitors the platform
 
 ---
 
 # Engineering Rules
 
-+ All logic must use **TypeScript**
+- All logic must use **TypeScript**
 
-+ **NO `any` types**
+- **NO `any` types**
 
-+ **NO unsafe casting**
+- **NO unsafe casting**
 
-+ Use **interfaces and types everywhere**
+- Use **interfaces and types everywhere**
 
-+ Code must be **modular**
+- Code must be **modular**
 
-+ Prefer **reusable components**
+- Prefer **reusable components**
 
-+ Avoid duplicated logic
+- Avoid duplicated logic
 
-+ Extract shared logic into hooks and utilities
+- Extract shared logic into hooks and utilities
 
 The project must follow **clean architecture principles**.
 
@@ -60,23 +60,23 @@ The project must follow **clean architecture principles**.
 
 # Tech Stack
 
-+ TypeScript
+- TypeScript
 
-+ React / NextJS
+- React / NextJS
 
-+ TailwindCSS
+- TailwindCSS
 
-+ Framer Motion
+- Framer Motion
 
-+ React Query or Server Actions
+- React Query or Server Actions
 
-+ Modular component architecture
+- Modular component architecture
 
 Animations must use:
 
-+ `motion`
+- `motion`
 
-+ `AnimatePresence`
+- `AnimatePresence`
 
 ---
 
@@ -86,13 +86,9 @@ Follow existing design system.
 
 Spacing must follow:
 
+px-section-px sm:px-section-px-sm lg:px-section-px-lg
 
-
-
-
-px-(--section-px) sm:px-(--section-px-sm) lg:px-(--section-px-lg)
-
-Use the **same max width already used in the codebase**.  The UI must be **mobile-first responsive**.  Breakpoints:
+Use the **same max width already used in the codebase**. The UI must be **mobile-first responsive**. Breakpoints:
 
 sm md lg xl
 
@@ -102,7 +98,7 @@ mobile → 1 column tablet → 2 columns desktop → 4 columns
 
 desktop → 4 columns
 
----  # Color System  Reusable colors must be declared in **global.css**  Example:
+--- # Color System Reusable colors must be declared in **global.css** Example:
 
 --primary --bg --accent --surface
 
@@ -114,8 +110,6 @@ DO NOT use:
 
 var(--color)
 
-
-
 ---
 
 # Animations
@@ -124,29 +118,29 @@ Use **Framer Motion** to make the UI feel premium.
 
 Animations should exist in:
 
-+ Dashboard navigation
+- Dashboard navigation
 
-+ Page transitions
+- Page transitions
 
-+ Dropdown expansion
+- Dropdown expansion
 
-+ Listing cards
+- Listing cards
 
-+ Modal appearance
+- Modal appearance
 
-+ Form success states
+- Form success states
 
-+ Toast notifications
+- Toast notifications
 
 Use `AnimatePresence` for:
 
-+ modal transitions
+- modal transitions
 
-+ dynamic lists
+- dynamic lists
 
-+ alerts
+- alerts
 
-+ notifications
+- notifications
 
 Animations must be **smooth and subtle**.
 
@@ -158,21 +152,15 @@ Users must select a **role during signup**.
 
 Roles:
 
-+ farmer
+- farmer
 
-+ buyer
+- buyer
 
 After login:
-
-
 
 if role === "farmer" if isClusterFarmer === true redirect → /cluster-dashboard else redirect → /farmer-dashboard
 
 if role === "buyer" redirect → /buyer-dashboard
-
-
-
-
 
 ---
 
@@ -182,15 +170,15 @@ if role === "buyer" redirect → /buyer-dashboard
 
 Normal farmers can:
 
-+ Create and update their profile
+- Create and update their profile
 
-+ Submit fish supply listings
+- Submit fish supply listings
 
-+ Apply to become a cluster farmer
+- Apply to become a cluster farmer
 
-+ View submitted listings
+- View submitted listings
 
-+ Track listing approval status
+- Track listing approval status
 
 Normal farmers **cannot publish directly to marketplace**.
 
@@ -202,41 +190,35 @@ Their listings must be **approved by a cluster farmer**.
 
 Fields should include:
 
-+ fullName
+- fullName
 
-+ phoneNumber
+- phoneNumber
 
-+ email
+- email
 
-+ occupation (default: Farmer)
+- occupation (default: Farmer)
 
-+ farmName
+- farmName
 
-+ farmAddress
+- farmAddress
 
-+ state
+- state
 
-+ localGovernment
+- localGovernment
 
-+ fishType
+- fishType
 
-+ farmingCapacityKg
+- farmingCapacityKg
 
-+ yearsOfExperience
+- yearsOfExperience
 
-+ profileImage
+- profileImage
 
-+ createdAt
+- createdAt
 
 TypeScript interface:
 
-
-
 interface FarmerProfile {id: stringfullName: stringphoneNumber: stringemail: stringoccupation: "Farmer"farmName: stringfarmAddress: stringstate: stringlocalGovernment: stringfishType: stringfarmingCapacityKg: numberyearsOfExperience: numberprofileImage?: stringcreatedAt: Date}
-
-
-
-
 
 ---
 
@@ -246,49 +228,39 @@ Inside the profile page, farmers can apply to become a cluster farmer.
 
 Required documents:
 
-+ KYC Identification
+- KYC Identification
 
-+ CAC Registration
+- CAC Registration
 
-+ Proof of Business Location
+- Proof of Business Location
 
-+ Government ID
+- Government ID
 
-+ Business Description
+- Business Description
 
 Interface:
 
-
-
 interface ClusterApplication {id: stringfarmerId: stringkycDocument: stringcacDocument: stringbusinessLocationProof: stringbusinessDescription: stringstatus: "pending" | "approved" | "rejected"}
-
-
-
-
 
 Flow:
 
-+ Farmer submits application
+- Farmer submits application
 
-+ Admin reviews documents
+- Admin reviews documents
 
-+ Admin approves or rejects
+- Admin approves or rejects
 
 If approved:
 
-
-
 farmer.isClusterFarmer = true redirect → /cluster-dashboard
 
----  # Farmer Supply Listing  Farmers can submit supply listings.  Minimum requirement:
+--- # Farmer Supply Listing Farmers can submit supply listings. Minimum requirement:
 
 1000kg fish and above
 
-Fields:  + fishType + harvestDate + totalAvailableKg + packagingOptions  Example packaging:
+Fields: + fishType + harvestDate + totalAvailableKg + packagingOptions Example packaging:
 
 1kg → 1000 pieces 3kg → 250 pieces 5kg → 100 pieces
-
-
 
 Interfaces:
 
@@ -300,8 +272,6 @@ When created:
 
 status = "pending"
 
-
-
 Cluster farmers will see these listings.
 
 ---
@@ -312,29 +282,21 @@ Cluster farmers act as **supply aggregators**.
 
 They can:
 
-+ Approve farmer listings
+- Approve farmer listings
 
-+ Reject farmer listings
+- Reject farmer listings
 
-+ Create their own listings
+- Create their own listings
 
-+ View farmers under them
+- View farmers under them
 
-+ Aggregate supply
+- Aggregate supply
 
-+ Publish listings to marketplace
+- Publish listings to marketplace
 
 When cluster farmer approves listing:
 
-
-
-
-
 listing.owner = clusterFarmerlisting.visibleOnMarketplace = true
-
-
-
-
 
 Thus the listing appears **as if created by the cluster farmer**.
 
@@ -344,29 +306,29 @@ Thus the listing appears **as if created by the cluster farmer**.
 
 Features:
 
-+ Dashboard statistics
+- Dashboard statistics
 
-+ Pending farmer listings
+- Pending farmer listings
 
-+ Approved listings
+- Approved listings
 
-+ Create listing
+- Create listing
 
-+ Farmers under cluster
+- Farmers under cluster
 
-+ Profile settings
+- Profile settings
 
 Cluster farmer profile includes additional fields:
 
-+ businessName
+- businessName
 
-+ CACNumber
+- CACNumber
 
-+ warehouseLocation
+- warehouseLocation
 
-+ distributionCapacity
+- distributionCapacity
 
-+ logisticsAvailable
+- logisticsAvailable
 
 ---
 
@@ -374,29 +336,23 @@ Cluster farmer profile includes additional fields:
 
 Marketplace route:
 
-
-
-
-
-
-
 Only **cluster farmer listings appear here**.
 
 Listing card must show:
 
-+ Fish Type
+- Fish Type
 
-+ Available Quantity
+- Available Quantity
 
-+ Packaging Options
+- Packaging Options
 
-+ Cluster Farmer Name
+- Cluster Farmer Name
 
-+ Location
+- Location
 
-+ Price per Kg
+- Price per Kg
 
-+ Delivery options
+- Delivery options
 
 Cards must have **hover animations**.
 
@@ -408,43 +364,39 @@ Buyers interact with the marketplace.
 
 Buyers can:
 
-+ Create profile
+- Create profile
 
-+ Browse marketplace
+- Browse marketplace
 
-+ Filter listings
+- Filter listings
 
-+ Purchase fish
+- Purchase fish
 
-+ Track orders
+- Track orders
 
-+ Save listings
+- Save listings
 
-+ Contact cluster farmers
+- Contact cluster farmers
 
 Buyer profile:
 
-+ fullName
+- fullName
 
-+ companyName
+- companyName
 
-+ phoneNumber
+- phoneNumber
 
-+ email
+- email
 
-+ deliveryAddress
+- deliveryAddress
 
-+ businessType
+- businessType
 
-+ purchaseVolumeEstimate
+- purchaseVolumeEstimate
 
 Interface:
 
-
-
 interface BuyerProfile {id: stringfullName: stringcompanyName?: stringphoneNumber: stringemail: stringdeliveryAddress: stringbusinessType: stringpurchaseVolumeEstimate?: number}
-
-
 
 ---
 
@@ -452,15 +404,15 @@ interface BuyerProfile {id: stringfullName: stringcompanyName?: stringphoneNumbe
 
 Features:
 
-+ Order history
+- Order history
 
-+ Active orders
+- Active orders
 
-+ Saved listings
+- Saved listings
 
-+ Profile settings
+- Profile settings
 
-+ Notifications
+- Notifications
 
 ---
 
@@ -468,27 +420,25 @@ Features:
 
 Admin capabilities:
 
-+ Approve cluster farmer applications
+- Approve cluster farmer applications
 
-+ Reject cluster farmer applications
+- Reject cluster farmer applications
 
-+ View all farmers
+- View all farmers
 
-+ View cluster farmers
+- View cluster farmers
 
-+ Monitor listings
+- Monitor listings
 
-+ Remove fraudulent listings
+- Remove fraudulent listings
 
-+ Platform analytics
+- Platform analytics
 
 Admin actions:
 
-
-
 approveClusterFarmer() rejectClusterFarmer() suspendFarmer() approveListing() removeListing()
 
----  # Routing Structure
+--- # Routing Structure
 
 /login /signup
 
@@ -502,10 +452,6 @@ approveClusterFarmer() rejectClusterFarmer() suspendFarmer() approveListing() re
 
 /admin-dashboard
 
-
-
-
-
 ---
 
 # Modular Component Architecture
@@ -518,11 +464,11 @@ Examples:
 
 ### Profile Components
 
-+ ProfileForm
+- ProfileForm
 
-+ ProfileAvatar
+- ProfileAvatar
 
-+ ProfileDetails
+- ProfileDetails
 
 Reusable between **farmer and buyer**.
 
@@ -530,33 +476,33 @@ Reusable between **farmer and buyer**.
 
 ### Listing Components
 
-+ ListingForm
+- ListingForm
 
-+ ListingCard
+- ListingCard
 
-+ ListingTable
+- ListingTable
 
-+ PackagingSelector
+- PackagingSelector
 
 Reusable between:
 
-+ farmer
+- farmer
 
-+ cluster farmer
+- cluster farmer
 
-+ marketplace
+- marketplace
 
 ---
 
 ### Dashboard Components
 
-+ DashboardLayout
+- DashboardLayout
 
-+ DashboardSidebar
+- DashboardSidebar
 
-+ DashboardHeader
+- DashboardHeader
 
-+ DashboardStats
+- DashboardStats
 
 Reusable across all dashboards.
 
@@ -568,13 +514,9 @@ Extract reusable logic into hooks.
 
 Examples:
 
-
-
 useAuth() useUserProfile() useListings() useMarketplace() useOrders()
 
----  # Folder Structure
-
-
+--- # Folder Structure
 
 src
 
@@ -624,27 +566,23 @@ marketplace
 
 auth
 
-
-
-
-
 ---
 
 # UX Enhancements
 
 Include:
 
-+ Skeleton loading states
+- Skeleton loading states
 
-+ Toast notifications
+- Toast notifications
 
-+ Smooth transitions
+- Smooth transitions
 
-+ Animated dropdowns
+- Animated dropdowns
 
-+ Interactive modals
+- Interactive modals
 
-+ Optimistic UI updates
+- Optimistic UI updates
 
 ---
 
@@ -652,25 +590,24 @@ Include:
 
 Build a **premium digital fish supply marketplace** where:
 
-+ Farmers produce fish
+- Farmers produce fish
 
-+ Cluster farmers aggregate supply
+- Cluster farmers aggregate supply
 
-+ Buyers purchase fish
+- Buyers purchase fish
 
-+ Admin governs the platform
+- Admin governs the platform
 
 The platform must emphasize:
 
-+ modular architecture
+- modular architecture
 
-+ reusable components
+- reusable components
 
-+ strong typing
+- strong typing
 
-+ smooth animations
+- smooth animations
 
-+ responsive design
+- responsive design
 
-+ clean engineering structure
-
+- clean engineering structure

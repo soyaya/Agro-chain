@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +13,7 @@ import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
 import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
 import { NIGERIAN_STATES } from "~/types/constants";
+import type { Role } from "~/types/types";
 import {
   InputOTP,
   InputOTPGroup,
@@ -40,12 +43,13 @@ const registerSchema = z
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
-type Role = "farmer" | "buyer";
-
 function RegisterFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = (searchParams.get("role")?.toLowerCase() || "") as Role;
+  const urlRole = (searchParams.get("role")?.toLowerCase() || "") as Role;
+
+  const [selectedRole, setSelectedRole] = useState<Role>(urlRole);
+  const role = selectedRole;
 
   const [selectedState, setSelectedState] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
@@ -84,13 +88,6 @@ function RegisterFormContent() {
     setSubmitting(true);
     setStatusModal({ open: true, variant: "loading" });
     try {
-      // Set the role cookie on the backend before registering
-      await fetch("/api/auth/role", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role }),
-      });
-
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -232,12 +229,65 @@ function RegisterFormContent() {
   return (
     <>
       <div className="default-container-max-width flex h-full min-h-full w-full flex-col gap-(--section-gap)">
-        <h2 className="font-ubuntu text-center text-2xl font-bold sm:text-3xl lg:text-4xl">
-          Create Account {role}
-        </h2>
+        <div className="flex flex-col items-center gap-1 text-center">
+          <h2 className="font-ubuntu text-2xl font-bold sm:text-3xl lg:text-4xl">
+            Create Account
+          </h2>
+          {role && (
+            <p className="font-roboto-slab text-sm text-text-colour">
+              Joining as a{" "}
+              <span className="font-semibold capitalize text-theme-green-dark">{role}</span>
+            </p>
+          )}
+        </div>
 
+        {/* Inline role selector - shown only when no ?role= param */}
+        {!urlRole && step === 1 && (
+          <div className="default-page-max-width flex flex-col gap-2">
+            <label className="font-roboto-slab text-sm font-medium text-heading-colour">
+              I am a…
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedRole("farmer")}
+                className={`rounded-2xl border p-4 text-left transition ${
+                  selectedRole === "farmer"
+                    ? "border-theme-green-dark bg-green-50"
+                    : "border-input-border hover:bg-gray-bg"
+                }`}
+              >
+                <p className="font-ubuntu font-semibold text-heading-colour">Farmer</p>
+                <p className="font-roboto-slab text-xs text-text-colour">
+                  I grow and sell catfish
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedRole("buyer")}
+                className={`rounded-2xl border p-4 text-left transition ${
+                  selectedRole === "buyer"
+                    ? "border-theme-green-dark bg-green-50"
+                    : "border-input-border hover:bg-gray-bg"
+                }`}
+              >
+                <p className="font-ubuntu font-semibold text-heading-colour">Buyer</p>
+                <p className="font-roboto-slab text-xs text-text-colour">
+                  I buy catfish in bulk
+                </p>
+              </button>
+            </div>
+          </div>
+        )}
+
+        <AnimatePresence mode="wait">
         {step === 1 ? (
-          <form
+          <motion.form
+            key="step-1"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             onSubmit={handleSubmit(onSubmit)}
             className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
           >
@@ -300,8 +350,8 @@ function RegisterFormContent() {
               />
             </div>
 
-            <div className="mx-auto mt-(--submit-button-mt) flex w-full max-w-sm flex-col">
-              {isFormComplete ? (
+            <div className="mx-auto mt-(--submit-button-mt) flex w-full max-w-sm flex-col gap-(--gap-base)">
+              {isFormComplete && role ? (
                 <SubmitPrimaryButton loading={submitting} type="submit">
                   Create Account
                 </SubmitPrimaryButton>
@@ -310,11 +360,27 @@ function RegisterFormContent() {
                   Create Account
                 </SubmitSecondaryButton>
               )}
+              <p className="text-text-colour text-center text-sm">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
+                >
+                  Log in
+                </Link>
+              </p>
             </div>
-          </form>
+          </motion.form>
         ) : (
-          <div className="default-page-max-width flex flex-col gap-(--section-gap)">
-            <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
+          <motion.div
+            key="step-2"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="default-page-max-width flex flex-col gap-(--section-gap)"
+          >
+            <p className="font-roboto-slab text-text-colour text-center lg:text-lg">
               Enter the OTP sent to your email
             </p>
             <div className="flex flex-col items-center gap-6">
@@ -350,7 +416,7 @@ function RegisterFormContent() {
                   Verify OTP
                 </SubmitPrimaryButton>
 
-                <p className="text-center text-sm text-(--text-colour)">
+                <p className="text-text-colour text-center text-sm">
                   Didn&apos;t receive a code?{" "}
                   <button
                     type="button"
@@ -365,7 +431,7 @@ function RegisterFormContent() {
                         : "Resend OTP"}
                   </button>
                 </p>
-                <p className="text-center text-xs text-(--text-colour)">
+                <p className="text-text-colour text-center text-xs">
                   {resendLocked
                     ? "You’ve reached the resend limit. Try again after 24 hours."
                     : `${Math.max(0, 2 - resendAttempts)} resend${
@@ -374,8 +440,9 @@ function RegisterFormContent() {
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
 
       <FullScreenStatusModal

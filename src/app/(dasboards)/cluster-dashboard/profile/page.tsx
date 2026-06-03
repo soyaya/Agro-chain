@@ -39,7 +39,9 @@ export default function ClusterProfilePage() {
           phoneNumber: user.phone_number ?? "",
           email: user.email ?? "",
           clusterName: user.business_name ?? user.farm_name ?? "",
-          location: [user.location_address, user.location_lga, user.location_state].filter(Boolean).join(", "),
+          location: [user.location_address, user.location_lga, user.location_state]
+            .filter(Boolean)
+            .join(", "),
         });
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to load profile");
@@ -73,27 +75,47 @@ export default function ClusterProfilePage() {
   };
 
   if (loading) {
-    return <div className="text-(--text-colour)">Loading profile...</div>;
+    return <div className="text-text-colour">Loading profile...</div>;
   }
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
         <div>
-          <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">Cluster Profile</h1>
-          <p className="font-roboto-slab text-(--text-colour)">Manage your cluster account details</p>
+          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Cluster Profile</h1>
+          <p className="font-roboto-slab text-text-colour">Manage your cluster account details</p>
         </div>
         {editing ? (
           <div className="flex gap-2">
-            <button onClick={() => setEditing(false)} className="rounded-xl border border-(--border-gray) px-4 py-2 text-sm">Cancel</button>
-            <button onClick={save} disabled={saving} className="rounded-xl bg-(--theme-green-dark) px-4 py-2 text-sm text-white">{saving ? "Saving..." : "Save"}</button>
+            <button
+              onClick={() => setEditing(false)}
+              className="border-gray-border rounded-xl border px-4 py-2 text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={save}
+              disabled={saving}
+              className="bg-theme-green-dark rounded-xl px-4 py-2 text-sm text-white"
+            >
+              {saving ? "Saving..." : "Save"}
+            </button>
           </div>
         ) : (
-          <button onClick={() => setEditing(true)} className="rounded-xl border border-(--border-gray) px-4 py-2 text-sm">Edit</button>
+          <button
+            onClick={() => setEditing(true)}
+            className="border-gray-border rounded-xl border px-4 py-2 text-sm"
+          >
+            Edit
+          </button>
         )}
       </motion.div>
 
-      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) md:grid-cols-2">
+      <div className="border-input-border grid grid-cols-1 gap-4 rounded-2xl border bg-(--white) p-(--space-xl) md:grid-cols-2">
         {(
           [
             ["Full Name", "fullName"],
@@ -104,16 +126,19 @@ export default function ClusterProfilePage() {
           ] as const
         ).map(([label, key]) => {
           const isNa = form[key] === "N/A" || form[key] === "";
-          const locked = key === "fullName" || key === "phoneNumber" || key === "email" ||
+          const locked =
+            key === "fullName" ||
+            key === "phoneNumber" ||
+            key === "email" ||
             (key === "location" && !isNa);
           return (
-            <label key={key} className="text-sm text-(--text-colour)">
-              <span className="mb-1 block font-medium text-(--heading-colour)">{label}</span>
+            <label key={key} className="text-text-colour text-sm">
+              <span className="text-heading-colour mb-1 block font-medium">{label}</span>
               <input
                 value={form[key]}
                 disabled={locked || !editing}
                 onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
-                className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
+                className="border-input-border w-full rounded-lg border px-3 py-2 disabled:bg-gray-50"
               />
             </label>
           );

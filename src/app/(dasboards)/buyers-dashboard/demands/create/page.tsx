@@ -102,15 +102,15 @@ export default function CreateDemandPage() {
       >
         <button
           onClick={() => router.back()}
-          className="font-roboto-slab flex w-fit items-center gap-2 text-sm text-(--text-colour) transition hover:text-(--heading-colour)"
+          className="font-roboto-slab text-text-colour hover:text-heading-colour flex w-fit items-center gap-2 text-sm transition"
         >
           <ArrowLeft size={18} />
           Back to Demands
         </button>
         <div>
-          <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">Create Demand</h1>
-          <p className="font-roboto-slab mt-1 text-(--text-colour)">
-            Request any weight of fish — even less than 1kg. Admin will assign a cluster farmer to
+          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Create Demand</h1>
+          <p className="font-roboto-slab text-text-colour mt-1">
+            Request any weight of fish - even less than 1kg. Admin will assign a cluster farmer to
             fulfill it.
           </p>
         </div>
@@ -121,13 +121,13 @@ export default function CreateDemandPage() {
         variants={SLIDE_UP_VARIANT}
         initial="hidden"
         animate="visible"
-        className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-gray-border rounded-3xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-(--gap-lg)">
           {/* Fish Type + Variant */}
           <div className="grid grid-cols-1 gap-(--gap-base) sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
-              <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+              <label className="font-roboto-slab text-heading-colour text-sm font-medium">
                 Fish Type <span className="text-red-500">*</span>
               </label>
               <SelectInput
@@ -143,7 +143,7 @@ export default function CreateDemandPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+              <label className="font-roboto-slab text-heading-colour text-sm font-medium">
                 Fish Variant <span className="text-red-500">*</span>
               </label>
               <SelectInput
@@ -171,7 +171,7 @@ export default function CreateDemandPage() {
               required
             />
             <p className="font-roboto-slab text-xs text-gray-500">
-              You can request any amount — there is no minimum weight.
+              You can request any amount - there is no minimum weight.
             </p>
           </div>
 
@@ -204,14 +204,14 @@ export default function CreateDemandPage() {
 
           {/* Notes */}
           <div className="flex flex-col gap-1.5">
-            <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+            <label className="font-roboto-slab text-heading-colour text-sm font-medium">
               Additional Notes <span className="font-normal text-gray-400">(optional)</span>
             </label>
             <textarea
               {...register("notes")}
               placeholder="Any specific requirements, preferred delivery time, etc."
               rows={3}
-              className="font-roboto-slab w-full rounded-2xl border border-(--border-input) p-(--space-md) text-sm text-(--text-colour) transition outline-none focus:border-(--border-gray)"
+              className="font-roboto-slab focus:border-gray-border text-text-colour border-input-border w-full rounded-2xl border p-(--space-md) text-sm transition outline-none"
             />
             {errors.notes && (
               <p className="font-roboto-slab text-xs text-red-500">{errors.notes.message}</p>

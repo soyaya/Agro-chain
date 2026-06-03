@@ -73,8 +73,8 @@ export default function ClusterOrdersPage() {
   return (
     <div className="flex flex-col gap-(--section-gap)">
       <motion.div variants={FADE_IN_VARIANT} initial="hidden" animate="visible">
-        <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">Orders</h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Orders</h1>
+        <p className="font-roboto-slab text-text-colour">
           Review buyer orders and update fulfillment status
         </p>
       </motion.div>
@@ -97,14 +97,14 @@ export default function ClusterOrdersPage() {
             <motion.div
               key={order.orderId}
               variants={FADE_IN_VARIANT}
-              className="rounded-2xl border border-(--border-gray) bg-(--white) p-6 shadow-sm"
+              className="border-gray-border rounded-2xl border bg-(--white) p-6 shadow-sm"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-ubuntu text-lg font-bold text-(--heading-colour)">
+                  <h3 className="font-ubuntu text-heading-colour text-lg font-bold">
                     Order #{order.orderId}
                   </h3>
-                  <p className="text-sm text-(--text-colour)">
+                  <p className="text-text-colour text-sm">
                     {order.buyerName} • {order.buyerPhone}
                   </p>
                 </div>
@@ -113,9 +113,10 @@ export default function ClusterOrdersPage() {
                 </span>
               </div>
 
-              <div className="mt-4 flex flex-col gap-2 text-sm text-(--text-colour)">
+              <div className="text-text-colour mt-4 flex flex-col gap-2 text-sm">
                 <p>
-                  {order.fishType} • {order.variant ?? "table_size"} • {order.processed ? "processed" : "unprocessed"}
+                  {order.fishType} • {order.variant ?? "table_size"} •{" "}
+                  {order.processed ? "processed" : "unprocessed"}
                 </p>
                 <p>
                   {order.weightKg}kg × {order.quantity} • {order.deliveryOption}
@@ -128,7 +129,7 @@ export default function ClusterOrdersPage() {
                   <>
                     <button
                       onClick={() => updateOrderStatus(order.orderId, "confirmed")}
-                      className="flex items-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+                      className="bg-theme-green-dark flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
                     >
                       <CheckCircle size={14} />
                       Accept
@@ -146,7 +147,7 @@ export default function ClusterOrdersPage() {
                 {order.status === "confirmed" && (
                   <button
                     onClick={() => updateOrderStatus(order.orderId, "processing")}
-                    className="flex items-center gap-2 rounded-full border border-(--border-gray) px-4 py-2 text-xs font-semibold text-(--heading-colour) transition hover:bg-(--gray-bg)"
+                    className="border-gray-border text-heading-colour hover:bg-gray-bg flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition"
                   >
                     <Package size={14} />
                     Start Processing
@@ -156,7 +157,7 @@ export default function ClusterOrdersPage() {
                 {order.status === "processing" && (
                   <button
                     onClick={() => updateOrderStatus(order.orderId, "shipped")}
-                    className="flex items-center gap-2 rounded-full border border-(--border-gray) px-4 py-2 text-xs font-semibold text-(--heading-colour) transition hover:bg-(--gray-bg)"
+                    className="border-gray-border text-heading-colour hover:bg-gray-bg flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition"
                   >
                     <Truck size={14} />
                     Mark as Shipped
@@ -166,7 +167,7 @@ export default function ClusterOrdersPage() {
                 {order.status === "shipped" && (
                   <button
                     onClick={() => updateOrderStatus(order.orderId, "delivered")}
-                    className="flex items-center gap-2 rounded-full border border-(--border-gray) px-4 py-2 text-xs font-semibold text-(--heading-colour) transition hover:bg-(--gray-bg)"
+                    className="border-gray-border text-heading-colour hover:bg-gray-bg flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition"
                   >
                     <CheckCircle size={14} />
                     Mark Delivered

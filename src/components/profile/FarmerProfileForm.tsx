@@ -20,49 +20,51 @@ import {
   FADE_IN_VARIANT,
 } from "~/types/constants";
 
-const farmerProfileSchema = z.object({
-  fullName: z.string().min(3, "Name must be at least 3 characters"),
-  phoneNumber: z.string().regex(PHONE_REGEX, "Invalid Nigerian phone number"),
-  email: z.string().email("Invalid email address"),
-  farmName: z.string().min(3, "Farm name must be at least 3 characters"),
-  farmAddress: z.string().min(5, "Farm address is required"),
-  state: z.string().min(1, "State is required"),
-  localGovernment: z.string().min(1, "Local government is required"),
-  fishType: z.string().min(1, "Fish type is required"),
-  farmingCapacityKg: z
-    .number()
-    .min(MIN_FARMING_CAPACITY_KG, `Minimum capacity is ${MIN_FARMING_CAPACITY_KG}kg`),
-  yearsOfExperience: z
-    .number()
-    .min(MIN_YEARS_EXPERIENCE, "Experience cannot be negative")
-    .max(MAX_YEARS_EXPERIENCE, `Maximum ${MAX_YEARS_EXPERIENCE} years`),
-  isClusterFarmer: z.boolean().optional(),
-  businessName: z.string().optional(),
-  cacNumber: z.string().optional(),
-  warehouseLocation: z.string().optional(),
-  distributionCapacity: z.number().optional(),
-  logisticsAvailable: z.boolean().optional(),
-}).refine(
-  (data) => {
-    if (data.isClusterFarmer) {
-      return (
-        data.businessName &&
-        data.businessName.length >= 3 &&
-        data.cacNumber &&
-        data.cacNumber.length >= 5 &&
-        data.warehouseLocation &&
-        data.warehouseLocation.length >= 5 &&
-        data.distributionCapacity &&
-        data.distributionCapacity > 0
-      );
-    }
-    return true;
-  },
-  {
-    message: "All cluster farmer fields are required when applying to be a cluster farmer",
-    path: ["businessName"],
-  }
-);
+const farmerProfileSchema = z
+  .object({
+    fullName: z.string().min(3, "Name must be at least 3 characters"),
+    phoneNumber: z.string().regex(PHONE_REGEX, "Invalid Nigerian phone number"),
+    email: z.string().email("Invalid email address"),
+    farmName: z.string().min(3, "Farm name must be at least 3 characters"),
+    farmAddress: z.string().min(5, "Farm address is required"),
+    state: z.string().min(1, "State is required"),
+    localGovernment: z.string().min(1, "Local government is required"),
+    fishType: z.string().min(1, "Fish type is required"),
+    farmingCapacityKg: z
+      .number()
+      .min(MIN_FARMING_CAPACITY_KG, `Minimum capacity is ${MIN_FARMING_CAPACITY_KG}kg`),
+    yearsOfExperience: z
+      .number()
+      .min(MIN_YEARS_EXPERIENCE, "Experience cannot be negative")
+      .max(MAX_YEARS_EXPERIENCE, `Maximum ${MAX_YEARS_EXPERIENCE} years`),
+    isClusterFarmer: z.boolean().optional(),
+    businessName: z.string().optional(),
+    cacNumber: z.string().optional(),
+    warehouseLocation: z.string().optional(),
+    distributionCapacity: z.number().optional(),
+    logisticsAvailable: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.isClusterFarmer) {
+        return (
+          data.businessName &&
+          data.businessName.length >= 3 &&
+          data.cacNumber &&
+          data.cacNumber.length >= 5 &&
+          data.warehouseLocation &&
+          data.warehouseLocation.length >= 5 &&
+          data.distributionCapacity &&
+          data.distributionCapacity > 0
+        );
+      }
+      return true;
+    },
+    {
+      message: "All cluster farmer fields are required when applying to be a cluster farmer",
+      path: ["businessName"],
+    },
+  );
 
 type FarmerProfileFormValues = z.infer<typeof farmerProfileSchema>;
 
@@ -78,9 +80,7 @@ export function FarmerProfileForm({
   isLoading = false,
 }: FarmerProfileFormProps) {
   const [profileImage, setProfileImage] = useState<File | undefined>();
-  const [imagePreview, setImagePreview] = useState<string | undefined>(
-    initialData?.profileImage
-  );
+  const [imagePreview, setImagePreview] = useState<string | undefined>(initialData?.profileImage);
 
   const {
     register,
@@ -131,8 +131,7 @@ export function FarmerProfileForm({
       });
       toast.success("Profile saved successfully!");
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to save profile";
+      const message = error instanceof Error ? error.message : "Failed to save profile";
       toast.error(message);
     }
   };
@@ -266,23 +265,27 @@ export function FarmerProfileForm({
       </motion.div>
 
       {/* Cluster Farmer Section */}
-      <motion.div variants={FADE_IN_VARIANT} className="rounded-xl border border-(--border-input) bg-gray-50 p-(--space-lg)">
+      <motion.div
+        variants={FADE_IN_VARIANT}
+        className="border-input-border rounded-xl border bg-gray-50 p-(--space-lg)"
+      >
         <div className="flex items-start gap-(--space-md)">
           <input
             type="checkbox"
             id="isClusterFarmer"
             {...register("isClusterFarmer")}
-            className="mt-1 h-5 w-5 rounded border-gray-300 text-(--theme-green-dark) focus:ring-2 focus:ring-(--theme-green-dark) hover:cursor-pointer ease-in-out transition-all duration-300"
+            className="text-theme-green-dark focus:ring-theme-green-dark mt-1 h-5 w-5 rounded border-gray-300 transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2"
           />
           <div className="flex-1">
             <label
               htmlFor="isClusterFarmer"
-              className="font-roboto-slab block text-base font-medium text-(--heading-colour) hover:cursor-pointer"
+              className="font-roboto-slab text-heading-colour block text-base font-medium hover:cursor-pointer"
             >
               I&apos;m interested in becoming a Cluster Farmer
             </label>
             <p className="font-roboto-slab mt-1 text-sm text-gray-600">
-              Cluster farmers can aggregate produce from multiple farmers and manage distribution to buyers
+              Cluster farmers can aggregate produce from multiple farmers and manage distribution to
+              buyers
             </p>
           </div>
         </div>
@@ -343,11 +346,11 @@ export function FarmerProfileForm({
                       type="checkbox"
                       id="logisticsAvailable"
                       {...register("logisticsAvailable")}
-                      className="mt-1 h-5 w-5 rounded border-gray-300 text-(--theme-green-dark) focus:ring-2 focus:ring-(--theme-green-dark) hover:cursor-pointer ease-in-out transition-all duration-300"
+                      className="text-theme-green-dark focus:ring-theme-green-dark mt-1 h-5 w-5 rounded border-gray-300 transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2"
                     />
                     <label
                       htmlFor="logisticsAvailable"
-                      className="font-roboto-slab block text-sm font-medium text-(--heading-colour) hover:cursor-pointer"
+                      className="font-roboto-slab text-heading-colour block text-sm font-medium hover:cursor-pointer"
                     >
                       I have logistics/transportation available for distribution
                     </label>
@@ -361,11 +364,7 @@ export function FarmerProfileForm({
 
       {/* Submit Button */}
       <motion.div variants={FADE_IN_VARIANT} className="mt-(--submit-button-mt)">
-        <SubmitPrimaryButton
-          loading={isLoading}
-          disabled={!isValid || isLoading}
-          type="submit"
-        >
+        <SubmitPrimaryButton loading={isLoading} disabled={!isValid || isLoading} type="submit">
           {initialData ? "Update Profile" : "Create Profile"}
         </SubmitPrimaryButton>
       </motion.div>

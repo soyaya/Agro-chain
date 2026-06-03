@@ -126,16 +126,14 @@ export default function BuyerDemandsPage() {
         className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
-            My Demands
-          </h1>
-          <p className="font-roboto-slab text-(--text-colour)">
-            Request custom quantities of fish — any weight, any variant
+          <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">My Demands</h1>
+          <p className="font-roboto-slab text-text-colour">
+            Request custom quantities of fish - any weight, any variant
           </p>
         </div>
         <button
           onClick={() => router.push("/buyers-dashboard/demands/create")}
-          className="font-roboto-slab flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
+          className="font-roboto-slab bg-theme-green-dark flex items-center justify-center gap-2 rounded-full px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
         >
           <Plus size={18} />
           Create Demand
@@ -157,16 +155,14 @@ export default function BuyerDemandsPage() {
             onClick={() => setFilterStatus(status)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
               filterStatus === status
-                ? "border-(--theme-green-dark) bg-green-50"
-                : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
+                ? "border-theme-green-dark bg-green-50"
+                : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
-            <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+            <span className="font-ubuntu text-heading-colour text-xl font-bold">
               {counts[status]}
             </span>
-            <span className="font-roboto-slab text-xs text-(--text-colour) capitalize">
-              {status}
-            </span>
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
           </button>
         ))}
       </motion.div>
@@ -186,7 +182,7 @@ export default function BuyerDemandsPage() {
               <motion.div
                 key={demand.id}
                 variants={FADE_IN_VARIANT}
-                className="rounded-2xl border border-(--border-gray) bg-(--white) p-6 shadow-sm transition hover:shadow-md"
+                className="border-gray-border rounded-2xl border bg-(--white) p-6 shadow-sm transition hover:shadow-md"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   {/* Left */}
@@ -210,38 +206,38 @@ export default function BuyerDemandsPage() {
                     <div className="flex flex-wrap gap-x-6 gap-y-2">
                       <div>
                         <p className="font-roboto-slab text-xs text-gray-500">Fish Type</p>
-                        <p className="font-ubuntu font-semibold text-(--heading-colour) capitalize">
+                        <p className="font-ubuntu text-heading-colour font-semibold capitalize">
                           {demand.fishType}
                         </p>
                       </div>
                       <div>
                         <p className="font-roboto-slab text-xs text-gray-500">Weight</p>
-                        <p className="font-ubuntu font-semibold text-(--heading-colour)">
+                        <p className="font-ubuntu text-heading-colour font-semibold">
                           {demand.weightKg} kg
                         </p>
                       </div>
                       <div>
                         <p className="font-roboto-slab text-xs text-gray-500">Variant</p>
-                        <p className="font-ubuntu font-semibold text-(--heading-colour) capitalize">
+                        <p className="font-ubuntu text-heading-colour font-semibold capitalize">
                           {demand.fishVariant.replace("_", " ")}
                         </p>
                       </div>
                       <div>
                         <p className="font-roboto-slab text-xs text-gray-500">Location</p>
-                        <p className="font-ubuntu font-semibold text-(--heading-colour)">
+                        <p className="font-ubuntu text-heading-colour font-semibold">
                           {demand.locationLga}, {demand.locationState}
                         </p>
                       </div>
                     </div>
 
                     {demand.notes && (
-                      <p className="font-roboto-slab text-sm text-(--text-colour)">
+                      <p className="font-roboto-slab text-text-colour text-sm">
                         <span className="font-medium">Note:</span> {demand.notes}
                       </p>
                     )}
                   </div>
 
-                  {/* Cancel button — only for pending demands */}
+                  {/* Cancel button - only for pending demands */}
                   {demand.status === "pending" && (
                     <button
                       onClick={() => handleCancel(demand.id)}

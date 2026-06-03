@@ -128,7 +128,7 @@ export default function SavedListingsPage() {
                   e.stopPropagation();
                   handleRemove(listing.id);
                 }}
-                className="absolute top-4 right-4 rounded-full border border-gray-200 bg-(--white)/90 p-2 text-(--error-red) opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+                className="text-error-red absolute top-4 right-4 rounded-full border border-gray-200 bg-(--white)/90 p-2 opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
                 aria-label="Remove from saved"
               >
                 <Trash2 size={18} />

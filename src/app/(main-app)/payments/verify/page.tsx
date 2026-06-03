@@ -13,16 +13,14 @@ function PaymentVerifyContent() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
 
-  const [status, setStatus] = useState<VerifyStatus>("loading");
-  const [message, setMessage] = useState("");
-  const [orderId, setOrderId] = useState<string | null>(null);
-
+  const [status, setStatus] = useState<VerifyStatus>(() =>
+    reference ? "loading" : "failed"
+  );
+  const [message, setMessage] = useState(() =>
+    reference ? "" : "No payment reference found."
+  );
   useEffect(() => {
-    if (!reference) {
-      setStatus("failed");
-      setMessage("No payment reference found.");
-      return;
-    }
+    if (!reference) return;
 
     const verify = async () => {
       try {
@@ -32,7 +30,6 @@ function PaymentVerifyContent() {
           data: { orderId: string; orderStatus: string; paymentStatus: string };
         }>(`/buyers/payments/verify?reference=${encodeURIComponent(reference)}`);
 
-        setOrderId(response.data.orderId);
         setStatus("success");
         setMessage(response.message);
 
@@ -49,7 +46,7 @@ function PaymentVerifyContent() {
   }, [reference, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-(--gray-bg)">
+    <div className="bg-gray-bg flex min-h-screen items-center justify-center">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -57,35 +54,31 @@ function PaymentVerifyContent() {
       >
         {status === "loading" && (
           <>
-            <div className="h-16 w-16 animate-spin rounded-full border-4 border-(--border-gray) border-t-(--theme-green-dark)" />
-            <p className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+            <div className="border-gray-border border-t-theme-green-dark h-16 w-16 animate-spin rounded-full border-4" />
+            <p className="font-ubuntu text-heading-colour text-xl font-bold">
               Verifying payment...
             </p>
-            <p className="text-sm text-(--text-colour)">
-              Please wait while we confirm your payment.
-            </p>
+            <p className="text-text-colour text-sm">Please wait while we confirm your payment.</p>
           </>
         )}
 
         {status === "success" && (
           <>
-            <CheckCircle size={64} className="text-(--theme-green-dark)" />
-            <p className="font-ubuntu text-xl font-bold text-(--heading-colour)">
-              Payment Confirmed!
-            </p>
-            <p className="text-sm text-(--text-colour)">{message}</p>
-            <p className="text-xs text-(--text-colour)">Redirecting to your order...</p>
+            <CheckCircle size={64} className="text-theme-green-dark" />
+            <p className="font-ubuntu text-heading-colour text-xl font-bold">Payment Confirmed!</p>
+            <p className="text-text-colour text-sm">{message}</p>
+            <p className="text-text-colour text-xs">Redirecting to your order...</p>
           </>
         )}
 
         {status === "failed" && (
           <>
-            <XCircle size={64} className="text-(--error-red)" />
-            <p className="font-ubuntu text-xl font-bold text-(--heading-colour)">Payment Failed</p>
-            <p className="text-sm text-(--text-colour)">{message}</p>
+            <XCircle size={64} className="text-error-red" />
+            <p className="font-ubuntu text-heading-colour text-xl font-bold">Payment Failed</p>
+            <p className="text-text-colour text-sm">{message}</p>
             <button
               onClick={() => router.push("/buyers-dashboard/orders")}
-              className="mt-4 rounded-full bg-(--theme-green-dark) px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              className="bg-theme-green-dark mt-4 rounded-full px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
             >
               View My Orders
             </button>
@@ -101,7 +94,7 @@ export default function PaymentVerifyPage() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-(--border-gray) border-t-(--theme-green-dark)" />
+          <div className="border-gray-border border-t-theme-green-dark h-12 w-12 animate-spin rounded-full border-4" />
         </div>
       }
     >

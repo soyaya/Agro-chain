@@ -45,12 +45,15 @@ export default function ClusterDashboardPage() {
     };
   }, []);
 
-  const stats = useMemo(() => [
-    { label: "Farmers Under Me", value: summary.farmersUnderMe.toLocaleString(), icon: Users },
-    { label: "Pending Approvals", value: summary.pendingApproval.toLocaleString(), icon: Clock },
-    { label: "Active Listings", value: summary.allListings.toLocaleString(), icon: CheckCircle },
-    { label: "Total Supply (kg)", value: summary.totalSupply.toLocaleString(), icon: FileText },
-  ], [summary]);
+  const stats = useMemo(
+    () => [
+      { label: "Farmers Under Me", value: summary.farmersUnderMe.toLocaleString(), icon: Users },
+      { label: "Pending Approvals", value: summary.pendingApproval.toLocaleString(), icon: Clock },
+      { label: "Active Listings", value: summary.allListings.toLocaleString(), icon: CheckCircle },
+      { label: "Total Supply (kg)", value: summary.totalSupply.toLocaleString(), icon: FileText },
+    ],
+    [summary],
+  );
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
@@ -60,10 +63,10 @@ export default function ClusterDashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
           Welcome back, Cluster Farmer! 👋
         </h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <p className="font-roboto-slab text-text-colour">
           Manage your farmers and marketplace listings
         </p>
       </motion.div>
@@ -81,13 +84,15 @@ export default function ClusterDashboardPage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-gray) bg-(--white) p-6 shadow-sm"
+              className="border-gray-border rounded-2xl border bg-(--white) p-6 shadow-sm"
             >
               <div className="mb-4 flex items-center justify-between">
                 <Icon className="text-green-700" size={22} />
               </div>
-              <p className="font-ubuntu mb-1 text-3xl font-bold text-(--heading-colour)">{loading ? "..." : stat.value}</p>
-              <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>
+              <p className="font-ubuntu text-heading-colour mb-1 text-3xl font-bold">
+                {loading ? "..." : stat.value}
+              </p>
+              <p className="font-roboto-slab text-text-colour text-sm">{stat.label}</p>
             </motion.div>
           );
         })}
@@ -98,21 +103,21 @@ export default function ClusterDashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu text-heading-colour mb-(--space-lg) text-xl font-semibold">
           Quick Actions
         </h2>
         <div className="flex flex-col gap-(--gap-base) sm:flex-row">
           <a
             href="/cluster-dashboard/pending-approvals"
-            className="font-roboto-slab flex-1 rounded-xl bg-(--theme-green-dark) px-(--space-lg) py-(--space-lg) text-center font-medium text-white transition-opacity duration-200 hover:opacity-90 focus:ring-2 focus:ring-(--theme-green-dark) focus:ring-offset-2 focus:outline-none"
+            className="font-roboto-slab bg-theme-green-dark focus:ring-theme-green-dark flex-1 rounded-xl px-(--space-lg) py-(--space-lg) text-center font-medium text-white transition-opacity duration-200 hover:opacity-90 focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             Review Pending Listings
           </a>
           <a
             href="/cluster-dashboard/farmers"
-            className="font-roboto-slab flex-1 rounded-xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-lg) text-center font-medium text-(--heading-colour) transition-colors duration-200 hover:bg-(--bg-pink) focus:ring-2 focus:ring-(--border-gray) focus:ring-offset-2 focus:outline-none"
+            className="font-roboto-slab border-gray-border text-heading-colour hover:bg-pink-bg focus:ring-border-gray flex-1 rounded-xl border bg-(--white) px-(--space-lg) py-(--space-lg) text-center font-medium transition-colors duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             View My Farmers
           </a>
@@ -124,20 +129,25 @@ export default function ClusterDashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu text-heading-colour mb-(--space-lg) text-xl font-semibold">
           Recent Activity
         </h2>
         <div className="flex flex-col gap-(--space-md)">
           {activities.length === 0 ? (
-            <p className="font-roboto-slab text-sm text-(--text-colour)">No recent activity yet.</p>
+            <p className="font-roboto-slab text-text-colour text-sm">No recent activity yet.</p>
           ) : (
             activities.map((activity) => (
-              <div key={activity.id} className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-(--bg-pink)">
+              <div
+                key={activity.id}
+                className="hover:bg-pink-bg flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors"
+              >
                 <div className="h-2 w-2 rounded-full bg-green-500" />
-                <p className="font-roboto-slab text-sm text-(--text-colour)">{activity.text}</p>
-                <span className="ml-auto text-xs text-gray-400">{new Date(activity.at).toLocaleDateString()}</span>
+                <p className="font-roboto-slab text-text-colour text-sm">{activity.text}</p>
+                <span className="ml-auto text-xs text-gray-400">
+                  {new Date(activity.at).toLocaleDateString()}
+                </span>
               </div>
             ))
           )}

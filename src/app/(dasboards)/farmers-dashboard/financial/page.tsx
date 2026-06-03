@@ -1,6 +1,6 @@
 "use client";
 
-// === Coming Soon — existing content preserved below
+// === Coming Soon - existing content preserved below
 // import { motion } from "framer-motion";
 // import { DollarSign, ShoppingCart, Receipt, TrendingUp, ArrowRight, AlertCircle } from "lucide-react";
 // import Link from "next/link";
@@ -86,10 +86,10 @@ export default function FinancialServicesPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-heading-colour">
           Financial Services 💰
         </h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <p className="font-roboto-slab text-text-colour">
           Access loans, credit purchases, and manage your farm finances
         </p>
       </motion.div>
@@ -106,7 +106,7 @@ export default function FinancialServicesPage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
+              className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
             >
               <div className="mb-(--space-lg) flex items-center justify-between">
                 <div className={`rounded-xl p-(--space-md) ${stat.bgColor}`}>
@@ -114,10 +114,10 @@ export default function FinancialServicesPage() {
                 </div>
                 <span className="font-roboto-slab text-xs text-green-600">{stat.change}</span>
               </div>
-              <p className="font-ubuntu mb-1 text-3xl font-bold text-(--heading-colour)">
+              <p className="font-ubuntu mb-1 text-3xl font-bold text-heading-colour">
                 {stat.value}
               </p>
-              <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>
+              <p className="font-roboto-slab text-sm text-text-colour">{stat.label}</p>
             </motion.div>
           );
         })}
@@ -147,7 +147,7 @@ export default function FinancialServicesPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-heading-colour">
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 gap-(--gap-lg) sm:grid-cols-2">
@@ -157,20 +157,20 @@ export default function FinancialServicesPage() {
               <Link
                 key={action.href}
                 href={action.href}
-                className="group rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm cursor-pointer ease-in-out transition-all duration-300 hover:shadow-lg hover:border-gray-300 hover:scale-105"
+                className="group rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm cursor-pointer ease-in-out transition-all duration-300 hover:shadow-lg hover:border-gray-300 hover:scale-105"
               >
                 <div className="flex items-start gap-(--space-lg)">
                   <div className={`rounded-xl p-(--space-md) ${action.color} transition-transform duration-300 group-hover:scale-110`}>
                     <Icon size={24} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-ubuntu mb-2 text-lg font-semibold text-(--heading-colour) group-hover:text-(--theme-green-dark)">
+                    <h3 className="font-ubuntu mb-2 text-lg font-semibold text-heading-colour group-hover:text-theme-green-dark">
                       {action.title}
                     </h3>
-                    <p className="font-roboto-slab text-sm text-(--text-colour) mb-(--space-md)">
+                    <p className="font-roboto-slab text-sm text-text-colour mb-(--space-md)">
                       {action.description}
                     </p>
-                    <div className="flex items-center gap-2 text-sm font-medium text-(--theme-green-dark)">
+                    <div className="flex items-center gap-2 text-sm font-medium text-theme-green-dark">
                       <span>Get Started</span>
                       <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
                     </div>
@@ -186,29 +186,29 @@ export default function FinancialServicesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.4 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-heading-colour">
           Recent Financial Activity
         </h2>
         <div className="flex flex-col gap-(--space-md)">
-          <div className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-(--bg-pink)">
+          <div className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-pink-bg">
             <div className="h-2 w-2 rounded-full bg-green-500" />
-            <p className="font-roboto-slab text-sm text-(--text-colour)">
+            <p className="font-roboto-slab text-sm text-text-colour">
               Loan payment of ₦25,000 processed successfully
             </p>
             <span className="ml-auto text-xs text-gray-400">2 days ago</span>
           </div>
-          <div className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-(--bg-pink)">
+          <div className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-pink-bg">
             <div className="h-2 w-2 rounded-full bg-blue-500" />
-            <p className="font-roboto-slab text-sm text-(--text-colour)">
+            <p className="font-roboto-slab text-sm text-text-colour">
               Credit purchase approved - ₦45,000 for fertilizers
             </p>
             <span className="ml-auto text-xs text-gray-400">5 days ago</span>
           </div>
-          <div className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-(--bg-pink)">
+          <div className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-pink-bg">
             <div className="h-2 w-2 rounded-full bg-yellow-500" />
-            <p className="font-roboto-slab text-sm text-(--text-colour)">
+            <p className="font-roboto-slab text-sm text-text-colour">
               Loan application under review - ₦150,000
             </p>
             <span className="ml-auto text-xs text-gray-400">1 week ago</span>

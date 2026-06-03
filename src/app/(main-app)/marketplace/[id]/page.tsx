@@ -122,23 +122,23 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-(--gray-bg)">
-        <p className="text-(--text-colour)">Loading listing...</p>
+      <div className="bg-gray-bg flex min-h-screen items-center justify-center">
+        <p className="text-text-colour">Loading listing...</p>
       </div>
     );
   }
 
   if (errorMessage || !listing) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-(--gray-bg)">
-        <p className="text-(--error-red)">{errorMessage ?? "Listing not found"}</p>
+      <div className="bg-gray-bg flex min-h-screen items-center justify-center">
+        <p className="text-error-red">{errorMessage ?? "Listing not found"}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-(--gray-bg)">
-      <div className="container-max-width px-(--section-px) py-(--section-py) sm:px-(--section-px-sm) sm:py-(--section-py-sm) lg:px-(--section-px-lg) lg:py-(--section-py-lg)">
+    <div className="bg-gray-bg min-h-screen">
+      <div className="container-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-(--section-py-lg)">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -157,7 +157,7 @@ export default function ListingDetailPage() {
           <motion.button
             variants={FADE_IN_VARIANT}
             onClick={() => router.back()}
-            className="flex w-fit items-center gap-2 text-(--text-colour) transition hover:text-(--heading-colour)"
+            className="text-text-colour hover:text-heading-colour flex w-fit items-center gap-2 transition"
           >
             <ArrowLeft size={20} />
             Back to Marketplace
@@ -173,12 +173,12 @@ export default function ListingDetailPage() {
               >
                 {/* Header */}
                 <div className="flex flex-col gap-(--gap-base)">
-                  <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">
+                  <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
                     {listing.fishType}
                   </h1>
                   <div className="flex items-center gap-(--gap-base)">
-                    <Building size={20} className="text-(--text-colour)" />
-                    <span className="font-roboto-slab text-lg text-(--text-colour)">
+                    <Building size={20} className="text-text-colour" />
+                    <span className="font-roboto-slab text-text-colour text-lg">
                       {listing.businessName}
                     </span>
                   </div>
@@ -187,40 +187,40 @@ export default function ListingDetailPage() {
                 {/* Details Grid */}
                 <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
                   <div className="flex items-center gap-(--gap-base)">
-                    <Package size={20} className="text-(--text-colour)" />
+                    <Package size={20} className="text-text-colour" />
                     <div className="flex flex-col">
-                      <span className="text-sm text-(--text-colour)">Available</span>
-                      <span className="font-roboto-slab font-medium text-(--heading-colour)">
+                      <span className="text-text-colour text-sm">Available</span>
+                      <span className="font-roboto-slab text-heading-colour font-medium">
                         {listing.totalAvailableKg}kg
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-(--gap-base)">
-                    <Calendar size={20} className="text-(--text-colour)" />
+                    <Calendar size={20} className="text-text-colour" />
                     <div className="flex flex-col">
-                      <span className="text-sm text-(--text-colour)">Harvest Date</span>
-                      <span className="font-roboto-slab font-medium text-(--heading-colour)">
+                      <span className="text-text-colour text-sm">Harvest Date</span>
+                      <span className="font-roboto-slab text-heading-colour font-medium">
                         {formatDate(listing.harvestDate)}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-(--gap-base)">
-                    <MapPin size={20} className="text-(--text-colour)" />
+                    <MapPin size={20} className="text-text-colour" />
                     <div className="flex flex-col">
-                      <span className="text-sm text-(--text-colour)">Location</span>
-                      <span className="font-roboto-slab font-medium text-(--heading-colour)">
+                      <span className="text-text-colour text-sm">Location</span>
+                      <span className="font-roboto-slab text-heading-colour font-medium">
                         {listing.location}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-(--gap-base)">
-                    <Phone size={20} className="text-(--text-colour)" />
+                    <Phone size={20} className="text-text-colour" />
                     <div className="flex flex-col">
-                      <span className="text-sm text-(--text-colour)">Contact</span>
-                      <span className="font-roboto-slab font-medium text-(--heading-colour)">
+                      <span className="text-text-colour text-sm">Contact</span>
+                      <span className="font-roboto-slab text-heading-colour font-medium">
                         {listing.clusterFarmerContact}
                       </span>
                     </div>
@@ -229,12 +229,12 @@ export default function ListingDetailPage() {
 
                 {/* Packaging Options */}
                 <div className="flex flex-col gap-(--gap-base)">
-                  <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                  <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                     Available Packages
                   </h3>
                   <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
-                    <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) p-(--space-md)">
-                      <span className="text-sm font-medium text-(--heading-colour)">
+                    <div className="border-gray-border flex flex-col gap-2 rounded-2xl border p-(--space-md)">
+                      <span className="text-heading-colour text-sm font-medium">
                         Choose Fish Type
                       </span>
                       <div className="flex flex-wrap gap-2">
@@ -244,8 +244,8 @@ export default function ListingDetailPage() {
                             onClick={() => setSelectedVariant(variant)}
                             className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
                               selectedVariant === variant
-                                ? "bg-(--theme-green-dark) text-white"
-                                : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
+                                ? "bg-theme-green-dark text-white"
+                                : "border-gray-border text-text-colour hover:bg-gray-bg border"
                             }`}
                           >
                             {variant}
@@ -254,8 +254,8 @@ export default function ListingDetailPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) p-(--space-md)">
-                      <span className="text-sm font-medium text-(--heading-colour)">
+                    <div className="border-gray-border flex flex-col gap-2 rounded-2xl border p-(--space-md)">
+                      <span className="text-heading-colour text-sm font-medium">
                         Processing Preference
                       </span>
                       <div className="flex gap-3">
@@ -263,8 +263,8 @@ export default function ListingDetailPage() {
                           onClick={() => setProcessed(false)}
                           className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition ${
                             !processed
-                              ? "bg-(--theme-green-dark) text-white"
-                              : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
+                              ? "bg-theme-green-dark text-white"
+                              : "border-gray-border text-text-colour hover:bg-gray-bg border"
                           }`}
                         >
                           Unprocessed
@@ -273,8 +273,8 @@ export default function ListingDetailPage() {
                           onClick={() => setProcessed(true)}
                           className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition ${
                             processed
-                              ? "bg-(--theme-green-dark) text-white"
-                              : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
+                              ? "bg-theme-green-dark text-white"
+                              : "border-gray-border text-text-colour hover:bg-gray-bg border"
                           }`}
                         >
                           Processed
@@ -296,27 +296,25 @@ export default function ListingDetailPage() {
                       return (
                         <div
                           key={index}
-                          className="flex flex-col gap-(--space-md) rounded-2xl border border-(--border-gray) p-(--space-lg)"
+                          className="border-gray-border flex flex-col gap-(--space-md) rounded-2xl border p-(--space-lg)"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-ubuntu text-lg font-bold text-(--heading-colour)">
+                            <span className="font-ubuntu text-heading-colour text-lg font-bold">
                               {pkg.weightKg}kg Package
                             </span>
-                            <span className="font-ubuntu text-lg font-bold text-(--theme-green-dark)">
+                            <span className="font-ubuntu text-theme-green-dark text-lg font-bold">
                               ₦{(pkg.pricePerUnit ?? 0).toLocaleString()}
                             </span>
                           </div>
-                          <p className="text-sm text-(--text-colour)">
-                            {pkg.quantity} units available
-                          </p>
+                          <p className="text-text-colour text-sm">{pkg.quantity} units available</p>
 
                           {cartItem ? (
-                            <div className="flex items-center justify-between rounded-full border border-(--border-gray) p-1">
+                            <div className="border-gray-border flex items-center justify-between rounded-full border p-1">
                               <button
                                 onClick={() =>
                                   cart.updateQuantity(cartItemIndex, cartItem.quantity - 1)
                                 }
-                                className="flex h-8 w-8 items-center justify-center rounded-full bg-(--gray-bg) transition hover:bg-(--border-gray)"
+                                className="bg-gray-bg hover:bg-border-gray flex h-8 w-8 items-center justify-center rounded-full transition"
                               >
                                 <Minus size={16} />
                               </button>
@@ -327,7 +325,7 @@ export default function ListingDetailPage() {
                                 onClick={() =>
                                   cart.updateQuantity(cartItemIndex, cartItem.quantity + 1)
                                 }
-                                className="flex h-8 w-8 items-center justify-center rounded-full bg-(--gray-bg) transition hover:bg-(--border-gray)"
+                                className="bg-gray-bg hover:bg-border-gray flex h-8 w-8 items-center justify-center rounded-full transition"
                               >
                                 <Plus size={16} />
                               </button>
@@ -335,7 +333,7 @@ export default function ListingDetailPage() {
                           ) : (
                             <button
                               onClick={() => addToCart(pkg)}
-                              className="flex h-10 items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90"
+                              className="bg-theme-green-dark flex h-10 items-center justify-center gap-2 rounded-full text-sm font-medium text-white transition hover:opacity-90"
                             >
                               <ShoppingCart size={16} />
                               Add to Cart
@@ -349,14 +347,14 @@ export default function ListingDetailPage() {
 
                 {/* Delivery Options */}
                 <div className="flex flex-col gap-(--gap-base)">
-                  <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                  <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                     Delivery Options
                   </h3>
                   <div className="flex flex-col gap-(--space-md)">
                     {(listing.deliveryOptions ?? []).map((option, index) => (
                       <label
                         key={index}
-                        className="flex items-center gap-(--gap-base) rounded-2xl border border-(--border-gray) p-(--space-lg) transition hover:bg-(--gray-bg)"
+                        className="border-gray-border hover:bg-gray-bg flex items-center gap-(--gap-base) rounded-2xl border p-(--space-lg) transition"
                       >
                         <input
                           type="radio"
@@ -367,8 +365,8 @@ export default function ListingDetailPage() {
                           className="h-5 w-5"
                         />
                         <div className="flex items-center gap-2">
-                          <Truck size={18} className="text-(--text-colour)" />
-                          <span className="font-roboto-slab text-(--text-colour)">{option}</span>
+                          <Truck size={18} className="text-text-colour" />
+                          <span className="font-roboto-slab text-text-colour">{option}</span>
                         </div>
                       </label>
                     ))}
@@ -383,38 +381,36 @@ export default function ListingDetailPage() {
                 variants={SLIDE_UP_VARIANT}
                 className="sticky top-4 flex flex-col gap-(--gap-base) rounded-3xl bg-(--white) p-(--space-xl) shadow-sm"
               >
-                <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
-                  Order Summary
-                </h3>
+                <h3 className="font-ubuntu text-heading-colour text-xl font-bold">Order Summary</h3>
 
                 {cart.items.length > 0 ? (
                   <>
                     <div className="flex flex-col gap-(--space-md)">
                       {cart.items.map((item, index) => (
                         <div key={index} className="flex justify-between text-sm">
-                          <span className="text-(--text-colour)">
+                          <span className="text-text-colour">
                             {item.weightKg}kg × {item.quantity} ({item.variant})
                           </span>
-                          <span className="font-medium text-(--heading-colour)">
+                          <span className="text-heading-colour font-medium">
                             ₦{(item.pricePerUnit * item.quantity).toLocaleString()}
                           </span>
                         </div>
                       ))}
                     </div>
 
-                    <div className="border-t border-(--border-gray) pt-(--space-md)">
+                    <div className="border-gray-border border-t pt-(--space-md)">
                       <div className="flex justify-between text-sm">
-                        <span className="text-(--text-colour)">Total Weight:</span>
-                        <span className="font-medium text-(--heading-colour)">{totalWeight}kg</span>
+                        <span className="text-text-colour">Total Weight:</span>
+                        <span className="text-heading-colour font-medium">{totalWeight}kg</span>
                       </div>
                     </div>
 
-                    <div className="border-t border-(--border-gray) pt-(--space-md)">
+                    <div className="border-gray-border border-t pt-(--space-md)">
                       <div className="flex justify-between">
-                        <span className="font-ubuntu text-lg font-bold text-(--heading-colour)">
+                        <span className="font-ubuntu text-heading-colour text-lg font-bold">
                           Total:
                         </span>
-                        <span className="font-ubuntu text-lg font-bold text-(--theme-green-dark)">
+                        <span className="font-ubuntu text-theme-green-dark text-lg font-bold">
                           ₦{totalAmount.toLocaleString()}
                         </span>
                       </div>
@@ -422,7 +418,7 @@ export default function ListingDetailPage() {
 
                     <button
                       onClick={handleCheckout}
-                      className="flex h-12 items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) text-white transition hover:opacity-90"
+                      className="bg-theme-green-dark flex h-12 items-center justify-center gap-2 rounded-full text-white transition hover:opacity-90"
                     >
                       <ShoppingCart size={18} />
                       Proceed to Checkout
@@ -430,8 +426,8 @@ export default function ListingDetailPage() {
                   </>
                 ) : (
                   <div className="flex flex-col items-center gap-(--gap-base) py-(--space-xl) text-center">
-                    <ShoppingCart size={48} className="text-(--text-colour)" />
-                    <p className="text-sm text-(--text-colour)">
+                    <ShoppingCart size={48} className="text-text-colour" />
+                    <p className="text-text-colour text-sm">
                       Your cart is empty. Add packages to get started.
                     </p>
                   </div>

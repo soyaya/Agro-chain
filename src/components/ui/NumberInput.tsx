@@ -60,10 +60,10 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {label && (
           <label
             htmlFor={label}
-            className="font-roboto-slab flex cursor-default items-center gap-1 text-base font-medium text-(--heading-colour)"
+            className="font-roboto-slab text-heading-colour flex cursor-default items-center gap-1 text-base font-medium"
           >
             {label}
-            {required && <span className="text-(--error-red)">*</span>}
+            {required && <span className="text-error-red">*</span>}
           </label>
         )}
 
@@ -89,13 +89,13 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 className={cn(
                   "font-roboto-slab flex h-12 w-full cursor-pointer items-center justify-between rounded-full border text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none",
                   "px-(--space-md)",
-                  hasError ? "border-(--error-red)" : "border-(--border-input)",
-                  "text-(--text-colour)",
-                  "hover:border-(--border-gray) hover:shadow-sm",
-                  "focus:border-(--theme-green-dark) focus:ring-2 focus:ring-(--theme-green-dark) focus:ring-offset-1",
+                  hasError ? "border-error-red" : "border-input-border",
+                  "text-text-colour",
+                  "hover:border-gray-border hover:shadow-sm",
+                  "focus:border-theme-green-dark focus:ring-theme-green-dark focus:ring-2 focus:ring-offset-1",
                 )}
               >
-                <span className={cn(internalValue ? "text-(--text-colour)" : "text-gray-400")}>
+                <span className={cn(internalValue ? "text-text-colour" : "text-gray-400")}>
                   {displayValue || placeholder}
                 </span>
 
@@ -118,7 +118,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                     transition={{ duration: 0.2 }}
                     role="listbox"
                     aria-label={label ? `${label} options` : "Number options"}
-                    className="absolute right-0 left-0 z-50 mt-2 max-h-60 overflow-auto rounded-xl border border-(--border-input) bg-(--white) shadow-lg"
+                    className="border-input-border absolute right-0 left-0 z-50 mt-2 max-h-60 overflow-auto rounded-xl border bg-(--white) shadow-lg"
                   >
                     {options.map((option) => (
                       <div
@@ -134,10 +134,10 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                           }
                         }}
                         className={cn(
-                          "font-roboto-slab cursor-pointer px-(--space-md) py-(--space-md) text-base text-(--text-colour) transition-all duration-200 ease-in-out",
-                          "hover:bg-(--bg-pink) hover:shadow-sm",
-                          "focus:bg-(--bg-pink) focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none focus:ring-inset",
-                          Number(internalValue) === option && "bg-(--bg-pink)",
+                          "font-roboto-slab text-text-colour cursor-pointer px-(--space-md) py-(--space-md) text-base transition-all duration-200 ease-in-out",
+                          "hover:bg-pink-bg hover:shadow-sm",
+                          "focus:ring-theme-green-dark focus:bg-pink-bg focus:ring-2 focus:outline-none focus:ring-inset",
+                          Number(internalValue) === option && "bg-pink-bg",
                         )}
                       >
                         {option}
@@ -172,17 +172,15 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
               className={cn(
                 "font-roboto-slab h-12 w-full rounded-full border py-(--space-lg) text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none",
                 "pr-(--space-md) pl-(--space-md)",
-                hasError ? "border-(--error-red)" : "border-(--border-input)",
-                "text-(--text-colour) caret-(--input-field-green) placeholder:text-base focus:border-(--border-gray)",
+                hasError ? "border-error-red" : "border-input-border",
+                "focus:border-gray-border text-text-colour caret-input-field-green placeholder:text-base",
               )}
               {...props}
             />
           )}
         </div>
 
-        {typeof error === "string" && error && (
-          <p className="text-sm text-(--error-red)">{error}</p>
-        )}
+        {typeof error === "string" && error && <p className="text-error-red text-sm">{error}</p>}
       </div>
     );
   },

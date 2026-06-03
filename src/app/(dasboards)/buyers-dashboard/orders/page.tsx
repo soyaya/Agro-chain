@@ -84,8 +84,8 @@ export default function BuyerOrdersPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">My Orders</h1>
-        <p className="font-roboto-slab text-(--text-colour)">Track and manage your fish orders</p>
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">My Orders</h1>
+        <p className="font-roboto-slab text-text-colour">Track and manage your fish orders</p>
       </motion.div>
 
       {/* Stats */}
@@ -112,14 +112,14 @@ export default function BuyerOrdersPage() {
             onClick={() => setFilterStatus(status)}
             className={`flex flex-col gap-1 rounded-2xl border p-4 transition-all duration-200 ${
               filterStatus === status
-                ? "border-(--theme-green-dark) bg-green-50"
-                : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
+                ? "border-theme-green-dark bg-green-50"
+                : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
-            <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+            <span className="font-ubuntu text-heading-colour text-xl font-bold">
               {statusCounts[status]}
             </span>
-            <span className="font-roboto-slab text-xs capitalize text-(--text-colour)">{status}</span>
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
           </motion.button>
         ))}
       </motion.div>
@@ -141,42 +141,55 @@ export default function BuyerOrdersPage() {
               <motion.div
                 key={order.orderId}
                 variants={FADE_IN_VARIANT}
-                className="rounded-2xl border border-(--border-gray) bg-(--white) p-5 shadow-sm transition hover:shadow-md"
+                className="border-gray-border rounded-2xl border bg-(--white) p-5 shadow-sm transition hover:shadow-md"
               >
                 <div className="flex flex-col gap-4">
                   {/* Header */}
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <h3 className="font-ubuntu text-base font-semibold text-(--heading-colour)">
+                      <h3 className="font-ubuntu text-heading-colour text-base font-semibold">
                         {order.orderNumber}
                       </h3>
-                      <p className="font-roboto-slab text-sm text-(--text-colour)">
+                      <p className="font-roboto-slab text-text-colour text-sm">
                         {new Date(order.createdAt).toLocaleDateString("en-NG", {
-                          day: "numeric", month: "short", year: "numeric",
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
                         })}
                       </p>
                     </div>
-                    <span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${statusColor}`}>
-                      {order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : "—"}
+                    <span
+                      className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${statusColor}`}
+                    >
+                      {order.status
+                        ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
+                        : "-"}
                     </span>
                   </div>
 
                   {/* Details */}
                   <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
                     <div>
-                      <p className="font-roboto-slab mb-0.5 text-xs text-(--text-colour)">Supplier</p>
-                      <p className="font-roboto-slab font-medium text-(--heading-colour)">{order.clusterFarmerName ?? "—"}</p>
+                      <p className="font-roboto-slab text-text-colour mb-0.5 text-xs">Supplier</p>
+                      <p className="font-roboto-slab text-heading-colour font-medium">
+                        {order.clusterFarmerName ?? "-"}
+                      </p>
                     </div>
                     <div>
-                      <p className="font-roboto-slab mb-0.5 text-xs text-(--text-colour)">Delivery</p>
-                      <p className="font-roboto-slab font-medium text-(--heading-colour)">{order.deliveryOption ?? "—"}</p>
+                      <p className="font-roboto-slab text-text-colour mb-0.5 text-xs">Delivery</p>
+                      <p className="font-roboto-slab text-heading-colour font-medium">
+                        {order.deliveryOption ?? "-"}
+                      </p>
                     </div>
                     <div>
-                      <p className="font-roboto-slab mb-0.5 text-xs text-(--text-colour)">Payment</p>
-                      <p className={`font-roboto-slab font-medium ${order.payment_status === "paid" ? "text-green-700" : "text-amber-600"}`}>
+                      <p className="font-roboto-slab text-text-colour mb-0.5 text-xs">Payment</p>
+                      <p
+                        className={`font-roboto-slab font-medium ${order.payment_status === "paid" ? "text-green-700" : "text-amber-600"}`}
+                      >
                         {order.payment_status
-                          ? order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)
-                          : "—"}
+                          ? order.payment_status.charAt(0).toUpperCase() +
+                            order.payment_status.slice(1)
+                          : "-"}
                       </p>
                     </div>
                   </div>
@@ -185,7 +198,7 @@ export default function BuyerOrdersPage() {
                   <div className="flex border-t border-gray-100 pt-3">
                     <button
                       onClick={() => router.push(`/buyers-dashboard/orders/${order.orderId}`)}
-                      className="font-roboto-slab flex items-center gap-2 rounded-xl bg-(--theme-green-dark) px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                      className="font-roboto-slab bg-theme-green-dark flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
                     >
                       <Eye size={15} />
                       View Details

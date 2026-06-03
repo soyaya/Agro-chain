@@ -71,8 +71,8 @@ export default function FarmerListingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-(--gray-bg)">
-      <div className="container-max-width px-(--section-px) py-(--section-py) sm:px-(--section-px-sm) sm:py-(--section-py-sm) lg:px-(--section-px-lg) lg:py-(--section-py-lg)">
+    <div className="bg-gray-bg min-h-screen">
+      <div className="container-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-(--section-py-lg)">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -85,17 +85,17 @@ export default function FarmerListingsPage() {
             className="flex flex-col gap-(--gap-base) md:flex-row md:items-center md:justify-between"
           >
             <div>
-              <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) lg:text-4xl">
+              <h1 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
                 My Listings
               </h1>
-              <p className="mt-2 text-(--text-colour)">
+              <p className="text-text-colour mt-2">
                 Manage your supply listings and track approval status
               </p>
             </div>
 
             <button
               onClick={() => router.push("/farmers-dashboard/listings/create")}
-              className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
+              className="bg-theme-green-dark flex items-center justify-center gap-2 rounded-full px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
             >
               <Plus size={18} />
               Create Listing
@@ -113,14 +113,14 @@ export default function FarmerListingsPage() {
                 onClick={() => setFilterStatus(status)}
                 className={`flex flex-col gap-2 rounded-2xl border p-(--space-lg) transition ${
                   filterStatus === status
-                    ? "border-(--theme-green-dark) bg-green-50"
-                    : "border-(--border-gray) bg-(--white) hover:bg-(--gray-bg)"
+                    ? "border-theme-green-dark bg-green-50"
+                    : "border-gray-border hover:bg-gray-bg bg-(--white)"
                 }`}
               >
-                <span className="text-2xl font-bold text-(--heading-colour)">
+                <span className="text-heading-colour text-2xl font-bold">
                   {statusCounts[status]}
                 </span>
-                <span className="text-sm text-(--text-colour) capitalize">{status}</span>
+                <span className="text-text-colour text-sm capitalize">{status}</span>
               </button>
             ))}
           </motion.div>
@@ -128,16 +128,16 @@ export default function FarmerListingsPage() {
           {loading ? (
             <motion.div
               variants={FADE_IN_VARIANT}
-              className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+              className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
             >
-              <p className="text-(--text-colour)">Loading listings...</p>
+              <p className="text-text-colour">Loading listings...</p>
             </motion.div>
           ) : errorMessage ? (
             <motion.div
               variants={FADE_IN_VARIANT}
-              className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+              className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
             >
-              <p className="text-(--error-red)">{errorMessage}</p>
+              <p className="text-error-red">{errorMessage}</p>
             </motion.div>
           ) : filteredListings.length > 0 ? (
             <motion.div
@@ -155,14 +155,14 @@ export default function FarmerListingsPage() {
           ) : (
             <motion.div
               variants={FADE_IN_VARIANT}
-              className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+              className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
             >
-              <Filter size={48} className="text-(--text-colour)" />
+              <Filter size={48} className="text-text-colour" />
               <div className="flex flex-col items-center gap-2 text-center">
-                <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                   No listings found
                 </h3>
-                <p className="text-(--text-colour)">
+                <p className="text-text-colour">
                   {filterStatus === "all"
                     ? "Create your first supply listing to get started"
                     : `No ${filterStatus} listings at the moment`}
@@ -171,7 +171,7 @@ export default function FarmerListingsPage() {
               {filterStatus === "all" && (
                 <button
                   onClick={() => router.push("/farmers-dashboard/listings/create")}
-                  className="flex items-center gap-2 rounded-full bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
+                  className="bg-theme-green-dark flex items-center gap-2 rounded-full px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
                 >
                   <Plus size={18} />
                   Create Listing

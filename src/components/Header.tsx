@@ -54,8 +54,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="border-border/40 sticky top-0 left-0 z-50 w-full border-b bg-linear-to-b from-(--navbar-bg) to-(--navbar-bg)/10 backdrop-blur-sm supports-backdrop-filter:bg-(--navbar-bg)/60">
-        <div className="mx-auto flex h-(--navbar-h) w-full max-w-7xl items-center justify-between gap-2 px-(--section-px) sm:px-(--section-px-sm) lg:px-(--section-px-lg)">
+      <header className="border-border/40 font-inter sticky top-0 left-0 z-50 w-full border-b bg-linear-to-b from-navbar-bg to-navbar-bg/10 backdrop-blur-sm supports-backdrop-filter:bg-navbar-bg/60">
+        <div className="px-section-px sm:px-section-px-sm lg:px-section-px-lg mx-auto flex h-(--navbar-h) w-full max-w-7xl items-center justify-between gap-2">
           {/* Left: Menu + Logo */}
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -64,18 +64,18 @@ export default function Header() {
           </div>
 
           {/* Center: Desktop Nav */}
-          <nav className="hidden items-center gap-2 lg:flex">
-            <ul className="flex items-center gap-2 rounded-full bg-[#FEFEFE] p-1 shadow-md">
+          <nav className="hidden items-center gap-2 lg:flex px-4 py-2">
+            <ul className="flex items-center gap-2 rounded-full">
               {navLinks.map(({ label, href, icon: Icon }) => {
                 const isActive = pathname == href;
                 return (
                   <li key={href}>
                     <Link
                       href={href}
-                      className={`font-inter flex items-center gap-2 rounded-full border border-(--border-gray) px-4 py-2 text-sm font-semibold transition-all duration-300 ease-in-out hover:opacity-90 ${
+                      className={`font-inter flex items-center gap-2 px-4 py-2 transition-all duration-300 ease-in-out hover:opacity-90 ${
                         isActive
-                          ? "bg-(--debridger-green-dark) text-white shadow-md"
-                          : "text-(--debridger-green-dark) hover:bg-(--debridger-green-dark) hover:text-white"
+                          ? "bg-transparent text-white font-semibold"
+                          : "text-white/80 font-medium hover:text-white"
                       }`}
                     >
                       {Icon && <Icon className="h-4 w-4" />}
@@ -101,9 +101,9 @@ export default function Header() {
 
           {/* Desktop Authentication Links */}
           <div className="relative hidden items-center gap-2 lg:flex">
-            <SecondaryLink href="/signin" label="Log In" className="border-white text-white" />
+            <SecondaryLink href="/login" label="Log In" className="border-white text-white" />
 
-            <PrimaryLink href="/signup" label="Sign Up" />
+            <PrimaryLink href="/register" label="Get Started" />
           </div>
         </div>
       </header>
@@ -152,7 +152,7 @@ export default function Header() {
                       </Link>
 
                       <span className="relative">
-                        <BellIcon className="h-6 w-6 text-lg text-(--text-colour)" />
+                        <BellIcon className="text-text-colour h-6 w-6 text-lg" />
                         <span className="absolute -top-2 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#EF4444] p-1 text-sm text-white shadow-md">
                           2
                         </span>
@@ -161,7 +161,7 @@ export default function Header() {
 
                     <Button
                       variant="ghost"
-                      className="flex w-fit items-center justify-center text-xl font-bold text-(--text-colour) transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-(--input-error-red)"
+                      className="text-text-colour flex w-fit items-center justify-center text-xl font-bold transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-(--input-error-red)"
                       onClick={() => {
                         setIsSidebarOpen(false);
                         console.log(isSidebarOpen);
@@ -182,9 +182,9 @@ export default function Header() {
                               href={href}
                               className={`${
                                 isActive
-                                  ? "group bg-[#E8EEE9] text-(--heading-colour)"
-                                  : "text-(--text-colour) hover:bg-[#E8EEE9]"
-                              } flex items-center gap-4 border-b border-(--border-gray) p-4 text-xl`}
+                                  ? "group text-heading-colour bg-[#E8EEE9]"
+                                  : "text-text-colour hover:bg-[#E8EEE9]"
+                              } border-gray-border flex items-center gap-4 border-b p-4 text-xl`}
                               onClick={() => setIsSidebarOpen(false)}
                             >
                               {Icon && (
@@ -203,9 +203,9 @@ export default function Header() {
                   {/* Authentication Links */}
                   {/* This will disappear when user sign in and the user and notification icon will show */}
                   <div className="flex flex-wrap items-center gap-4 p-4">
-                    <SecondaryLink href="/signin" label="Login" className="" />
+                    <SecondaryLink href="/login" label="Log In" className="" />
 
-                    <PrimaryLink href="/signup" label="Sign Up" />
+                    <PrimaryLink href="/register" label="Get Started" />
                   </div>
                 </div>
               </div>

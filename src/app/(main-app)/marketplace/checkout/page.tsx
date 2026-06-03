@@ -71,8 +71,8 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-(--gray-bg)">
-      <div className="container-max-width px-(--section-px) py-(--section-py) sm:px-(--section-px-sm) sm:py-(--section-py-sm) lg:px-(--section-px-lg) lg:py-(--section-py-lg)">
+    <div className="bg-gray-bg min-h-screen">
+      <div className="container-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-(--section-py-lg)">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,34 +80,32 @@ export default function CheckoutPage() {
         >
           <div className="lg:col-span-2">
             <div className="rounded-3xl bg-(--white) p-(--space-xl) shadow-sm">
-              <h1 className="font-ubuntu text-2xl font-bold text-(--heading-colour)">
-                Checkout
-              </h1>
-              <p className="mt-1 text-sm text-(--text-colour)">
+              <h1 className="font-ubuntu text-heading-colour text-2xl font-bold">Checkout</h1>
+              <p className="text-text-colour mt-1 text-sm">
                 Review your cart and confirm delivery options.
               </p>
 
               <div className="mt-6 flex flex-col gap-4">
                 {cart.items.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-(--border-gray) p-6 text-center text-sm text-(--text-colour)">
+                  <div className="border-gray-border text-text-colour rounded-2xl border border-dashed p-6 text-center text-sm">
                     Your cart is empty.
                   </div>
                 ) : (
                   cart.items.map((item, index) => (
                     <div
                       key={`${item.listingId}-${item.weightKg}-${item.variant}-${index}`}
-                      className="flex flex-col gap-3 rounded-2xl border border-(--border-gray) p-4"
+                      className="border-gray-border flex flex-col gap-3 rounded-2xl border p-4"
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="font-roboto-slab font-semibold text-(--heading-colour)">
+                          <p className="font-roboto-slab text-heading-colour font-semibold">
                             {item.fishType} • {item.variant}
                           </p>
                           <p className="text-xs text-gray-500">
                             {item.processed ? "Processed" : "Unprocessed"} • {item.weightKg}kg pack
                           </p>
                         </div>
-                        <p className="text-sm font-semibold text-(--heading-colour)">
+                        <p className="text-heading-colour text-sm font-semibold">
                           ₦{item.totalPrice.toLocaleString()}
                         </p>
                       </div>
@@ -121,20 +119,20 @@ export default function CheckoutPage() {
               </div>
 
               <div className="mt-8">
-                <h2 className="font-ubuntu text-lg font-bold text-(--heading-colour)">
+                <h2 className="font-ubuntu text-heading-colour text-lg font-bold">
                   Delivery Preferences (Per Item)
                 </h2>
                 <div className="mt-4 flex flex-col gap-3">
                   {cart.items.map((item, index) => (
                     <div
                       key={`${item.listingId}-${item.weightKg}-${item.variant}-${index}`}
-                      className="flex flex-col gap-3 rounded-2xl border border-(--border-gray) p-4 sm:flex-row sm:items-center sm:justify-between"
+                      className="border-gray-border flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div>
-                        <p className="text-sm font-semibold text-(--heading-colour)">
+                        <p className="text-heading-colour text-sm font-semibold">
                           {item.fishType} • {item.variant}
                         </p>
-                        <p className="text-xs text-(--text-colour)">
+                        <p className="text-text-colour text-xs">
                           {item.weightKg}kg pack × {item.quantity}
                         </p>
                       </div>
@@ -143,8 +141,8 @@ export default function CheckoutPage() {
                           onClick={() => cart.updateDeliveryType(index, "pickup")}
                           className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition ${
                             item.deliveryType === "pickup"
-                              ? "border-(--theme-green-dark) bg-green-50 text-(--theme-green-dark)"
-                              : "border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
+                              ? "border-theme-green-dark text-theme-green-dark bg-green-50"
+                              : "border-gray-border text-text-colour hover:bg-gray-bg"
                           }`}
                         >
                           <Package size={14} />
@@ -154,8 +152,8 @@ export default function CheckoutPage() {
                           onClick={() => cart.updateDeliveryType(index, "delivery")}
                           className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition ${
                             item.deliveryType === "delivery"
-                              ? "border-(--theme-green-dark) bg-green-50 text-(--theme-green-dark)"
-                              : "border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
+                              ? "border-theme-green-dark text-theme-green-dark bg-green-50"
+                              : "border-gray-border text-text-colour hover:bg-gray-bg"
                           }`}
                         >
                           <Truck size={14} />
@@ -168,7 +166,7 @@ export default function CheckoutPage() {
 
                 {derivedDeliveryType === "delivery" && (
                   <div className="mt-4">
-                    <label className="text-sm font-medium text-(--heading-colour)">
+                    <label className="text-heading-colour text-sm font-medium">
                       Delivery Address
                     </label>
                     <textarea
@@ -177,16 +175,14 @@ export default function CheckoutPage() {
                         setDeliveryAddress(e.target.value);
                         if (addressError) setAddressError(null);
                       }}
-                      className={`mt-2 h-24 w-full rounded-2xl border p-4 text-sm text-(--text-colour) outline-none transition ${
+                      className={`text-text-colour mt-2 h-24 w-full rounded-2xl border p-4 text-sm transition outline-none ${
                         addressError
                           ? "border-red-400 focus:border-red-500"
-                          : "border-(--border-input) focus:border-(--theme-green-dark)"
+                          : "border-input-border focus:border-theme-green-dark"
                       }`}
                       placeholder="Enter delivery address"
                     />
-                    {addressError && (
-                      <p className="mt-2 text-xs text-red-500">{addressError}</p>
-                    )}
+                    {addressError && <p className="mt-2 text-xs text-red-500">{addressError}</p>}
                   </div>
                 )}
               </div>
@@ -195,27 +191,23 @@ export default function CheckoutPage() {
 
           <div className="lg:col-span-1">
             <div className="sticky top-4 rounded-3xl bg-(--white) p-(--space-xl) shadow-sm">
-              <h2 className="font-ubuntu text-lg font-bold text-(--heading-colour)">
-                Order Summary
-              </h2>
-              <div className="mt-4 flex flex-col gap-3 text-sm text-(--text-colour)">
+              <h2 className="font-ubuntu text-heading-colour text-lg font-bold">Order Summary</h2>
+              <div className="text-text-colour mt-4 flex flex-col gap-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span>Subtotal</span>
-                  <span className="font-semibold text-(--heading-colour)">
+                  <span className="text-heading-colour font-semibold">
                     ₦{cart.subtotal.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Delivery Fee</span>
-                  <span className="font-semibold text-(--heading-colour)">
+                  <span className="text-heading-colour font-semibold">
                     ₦{deliveryFee.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-t border-(--border-gray) pt-3">
-                  <span className="font-ubuntu text-base font-bold text-(--heading-colour)">
-                    Total
-                  </span>
-                  <span className="font-ubuntu text-base font-bold text-(--theme-green-dark)">
+                <div className="border-gray-border flex items-center justify-between border-t pt-3">
+                  <span className="font-ubuntu text-heading-colour text-base font-bold">Total</span>
+                  <span className="font-ubuntu text-theme-green-dark text-base font-bold">
                     ₦{totalAmount.toLocaleString()}
                   </span>
                 </div>
@@ -223,7 +215,7 @@ export default function CheckoutPage() {
               <button
                 onClick={handlePlaceOrder}
                 disabled={submitting}
-                className="mt-6 flex h-12 w-full items-center justify-center rounded-full bg-(--theme-green-dark) text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                className="bg-theme-green-dark mt-6 flex h-12 w-full items-center justify-center rounded-full text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting ? "Submitting..." : "Place Order"}
               </button>

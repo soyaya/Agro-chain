@@ -104,8 +104,8 @@ export default function CreateClusterListingPage() {
   const stateOptions = NIGERIAN_STATES.map((s) => ({ label: s, value: s }));
 
   return (
-    <div className="min-h-screen bg-(--gray-bg)">
-      <div className="container-max-width px-(--section-px) py-(--section-py) sm:px-(--section-px-sm) sm:py-(--section-py-sm) lg:px-(--section-px-lg) lg:py-(--section-py-lg)">
+    <div className="bg-gray-bg min-h-screen">
+      <div className="container-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-(--section-py-lg)">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -119,16 +119,16 @@ export default function CreateClusterListingPage() {
           <motion.div variants={FADE_IN_VARIANT} className="flex flex-col gap-(--gap-base)">
             <button
               onClick={() => router.back()}
-              className="flex w-fit items-center gap-2 text-(--text-colour) transition hover:text-(--heading-colour)"
+              className="text-text-colour hover:text-heading-colour flex w-fit items-center gap-2 transition"
             >
               <ArrowLeft size={20} />
               Back to Listings
             </button>
             <div>
-              <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) lg:text-4xl">
+              <h1 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
                 Create Marketplace Listing
               </h1>
-              <p className="font-roboto-slab mt-2 text-(--text-colour)">
+              <p className="font-roboto-slab text-text-colour mt-2">
                 List your aggregated fish supply on the marketplace
               </p>
             </div>
@@ -142,7 +142,7 @@ export default function CreateClusterListingPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-(--gap-lg)">
               {/* Supply Details */}
               <div>
-                <h2 className="font-ubuntu mb-(--space-lg) text-lg font-semibold text-(--heading-colour)">
+                <h2 className="font-ubuntu text-heading-colour mb-(--space-lg) text-lg font-semibold">
                   Supply Details
                 </h2>
                 <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
@@ -174,7 +174,7 @@ export default function CreateClusterListingPage() {
 
               {/* Location */}
               <div>
-                <h2 className="font-ubuntu mb-(--space-lg) text-lg font-semibold text-(--heading-colour)">
+                <h2 className="font-ubuntu text-heading-colour mb-(--space-lg) text-lg font-semibold">
                   Location
                 </h2>
                 <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
@@ -210,13 +210,13 @@ export default function CreateClusterListingPage() {
               {/* Packaging Options */}
               <div>
                 <div className="mb-(--space-lg) flex items-center justify-between">
-                  <h2 className="font-ubuntu text-lg font-semibold text-(--heading-colour)">
+                  <h2 className="font-ubuntu text-heading-colour text-lg font-semibold">
                     Packaging Options
                   </h2>
                   <button
                     type="button"
                     onClick={addPackaging}
-                    className="font-roboto-slab flex items-center gap-1.5 rounded-xl border border-(--border-gray) px-(--space-lg) py-(--space-sm) text-sm font-medium text-(--heading-colour) transition hover:bg-(--bg-pink)"
+                    className="font-roboto-slab border-gray-border text-heading-colour hover:bg-pink-bg flex items-center gap-1.5 rounded-xl border px-(--space-lg) py-(--space-sm) text-sm font-medium transition"
                   >
                     <Plus size={16} />
                     Add Option
@@ -224,8 +224,8 @@ export default function CreateClusterListingPage() {
                 </div>
 
                 {packaging.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-(--border-gray) p-(--space-xl) text-center">
-                    <p className="font-roboto-slab text-sm text-(--text-colour)">
+                  <div className="border-gray-border rounded-2xl border border-dashed p-(--space-xl) text-center">
+                    <p className="font-roboto-slab text-text-colour text-sm">
                       No packaging options added yet. Click &quot;Add Option&quot; to start.
                     </p>
                   </div>
@@ -238,10 +238,10 @@ export default function CreateClusterListingPage() {
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -8 }}
-                          className="grid grid-cols-2 gap-(--gap-base) rounded-2xl border border-(--border-gray) p-(--space-lg)"
+                          className="border-gray-border grid grid-cols-2 gap-(--gap-base) rounded-2xl border p-(--space-lg)"
                         >
                           <div>
-                            <label className="font-roboto-slab mb-1.5 block text-xs font-medium text-(--heading-colour)">
+                            <label className="font-roboto-slab text-heading-colour mb-1.5 block text-xs font-medium">
                               Weight (kg)
                             </label>
                             <input
@@ -251,11 +251,11 @@ export default function CreateClusterListingPage() {
                               onChange={(e) =>
                                 updatePackaging(i, "weightKg", Number(e.target.value))
                               }
-                              className="font-roboto-slab w-full rounded-lg border border-(--border-input) px-(--space-md) py-(--space-sm) text-sm focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
+                              className="font-roboto-slab border-input-border focus:ring-theme-green-dark w-full rounded-lg border px-(--space-md) py-(--space-sm) text-sm focus:ring-2 focus:outline-none"
                             />
                           </div>
                           <div className="relative">
-                            <label className="font-roboto-slab mb-1.5 block text-xs font-medium text-(--heading-colour)">
+                            <label className="font-roboto-slab text-heading-colour mb-1.5 block text-xs font-medium">
                               Quantity
                             </label>
                             <input
@@ -265,7 +265,7 @@ export default function CreateClusterListingPage() {
                               onChange={(e) =>
                                 updatePackaging(i, "quantity", Number(e.target.value))
                               }
-                              className="font-roboto-slab w-full rounded-lg border border-(--border-input) px-(--space-md) py-(--space-sm) text-sm focus:ring-2 focus:ring-(--theme-green-dark) focus:outline-none"
+                              className="font-roboto-slab border-input-border focus:ring-theme-green-dark w-full rounded-lg border px-(--space-md) py-(--space-sm) text-sm focus:ring-2 focus:outline-none"
                             />
                             <button
                               type="button"
@@ -288,7 +288,7 @@ export default function CreateClusterListingPage() {
 
               {/* Delivery Options */}
               <div>
-                <h2 className="font-ubuntu mb-(--space-lg) text-lg font-semibold text-(--heading-colour)">
+                <h2 className="font-ubuntu text-heading-colour mb-(--space-lg) text-lg font-semibold">
                   Delivery Options
                 </h2>
                 <div className="flex flex-wrap gap-(--gap-base)">
@@ -299,8 +299,8 @@ export default function CreateClusterListingPage() {
                       onClick={() => toggleDelivery(option)}
                       className={`font-roboto-slab rounded-xl border px-(--space-lg) py-(--space-sm) text-sm font-medium transition ${
                         selectedDelivery.includes(option)
-                          ? "border-(--theme-green-dark) bg-green-50 text-(--theme-green-dark)"
-                          : "border-(--border-gray) bg-(--white) text-(--heading-colour) hover:bg-(--bg-pink)"
+                          ? "border-theme-green-dark text-theme-green-dark bg-green-50"
+                          : "border-gray-border text-heading-colour hover:bg-pink-bg bg-(--white)"
                       }`}
                     >
                       {option}
@@ -313,14 +313,14 @@ export default function CreateClusterListingPage() {
               </div>
 
               {/* Marketplace Visibility */}
-              <div className="flex items-start gap-(--space-md) rounded-2xl border border-(--border-gray) p-(--space-lg)">
+              <div className="border-gray-border flex items-start gap-(--space-md) rounded-2xl border p-(--space-lg)">
                 <button
                   type="button"
                   onClick={() => setValue("visibleOnMarketplace", !visibleOnMarketplace)}
                   className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition ${
                     visibleOnMarketplace
-                      ? "border-(--theme-green-dark) bg-(--theme-green-dark)"
-                      : "border-(--border-gray) bg-(--white)"
+                      ? "border-theme-green-dark bg-theme-green-dark"
+                      : "border-gray-border bg-(--white)"
                   }`}
                   aria-label="Toggle marketplace visibility"
                 >
@@ -339,15 +339,15 @@ export default function CreateClusterListingPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     {visibleOnMarketplace ? (
-                      <Eye size={16} className="text-(--theme-green-dark)" />
+                      <Eye size={16} className="text-theme-green-dark" />
                     ) : (
                       <EyeOff size={16} className="text-gray-400" />
                     )}
-                    <span className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                    <span className="font-roboto-slab text-heading-colour text-sm font-medium">
                       Visible on marketplace
                     </span>
                   </div>
-                  <p className="font-roboto-slab mt-1 text-xs text-(--text-colour)">
+                  <p className="font-roboto-slab text-text-colour mt-1 text-xs">
                     When enabled, this listing will be publicly visible to buyers on the marketplace
                     after approval.
                   </p>

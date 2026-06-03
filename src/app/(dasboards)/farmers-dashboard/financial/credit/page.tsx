@@ -1,6 +1,6 @@
 "use client";
 
-// === Coming Soon — existing content preserved below
+// === Coming Soon - existing content preserved below
 // import { motion } from "framer-motion";
 // import { Plus, ShoppingCart, Package, Truck, CheckCircle, Clock, CreditCard } from "lucide-react";
 // import Link from "next/link";
@@ -173,16 +173,16 @@ export default function CreditPurchasesPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-heading-colour">
             Credit Purchases 🛒
           </h1>
-          <p className="font-roboto-slab text-(--text-colour)">
+          <p className="font-roboto-slab text-text-colour">
             Buy agricultural supplies on credit with flexible payment terms
           </p>
         </div>
         <Link
           href="/farmers-dashboard/financial/credit/catalog"
-          className="font-roboto-slab flex items-center gap-2 rounded-xl bg-(--theme-green-dark) px-(--space-lg) py-(--space-md) text-white cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90 focus:ring-2 focus:ring-(--theme-green-dark) focus:ring-offset-2 focus:outline-none"
+          className="font-roboto-slab flex items-center gap-2 rounded-xl bg-theme-green-dark px-(--space-lg) py-(--space-md) text-white cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90 focus:ring-2 focus:ring-theme-green-dark focus:ring-offset-2 focus:outline-none"
         >
           <Plus size={20} />
           <span>Browse Catalog</span>
@@ -201,17 +201,17 @@ export default function CreditPurchasesPage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
+              className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
             >
               <div className="mb-(--space-lg) flex items-center gap-(--space-md)">
                 <div className={`rounded-xl p-(--space-md) ${stat.bgColor}`}>
                   <Icon size={24} className={stat.color} />
                 </div>
               </div>
-              <p className="font-ubuntu mb-1 text-2xl font-bold text-(--heading-colour)">
+              <p className="font-ubuntu mb-1 text-2xl font-bold text-heading-colour">
                 {stat.value}
               </p>
-              <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>
+              <p className="font-roboto-slab text-sm text-text-colour">{stat.label}</p>
             </motion.div>
           );
         })}
@@ -221,17 +221,17 @@ export default function CreditPurchasesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h3 className="font-ubuntu mb-(--space-md) text-lg font-semibold text-(--heading-colour)">
+        <h3 className="font-ubuntu mb-(--space-md) text-lg font-semibold text-heading-colour">
           Credit Usage
         </h3>
         <div className="mb-(--space-sm)">
           <div className="flex justify-between text-sm mb-2">
-            <span className="font-roboto-slab text-(--text-colour)">
+            <span className="font-roboto-slab text-text-colour">
               ₦{totalCreditUsed.toLocaleString()} of ₦{creditLimit.toLocaleString()} used
             </span>
-            <span className="font-roboto-slab font-medium text-(--heading-colour)">
+            <span className="font-roboto-slab font-medium text-heading-colour">
               {((totalCreditUsed / creditLimit) * 100).toFixed(1)}%
             </span>
           </div>
@@ -251,12 +251,12 @@ export default function CreditPurchasesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-heading-colour">
           Your Credit Purchases
         </h2>
-        
+
         {creditPurchases.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-(--space-2xl) text-center">
             <ShoppingCart size={48} className="text-gray-300 mb-(--space-md)" />
@@ -265,7 +265,7 @@ export default function CreditPurchasesPage() {
             </p>
             <Link
               href="/farmers-dashboard/financial/credit/catalog"
-              className="font-roboto-slab rounded-xl bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-white cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90"
+              className="font-roboto-slab rounded-xl bg-theme-green-dark px-(--space-xl) py-(--space-md) text-white cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90"
             >
               Browse Product Catalog
             </Link>
@@ -277,17 +277,17 @@ export default function CreditPurchasesPage() {
               const StatusIcon = statusConfig.icon;
               const paidPayments = purchase.paymentSchedule.filter(p => p.status === "paid").length;
               const totalPayments = purchase.paymentSchedule.length;
-              
+
               return (
                 <div
                   key={purchase.id}
-                  className="rounded-xl border border-(--border-input) p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-105"
+                  className="rounded-xl border border-input-border p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-105"
                 >
                   <div className="flex flex-col gap-(--space-md)">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-(--space-md) mb-(--space-sm)">
-                          <h3 className="font-ubuntu text-lg font-semibold text-(--heading-colour)">
+                          <h3 className="font-ubuntu text-lg font-semibold text-heading-colour">
                             {purchase.orderNumber}
                           </h3>
                           <span className={`flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${statusConfig.bgColor} ${statusConfig.color}`}>
@@ -301,7 +301,7 @@ export default function CreditPurchasesPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-roboto-slab text-xs text-gray-500">Total Amount</p>
-                        <p className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                        <p className="font-ubuntu text-xl font-bold text-heading-colour">
                           ₦{purchase.totalAmount.toLocaleString()}
                         </p>
                       </div>
@@ -312,14 +312,14 @@ export default function CreditPurchasesPage() {
                         {purchase.items.map((item, index) => (
                           <div key={index} className="flex items-center justify-between">
                             <div className="flex-1">
-                              <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                              <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                                 {item.productName}
                               </p>
                               <p className="font-roboto-slab text-xs text-gray-500">
                                 Qty: {item.quantity} × ₦{item.unitPrice.toLocaleString()}
                               </p>
                             </div>
-                            <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                            <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                               ₦{item.totalPrice.toLocaleString()}
                             </p>
                           </div>
@@ -342,7 +342,7 @@ export default function CreditPurchasesPage() {
                     </div>
                     <Link
                       href={`/farmers-dashboard/financial/credit/${purchase.id}`}
-                      className="font-roboto-slab rounded-lg border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-sm) text-center text-sm font-medium text-(--heading-colour) cursor-pointer ease-in-out transition-all duration-300 hover:bg-(--bg-pink) focus:ring-2 focus:ring-(--border-gray) focus:ring-offset-2 focus:outline-none"
+                      className="font-roboto-slab rounded-lg border border-gray-border bg-(--white) px-(--space-lg) py-(--space-sm) text-center text-sm font-medium text-heading-colour cursor-pointer ease-in-out transition-all duration-300 hover:bg-pink-bg focus:ring-2 focus:ring-border-gray focus:ring-offset-2 focus:outline-none"
                     >
                       View Details
                     </Link>

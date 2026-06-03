@@ -52,14 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const fetchUser = async () => {
       try {
-        // Always attempt getMe — the auth_token httpOnly cookie is sent automatically.
+        // Always attempt getMe - the auth_token httpOnly cookie is sent automatically.
         // A 401 means no valid session, which is fine.
         const response = await authService.getMe();
         setUser(mapBackendUser(response.data.user));
       } catch (error) {
         // 401 = not logged in (expected)
         // status 0 = network error / backend not running (expected in dev)
-        // anything else is unexpected — log it
+        // anything else is unexpected - log it
         const isExpected =
           error instanceof ApiError && (error.status === 401 || error.status === 0);
         if (!isExpected) {

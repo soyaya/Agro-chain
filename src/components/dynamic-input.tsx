@@ -70,10 +70,10 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
         {label && (
           <label
             htmlFor={label}
-            className="font-roboto-slab flex cursor-pointer items-center gap-1 text-base font-medium text-(--heading-colour) transition-all duration-300 ease-in-out"
+            className="font-roboto-slab text-heading-colour flex cursor-pointer items-center gap-1 text-base font-medium transition-all duration-300 ease-in-out"
           >
             {label}
-            {required && <span className="text-(--error-red)">*</span>}
+            {required && <span className="text-error-red">*</span>}
           </label>
         )}
 
@@ -93,11 +93,11 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
             aria-label={label || fieldType}
             placeholder={finalPlaceholder}
             className={cn(
-              "font-roboto-slab h-12 w-full rounded-full hover:bg-(--bg-pink) focus:bg-transparent bg-transparent focus:ring focus:ring-(--theme-green) border py-(--space-lg) text-base shadow-xs ring-0 transition-all hover:cursor-pointer cursor-default focus:cursor-text duration-300 ease-in-out outline-none",
+              "font-roboto-slab hover:bg-pink-bg h-12 w-full cursor-default rounded-full border bg-transparent py-(--space-lg) text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none hover:cursor-pointer focus:cursor-text focus:bg-transparent focus:ring focus:ring-(--theme-green)",
               LeadingIcon ? "pl-(--space-forty)" : "pl-(--space-md)",
               fieldType === "password" || fieldType === "confirm-password" ? "pr-10" : "pr-3",
-              hasError ? "border-(--error-red)" : "border-(--border-input)",
-              "border-(--border-input) text-(--text-colour) caret-(--input-field-green) placeholder:text-base focus:border-(--border-gray)",
+              hasError ? "border-error-red" : "border-input-border",
+              "focus:border-gray-border text-text-colour border-input-border caret-input-field-green placeholder:text-base",
             )}
             {...props}
           />
@@ -115,9 +115,7 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
         </div>
 
         {/* Error message */}
-        {typeof error === "string" && error && (
-          <p className="text-sm text-(--error-red)">{error}</p>
-        )}
+        {typeof error === "string" && error && <p className="text-error-red text-sm">{error}</p>}
       </div>
     );
   },
@@ -185,9 +183,9 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
       <div ref={ref} className={cn("flex flex-col gap-(--space-md)", className)}>
         {/* Label */}
         {label && (
-          <label className="font-roboto-slab flex items-center gap-1 text-base font-medium text-(--heading-colour)">
+          <label className="font-roboto-slab text-heading-colour flex items-center gap-1 text-base font-medium">
             {label}
-            {required && <span className="text-(--error-red)">*</span>}
+            {required && <span className="text-error-red">*</span>}
           </label>
         )}
 
@@ -213,13 +211,13 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
             className={cn(
               "font-roboto-slab flex h-12 w-full items-center justify-between rounded-full border text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none",
               "px-(--space-md)",
-              hasError ? "border-(--error-red)" : "border-(--border-input)",
-              "cursor-pointer text-(--text-colour)",
-              "hover:border-(--border-gray) hover:shadow-sm",
-              "focus:border-(--theme-green-dark) focus:ring-[0.2px] focus:ring-(--theme-green-dark)",
+              hasError ? "border-error-red" : "border-input-border",
+              "text-text-colour cursor-pointer",
+              "hover:border-gray-border hover:shadow-sm",
+              "focus:border-theme-green-dark focus:ring-theme-green-dark focus:ring-[0.2px]",
             )}
           >
-            <span className={cn(selectedOption ? "text-(--text-colour)" : "text-gray-400")}>
+            <span className={cn(selectedOption ? "text-text-colour" : "text-gray-400")}>
               {display}
             </span>
 
@@ -243,7 +241,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
                 transition={{ duration: 0.2 }}
                 role="listbox"
                 aria-label={label ? `${label} options` : "Options"}
-                className="absolute right-0 left-0 z-50 mt-2 max-h-60 overflow-auto rounded-xl border border-(--border-input) bg-(--white) shadow-lg"
+                className="border-input-border absolute right-0 left-0 z-50 mt-2 max-h-60 overflow-auto rounded-xl border bg-(--white) shadow-lg"
               >
                 {options.map((option) => (
                   <div
@@ -263,10 +261,10 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
                       }
                     }}
                     className={cn(
-                      "font-roboto-slab cursor-pointer px-(--space-md) py-(--space-md) text-base text-(--text-colour) transition-all duration-200 ease-in-out",
-                      "hover:bg-(--bg-pink) hover:shadow-sm",
-                      "focus:bg-(--bg-pink) focus:outline-none focus:ring-inset",
-                      option.value === value && "bg-(--bg-pink)",
+                      "font-roboto-slab text-text-colour cursor-pointer px-(--space-md) py-(--space-md) text-base transition-all duration-200 ease-in-out",
+                      "hover:bg-pink-bg hover:shadow-sm",
+                      "focus:bg-pink-bg focus:outline-none focus:ring-inset",
+                      option.value === value && "bg-pink-bg",
                     )}
                   >
                     {option.label}
@@ -278,9 +276,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
         </div>
 
         {/* Error */}
-        {typeof error === "string" && error && (
-          <p className="text-sm text-(--error-red)">{error}</p>
-        )}
+        {typeof error === "string" && error && <p className="text-error-red text-sm">{error}</p>}
       </div>
     );
   },

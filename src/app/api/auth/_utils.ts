@@ -13,7 +13,7 @@ const buildUrl = (path: string) => {
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 const IS_PROD = process.env.NODE_ENV === "production";
 
-// === GET passthrough — forwards auth cookie to backend and returns response as-is
+// === GET passthrough - forwards auth cookie to backend and returns response as-is
 
 export async function forwardAuthGet(req: Request, path: string) {
   const baseUrl = getBaseUrl();
@@ -50,7 +50,7 @@ export async function forwardAuthGet(req: Request, path: string) {
   return nextResponse;
 }
 
-// === Dumb passthrough — used for non-session endpoints (login step 1, register, forgot-password, etc.)
+// === Dumb passthrough - used for non-session endpoints (login step 1, register, forgot-password, etc.)
 
 export async function forwardAuthRequest(req: Request, path: string) {
   const baseUrl = getBaseUrl();
@@ -100,7 +100,7 @@ export async function forwardAuthRequest(req: Request, path: string) {
   return nextResponse;
 }
 
-// === Smart session handler — used for OTP verify endpoints that issue tokens
+// === Smart session handler - used for OTP verify endpoints that issue tokens
 // Extracts access_token + user from the backend response, sets httpOnly cookies,
 // and returns the response body without exposing tokens to the browser.
 
@@ -157,7 +157,7 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
   const accessToken = data.access_token as string | undefined;
   const user = data.user as Record<string, unknown> | undefined;
 
-  // Build a clean response body — strip tokens so they never reach the browser
+  // Build a clean response body - strip tokens so they never reach the browser
   const cleanData: Record<string, unknown> = { ...data };
   delete cleanData.access_token;
   delete cleanData.refresh_token;
@@ -167,7 +167,7 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
   nextResponse.headers.set("content-type", "application/json");
 
   if (accessToken) {
-    // httpOnly — JS cannot read this, sent automatically by browser on every request
+    // httpOnly - JS cannot read this, sent automatically by browser on every request
     nextResponse.cookies.set("auth_token", accessToken, {
       httpOnly: true,
       secure: IS_PROD,
@@ -178,7 +178,7 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
   }
 
   if (user) {
-    // Non-httpOnly — readable by JS for header display and route guarding
+    // Non-httpOnly - readable by JS for header display and route guarding
     const currentUser = {
       id: user.id,
       role: user.role,

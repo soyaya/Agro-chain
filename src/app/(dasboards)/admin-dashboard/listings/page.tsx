@@ -10,13 +10,13 @@ import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
 const STATUS_STYLES: Record<string, string> = {
-  active:  "bg-green-50 text-green-700 border-green-200",
+  active: "bg-green-50 text-green-700 border-green-200",
   pending: "bg-amber-50 text-amber-700 border-amber-200",
-  sold:    "bg-blue-50 text-blue-700 border-blue-200",
+  sold: "bg-blue-50 text-blue-700 border-blue-200",
   flagged: "bg-red-50 text-red-700 border-red-200",
   expired: "bg-gray-50 text-gray-500 border-gray-200",
-  draft:   "bg-yellow-50 text-yellow-700 border-yellow-200",
-  archived:"bg-gray-50 text-gray-500 border-gray-200",
+  draft: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  archived: "bg-gray-50 text-gray-500 border-gray-200",
   deleted: "bg-red-50 text-red-400 border-red-100",
 };
 
@@ -46,14 +46,18 @@ export default function AdminListingsPage() {
       }
     };
     void load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleApprove = async (id: string) => {
     setActionLoading(id);
     try {
       await adminService.approveListing(id);
-      setListings((prev) => prev.map((l) => l.id === id ? { ...l, status: "active", clusterApproved: true } : l));
+      setListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status: "active", clusterApproved: true } : l)),
+      );
       toast.success("Listing approved and now live on the marketplace.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to approve listing");
@@ -66,7 +70,7 @@ export default function AdminListingsPage() {
     setActionLoading(id);
     try {
       await adminService.rejectListing(id);
-      setListings((prev) => prev.map((l) => l.id === id ? { ...l, status: "flagged" } : l));
+      setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: "flagged" } : l)));
       toast.success("Listing rejected.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to reject listing");
@@ -79,7 +83,7 @@ export default function AdminListingsPage() {
     setActionLoading(id);
     try {
       await adminService.flagListing(id);
-      setListings((prev) => prev.map((l) => l.id === id ? { ...l, status: "flagged" } : l));
+      setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: "flagged" } : l)));
       toast.success("Listing flagged.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to flag listing");
@@ -112,10 +116,10 @@ export default function AdminListingsPage() {
   });
 
   const counts: Record<StatusFilter, number> = {
-    all:     listings.length,
+    all: listings.length,
     pending: listings.filter((l) => l.status === "pending").length,
-    active:  listings.filter((l) => l.status === "active").length,
-    sold:    listings.filter((l) => l.status === "sold").length,
+    active: listings.filter((l) => l.status === "active").length,
+    sold: listings.filter((l) => l.status === "sold").length,
     flagged: listings.filter((l) => l.status === "flagged").length,
     expired: listings.filter((l) => l.status === "expired").length,
   };
@@ -145,8 +149,12 @@ export default function AdminListingsPage() {
         className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">Listing Oversight</h1>
-          <p className="font-roboto-slab text-(--text-colour)">Review pending listings and moderate the marketplace.</p>
+          <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
+            Listing Oversight
+          </h1>
+          <p className="font-roboto-slab text-text-colour">
+            Review pending listings and moderate the marketplace.
+          </p>
         </div>
         <div className="relative w-full max-w-xs">
           <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
@@ -155,7 +163,7 @@ export default function AdminListingsPage() {
             placeholder="Search fish type, farmer, state..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="font-roboto-slab h-10 w-full rounded-xl border border-(--border-input) pr-4 pl-9 text-sm transition outline-none focus:border-(--border-gray)"
+            className="font-roboto-slab focus:border-gray-border border-input-border h-10 w-full rounded-xl border pr-4 pl-9 text-sm transition outline-none"
           />
         </div>
       </motion.div>
@@ -173,12 +181,14 @@ export default function AdminListingsPage() {
             onClick={() => setFilterStatus(status)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
               filterStatus === status
-                ? "border-(--theme-green-dark) bg-green-50"
-                : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
+                ? "border-theme-green-dark bg-green-50"
+                : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
-            <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">{counts[status]}</span>
-            <span className="font-roboto-slab text-xs capitalize text-(--text-colour)">{status}</span>
+            <span className="font-ubuntu text-heading-colour text-xl font-bold">
+              {counts[status]}
+            </span>
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
           </button>
         ))}
       </motion.div>
@@ -189,41 +199,58 @@ export default function AdminListingsPage() {
           variants={FADE_IN_VARIANT}
           initial="hidden"
           animate="visible"
-          className="overflow-hidden rounded-2xl border border-(--border-gray) bg-(--white) shadow-sm"
+          className="border-gray-border overflow-hidden rounded-2xl border bg-(--white) shadow-sm"
         >
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b border-(--border-gray) bg-(--bg-pink)">
+              <thead className="border-gray-border bg-pink-bg border-b">
                 <tr>
-                  {["Fish Type", "Qty / Kg", "Price/kg", "Farmer", "Location", "Status", "Actions"].map((h) => (
-                    <th key={h} className="font-roboto-slab px-4 py-3 text-left text-xs font-semibold text-(--text-colour)">
+                  {[
+                    "Fish Type",
+                    "Qty / Kg",
+                    "Price/kg",
+                    "Farmer",
+                    "Location",
+                    "Status",
+                    "Actions",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="font-roboto-slab text-text-colour px-4 py-3 text-left text-xs font-semibold"
+                    >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-(--border-gray)">
+              <tbody className="divide-border-gray divide-y">
                 {filtered.map((listing) => (
-                  <motion.tr key={listing.id} variants={FADE_IN_VARIANT} className="transition hover:bg-(--bg-pink)">
-                    <td className="font-roboto-slab px-4 py-3 text-sm font-medium capitalize text-(--heading-colour)">
+                  <motion.tr
+                    key={listing.id}
+                    variants={FADE_IN_VARIANT}
+                    className="hover:bg-pink-bg transition"
+                  >
+                    <td className="font-roboto-slab text-heading-colour px-4 py-3 text-sm font-medium capitalize">
                       {listing.fishType}
                     </td>
-                    <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
+                    <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                       {listing.quantityAvailable} fish
                       <br />
                       <span className="text-xs text-gray-400">{listing.totalAvailableKg} kg</span>
                     </td>
-                    <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
+                    <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                       ₦{Number(listing.pricePerKg).toLocaleString()}
                     </td>
-                    <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
+                    <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                       {listing.clusterFarmerName}
                     </td>
-                    <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
+                    <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                       {listing.locationLga}, {listing.locationState}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`font-roboto-slab rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[listing.status] ?? STATUS_STYLES.draft}`}>
+                      <span
+                        className={`font-roboto-slab rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[listing.status] ?? STATUS_STYLES.draft}`}
+                      >
                         {listing.status}
                       </span>
                     </td>

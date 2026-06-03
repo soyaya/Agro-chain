@@ -75,10 +75,10 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
                     <UserCheck size={24} className="text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                    <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                       Assign Demand
                     </h3>
-                    <p className="font-roboto-slab text-sm text-(--text-colour)">
+                    <p className="font-roboto-slab text-text-colour text-sm">
                       {demand.fishType} · {demand.weightKg}kg · {demand.locationState}
                     </p>
                   </div>
@@ -94,7 +94,7 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
               {/* Farmer list */}
               <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">
                 {displayFarmers.length === 0 ? (
-                  <p className="font-roboto-slab py-4 text-center text-sm text-(--text-colour)">
+                  <p className="font-roboto-slab text-text-colour py-4 text-center text-sm">
                     No cluster farmers available
                   </p>
                 ) : (
@@ -104,16 +104,16 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
                       onClick={() => setSelectedFarmerId(farmer.id)}
                       className={`flex items-center justify-between rounded-2xl border p-(--space-md) text-left transition ${
                         selectedFarmerId === farmer.id
-                          ? "border-(--theme-green-dark) bg-green-50"
-                          : "border-(--border-gray) hover:bg-(--bg-pink)"
+                          ? "border-theme-green-dark bg-green-50"
+                          : "border-gray-border hover:bg-pink-bg"
                       }`}
                     >
                       <div>
-                        <p className="font-roboto-slab text-sm font-semibold text-(--heading-colour)">
+                        <p className="font-roboto-slab text-heading-colour text-sm font-semibold">
                           {farmer.fullName}
                         </p>
                         {farmer.businessName && (
-                          <p className="font-roboto-slab text-xs text-(--text-colour)">
+                          <p className="font-roboto-slab text-text-colour text-xs">
                             {farmer.businessName}
                           </p>
                         )}
@@ -122,7 +122,7 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
                         </p>
                       </div>
                       {selectedFarmerId === farmer.id && (
-                        <div className="h-4 w-4 rounded-full bg-(--theme-green-dark)" />
+                        <div className="bg-theme-green-dark h-4 w-4 rounded-full" />
                       )}
                     </button>
                   ))
@@ -131,7 +131,7 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
 
               {relevantFarmers.length === 0 && farmers.length > 0 && (
                 <p className="font-roboto-slab text-xs text-yellow-600">
-                  No cluster farmers in {demand.locationState} — showing all available farmers
+                  No cluster farmers in {demand.locationState} - showing all available farmers
                 </p>
               )}
 
@@ -140,14 +140,14 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
                 <button
                   onClick={handleClose}
                   disabled={loading}
-                  className="font-roboto-slab flex h-12 items-center justify-center rounded-full border border-(--border-gray) text-sm font-medium text-(--text-colour) transition hover:bg-(--bg-pink) disabled:opacity-50"
+                  className="font-roboto-slab border-gray-border text-text-colour hover:bg-pink-bg flex h-12 items-center justify-center rounded-full border text-sm font-medium transition disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => selectedFarmerId && onConfirm(selectedFarmerId)}
                   disabled={loading || !selectedFarmerId}
-                  className="font-roboto-slab flex h-12 items-center justify-center rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+                  className="font-roboto-slab bg-theme-green-dark flex h-12 items-center justify-center rounded-full text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
                 >
                   {loading ? "Assigning..." : "Assign"}
                 </button>
@@ -258,10 +258,10 @@ export default function AdminDemandsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
           Demand Management
         </h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <p className="font-roboto-slab text-text-colour">
           Review buyer demands and assign them to available cluster farmers.
         </p>
       </motion.div>
@@ -280,16 +280,14 @@ export default function AdminDemandsPage() {
               onClick={() => setFilterStatus(status)}
               className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
                 filterStatus === status
-                  ? "border-(--theme-green-dark) bg-green-50"
-                  : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
+                  ? "border-theme-green-dark bg-green-50"
+                  : "border-gray-border hover:bg-pink-bg bg-(--white)"
               }`}
             >
-              <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+              <span className="font-ubuntu text-heading-colour text-xl font-bold">
                 {counts[status]}
               </span>
-              <span className="font-roboto-slab text-xs text-(--text-colour) capitalize">
-                {status}
-              </span>
+              <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
             </button>
           ),
         )}
@@ -301,11 +299,11 @@ export default function AdminDemandsPage() {
           variants={FADE_IN_VARIANT}
           initial="hidden"
           animate="visible"
-          className="overflow-hidden rounded-2xl border border-(--border-gray) bg-(--white) shadow-sm"
+          className="border-gray-border overflow-hidden rounded-2xl border bg-(--white) shadow-sm"
         >
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b border-(--border-gray) bg-(--bg-pink)">
+              <thead className="border-gray-border bg-pink-bg border-b">
                 <tr>
                   {[
                     "Buyer",
@@ -319,24 +317,24 @@ export default function AdminDemandsPage() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="font-roboto-slab px-4 py-3 text-left text-xs font-semibold text-(--text-colour)"
+                      className="font-roboto-slab text-text-colour px-4 py-3 text-left text-xs font-semibold"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-(--border-gray)">
+              <tbody className="divide-border-gray divide-y">
                 {filtered.map((demand) => {
                   const config = STATUS_CONFIG[demand.status];
                   return (
                     <motion.tr
                       key={demand.id}
                       variants={FADE_IN_VARIANT}
-                      className="transition hover:bg-(--bg-pink)"
+                      className="hover:bg-pink-bg transition"
                     >
                       <td className="px-4 py-3">
-                        <p className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                        <p className="font-roboto-slab text-heading-colour text-sm font-medium">
                           {demand.buyerName}
                         </p>
                         {demand.buyerPhone && (
@@ -345,13 +343,13 @@ export default function AdminDemandsPage() {
                           </p>
                         )}
                       </td>
-                      <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour) capitalize">
+                      <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm capitalize">
                         {demand.fishType}
                       </td>
-                      <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
+                      <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                         {demand.weightKg} kg
                       </td>
-                      <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
+                      <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                         {demand.locationLga}, {demand.locationState}
                       </td>
                       <td className="px-4 py-3">
@@ -361,8 +359,8 @@ export default function AdminDemandsPage() {
                           {config.label}
                         </span>
                       </td>
-                      <td className="font-roboto-slab px-4 py-3 text-sm text-(--text-colour)">
-                        {demand.assignedClusterFarmerName ?? "—"}
+                      <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
+                        {demand.assignedClusterFarmerName ?? "-"}
                       </td>
                       <td className="font-roboto-slab px-4 py-3 text-xs text-gray-400">
                         {new Date(demand.createdAt).toLocaleDateString("en-NG", {
@@ -374,7 +372,7 @@ export default function AdminDemandsPage() {
                         {demand.status === "pending" && (
                           <button
                             onClick={() => setAssignModal(demand)}
-                            className="font-roboto-slab flex items-center gap-1.5 rounded-xl bg-(--theme-green-dark) px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
+                            className="font-roboto-slab bg-theme-green-dark flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
                           >
                             <UserCheck size={13} />
                             Assign

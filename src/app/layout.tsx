@@ -10,70 +10,106 @@ export const metadata = {
 
   title: {
     template: "%s | Agro-chain",
-    default: "Agro-chain | Catfish Marketplace for Farmers & Buyers",
+    default: "Agro-chain | Nigeria's Catfish Marketplace",
   },
 
   description:
-    "Agro-chain is a digital marketplace connecting cluster catfish farmers with verified bulk buyers. We streamline sourcing, secure payments, and coordinate logistics for fresh, traceable supply.",
+    "Agro-chain is a digital marketplace connecting verified catfish farmers and cluster aggregators with bulk buyers across Nigeria. Secure Paystack escrow, admin-set pricing, and coordinated delivery.",
 
   keywords: [
-    "catfish",
-    "marketplace",
-    "farmers",
-    "buyers",
-    "Nigeria",
-    "aquaculture",
-    "supply chain",
+    "catfish marketplace Nigeria",
+    "buy catfish online",
+    "fresh catfish supply",
+    "catfish farmers Nigeria",
+    "bulk catfish buyers",
+    "cluster farmers",
+    "aquaculture marketplace",
+    "Paystack escrow",
+    "agro-chain",
+    "fish supply chain",
+    "catfish fingerlings",
+    "table size catfish",
   ],
 
   authors: [
-    {
-      name: "Agro-chain Team",
-      url: "https://agro-chain-bom-vercel.vercel.app/",
-    },
+    { name: "Olorunshogo M. Bamtefa", url: "https://agro-chain-bom-vercel.vercel.app" },
+    { name: "Stephanie Nwankwo", url: "https://agro-chain-bom-vercel.vercel.app" },
+    { name: "David David", url: "https://agro-chain-bom-vercel.vercel.app" },
   ],
 
-  creator: "Agro-chain Team",
+  creator: "Agro-chain",
   publisher: "Agro-chain",
+
+  category: "Agriculture",
 
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
+      noimageindex: false,
       "max-video-preview": -1,
-      "max-image-preview": "large",
+      "max-image-preview": "large" as const,
       "max-snippet": -1,
     },
   },
 
   alternates: {
-    canonical: "/",
+    canonical: "https://agro-chain-bom-vercel.vercel.app",
   },
 
   openGraph: {
     type: "website",
     locale: "en_NG",
+    url: "https://agro-chain-bom-vercel.vercel.app",
     siteName: "Agro-chain",
+    title: "Agro-chain | Nigeria's Catfish Marketplace",
+    description:
+      "Connecting verified catfish farmers to bulk buyers across Nigeria. Secure Paystack payments, admin-set pricing, full supply chain traceability.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/images/og-hero.png",
         width: 1200,
         height: 630,
-        alt: "Agro-chain platform connecting catfish farmers and bulk buyers with secure payments and coordinated delivery",
+        alt: "Agro-chain - Nigeria's catfish marketplace connecting verified farmers to bulk buyers",
+        type: "image/png",
       },
     ],
   },
 
   twitter: {
-    card: "summary_large_image",
-    site: "@AgroChain",
-    creator: "@AgroChain",
-    images: {
-      url: "/twitter-image.png",
-      alt: "Agro-chain catfish marketplace connecting cluster farmers to verified buyers",
-    },
+    card: "summary_large_image" as const,
+    site: "@AgroChainNG",
+    creator: "@AgroChainNG",
+    title: "Agro-chain | Nigeria's Catfish Marketplace",
+    description:
+      "Buy and sell catfish with confidence. Verified farmers, secure Paystack escrow, fair pricing across Nigeria.",
+    images: [
+      {
+        url: "/images/og-hero.png",
+        alt: "Agro-chain catfish marketplace",
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+
+  verification: {
+    google: "",
+  },
+
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default" as const,
+    title: "Agro-chain",
+  },
+
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
 };
 

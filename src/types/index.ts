@@ -557,7 +557,7 @@ export interface SupplyListingFormData {
   fishType: string;
   harvestDate: Date;
   totalAvailableKg: number;
-  weightKg: number;   // Weight per fish in kg — replaces packaging array
+  weightKg: number;   // Weight per fish in kg - replaces packaging array
 }
 
 export interface ClusterApplicationFormData {

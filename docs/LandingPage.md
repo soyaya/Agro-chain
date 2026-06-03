@@ -58,7 +58,7 @@ section label in small caps, bold left-aligned headline, supporting paragraph on
 
 - The numbered card layout (1, 2, 3) for the three user journeys: Farmer, Cluster Farmer, Buyer
 - The dark section as a visual contrast break - use it for the "How It Works" or "Our Solution"
-  section with `bg-(--heading-colour)` or a near-black background
+  section with `bg-heading-colour` or a near-black background
 - The small-caps section label above the headline (e.g. "HOW IT WORKS" or "OUR PLATFORM")
 - The two-column layout: headline left, supporting paragraph right - use this for section intros
 
@@ -106,9 +106,7 @@ props which will cause a Next.js build error. Either add dimensions or replace w
 ```tsx
 // Option A - text logo (safe, no image dependency)
 export default function AppLogo() {
-  return (
-    <span className="font-ubuntu text-xl font-bold text-(--theme-green-dark)">Agro-chain</span>
-  );
+  return <span className="font-ubuntu text-theme-green-dark text-xl font-bold">Agro-chain</span>;
 }
 
 // Option B - image with dimensions
@@ -157,7 +155,7 @@ opacity. Just fresh fish, fair prices, and reliable logistics.
 **Implementation notes:**
 
 - Use `min-h-screen` with `flex items-center`
-- Background: `bg-(--theme-green-dark)` with a `bg-[url('/Home_Image_1/Home_1.webp')]` overlay
+- Background: `bg-theme-green-dark` with a `bg-[url('/Home_Image_1/Home_1.webp')]` overlay
   at low opacity (10-15%) using `before:` pseudo-element or a positioned `<Image>` with `opacity-10`
 - Animate headline in with `framer-motion` `FADE_IN_VARIANT` - already in `constants.ts`
 - "Browse Marketplace" links to `/marketplace` (public, no login required)
@@ -183,8 +181,8 @@ Farmers       Farmers       Monthly         Covered
 **Implementation notes:**
 
 - Use `STAGGER_CONTAINER_VARIANT` + `SLIDE_UP_VARIANT` from `constants.ts` for staggered entrance
-- Numbers in `font-ubuntu text-5xl font-bold text-(--theme-green-dark)`
-- Labels in `font-roboto-slab text-sm text-(--text-colour)`
+- Numbers in `font-ubuntu text-5xl font-bold text-theme-green-dark`
+- Labels in `font-roboto-slab text-sm text-text-colour`
 - Thin top/bottom border to separate from adjacent sections
 
 ---
@@ -193,7 +191,7 @@ Farmers       Farmers       Monthly         Covered
 
 **Visual reference:** `strategic.webp` numbered cards + `original-f86465469d037b98c639b280a5ce1b6d.webp` alternating rows
 
-**Layout:** Dark section (`bg-(--heading-colour)` or `#0f1f17`). Small-caps section label top-left.
+**Layout:** Dark section (`bg-heading-colour` or `#0f1f17`). Small-caps section label top-left.
 Bold white headline left, supporting paragraph right (two-column intro). Then three numbered cards
 below in a row.
 
@@ -223,7 +221,7 @@ approval → Earn         Fulfill orders →        Pay securely →
 
 - Dark background is the visual contrast break - matches `strategic.webp` aesthetic
 - Cards use `rounded-2xl border border-white/10 bg-white/5 p-6` for the glassmorphism card look
-- Number badge: `h-8 w-8 rounded-full bg-(--theme-green-dark) text-white text-sm font-bold`
+- Number badge: `h-8 w-8 rounded-full bg-theme-green-dark text-white text-sm font-bold`
 - Each card links to the relevant registration path at the bottom
 
 ---
@@ -256,16 +254,16 @@ confirms delivery.      farmer. Full chain      right cluster farmer
 
 **Implementation notes:**
 
-- Cards: `rounded-2xl border border-(--border-gray) bg-(--white) p-6 shadow-sm`
+- Cards: `rounded-2xl border border-gray-border bg-(--white) p-6 shadow-sm`
 - Icon container: `h-12 w-12 rounded-xl bg-green-50 flex items-center justify-center`
-- Icon: `text-(--theme-green-dark)` at size 24
+- Icon: `text-theme-green-dark` at size 24
 - Hover: `hover:shadow-md transition-shadow`
 
 ---
 
 ### Section 5 - Fish Types / Browse by Category
 
-**Layout:** Light gray background (`bg-(--gray-bg)`). Section label + H2. 6-card grid (3 on desktop,
+**Layout:** Light gray background (`bg-gray-bg`). Section label + H2. 6-card grid (3 on desktop,
 2 on tablet, 2 on mobile). Each card is a fish type with a name, short description, and a
 "Browse" link to `/marketplace?fishType=X`.
 
@@ -328,7 +326,7 @@ View All Listings →  (links to /marketplace)
 
 ### Section 7 - Testimonials
 
-**Layout:** Dark green background (`bg-(--theme-green-dark)`). Section label + H2 centered.
+**Layout:** Dark green background (`bg-theme-green-dark`). Section label + H2 centered.
 3 quote cards in a row.
 
 **Content (placeholder - replace with real quotes):**
@@ -476,7 +474,7 @@ Each card:
 Placement: After values, before the CTA. This is the natural position - visitors who've read
 the mission and values are primed to connect with the people behind it.
 
-Card style: `rounded-2xl border border-(--border-gray) bg-(--white) p-6 text-center shadow-sm`
+Card style: `rounded-2xl border border-gray-border bg-(--white) p-6 text-center shadow-sm`
 
 ### Section 6 - CTA
 
@@ -859,33 +857,31 @@ const role = (searchParams.get("role")?.toLowerCase() || "") as Role;
 {
   !role && (
     <div className="flex flex-col gap-2">
-      <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
-        I am a...
-      </label>
+      <label className="font-roboto-slab text-heading-colour text-sm font-medium">I am a...</label>
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
           onClick={() => setSelectedRole("farmer")}
           className={`rounded-2xl border p-4 text-left transition ${
             selectedRole === "farmer"
-              ? "border-(--theme-green-dark) bg-green-50"
-              : "border-(--border-gray) hover:bg-(--gray-bg)"
+              ? "border-theme-green-dark bg-green-50"
+              : "border-gray-border hover:bg-gray-bg"
           }`}
         >
-          <p className="font-ubuntu font-semibold text-(--heading-colour)">Farmer</p>
-          <p className="font-roboto-slab text-xs text-(--text-colour)">I grow and sell catfish</p>
+          <p className="font-ubuntu text-heading-colour font-semibold">Farmer</p>
+          <p className="font-roboto-slab text-text-colour text-xs">I grow and sell catfish</p>
         </button>
         <button
           type="button"
           onClick={() => setSelectedRole("buyer")}
           className={`rounded-2xl border p-4 text-left transition ${
             selectedRole === "buyer"
-              ? "border-(--theme-green-dark) bg-green-50"
-              : "border-(--border-gray) hover:bg-(--gray-bg)"
+              ? "border-theme-green-dark bg-green-50"
+              : "border-gray-border hover:bg-gray-bg"
           }`}
         >
-          <p className="font-ubuntu font-semibold text-(--heading-colour)">Buyer</p>
-          <p className="font-roboto-slab text-xs text-(--text-colour)">I buy catfish in bulk</p>
+          <p className="font-ubuntu text-heading-colour font-semibold">Buyer</p>
+          <p className="font-roboto-slab text-text-colour text-xs">I buy catfish in bulk</p>
         </button>
       </div>
     </div>
@@ -1063,3 +1059,862 @@ Going through everything systematically:
 5. Add `?redirect=` handling to `login/page.tsx` for post-login redirect
 6. Add "Already have an account? Log in" link to `register/page.tsx`
 7. Add Agro-chain logo link to `(auth)/layout.tsx`
+
+---
+
+## Developer Environment
+
+### `.vscode/settings.json`
+
+Create this file at the root of the frontend project. It enforces consistent formatting and
+TypeScript resolution across the team. Sourced from the Stayar-V2 project which already had this
+pattern locked in.
+
+```json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.autoClosingTags": false
+}
+```
+
+File path: `frontend/.vscode/settings.json`
+
+---
+
+## Design System Foundations
+
+### Why This Matters
+
+The Stayar-V2 project established a clean token system where every color, spacing value, and layout
+width is defined once as a CSS variable, mapped to Tailwind via `@theme inline`, and then usable
+as a Tailwind utility class anywhere in the codebase. We adopt the same pattern for Agro-chain.
+
+**The rule:** if you need to write an arbitrary value like `text-[#1b4332]` or `px-[6.25rem]`,
+that value should instead be a named token. Use `text-theme-green-dark` and `px-section-py-lg`.
+
+---
+
+### Color Token System
+
+All custom colors are defined in `src/app/globals.css` inside the `:root` block and then mapped
+to Tailwind in the `@theme inline` block. This makes them available as `bg-*`, `text-*`,
+`border-*`, and `ring-*` utilities.
+
+**Full token table — defined in `:root`, usable in Tailwind:**
+
+| CSS Variable          | Tailwind Class         | Value     | Use                                             |
+| --------------------- | ---------------------- | --------- | ----------------------------------------------- |
+| `--heading-colour`    | `text-heading-colour`  | `#090909` | All headings (H1–H4)                            |
+| `--text-colour`       | `text-text-colour`     | `#6d6a6a` | Body copy, labels                               |
+| `--text-colour-2`     | `text-text-colour-2`   | `#393939` | Slightly darker body, FAQ answers               |
+| `--text-input`        | `text-text-input`      | `#b3b3b3` | Input placeholder text                          |
+| `--gray-bg`           | `bg-gray-bg`           | `#f0faf4` | Alternating section backgrounds                 |
+| `--light-gray`        | `bg-light-gray`        | `#e8f5ee` | Nested panels within gray-bg sections           |
+| `--border-gray`       | `border-gray-border`   | `#e0e0e0` | Default card/section borders                    |
+| `--border-black`      | `border-black-border`  | `#1b1b1b` | Strong emphasis borders                         |
+| `--border-input`      | `border-input-border`  | `#d2d2d2` | Input field borders                             |
+| `--theme-green-dark`  | `bg-theme-green-dark`  | `#1b4332` | Hero, dark accent sections, primary brand green |
+| `--theme-green-light` | `bg-theme-green-light` | `#2d6a4f` | Hover states, secondary green accents           |
+| `--section-dark-bg`   | `bg-section-dark`      | `#0f1f17` | How It Works section, near-black green          |
+| `--error-red`         | `text-error-red`       | `#ff0000` | Form validation errors                          |
+| `--bg-pink`           | `bg-pink`              | `#fff9f8` | Warm off-white for special panels               |
+| `--input-field-green` | `bg-input-field-green` | `#1b4332` | Active/filled input state                       |
+
+**How to use in JSX:**
+
+```tsx
+// Before (arbitrary value):
+<h1 className="text-[#090909]">Title</h1>
+<section className="bg-[#f0faf4]">...</section>
+
+// After (named token):
+<h1 className="text-heading-colour">Title</h1>
+<section className="bg-gray-bg">...</section>
+```
+
+---
+
+### Spacing Token System
+
+Section-level spacing is defined as CSS variables and mapped to Tailwind spacing utilities via
+`@theme inline`. This means you never write hardcoded padding values for page-level sections.
+
+**Token definitions in `:root`:**
+
+```css
+--navbar-h: 5rem;
+--dash-sidebar-width: 15rem;
+
+--section-px: 1rem; /* mobile horizontal padding */
+--section-px-sm: 1.5rem; /* tablet horizontal padding */
+--section-px-lg: 2rem; /* desktop horizontal padding */
+
+--section-py: 2rem; /* mobile vertical padding */
+--section-py-sm: 2.5rem; /* tablet vertical padding */
+--section-py-lg: 6.25rem; /* desktop vertical padding — DO NOT reduce, this is what gives sections air */
+```
+
+**Tailwind utilities generated:**
+
+| CSS Variable           | Tailwind Utility                           | Use                                   |
+| ---------------------- | ------------------------------------------ | ------------------------------------- |
+| `--navbar-h`           | `h-navbar-h`, `mt-navbar-h`, `pt-navbar-h` | Offset content below the fixed header |
+| `--section-px`         | `px-section-px`                            | Mobile section horizontal padding     |
+| `--section-px-sm`      | `sm:px-section-px-sm`                      | Tablet breakpoint horizontal padding  |
+| `--section-px-lg`      | `lg:px-section-px-lg`                      | Desktop horizontal padding            |
+| `--section-py`         | `py-section-py`                            | Mobile section vertical padding       |
+| `--section-py-sm`      | `sm:py-section-py-sm`                      | Tablet vertical padding               |
+| `--section-py-lg`      | `lg:py-section-py-lg`                      | Desktop vertical padding              |
+| `--dash-sidebar-width` | `w-dash-sidebar`, `ml-dash-sidebar`        | Dashboard sidebar width offset        |
+
+**Standard section padding pattern:**
+
+```tsx
+<section>
+  <div className="px-section-px py-section-py sm:px-section-px-sm sm:py-section-py-sm lg:px-section-px-lg lg:py-section-py-lg">
+    {/* section content */}
+  </div>
+</section>
+```
+
+Or with hardcoded lg overrides where the design calls for it (Stayar also does this):
+
+```tsx
+<div className="px-4 py-10 lg:px-25 lg:py-25">
+```
+
+Both patterns are acceptable. Prefer the token-based one for new sections to keep spacing
+consistent if the variables are ever adjusted.
+
+---
+
+### Layout Component Classes
+
+Five width classes are defined in `src/app/globals.css` under `@layer components`. Use these
+instead of writing `mx-auto max-w-[...]` on every container. They are always centered and
+full-width up to their max.
+
+| Class                     | Max Width         | Use                                                            |
+| ------------------------- | ----------------- | -------------------------------------------------------------- |
+| `.layout-max-width`       | 1440px            | Outermost page wrapper — wrap the entire layout in this        |
+| `.content-width`          | 1200px            | Content area inside a layout (replaces `.container-max-width`) |
+| `.container-max-width`    | 1200px            | Legacy alias for `.content-width` — kept for backwards compat  |
+| `.form-width`             | 512px             | Auth pages, modal forms, standalone input forms                |
+| `.card-width`             | 384px             | Individual cards, panels, confirmation modals                  |
+| `.narrow-width`           | 320px             | Tight sidebars, minimal containers                             |
+| `.default-page-max-width` | 400px (max-w-100) | Legacy — kept for existing dashboard pages                     |
+
+**Usage pattern in a page layout:**
+
+```tsx
+<div className="layout-max-width">
+  <Header />
+  <main>
+    {/* each section's inner div gets content-width or the section-px utilities */}
+    <section className="bg-gray-bg">
+      <div className="content-width px-4 py-10 lg:px-25 lg:py-25">{/* content */}</div>
+    </section>
+  </main>
+  <Footer />
+</div>
+```
+
+---
+
+### Background Color & Section Rhythm
+
+**Why `--gray-bg` is `#f0faf4` and not `#f7f7f7`:**
+
+The original gray (`#f7f7f7`) is generic neutral — it creates alternating sections but doesn't
+feel intentionally agricultural. The new value `#f0faf4` is a very faint green tint. Visitors
+won't consciously register it as green, but it subconsciously ties every section to the brand
+color. The dark hero sections are explicitly green. The light alternating sections are barely-green.
+Nothing on the page is "neutral" — the whole visual system breathes the brand.
+
+`--light-gray: #e8f5ee` is slightly deeper — use it for panels or cards nested inside a
+`bg-gray-bg` section, so there's still a hierarchy without going all the way to white.
+
+**Section color rotation pattern for the homepage:**
+
+```
+Section 1 - Hero:                bg-theme-green-dark (dark green, full bleed image)
+Section 2 - Impact Stats:        bg-white
+Section 3 - How It Works:        bg-section-dark (near-black green)
+Section 4 - Why Agro-chain:      bg-white
+Section 5 - Browse by Category:  bg-gray-bg (#f0faf4 green tint)
+Section 6 - Marketplace Preview: bg-white
+Section 7 - Testimonials:        bg-theme-green-dark (dark green)
+Section 8 - Final CTA Banner:    gradient from --theme-green-dark to --theme-green-light
+```
+
+This creates a rhythmic alternation: dark → white → near-black → white → tinted → white →
+dark → gradient. No section looks like the one before it.
+
+---
+
+### Dark Mode Decision
+
+**Decision: No dark/light toggle. Not now.**
+
+Reasons:
+
+- The brand green (`#1b4332`) is already a dark color. On a dark background it disappears —
+  you'd need a completely different green token set for dark mode.
+- Marketplace/agri platforms work best on white. Product images and listing cards pop on white
+  backgrounds, not dark ones.
+- The design already has built-in dark-light rhythm through the intentional dark sections
+  (hero, how-it-works, testimonials). This IS the contrast — it's layout-level, not a user toggle.
+- Nigerian reference platforms (Paystack, Flutterwave, Farmcrowdy) are all light-mode. Users
+  are not expecting a dark toggle here.
+
+**Dashboard dark mode — future consideration:**
+Dashboard users (admin, cluster farmers) stare at the UI for hours. Dark mode makes more sense
+there. This is deferred to a future phase and should NOT influence landing page decisions.
+
+The `.dark` class block in `globals.css` comes from the shadcn preset and is kept in place but
+is not actively used. Do not wire it to a toggle on the landing page or marketplace.
+
+---
+
+### Section Anatomy Standard
+
+Every section on the marketing pages follows this structure. Not every field is required, but
+the order is fixed when fields are present:
+
+```
+[Section label]      — small caps, text-theme-green-dark, optional (not every section needs it)
+[H2]                 — always present, font-ubuntu
+[Subheading]         — 1–2 sentences, font-roboto-slab, text-text-colour, always present
+[Content block]      — cards / grid / timeline / listing preview
+[CTA]                — optional but explicit — state the label and destination in the spec
+```
+
+**Sections missing CTAs that should have them:**
+
+| Section                    | Suggested CTA        | Destination     |
+| -------------------------- | -------------------- | --------------- |
+| Section 2 — Impact Stats   | "See how it works →" | `/how-it-works` |
+| Section 4 — Why Agro-chain | "Get Started Free →" | `/register`     |
+| Section 7 — Testimonials   | "Join them →"        | `/register`     |
+
+Section 6 (Marketplace Preview) already has "View All Listings →" → `/marketplace`. This is the
+correct pattern — every section that sells a feature should have an exit.
+
+---
+
+## SectionFAQ Component
+
+### Pattern Overview
+
+The FAQ section is a fully dynamic, reusable component. It accepts a typed array of FAQ objects
+and renders an animated accordion. Place it on any page by importing the component and passing
+the relevant array. No hardcoded questions inside the component.
+
+This pattern is adapted from the Stayar-V2 `SectionFAQ.tsx` component (stored in `docs/FAQ.md`
+as the reference implementation).
+
+---
+
+### The FAQ Type
+
+Define in `src/models/models.ts` (or wherever the page data arrays live):
+
+```typescript
+export type FAQ = {
+  question: string;
+  answer: string;
+};
+```
+
+---
+
+### FAQ Arrays
+
+Each page gets its own named array. These live in `src/models/models.ts` alongside `navLinks`,
+`socialLinks`, etc.
+
+```typescript
+// Homepage FAQs - general platform questions
+export const homeFaqs: FAQ[] = [
+  {
+    question: 'Do I need an account to browse the marketplace?',
+    answer:
+      'No. The marketplace is fully public. You can browse all listings, view prices, and read seller details without logging in. An account is only needed when you add to cart or checkout.',
+  },
+  {
+    question: 'How are prices set on Agro-chain?',
+    answer:
+      'All prices are set platform-wide by admin — not by individual sellers. This means no price negotiation, no hidden costs, and the same fair price for every buyer.',
+  },
+  {
+    question: 'How do I know a seller is genuine?',
+    answer:
+      'All cluster farmers are KYC-verified and admin-approved before they can list. Every listing is tied to a verified farmer and their cluster farmer. Full chain of custody is visible.',
+  },
+  {
+    question: 'What payment methods are accepted?',
+    answer:
+      'Payments are processed via Paystack — card and bank transfer. Funds are held in escrow until you confirm delivery, so your money is protected.',
+  },
+  {
+    question: 'How long does delivery take?',
+    answer:
+      'Delivery timelines depend on the cluster farmer and your location. Each listing shows the seller's state and warehouse location. Contact details are available after checkout.',
+  },
+];
+
+// How It Works page — role-specific FAQs
+export const farmerFaqs: FAQ[] = [
+  {
+    question: 'How long does cluster approval take?',
+    answer: 'Cluster farmers are expected to review listings within 24–48 hours of submission.',
+  },
+  {
+    question: 'What happens if my listing is rejected?',
+    answer:
+      'Your cluster farmer will include a reason with the rejection. Fix the issue and resubmit — common reasons are inaccurate weight, wrong fish type, or missing harvest date.',
+  },
+  {
+    question: 'Can I list multiple fish types?',
+    answer:
+      'Yes. You can create separate listings for each fish type you have available. Each listing is reviewed independently.',
+  },
+  {
+    question: 'When do I get paid?',
+    answer:
+      'After a buyer confirms delivery, the payout is released from escrow to your cluster farmer, who distributes to you based on your agreed terms.',
+  },
+];
+
+export const clusterFarmerFaqs: FAQ[] = [
+  {
+    question: 'How do I apply for cluster farmer status?',
+    answer:
+      'Submit your CAC certificate, BVN, and warehouse location through the registration flow. Admin reviews applications and approves within 3–5 business days.',
+  },
+  {
+    question: 'How are farmers assigned to me?',
+    answer:
+      'Farmers in your geographic area are automatically assigned to your cluster. You can see and manage all your assigned farmers from your dashboard.',
+  },
+  {
+    question: 'When do I receive my payout?',
+    answer:
+      'Payouts are released after a buyer confirms delivery. The exact timing depends on the escrow delay window selected at listing creation.',
+  },
+];
+
+export const buyerFaqs: FAQ[] = [
+  {
+    question: 'Do I need an account to browse?',
+    answer:
+      'No. Browsing, filtering, and viewing listings is fully public. You only need an account to add to cart or checkout.',
+  },
+  {
+    question: 'What payment methods are accepted?',
+    answer: 'Paystack — card or bank transfer. Funds are held in escrow until you confirm delivery.',
+  },
+  {
+    question: 'What if my order doesn\'t arrive?',
+    answer:
+      'Do not confirm delivery until your order actually arrives and you are satisfied. Escrow funds are only released after your confirmation. Contact support if there is a dispute.',
+  },
+  {
+    question: 'Can I order from multiple sellers in one cart?',
+    answer:
+      'Currently each order is tied to one cluster farmer. For multi-seller orders, place separate orders per seller.',
+  },
+];
+
+// About page FAQs — company, mission, platform background
+export const aboutFaqs: FAQ[] = [
+  {
+    question: 'What is Agro-chain?',
+    answer:
+      'Agro-chain is a digital marketplace that connects verified catfish farmers and cluster aggregators with bulk buyers across Nigeria — bringing transparency, fair pricing, and secure payments to a ₦500B+ informal industry.',
+  },
+  {
+    question: 'Who is behind Agro-chain?',
+    answer:
+      'Agro-chain was built by a team that saw how informal catfish trading was hurting both farmers and buyers — opaque prices, unreliable logistics, and unverified sellers. We built the platform to change that.',
+  },
+  {
+    question: 'What states does Agro-chain cover?',
+    answer:
+      'We currently cover 6 states across Nigeria with verified cluster farmers on the ground. We are expanding based on demand — submit a demand request if your state isn\'t listed yet.',
+  },
+  {
+    question: 'Is Agro-chain only for catfish?',
+    answer:
+      'Currently yes — catfish, fingerlings, juveniles, table size, jumbo, and parent stocks. We chose to go deep on one protein before expanding. Other fish types may follow based on platform growth.',
+  },
+  {
+    question: 'How does Agro-chain make money?',
+    answer:
+      'A small platform fee is applied at checkout. This is included in the admin-set pricing — there are no hidden fees added at payment time.',
+  },
+];
+
+// Contact page FAQs — support, partnership, response times
+export const contactFaqs: FAQ[] = [
+  {
+    question: 'How quickly will you respond to my message?',
+    answer:
+      'We respond to all inquiries within 24 hours on business days (Monday–Friday, 9am–5pm WAT). WhatsApp messages are typically faster.',
+  },
+  {
+    question: 'I\'m a buyer and my order has a problem. Who do I contact?',
+    answer:
+      'Contact us via WhatsApp (+234 701 228 8798) for the fastest response on order issues. Include your order ID and a brief description of the problem.',
+  },
+  {
+    question: 'I\'m a farmer and want to join the platform. What do I do?',
+    answer:
+      'Register at /register?role=farmer. After registration you\'ll be assigned to a cluster farmer in your area. They will guide you through your first listing.',
+  },
+  {
+    question: 'I want to partner with Agro-chain as an organisation or logistics provider.',
+    answer:
+      'Send a partnership inquiry through the contact form selecting "Partnership" as the subject. Our team will review and respond within 2–3 business days.',
+  },
+  {
+    question: 'Is there a phone number I can call?',
+    answer:
+      'Yes — +234 701 228 8798, available Monday–Friday, 9am–5pm WAT. WhatsApp is preferred for faster support.',
+  },
+];
+
+// Support page FAQs — mixed general
+export const supportFaqs: FAQ[] = [
+  ...homeFaqs,
+  ...farmerFaqs.slice(0, 2),
+  ...buyerFaqs.slice(0, 2),
+];
+```
+
+---
+
+### The SectionFAQ Component
+
+File: `src/components/SectionFAQ.tsx`
+
+This is a direct adaptation of the Stayar-V2 `SectionFAQ.tsx`. Key differences for Agro-chain:
+
+- Uses `font-ubuntu` and `font-roboto-slab` instead of `font-outfit`
+- Uses Agro-chain brand tokens (`text-heading-colour`, `bg-gray-bg`, `border-gray-border`)
+- The left column heading/subtext/CTA is configurable via props (not hardcoded)
+- `usePathname` from `next/navigation` instead of `useLocation` from `react-router`
+
+---
+
+### Usage in Pages
+
+```tsx
+// Homepage (src/app/(main-app)/page.tsx)
+import SectionFAQ from '@/components/SectionFAQ';
+import { homeFaqs } from '@/models/models';
+
+// Inside the page JSX:
+<SectionFAQ
+  faqs={homeFaqs}
+  heading="Simplifying complex farming questions."
+  subtext="Can't find your answer? Reach us directly and we'll respond within 24 hours."
+  ctaLabel="Contact Support"
+  ctaHref="/contact"
+/>
+
+// How It Works page (src/app/(main-app)/how-it-works/page.tsx)
+import SectionFAQ from '@/components/SectionFAQ';
+import { farmerFaqs } from '@/models/models';
+
+// With role tabs — render conditionally based on active tab:
+<SectionFAQ faqs={activeRole === 'farmer' ? farmerFaqs : activeRole === 'cluster' ? clusterFarmerFaqs : buyerFaqs} />
+
+// Support page — already has an FAQ section, swap arrays:
+<SectionFAQ faqs={supportFaqs} heading="How can we help?" />
+```
+
+---
+
+### SectionFAQ Placement Rule
+
+**SectionFAQ is always the last section before the Footer on every marketing page.**
+
+No exceptions. This means:
+
+| Page            | SectionFAQ array                       | Left column CTA                               |
+| --------------- | -------------------------------------- | --------------------------------------------- |
+| `/` homepage    | `homeFaqs`                             | "Contact Support" → `/contact`                |
+| `/about`        | `aboutFaqs`                            | "Learn more about us" → `/contact`            |
+| `/how-it-works` | role-specific array (tabbed or single) | "Get Started" → `/register`                   |
+| `/contact`      | `contactFaqs`                          | "WhatsApp us" → `https://wa.me/2347012288798` |
+| `/support`      | `supportFaqs`                          | "Contact Us" → `/contact`                     |
+
+The Footer follows immediately after `<SectionFAQ />` in every page's JSX — nothing between them.
+
+---
+
+### Design Decisions in the FAQ Component
+
+1. **Shows 5 items by default, "Show All" button if more** — avoids an overwhelming wall of
+   questions on first load. Same as Stayar.
+
+2. **First item opens on mount (`openIndex: 0`)** — gives the visitor immediate visual affordance
+   that the items are interactive. Resets to `null` on route change.
+
+3. **Left column is not hardcoded** — `heading`, `subtext`, `ctaLabel`, `ctaHref` are all props
+   with sensible defaults. This lets you put the same component on 4 different pages without
+   forking the code.
+
+4. **`grid-rows-[0fr] → grid-rows-[1fr]` animation** — the CSS grid row trick for smooth
+   height transitions without JavaScript measurements. More performant than `height: auto`
+   animation via JS.
+
+5. **The left column CTA** — links to `/contact` by default but can be overridden. On the
+   how-it-works page it should link to `/register`. On the support page it can link to WhatsApp.
+
+---
+
+## Complete Implementation Order (All Phases)
+
+This is the canonical top-to-bottom build order for the full landing page project, including
+the design system foundations, FAQ component, and all pages.
+
+### Phase 1 — Foundation (do these before any page work)
+
+1. Create `.vscode/settings.json` with the settings above
+2. Verify `globals.css` has all Tailwind tokens in `@theme inline` (should be done)
+3. Verify `--section-py-lg: 6.25rem` is set (should be done)
+4. Verify `--gray-bg: #f0faf4` is set (should be done)
+5. Verify layout component classes exist in `@layer components` (should be done)
+6. Update `navLinks` and `sideNavLinks` in `models.ts`
+7. Add `FAQ` type and all FAQ arrays to `models.ts`
+8. Fix `AppLogo.tsx` (add width/height to Image)
+9. Uncomment Header and Footer in `(main-app)/layout.tsx`
+10. Fix Header auth CTA hrefs (`/signin` → `/login`, `/signup` → `/register`)
+
+### Phase 2 — Shared Components
+
+11. Build `SectionFAQ.tsx` component
+12. Test `SectionFAQ` in isolation with `homeFaqs`
+13. Confirm Framer Motion is installed (`framer-motion` — already in the project)
+14. Confirm animation variants (`FADE_IN_VARIANT`, `SLIDE_UP_VARIANT`, `STAGGER_CONTAINER_VARIANT`)
+    are in `constants.ts`
+
+### Phase 3 — Pages (in priority order)
+
+15. Build `/` homepage — all 8 sections
+16. Build `/about` — all 6 sections
+17. Build `/contact` — all 5 sections
+18. Build `/how-it-works` — all 4 sections
+
+### Phase 4 — Auth Restructure
+
+19. Update `register/page.tsx` — inline role selector, remove role cookie call
+20. Delete or redirect `/authentication/page.tsx`
+21. Delete `/api/auth/role/route.ts` (after backend confirmation)
+22. Add `?redirect=` handling to `login/page.tsx`
+23. Add "Already have an account? Log in" to `register/page.tsx`
+24. Add Agro-chain logo link to `(auth)/layout.tsx`
+
+### Phase 5 — Marketplace Auth Gate
+
+25. Add "Log in to buy" gate to `Add to Cart` in marketplace
+26. Implement `/login?redirect=/marketplace/[id]` redirect and return flow
+
+---
+
+## Token Reference Card
+
+Quick lookup for the most-used tokens during landing page development.
+
+**Colors:**
+
+```tsx
+// Backgrounds
+bg - white; // pure white sections
+bg - gray - bg; // #f0faf4 green-tinted alternating sections
+bg - theme - green - dark; // #1b4332 hero, testimonials, CTA banner
+bg - section - dark; // #0f1f17 how-it-works near-black section
+
+// Text
+text - heading - colour; // #090909 all headings
+text - text - colour; // #6d6a6a body copy
+text - text - colour - 2; // #393939 darker body, FAQ answers
+text - white; // white text on dark sections
+
+// Borders
+border - gray - border; // #e0e0e0 default borders
+border - input - border; // #d2d2d2 form inputs
+
+// Brand accent
+text - theme - green - dark; // green text links, section labels
+border - theme - green - dark; // active input/card borders
+```
+
+**Spacing:**
+
+```tsx
+// Section padding (always use all three breakpoints)
+px-section-px py-section-py
+sm:px-section-px-sm sm:py-section-py-sm
+lg:px-section-px-lg lg:py-section-py-lg
+
+// Or the hardcoded equivalent Stayar also uses:
+px-4 py-10 lg:px-25 lg:py-25
+
+// Height offset for fixed header
+mt-navbar-h   // push content below the navbar
+pt-navbar-h   // pad top of first section
+```
+
+**Layout widths:**
+
+```tsx
+layout - max - width; // 1440px — outermost page wrapper
+content - width; // 1200px — section inner container
+form - width; // 512px  — auth forms
+card - width; // 384px  — cards and modals
+```
+
+**Fonts:**
+
+```tsx
+font - ubuntu; // headings, labels, buttons, nav links
+font - roboto - slab; // body copy, descriptions, FAQ answers
+```
+
+---
+
+## What Else — Gaps Not Covered in the Main Spec
+
+These are real items that need handling during or after implementation. None of them are blocking
+for the initial build, but all of them affect production readiness or user experience.
+
+---
+
+### 1. Page Metadata / SEO
+
+Every page in Next.js App Router needs an `export const metadata: Metadata` block. Without it,
+all pages share the same default title and no OG tags — bad for sharing and search.
+
+Add to each page file:
+
+```tsx
+// src/app/(main-app)/page.tsx
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Agro-chain | Nigeria's Catfish Marketplace",
+  description:
+    "Connecting verified catfish farmers to bulk buyers. Secure payments, fair admin-set pricing, and coordinated delivery across Nigeria.",
+  openGraph: {
+    type: "website",
+    url: "https://agro-chain.com",
+    title: "Agro-chain | Nigeria's Catfish Marketplace",
+    description: "Connecting verified catfish farmers to bulk buyers across Nigeria.",
+    images: [{ url: "https://agro-chain.com/images/og-hero.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Agro-chain | Nigeria's Catfish Marketplace",
+    description: "Connecting verified catfish farmers to bulk buyers across Nigeria.",
+    images: ["https://agro-chain.com/images/og-hero.png"],
+  },
+};
+```
+
+Do the same for `/about`, `/how-it-works`, `/contact` — each with unique title and description.
+
+---
+
+### 2. `not-found.tsx` for Marketing Pages
+
+When users land on a broken URL on the marketing site, they should see a branded 404 with CTAs
+back to the homepage and marketplace — not Next.js's default white page.
+
+File to create: `src/app/(main-app)/not-found.tsx`
+
+Simple implementation:
+
+```tsx
+import Link from "next/link";
+
+export default function NotFound() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 text-center">
+      <h1 className="font-ubuntu text-heading-colour text-5xl font-bold">404</h1>
+      <p className="font-roboto-slab text-text-colour text-lg">
+        This page doesn't exist. Back to safety?
+      </p>
+      <div className="flex gap-4">
+        <Link href="/" className="font-ubuntu text-theme-green-dark text-sm font-medium underline">
+          Go Home
+        </Link>
+        <Link
+          href="/marketplace"
+          className="font-ubuntu text-theme-green-dark text-sm font-medium underline"
+        >
+          Browse Marketplace
+        </Link>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### 3. Footer Newsletter/Subscribe Section
+
+The existing `Footer.tsx` has a subscribe section that's currently commented out (mentioned in the
+spec as "just needs the subscribe section uncommented"). Add this to the Phase 1 implementation
+order — the footer is rendered on every page so it's high impact.
+
+When uncommenting, wire the email input to a console.log or a Formspree endpoint for now, same
+pattern as the contact form.
+
+---
+
+### 4. `aria-label` on Every Section
+
+Stayar adds `aria-label` to every `<section>` element for accessibility and screen readers.
+Apply the same pattern to every section on every landing page:
+
+```tsx
+<section aria-label="Hero Section">
+<section aria-label="Impact Stats">
+<section aria-label="How It Works">
+<section aria-label="Why Agro-chain">
+<section aria-label="Browse by Category">
+<section aria-label="Marketplace Preview">
+<section aria-label="Testimonials">
+<section aria-label="Call to Action">
+<section aria-label="FAQ Section">  ← already in SectionFAQ component
+```
+
+---
+
+### 5. `whileInView` Scroll Animations — Which Sections Get What
+
+The doc mentions using `whileInView` for scroll animations. Here's the explicit plan:
+
+| Section                   | Animation                                     | Variant                                          |
+| ------------------------- | --------------------------------------------- | ------------------------------------------------ |
+| Hero                      | `animate` (not whileInView — already visible) | `FADE_IN_VARIANT`                                |
+| Impact Stats              | `whileInView` stagger                         | `STAGGER_CONTAINER_VARIANT` + `SLIDE_UP_VARIANT` |
+| How It Works cards        | `whileInView` stagger                         | `STAGGER_CONTAINER_VARIANT`                      |
+| Why Agro-chain cards      | `whileInView` stagger                         | `STAGGER_CONTAINER_VARIANT`                      |
+| Browse by Category        | `whileInView` stagger                         | `STAGGER_CONTAINER_VARIANT`                      |
+| Marketplace Preview cards | `whileInView` stagger                         | `STAGGER_CONTAINER_VARIANT`                      |
+| Testimonials              | `whileInView` stagger                         | `STAGGER_CONTAINER_VARIANT`                      |
+| Final CTA                 | `whileInView`                                 | `FADE_IN_VARIANT`                                |
+
+All `whileInView` sections use:
+
+```tsx
+viewport={{ once: true, margin: '-100px' }}
+```
+
+The `once: true` means the animation fires once and stays — no re-animation on scroll back up.
+
+---
+
+### 6. OG Image Asset
+
+The metadata blocks reference `/images/og-hero.png`. This image needs to exist in `public/images/`.
+Recommended: a 1200×630px crop of the hero farm/catfish pond image with the Agro-chain logotype
+overlaid. Create this before deploying the landing page publicly.
+
+---
+
+### 7. `robots.txt` and `sitemap.xml`
+
+Next.js App Router has built-in support for both. Create these files:
+
+**`src/app/robots.ts`:**
+
+```ts
+import type { MetadataRoute } from "next";
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: { userAgent: "*", allow: "/" },
+    sitemap: "https://agro-chain.com/sitemap.xml",
+  };
+}
+```
+
+**`src/app/sitemap.ts`:**
+
+```ts
+import type { MetadataRoute } from "next";
+export default function sitemap(): MetadataRoute.Sitemap {
+  return [
+    {
+      url: "https://agro-chain.com",
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: "https://agro-chain.com/about",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: "https://agro-chain.com/how-it-works",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: "https://agro-chain.com/contact",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: "https://agro-chain.com/marketplace",
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+  ];
+}
+```
+
+---
+
+### 8. `/register?role=farmer` vs Cluster Farmer CTA
+
+The "How It Works" section has a Card 2 for Cluster Farmers that currently links to
+`/register?role=farmer`. This is correct — cluster status is applied for after registration,
+not at signup. But the card copy must make this clear:
+
+```
+"Start as a Farmer → Apply for Cluster Status after registration"
+```
+
+Not confusing if worded right, but easy to miss if not explicitly stated on the card.
+
+---
+
+### 9. `.vscode` — Already Ahead of Stayar
+
+Agro-chain's `.vscode` is already more complete than Stayar's:
+
+- `settings.json` — all Stayar settings + more (auto-save, rulers, sticky scroll, git integration, file nesting)
+- `extensions.json` — full recommended extension list (Stayar has none)
+- `launch.json` — Next.js debug configs (Stayar has none)
+- Added `cSpell.words` for project-specific terms (Stayar has `["STAYAR"]`, ours has 19 terms)
+- Tailwind class regex was already in the updated settings (includes `cn()`, `cva()`, `cx()`)
+
+No action needed on `.vscode` beyond what was added above.

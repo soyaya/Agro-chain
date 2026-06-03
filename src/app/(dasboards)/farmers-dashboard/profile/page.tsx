@@ -104,7 +104,7 @@ export default function FarmerProfilePage() {
     logisticsAvailable: false,
   });
 
-  // Files held in state — not uploaded yet
+  // Files held in state - not uploaded yet
   const [docFiles, setDocFiles] = useState<DocFiles>({
     bvnVerification: null,
     proofOfAddress: null,
@@ -196,7 +196,7 @@ export default function FarmerProfilePage() {
   const submitClusterApplication = async () => {
     setApplyingCluster(true);
     try {
-      // Upload any new files — skip if already have a URL for that doc
+      // Upload any new files - skip if already have a URL for that doc
       const uploadDoc = async (key: keyof DocFiles): Promise<string | undefined> => {
         const file = docFiles[key];
         if (file) return uploadFile(file);
@@ -261,8 +261,8 @@ export default function FarmerProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">My Profile</h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">My Profile</h1>
+        <p className="font-roboto-slab text-text-colour">
           Manage your farmer profile and cluster application
         </p>
       </motion.div>
@@ -272,24 +272,24 @@ export default function FarmerProfilePage() {
         variants={FADE_IN_VARIANT}
         initial="hidden"
         animate="visible"
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">
+          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">
             Profile Information
           </h2>
           {isEditing ? (
             <div className="flex gap-2">
               <button
                 onClick={() => setIsEditing(false)}
-                className="font-roboto-slab rounded-xl border border-(--border-gray) px-4 py-2 text-sm text-(--text-colour) transition hover:bg-(--bg-pink)"
+                className="font-roboto-slab border-gray-border text-text-colour hover:bg-pink-bg rounded-xl border px-4 py-2 text-sm transition"
               >
                 Cancel
               </button>
               <button
                 onClick={saveProfile}
                 disabled={savingProfile}
-                className="font-roboto-slab rounded-xl bg-(--theme-green-dark) px-4 py-2 text-sm text-white transition hover:opacity-90 disabled:opacity-50"
+                className="font-roboto-slab bg-theme-green-dark rounded-xl px-4 py-2 text-sm text-white transition hover:opacity-90 disabled:opacity-50"
               >
                 {savingProfile ? "Saving..." : "Save"}
               </button>
@@ -297,7 +297,7 @@ export default function FarmerProfilePage() {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="font-roboto-slab rounded-xl border border-(--border-gray) px-4 py-2 text-sm text-(--text-colour) transition hover:bg-(--bg-pink)"
+              className="font-roboto-slab border-gray-border text-text-colour hover:bg-pink-bg rounded-xl border px-4 py-2 text-sm transition"
             >
               Edit
             </button>
@@ -317,7 +317,10 @@ export default function FarmerProfilePage() {
             ] as [string, keyof ProfileForm][]
           ).map(([label, key]) => {
             const isNa = String(form[key]) === "N/A" || String(form[key]) === "";
-            const locked = key === "fullName" || key === "phoneNumber" || key === "email" ||
+            const locked =
+              key === "fullName" ||
+              key === "phoneNumber" ||
+              key === "email" ||
               ((key === "state" || key === "localGovernment") && !isNa);
             return (
               <DynamicInput
@@ -333,7 +336,7 @@ export default function FarmerProfilePage() {
 
           {/* Fish Type select */}
           <div className="flex flex-col gap-1.5">
-            <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+            <label className="font-roboto-slab text-heading-colour text-sm font-medium">
               Fish Type
             </label>
             {isEditing ? (
@@ -347,7 +350,7 @@ export default function FarmerProfilePage() {
               <input
                 value={form.fishType}
                 disabled
-                className="font-roboto-slab w-full rounded-lg border border-(--border-input) px-3 py-2 text-sm disabled:bg-gray-50"
+                className="font-roboto-slab border-input-border w-full rounded-lg border px-3 py-2 text-sm disabled:bg-gray-50"
               />
             )}
           </div>
@@ -377,7 +380,7 @@ export default function FarmerProfilePage() {
         variants={FADE_IN_VARIANT}
         initial="hidden"
         animate="visible"
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         {/* Trigger checkbox */}
         <div className="flex items-start gap-3">
@@ -387,23 +390,23 @@ export default function FarmerProfilePage() {
             checked={wantsCluster}
             onChange={(e) => setWantsCluster(e.target.checked)}
             disabled={hasApplied}
-            className="mt-1 h-5 w-5 cursor-pointer rounded border-gray-300 text-(--theme-green-dark) focus:ring-2 focus:ring-(--theme-green-dark) disabled:cursor-default"
+            className="text-theme-green-dark focus:ring-theme-green-dark mt-1 h-5 w-5 cursor-pointer rounded border-gray-300 focus:ring-2 disabled:cursor-default"
           />
           <div>
             <label
               htmlFor="wantsCluster"
-              className={`font-ubuntu block text-lg font-semibold text-(--heading-colour) ${!hasApplied ? "cursor-pointer" : ""}`}
+              className={`font-ubuntu text-heading-colour block text-lg font-semibold ${!hasApplied ? "cursor-pointer" : ""}`}
             >
               Apply to become a Cluster Farmer
             </label>
-            <p className="font-roboto-slab mt-0.5 text-sm text-(--text-colour)">
+            <p className="font-roboto-slab text-text-colour mt-0.5 text-sm">
               Cluster farmers aggregate supply from multiple farmers and sell on the marketplace
               under their name.
             </p>
           </div>
         </div>
 
-        {/* Status banner — shown when already applied */}
+        {/* Status banner - shown when already applied */}
         <AnimatePresence>
           {hasApplied && (
             <motion.div
@@ -428,7 +431,7 @@ export default function FarmerProfilePage() {
                   className={`font-roboto-slab text-sm font-medium ${isApproved ? "text-green-800" : "text-yellow-800"}`}
                 >
                   {isApproved
-                    ? "Approved — you are a Cluster Farmer. Log out and back in to access your cluster dashboard."
+                    ? "Approved - you are a Cluster Farmer. Log out and back in to access your cluster dashboard."
                     : "Application under review. Admin will approve or reject shortly."}
                 </p>
               </div>
@@ -436,7 +439,7 @@ export default function FarmerProfilePage() {
           )}
         </AnimatePresence>
 
-        {/* Application form — shown when checkbox is checked */}
+        {/* Application form - shown when checkbox is checked */}
         <AnimatePresence>
           {wantsCluster && (
             <motion.div
@@ -497,11 +500,11 @@ export default function FarmerProfilePage() {
                     onChange={(e) =>
                       setClusterForm((p) => ({ ...p, logisticsAvailable: e.target.checked }))
                     }
-                    className="h-5 w-5 cursor-pointer rounded border-gray-300 text-(--theme-green-dark) focus:ring-2 focus:ring-(--theme-green-dark)"
+                    className="text-theme-green-dark focus:ring-theme-green-dark h-5 w-5 cursor-pointer rounded border-gray-300 focus:ring-2"
                   />
                   <label
                     htmlFor="logisticsAvailable"
-                    className="font-roboto-slab cursor-pointer text-sm font-medium text-(--heading-colour)"
+                    className="font-roboto-slab text-heading-colour cursor-pointer text-sm font-medium"
                   >
                     I have logistics / transportation available for distribution
                   </label>
@@ -510,7 +513,7 @@ export default function FarmerProfilePage() {
                 {/* Document uploads */}
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-ubuntu text-base font-semibold text-(--heading-colour)">
+                    <h3 className="font-ubuntu text-heading-colour text-base font-semibold">
                       Required Documents
                     </h3>
                     <span className="font-roboto-slab text-xs text-gray-400">
@@ -535,7 +538,7 @@ export default function FarmerProfilePage() {
                           <div className="mb-1 flex items-center gap-2">
                             <CheckCircle size={14} className="text-green-600" />
                             <span className="font-roboto-slab text-xs text-green-700">
-                              Previously uploaded — upload a new file to replace
+                              Previously uploaded - upload a new file to replace
                             </span>
                           </div>
                         )}

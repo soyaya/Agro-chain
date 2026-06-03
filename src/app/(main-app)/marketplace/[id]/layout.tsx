@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Listing Details",
   description:
-    "View full details of this fish supply listing on Agro-chain — including fish type, available quantity, packaging options, price per kg, delivery options, and seller information.",
+    "View full details of this fish supply listing on Agro-chain - including fish type, available quantity, packaging options, price per kg, delivery options, and seller information.",
   keywords: [
     "catfish listing",
     "buy catfish",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     title: "Fish Listing – Agro-chain Marketplace",
     description:
-      "View full details of this fish supply listing — pricing, quantity, packaging, and delivery options from a verified cluster farmer.",
+      "View full details of this fish supply listing - pricing, quantity, packaging, and delivery options from a verified cluster farmer.",
   },
 };
 

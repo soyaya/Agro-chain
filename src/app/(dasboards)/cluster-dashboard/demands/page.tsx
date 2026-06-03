@@ -73,10 +73,10 @@ function DeclineModal({ isOpen, onClose, onConfirm, loading }: DeclineModalProps
                   <XCircle size={24} className="text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+                  <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                     Decline Demand
                   </h3>
-                  <p className="font-roboto-slab text-sm text-(--text-colour)">
+                  <p className="font-roboto-slab text-text-colour text-sm">
                     Reason is optional but helpful for the buyer
                   </p>
                 </div>
@@ -85,13 +85,13 @@ function DeclineModal({ isOpen, onClose, onConfirm, loading }: DeclineModalProps
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Reason for declining (optional)..."
-                className="font-roboto-slab h-28 w-full rounded-2xl border border-(--border-input) p-(--space-md) text-sm text-(--text-colour) transition outline-none focus:border-(--border-gray)"
+                className="font-roboto-slab focus:border-gray-border text-text-colour border-input-border h-28 w-full rounded-2xl border p-(--space-md) text-sm transition outline-none"
               />
               <div className="grid grid-cols-2 gap-(--gap-base)">
                 <button
                   onClick={handleClose}
                   disabled={loading}
-                  className="font-roboto-slab flex h-12 items-center justify-center rounded-full border border-(--border-gray) text-sm font-medium text-(--text-colour) transition hover:bg-(--bg-pink) disabled:opacity-50"
+                  className="font-roboto-slab border-gray-border text-text-colour hover:bg-pink-bg flex h-12 items-center justify-center rounded-full border text-sm font-medium transition disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -150,7 +150,7 @@ export default function ClusterDemandsPage() {
       setDemands((prev) =>
         prev.map((d) => (d.id === id ? { ...d, status: "accepted" as DemandStatus } : d)),
       );
-      toast.success("Demand accepted — it will appear in your Orders.");
+      toast.success("Demand accepted - it will appear in your Orders.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to accept demand");
     } finally {
@@ -231,8 +231,8 @@ export default function ClusterDemandsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">Demands</h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">Demands</h1>
+        <p className="font-roboto-slab text-text-colour">
           Custom buyer requests assigned to you by admin. Accept to fulfill or decline if
           unavailable.
         </p>
@@ -249,7 +249,7 @@ export default function ClusterDemandsPage() {
           <AlertCircle size={22} className="shrink-0 text-blue-600" />
           <p className="font-roboto-slab text-sm text-blue-800">
             <span className="font-semibold">{assignedCount}</span> new demand
-            {assignedCount !== 1 ? "s" : ""} assigned to you — review and accept or decline
+            {assignedCount !== 1 ? "s" : ""} assigned to you - review and accept or decline
           </p>
         </motion.div>
       )}
@@ -267,16 +267,14 @@ export default function ClusterDemandsPage() {
             onClick={() => setFilterStatus(status)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
               filterStatus === status
-                ? "border-(--theme-green-dark) bg-green-50"
-                : "border-(--border-gray) bg-(--white) hover:bg-(--bg-pink)"
+                ? "border-theme-green-dark bg-green-50"
+                : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
-            <span className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+            <span className="font-ubuntu text-heading-colour text-xl font-bold">
               {counts[status]}
             </span>
-            <span className="font-roboto-slab text-xs text-(--text-colour) capitalize">
-              {status}
-            </span>
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
           </button>
         ))}
       </motion.div>
@@ -295,15 +293,15 @@ export default function ClusterDemandsPage() {
               <motion.div
                 key={demand.id}
                 variants={FADE_IN_VARIANT}
-                className="flex flex-col gap-4 rounded-3xl border border-(--border-gray) bg-(--white) p-6 shadow-sm"
+                className="border-gray-border flex flex-col gap-4 rounded-3xl border bg-(--white) p-6 shadow-sm"
               >
                 {/* Top */}
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-ubuntu text-lg font-bold text-(--heading-colour) capitalize">
+                    <h3 className="font-ubuntu text-heading-colour text-lg font-bold capitalize">
                       {demand.fishType}
                     </h3>
-                    <p className="font-roboto-slab text-sm text-(--text-colour)">
+                    <p className="font-roboto-slab text-text-colour text-sm">
                       from {demand.buyerName}
                     </p>
                   </div>
@@ -318,19 +316,19 @@ export default function ClusterDemandsPage() {
 
                 {/* Details */}
                 <div className="flex flex-col gap-2.5">
-                  <div className="font-roboto-slab flex items-center gap-2 text-sm text-(--text-colour)">
+                  <div className="font-roboto-slab text-text-colour flex items-center gap-2 text-sm">
                     <Package size={15} className="shrink-0 text-gray-400" />
                     <span>
                       {demand.weightKg} kg · {demand.fishVariant.replace("_", " ")}
                     </span>
                   </div>
-                  <div className="font-roboto-slab flex items-center gap-2 text-sm text-(--text-colour)">
+                  <div className="font-roboto-slab text-text-colour flex items-center gap-2 text-sm">
                     <MapPin size={15} className="shrink-0 text-gray-400" />
                     <span>
                       {demand.locationLga}, {demand.locationState}
                     </span>
                   </div>
-                  <div className="font-roboto-slab flex items-center gap-2 text-sm text-(--text-colour)">
+                  <div className="font-roboto-slab text-text-colour flex items-center gap-2 text-sm">
                     <Clock size={15} className="shrink-0 text-gray-400" />
                     <span>
                       {new Date(demand.createdAt).toLocaleDateString("en-NG", {
@@ -341,7 +339,7 @@ export default function ClusterDemandsPage() {
                     </span>
                   </div>
                   {demand.notes && (
-                    <p className="font-roboto-slab text-sm text-(--text-colour)">
+                    <p className="font-roboto-slab text-text-colour text-sm">
                       <span className="font-medium">Note:</span> {demand.notes}
                     </p>
                   )}
@@ -353,7 +351,7 @@ export default function ClusterDemandsPage() {
                     <button
                       onClick={() => handleAccept(demand.id)}
                       disabled={actionLoading}
-                      className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                      className="font-roboto-slab bg-theme-green-dark flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
                     >
                       <CheckCircle size={16} />
                       Accept
@@ -373,7 +371,7 @@ export default function ClusterDemandsPage() {
                   <button
                     onClick={() => handleFulfill(demand.id)}
                     disabled={actionLoading}
-                    className="font-roboto-slab flex w-full items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                    className="font-roboto-slab bg-theme-green-dark flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
                   >
                     <Truck size={16} />
                     Mark as Fulfilled

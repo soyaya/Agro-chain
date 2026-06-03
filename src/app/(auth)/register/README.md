@@ -18,9 +18,9 @@ When the user now upload such, it'll be subject to review by the admin and when 
 Now, normal farmer can see their listings, update their profile in their dashboard, and what else should be there
 As a cluster farmer now, you get to also make listings, see your listings because the normal farmers dont have to see any listing and whatever farmer is under him as the cluster list anything, it'll appear as if it's theirs.
 you also get to see the farmers under you and their information
-what else, you also get to update your profile 
+what else, you also get to update your profile
 
-once the hassle of cluster and average farmer is done, and cluster farmer approves any lsitings, it goes to the marketplace as the cluster famer listed goods. 
+once the hassle of cluster and average farmer is done, and cluster farmer approves any lsitings, it goes to the marketplace as the cluster famer listed goods.
 so the market place will be a different route.
 
 what else?
@@ -34,7 +34,7 @@ let's do theirs
 responsiveness should be considered for mobile, tablet and large screens.
 
 use consistent maxwidth as i have been using
-any px-(--section-px) sm:px-(--section-px-sm) and lg:px-(--section-px-lg) should be continued.
+any px-section-px sm:px-section-px-sm and lg:px-section-px-lg should be continued.
 
 clean it up without compromising existing template and give me the super prompt.
 

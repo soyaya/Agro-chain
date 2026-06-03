@@ -11,7 +11,10 @@ interface SubmitSecondaryButtonProps extends React.ButtonHTMLAttributes<HTMLButt
   className?: string;
 }
 
-export const SubmitSecondaryButton = React.forwardRef<HTMLButtonElement, SubmitSecondaryButtonProps>(
+export const SubmitSecondaryButton = React.forwardRef<
+  HTMLButtonElement,
+  SubmitSecondaryButtonProps
+>(
   (
     {
       loading = false,
@@ -30,11 +33,12 @@ export const SubmitSecondaryButton = React.forwardRef<HTMLButtonElement, SubmitS
         variant="outline"
         disabled={loading || disabled}
         className={cn(
-          "rounded-full h-12 w-full bg-transparent border border-(--border-gray) font-bold transition-all shadow-xs duration-300 ease-in-out cursor-default",
-          "hover:shadow-sm hover:opacity-96 hover:bg-(--bg-pink) hover:scale-[1.01] hover:cursor-pointer",
-          "focus:outline-none focus:ring-1 focus:ring-(--border-gray)",
+          "border-gray-border h-12 w-full cursor-default rounded-full border bg-transparent font-bold shadow-xs transition-all duration-300 ease-in-out",
+          "hover:bg-pink-bg hover:scale-[1.01] hover:cursor-pointer hover:opacity-96 hover:shadow-sm",
+          "focus:ring-border-gray focus:ring-1 focus:outline-none",
           "active:scale-[0.99]",
-          (loading || disabled) && "cursor-not-allowed opacity-90 hover:scale-100 active:scale-100 hover:bg-transparent",
+          (loading || disabled) &&
+            "cursor-not-allowed opacity-90 hover:scale-100 hover:bg-transparent active:scale-100",
           className,
         )}
         {...props}

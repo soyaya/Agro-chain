@@ -31,9 +31,21 @@ interface ListingSummary {
 }
 
 const STATUS_CONFIG = {
-  approved: { label: "Approved", icon: CheckCircle, className: "bg-green-50 text-green-700 border-green-200" },
-  pending:  { label: "Pending",  icon: Clock,        className: "bg-amber-50 text-amber-700 border-amber-200" },
-  rejected: { label: "Rejected", icon: XCircle,      className: "bg-red-50 text-red-600 border-red-200" },
+  approved: {
+    label: "Approved",
+    icon: CheckCircle,
+    className: "bg-green-50 text-green-700 border-green-200",
+  },
+  pending: {
+    label: "Pending",
+    icon: Clock,
+    className: "bg-amber-50 text-amber-700 border-amber-200",
+  },
+  rejected: {
+    label: "Rejected",
+    icon: XCircle,
+    className: "bg-red-50 text-red-600 border-red-200",
+  },
 };
 
 export default function ClusterMyListingsPage() {
@@ -61,7 +73,9 @@ export default function ClusterMyListingsPage() {
       }
     };
     void load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading) return <LoadingState message="Loading your listings..." size="lg" />;
@@ -69,70 +83,112 @@ export default function ClusterMyListingsPage() {
   return (
     <div className="flex flex-col gap-(--section-gap)">
       <motion.div variants={SLIDE_UP_VARIANT} initial="hidden" animate="visible">
-        <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">My Listings</h1>
-        <p className="font-roboto-slab text-(--text-colour)">Fish listings you created on the platform.</p>
+        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">My Listings</h1>
+        <p className="font-roboto-slab text-text-colour">
+          Fish listings you created on the platform.
+        </p>
       </motion.div>
 
       {/* Summary strip */}
       {summary && (
-        <motion.div variants={SLIDE_UP_VARIANT} initial="hidden" animate="visible" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <motion.div
+          variants={SLIDE_UP_VARIANT}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+        >
           {[
             { label: "Total", value: summary.totalListings },
             { label: "Approved", value: summary.approved },
             { label: "Pending", value: summary.pendingApproval },
             { label: "Rejected", value: summary.rejected },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-(--border-gray) bg-(--white) p-4 shadow-sm">
-              <p className="font-ubuntu text-2xl font-bold text-(--heading-colour)">{s.value}</p>
-              <p className="font-roboto-slab text-xs text-(--text-colour)">{s.label}</p>
+            <div
+              key={s.label}
+              className="border-gray-border rounded-2xl border bg-(--white) p-4 shadow-sm"
+            >
+              <p className="font-ubuntu text-heading-colour text-2xl font-bold">{s.value}</p>
+              <p className="font-roboto-slab text-text-colour text-xs">{s.label}</p>
             </div>
           ))}
         </motion.div>
       )}
 
       {listings.length === 0 ? (
-        <motion.div variants={SLIDE_UP_VARIANT} initial="hidden" animate="visible"
-          className="flex flex-col items-center gap-3 rounded-2xl border border-(--border-gray) bg-(--white) p-12 text-center shadow-sm">
+        <motion.div
+          variants={SLIDE_UP_VARIANT}
+          initial="hidden"
+          animate="visible"
+          className="border-gray-border flex flex-col items-center gap-3 rounded-2xl border bg-(--white) p-12 text-center shadow-sm"
+        >
           <Package size={40} className="text-gray-300" />
-          <p className="font-ubuntu font-semibold text-(--heading-colour)">No listings yet</p>
-          <p className="font-roboto-slab text-sm text-(--text-colour)">Create your first listing to appear on the marketplace.</p>
-          <Link href="/cluster-dashboard/listings/create"
-            className="mt-2 rounded-xl bg-(--theme-green-dark) px-5 py-2.5 text-sm font-medium text-white hover:opacity-90">
+          <p className="font-ubuntu text-heading-colour font-semibold">No listings yet</p>
+          <p className="font-roboto-slab text-text-colour text-sm">
+            Create your first listing to appear on the marketplace.
+          </p>
+          <Link
+            href="/cluster-dashboard/listings/create"
+            className="bg-theme-green-dark mt-2 rounded-xl px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
+          >
             Create Listing
           </Link>
         </motion.div>
       ) : (
-        <motion.div variants={STAGGER_CONTAINER_VARIANT} initial="hidden" animate="visible"
-          className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <motion.div
+          variants={STAGGER_CONTAINER_VARIANT}
+          initial="hidden"
+          animate="visible"
+          className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+        >
           {listings.map((listing) => {
             const cfg = STATUS_CONFIG[listing.status] ?? STATUS_CONFIG.pending;
             const StatusIcon = cfg.icon;
             return (
-              <motion.div key={listing.id} variants={SLIDE_UP_VARIANT}
-                className="flex flex-col gap-4 rounded-2xl border border-(--border-gray) bg-(--white) p-5 shadow-sm">
+              <motion.div
+                key={listing.id}
+                variants={SLIDE_UP_VARIANT}
+                className="border-gray-border flex flex-col gap-4 rounded-2xl border bg-(--white) p-5 shadow-sm"
+              >
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-ubuntu text-base font-semibold capitalize text-(--heading-colour)">
+                  <h3 className="font-ubuntu text-heading-colour text-base font-semibold capitalize">
                     {listing.fishType}
                   </h3>
-                  <span className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}>
+                  <span
+                    className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}
+                  >
                     <StatusIcon size={12} />
                     {cfg.label}
                   </span>
                 </div>
 
-                <div className="flex flex-col gap-1.5 text-sm text-(--text-colour)">
+                <div className="text-text-colour flex flex-col gap-1.5 text-sm">
                   <div className="font-roboto-slab flex items-center gap-2">
                     <Package size={14} className="shrink-0 text-gray-400" />
-                    <span>{listing.totalFishAvailable.toLocaleString()} fish · {listing.totalAvailableKg.toLocaleString()} kg total</span>
+                    <span>
+                      {listing.totalFishAvailable.toLocaleString()} fish ·{" "}
+                      {listing.totalAvailableKg.toLocaleString()} kg total
+                    </span>
                   </div>
                   <div className="font-roboto-slab flex items-center gap-2">
                     <Calendar size={14} className="shrink-0 text-gray-400" />
-                    <span>Harvest: {new Date(listing.harvestDate).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</span>
+                    <span>
+                      Harvest:{" "}
+                      {new Date(listing.harvestDate).toLocaleDateString("en-NG", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
                   </div>
                 </div>
 
                 <p className="font-roboto-slab mt-auto text-xs text-gray-400">
-                  Listed {new Date(listing.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}
+                  Listed{" "}
+                  {new Date(listing.createdAt).toLocaleDateString("en-NG", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </p>
               </motion.div>
             );

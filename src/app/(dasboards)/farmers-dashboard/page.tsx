@@ -55,35 +55,35 @@ export default function FarmersDashboardPage() {
 
   const stats = useMemo(
     () => [
-    {
-      label: "Total Listings",
-      value: summary.totalListings.toLocaleString(),
-      icon: FileText,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      label: "Pending Approval",
-      value: summary.pendingApproval.toLocaleString(),
-      icon: Clock,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-    },
-    {
-      label: "Approved",
-      value: summary.approved.toLocaleString(),
-      icon: CheckCircle,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      label: "Total Supply (kg)",
-      value: summary.totalSupply.toLocaleString(),
-      icon: Package,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
-  ],
+      {
+        label: "Total Listings",
+        value: summary.totalListings.toLocaleString(),
+        icon: FileText,
+        color: "text-blue-600",
+        bgColor: "bg-blue-50",
+      },
+      {
+        label: "Pending Approval",
+        value: summary.pendingApproval.toLocaleString(),
+        icon: Clock,
+        color: "text-yellow-600",
+        bgColor: "bg-yellow-50",
+      },
+      {
+        label: "Approved",
+        value: summary.approved.toLocaleString(),
+        icon: CheckCircle,
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+      },
+      {
+        label: "Total Supply (kg)",
+        value: summary.totalSupply.toLocaleString(),
+        icon: Package,
+        color: "text-purple-600",
+        bgColor: "bg-purple-50",
+      },
+    ],
     [summary],
   );
 
@@ -95,10 +95,10 @@ export default function FarmersDashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
           Welcome back, Farmer! 👋
         </h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <p className="font-roboto-slab text-text-colour">
           Here&apos;s an overview of your farm activities
         </p>
       </motion.div>
@@ -116,15 +116,17 @@ export default function FarmersDashboardPage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm transition-shadow duration-300 hover:shadow-md"
+              className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm transition-shadow duration-300 hover:shadow-md"
             >
               <div className="mb-(--space-lg) flex items-center gap-(--space-md)">
                 <div className={`rounded-xl p-(--space-md) ${stat.bgColor}`}>
                   <Icon size={24} className={stat.color} />
                 </div>
               </div>
-              <p className="font-ubuntu mb-1 text-3xl font-bold text-(--heading-colour)">{loading ? "..." : stat.value}</p>
-              <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>
+              <p className="font-ubuntu text-heading-colour mb-1 text-3xl font-bold">
+                {loading ? "..." : stat.value}
+              </p>
+              <p className="font-roboto-slab text-text-colour text-sm">{stat.label}</p>
             </motion.div>
           );
         })}
@@ -135,21 +137,21 @@ export default function FarmersDashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu text-heading-colour mb-(--space-lg) text-xl font-semibold">
           Quick Actions
         </h2>
         <div className="flex flex-col gap-(--gap-base) sm:flex-row">
           <a
             href="/farmers-dashboard/listings/create"
-            className="font-roboto-slab flex-1 rounded-xl bg-(--theme-green-dark) px-(--space-lg) py-(--space-lg) text-center font-medium text-white hover:cursor-pointer ease-in-out transition-all duration-300 hover:opacity-90 focus:ring-2 focus:ring-(--theme-green-dark) focus:ring-offset-2 focus:outline-none"
+            className="font-roboto-slab bg-theme-green-dark focus:ring-theme-green-dark flex-1 rounded-xl px-(--space-lg) py-(--space-lg) text-center font-medium text-white transition-all duration-300 ease-in-out hover:cursor-pointer hover:opacity-90 focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             Create New Listing
           </a>
           <a
             href="/farmers-dashboard/listings"
-            className="font-roboto-slab flex-1 rounded-xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-lg) text-center font-medium text-(--heading-colour) hover:cursor-pointer ease-in-out transition-all duration-300 hover:bg-(--bg-pink) focus:ring-2 focus:ring-(--border-gray) focus:ring-offset-2 focus:outline-none"
+            className="font-roboto-slab border-gray-border text-heading-colour hover:bg-pink-bg focus:ring-border-gray flex-1 rounded-xl border bg-(--white) px-(--space-lg) py-(--space-lg) text-center font-medium transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             View All Listings
           </a>
@@ -161,21 +163,22 @@ export default function FarmersDashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu text-heading-colour mb-(--space-lg) text-xl font-semibold">
           Recent Activity
         </h2>
         <div className="flex flex-col gap-(--space-md)">
           {activities.length === 0 ? (
-            <p className="font-roboto-slab text-sm text-(--text-colour)">
-              No recent activity yet.
-            </p>
+            <p className="font-roboto-slab text-text-colour text-sm">No recent activity yet.</p>
           ) : (
             activities.map((item) => (
-              <div key={item.id} className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-(--bg-pink)">
+              <div
+                key={item.id}
+                className="hover:bg-pink-bg flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors"
+              >
                 <div className="h-2 w-2 rounded-full bg-green-500" />
-                <p className="font-roboto-slab text-sm text-(--text-colour)">{item.text}</p>
+                <p className="font-roboto-slab text-text-colour text-sm">{item.text}</p>
                 <span className="ml-auto text-xs text-gray-400">
                   {new Date(item.at).toLocaleString()}
                 </span>

@@ -56,7 +56,7 @@ export interface CreateListingPayload {
   harvestDate: string;
   listedDate?: string;
   totalFishAvailable: number;
-  weightKg: number;   // Weight per fish in kg — pricePerUnit is computed by backend from admin config
+  weightKg: number;   // Weight per fish in kg - pricePerUnit is computed by backend from admin config
 }
 
 export interface UpdateFarmerProfilePayload {
@@ -79,7 +79,7 @@ export interface ClusterApplicationPayload {
   warehouseLocation?: string;
   distributionCapacity?: number;
   logisticsAvailable?: boolean;
-  // Document URLs — obtained after uploading files to Cloudinary
+  // Document URLs - obtained after uploading files to Cloudinary
   bvnVerification?: string;
   proofOfAddress?: string;
   cacRegistration?: string;

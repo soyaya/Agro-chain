@@ -29,7 +29,7 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
     const newPackaging: PackagingOption = {
       weightKg: selectedWeight,
       quantity,
-      // pricePerUnit is intentionally omitted — computed by backend from admin config
+      // pricePerUnit is intentionally omitted - computed by backend from admin config
     };
 
     onChange([...packaging, newPackaging]);
@@ -48,8 +48,8 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
       aria-label="Packaging configuration"
     >
       <div className="flex items-center gap-2">
-        <Package size={20} className="text-(--text-colour)" aria-hidden="true" />
-        <h3 className="font-roboto-slab text-lg font-medium text-(--heading-colour)">
+        <Package size={20} className="text-text-colour" aria-hidden="true" />
+        <h3 className="font-roboto-slab text-heading-colour text-lg font-medium">
           Packaging Options
         </h3>
       </div>
@@ -57,7 +57,7 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
       {/* Add Packaging Form */}
       <motion.div
         variants={FADE_IN_VARIANT}
-        className="grid grid-cols-1 gap-(--gap-base) rounded-2xl border border-(--border-gray) bg-(--white)/50 p-(--space-lg) backdrop-blur-sm md:grid-cols-2"
+        className="border-gray-border grid grid-cols-1 gap-(--gap-base) rounded-2xl border bg-(--white)/50 p-(--space-lg) backdrop-blur-sm md:grid-cols-2"
         role="form"
         aria-label="Add packaging option"
       >
@@ -77,7 +77,7 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
             disabled={!totalKg || selectedWeight <= 0}
             aria-label="Add packaging option"
             aria-disabled={!totalKg || selectedWeight <= 0}
-            className="font-roboto-slab flex h-12 w-full items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) font-medium text-white transition-all duration-200 hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+            className="font-roboto-slab bg-theme-green-dark flex h-12 w-full items-center justify-center gap-2 rounded-full font-medium text-white transition-all duration-200 hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Plus size={18} aria-hidden="true" />
             Add Package
@@ -100,20 +100,20 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                className="flex items-center justify-between rounded-2xl border border-(--border-gray) p-(--space-lg)"
+                className="border-gray-border flex items-center justify-between rounded-2xl border p-(--space-lg)"
               >
                 <div className="flex flex-col gap-1">
-                  <p className="font-roboto-slab text-base text-(--heading-colour)">
+                  <p className="font-roboto-slab text-heading-colour text-base">
                     {pkg.weightKg}kg packages
                   </p>
-                  <p className="text-sm text-(--text-colour)">
+                  <p className="text-text-colour text-sm">
                     {pkg.quantity} units · price set by platform
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => removePackaging(index)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-(--error-red) transition hover:bg-red-100"
+                  className="text-error-red flex h-10 w-10 items-center justify-center rounded-full bg-red-50 transition hover:bg-red-100"
                   aria-label={`Remove ${pkg.weightKg}kg packaging option`}
                 >
                   <Trash2 size={18} />
@@ -122,12 +122,10 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
             ))}
 
             {/* Summary */}
-            <div className="rounded-2xl bg-(--gray-bg) p-(--space-lg)">
+            <div className="bg-gray-bg rounded-2xl p-(--space-lg)">
               <div className="flex justify-between">
-                <span className="font-roboto-slab text-sm text-(--text-colour)">
-                  Total Packaged:
-                </span>
-                <span className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                <span className="font-roboto-slab text-text-colour text-sm">Total Packaged:</span>
+                <span className="font-roboto-slab text-heading-colour text-sm font-medium">
                   {totalPackaged}kg / {totalKg}kg
                 </span>
               </div>
@@ -141,7 +139,7 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
         )}
       </AnimatePresence>
 
-      {error && <p className="text-sm text-(--error-red)">{error}</p>}
+      {error && <p className="text-error-red text-sm">{error}</p>}
     </div>
   );
 }

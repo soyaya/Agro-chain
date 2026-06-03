@@ -58,7 +58,7 @@ export interface AddToCartPayload {
   processed?: boolean;
   weightKg: number;
   quantity: number;
-  pricePerUnit: number;   // Price snapshot — read from listing.packaging[n].pricePerUnit, not user input
+  pricePerUnit: number;   // Price snapshot - read from listing.packaging[n].pricePerUnit, not user input
 }
 
 export interface CheckoutPayload {
@@ -127,7 +127,7 @@ export const marketplaceService = {
     return apiFetch(`/marketplace/cart/${cartItemId}`, { method: "DELETE" });
   },
 
-  /** Checkout — creates an order from selected cart items. */
+  /** Checkout - creates an order from selected cart items. */
   checkout(payload: CheckoutPayload): Promise<CheckoutResponse> {
     return apiFetch<CheckoutResponse>("/marketplace/checkout", {
       method: "POST",

@@ -2,7 +2,7 @@
 
 import { ComingSoon } from "~/components/shared/ComingSoon";
 
-// === Coming Soon — original content preserved below
+// === Coming Soon - original content preserved below
 // import { motion } from "framer-motion";
 // import { ArrowLeft, FileText, Download, CheckCircle, Clock, DollarSign, AlertCircle } from "lucide-react";
 // import Link from "next/link";

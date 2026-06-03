@@ -38,7 +38,7 @@ export function ErrorState({
         transition={{ type: "spring", bounce: 0.5 }}
         className="rounded-full bg-red-50 p-4"
       >
-        <AlertCircle size={iconSizes[size]} className="text-(--error-red)" />
+        <AlertCircle size={iconSizes[size]} className="text-error-red" />
       </motion.div>
       <div className="max-w-md text-center">
         <h3 className="font-ubuntu mb-2 text-lg font-semibold text-gray-900">Error</h3>

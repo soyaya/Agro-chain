@@ -1,6 +1,6 @@
 "use client";
 
-// === Coming Soon — existing content preserved below
+// === Coming Soon - existing content preserved below
 // import { motion } from "framer-motion";
 // import { TrendingUp, TrendingDown, Minus, CreditCard, DollarSign, Receipt, AlertCircle, CheckCircle } from "lucide-react";
 // import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
@@ -101,10 +101,10 @@ export default function FinancialProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
+        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-heading-colour">
           Financial Profile 📊
         </h1>
-        <p className="font-roboto-slab text-(--text-colour)">
+        <p className="font-roboto-slab text-text-colour">
           View your credit score, risk assessment, and financial standing
         </p>
       </motion.div>
@@ -121,17 +121,17 @@ export default function FinancialProfilePage() {
             <motion.div
               key={stat.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
+              className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:scale-105"
             >
               <div className="mb-(--space-lg) flex items-center gap-(--space-md)">
                 <div className={`rounded-xl p-(--space-md) ${stat.bgColor}`}>
                   <Icon size={24} className={stat.color} />
                 </div>
               </div>
-              <p className="font-ubuntu mb-1 text-2xl font-bold text-(--heading-colour)">
+              <p className="font-ubuntu mb-1 text-2xl font-bold text-heading-colour">
                 {stat.value}
               </p>
-              <p className="font-roboto-slab text-sm text-(--text-colour)">{stat.label}</p>
+              <p className="font-roboto-slab text-sm text-text-colour">{stat.label}</p>
               {stat.subtitle && (
                 <p className={`font-roboto-slab text-xs mt-1 ${stat.color}`}>{stat.subtitle}</p>
               )}
@@ -144,9 +144,9 @@ export default function FinancialProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-heading-colour">
           Credit Score Overview
         </h2>
         <div className="flex flex-col gap-(--space-lg) lg:flex-row lg:items-center">
@@ -154,7 +154,7 @@ export default function FinancialProfilePage() {
             <div className="mb-(--space-md)">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-roboto-slab text-sm text-gray-600">Credit Score Range</span>
-                <span className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                <span className="font-roboto-slab text-sm font-medium text-heading-colour">
                   {financialProfile.creditScore} / 850
                 </span>
               </div>
@@ -179,7 +179,7 @@ export default function FinancialProfilePage() {
             </div>
           </div>
           <div className="lg:w-1/3">
-            <div className="rounded-xl border border-(--border-input) p-(--space-lg) bg-gray-50">
+            <div className="rounded-xl border border-input-border p-(--space-lg) bg-gray-50">
               <p className="font-roboto-slab text-xs text-gray-600 mb-2">Score Breakdown</p>
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between">
@@ -208,9 +208,9 @@ export default function FinancialProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-(--heading-colour)">
+        <h2 className="font-ubuntu mb-(--space-lg) text-xl font-semibold text-heading-colour">
           Credit Utilization
         </h2>
         <div className="mb-(--space-md)">
@@ -218,7 +218,7 @@ export default function FinancialProfilePage() {
             <span className="font-roboto-slab text-sm text-gray-600">
               ₦{(financialProfile.creditLimit - financialProfile.availableCredit).toLocaleString()} of ₦{financialProfile.creditLimit.toLocaleString()} used
             </span>
-            <span className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+            <span className="font-roboto-slab text-sm font-medium text-heading-colour">
               {creditUtilization.toFixed(1)}%
             </span>
           </div>
@@ -245,10 +245,10 @@ export default function FinancialProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.4 }}
-        className="rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
+        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="flex items-center justify-between mb-(--space-lg)">
-          <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">
+          <h2 className="font-ubuntu text-xl font-semibold text-heading-colour">
             Risk Assessment
           </h2>
           <span className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${riskConfig.bgColor} ${riskConfig.color}`}>
@@ -264,11 +264,11 @@ export default function FinancialProfilePage() {
             return (
               <div
                 key={index}
-                className="flex items-center justify-between rounded-lg border border-(--border-input) p-(--space-md) cursor-default ease-in-out transition-all duration-300 hover:shadow-sm hover:scale-105"
+                className="flex items-center justify-between rounded-lg border border-input-border p-(--space-md) cursor-default ease-in-out transition-all duration-300 hover:shadow-sm hover:scale-105"
               >
                 <div className="flex items-center gap-(--space-md)">
                   <ImpactIcon size={20} className={impactColor} />
-                  <span className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                  <span className="font-roboto-slab text-sm font-medium text-heading-colour">
                     {factor.factor}
                   </span>
                 </div>
@@ -292,7 +292,7 @@ export default function FinancialProfilePage() {
         </div>
         <div className="mt-(--space-lg) rounded-lg bg-blue-50 p-(--space-md)">
           <p className="font-roboto-slab text-xs text-blue-800">
-            Last assessed: {financialProfile.riskAssessment.lastAssessment.toLocaleDateString()} • 
+            Last assessed: {financialProfile.riskAssessment.lastAssessment.toLocaleDateString()} •
             Next review: {financialProfile.riskAssessment.nextReview.toLocaleDateString()}
           </p>
         </div>

@@ -1,6 +1,5 @@
-// import Header from "~/components/PageLanding/Header";
-// import SubscribeSection from "~/components/PageLanding/SubscribeSection";
-// import Footer from "~/components/PageLanding/Footer";
+import Header from "~/components/Header";
+import Footer from "~/components/Footer";
 
 export const metadata = {
   // metadataBase, title.template, openGraph.siteName, openGraph.locale,
@@ -45,10 +44,9 @@ export const metadata = {
 export default function MainLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <>
-      {/* <Header /> */}
+      <Header />
       <main>{children}</main>
-      {/* <SubscribeSection />
-      <Footer /> */}
+      <Footer />
     </>
   );
 }

@@ -25,7 +25,7 @@ const pageNames = [
   "verify-identity (/verify-identity)",
 ];
 
-describe("Auth page metadata — Property 2: correctness", () => {
+describe("Auth page metadata - Property 2: correctness", () => {
   it("every auth page metadata object has robots noindex/nofollow and no keywords", () => {
     fc.assert(
       fc.property(fc.integer({ min: 0, max: authPageMetadata.length - 1 }), (index) => {

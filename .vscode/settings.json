@@ -1,18 +1,79 @@
 {
-    // === Auto Save
-  "files.autoSave": "afterDelay",
-  "files.autoSaveDelay": 300,
+  // === Editor core
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  // === Tab & indentation
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+  "editor.rulers": [80],
+  "editor.wordWrap": "off",
+  "editor.linkedEditing": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.inlayHints.enabled": "on",
+  "editor.suggest.preview": true,
+  "editor.acceptSuggestionOnEnter": "smart",
+  "editor.quickSuggestionsDelay": 100,
+  "editor.stickyScroll.enabled": true,
+
+  // === Files
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 300,
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/cache": true,
+    "**/artifacts": true,
+    "**/out": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.next/**": true,
+    "**/node_modules/**": true
   },
 
-  // === Prettier config
+  // === Search
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/package-lock.json": true,
+    "**/cache": true,
+    "**/artifacts": true,
+    "**/out": true
+  },
+
+  // === TypeScript
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.inlayHints.parameterNames.enabled": "literals",
+  "typescript.inlayHints.variableTypes.enabled": false,
+  "typescript.inlayHints.functionLikeReturnTypes.enabled": false,
+  "js/ts.autoClosingTags.enabled": false,
+
+  // === ESLint
+  "eslint.enable": true,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.run": "onSave",
+
+  // === Prettier
+  "prettier.requireConfig": true,
+  "prettier.configPath": ".prettierrc",
+  "prettier.useEditorConfig": false,
   "prettier.printWidth": 80,
   "prettier.tabWidth": 2,
   "prettier.useTabs": false,
@@ -20,49 +81,91 @@
   "prettier.semi": true,
   "prettier.trailingComma": "es5",
   "prettier.bracketSpacing": true,
-
   "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  // === Prettier
-  "prettier.requireConfig": true,
-  "prettier.useEditorConfig": false,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on"
+  },
 
-  // === Optional: trim whitespace
-  "files.trimTrailingWhitespace": true,
-  "files.insertFinalNewline": true,
-  "editor.wordWrap": "off",
-
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
+  // === Tailwind CSS
+  "tailwindCSS.experimental.classRegex": [
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   ],
-  // === Exclusions
-  "files.exclude": {
-    "**/.git": true,
-    "**/.DS_Store": true,
-    "**/node_modules": true,
-    "**/cache": true,
-    "**/artifacts": true,
-    "**/out": true
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
   },
-    // === Search
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/cache": true,
-    "**/artifacts": true,
-    "**/out": true
+  "tailwindCSS.validate": true,
+
+  // === Terminal
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "npm.packageManager": "pnpm",
+
+  // === Git
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+
+  // === cSpell — project-specific words to suppress false squiggles
+  "cSpell.words": [
+    "Agrochain",
+    "AGROCHAIN",
+    "Paystack",
+    "catfish",
+    "fingerlings",
+    "broodstock",
+    "juveniles",
+    "KYC",
+    "BVN",
+    "CAC",
+    "Kaduna",
+    "pricePerKg",
+    "pricePerUnit",
+    "weightKg",
+    "farmerId",
+    "clusterId",
+    "listingId",
+    "fishType",
+    "harvestDate",
+    "listedDate"
+  ],
+
+  // === Extensions
+  "auto-close-tag.fullMode": false,
+
+  // === Misc
+  "emmet.includeLanguages": {
+    "typescriptreact": "html"
   },
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.autoClosingTags": false,
-  "auto-close-tag.fullMode": false
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js, ${capture}.d.ts",
+    "*.tsx": "${capture}.module.css",
+    "package.json": "package-lock.json, .npmrc, .nvmrc, .node-version",
+    "next.config.*": "next-env.d.ts",
+    "tailwind.config.*": "postcss.config.*",
+    ".eslintrc.*": ".eslintignore, .prettierrc, .prettierignore, .editorconfig, .lintstagedrc*"
+  }
 }

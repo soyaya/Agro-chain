@@ -110,7 +110,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           setItems(mapped);
         }
       } catch {
-        // Not logged in or backend unreachable — keep local cart
+        // Not logged in or backend unreachable - keep local cart
       } finally {
         setSynced(true);
       }

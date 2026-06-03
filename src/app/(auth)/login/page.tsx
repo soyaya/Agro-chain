@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,8 +25,10 @@ const emailSchema = z.object({
 });
 type EmailForm = z.infer<typeof emailSchema>;
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "";
 
   const [step, setStep] = useState<1 | 2>(1);
   const [emailAddress, setEmailAddress] = useState("");
@@ -81,7 +83,7 @@ export default function LoginPage() {
     }
   };
 
-  // Step 2: verify OTP — proxy sets httpOnly cookies, we just redirect
+  // Step 2: verify OTP - proxy sets httpOnly cookies, we just redirect
   const handleVerify = useCallback(async () => {
     if (loading || success) return;
     setLoading(true);
@@ -105,7 +107,7 @@ export default function LoginPage() {
         throw new Error(json.message || "OTP verification failed");
       }
 
-      // Cookies are set by the proxy — just determine where to redirect
+      // Cookies are set by the proxy - just determine where to redirect
       const user = json.data?.user;
       const role = user?.role ?? "";
       const isCluster = user?.is_cluster_farmer === true || role === "cluster";
@@ -119,7 +121,8 @@ export default function LoginPage() {
       setStatusModal({ open: true, variant: "success" });
       toast.success("Login successful!");
 
-      setTimeout(() => router.push(dashboardPath), 800);
+      const destination = redirectTo || dashboardPath;
+      setTimeout(() => router.push(destination), 800);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Invalid or expired code";
       setError(msg);
@@ -180,7 +183,7 @@ export default function LoginPage() {
   return (
     <>
       <motion.div
-        className="default-container-max-width flex min-h-screen flex-col py-(--section-px) sm:py-(--section-px-sm)"
+        className="default-container-max-width py-section-py flex min-h-screen flex-col sm:py-(--section-px-sm)"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -197,7 +200,7 @@ export default function LoginPage() {
               onSubmit={handleSubmit(onSendOtp)}
               className="flex w-full flex-col gap-(--section-gap)"
             >
-              <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
+              <p className="font-roboto-slab text-text-colour text-center lg:text-lg">
                 Enter your email address to receive a verification code
               </p>
 
@@ -224,7 +227,7 @@ export default function LoginPage() {
                 <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
                   Send OTP
                 </SubmitPrimaryButton>
-                <p className="text-center text-sm text-(--text-colour)">
+                <p className="text-text-colour text-center text-sm">
                   Forgot your password?{" "}
                   <Link
                     href="/forgot-password"
@@ -233,7 +236,7 @@ export default function LoginPage() {
                     Reset it
                   </Link>
                 </p>
-                <p className="text-center text-sm text-(--text-colour)">
+                <p className="text-text-colour text-center text-sm">
                   Don&apos;t have an account?{" "}
                   <Link
                     href="/register"
@@ -246,7 +249,7 @@ export default function LoginPage() {
             </form>
           ) : (
             <div className="flex flex-col gap-(--section-gap)">
-              <p className="font-roboto-slab text-center text-(--text-colour) lg:text-lg">
+              <p className="font-roboto-slab text-text-colour text-center lg:text-lg">
                 Enter the OTP sent to your email
               </p>
 
@@ -279,7 +282,7 @@ export default function LoginPage() {
                     onClick={handleVerify}
                     disabled={loginOtp.length < 6 || loading || success}
                     loading={loading}
-                    className={cn(success && "bg-(--theme-green-dark) hover:opacity-96")}
+                    className={cn(success && "bg-theme-green-dark hover:opacity-96")}
                   >
                     {success
                       ? "Verified! Redirecting..."
@@ -288,7 +291,7 @@ export default function LoginPage() {
                         : "Verify Code"}
                   </SubmitPrimaryButton>
 
-                  <p className="text-center text-sm text-(--text-colour)">
+                  <p className="text-text-colour text-center text-sm">
                     Didn&apos;t receive a code?{" "}
                     <button
                       type="button"
@@ -303,7 +306,7 @@ export default function LoginPage() {
                           : "Resend OTP"}
                     </button>
                   </p>
-                  <p className="text-center text-xs text-(--text-colour)">
+                  <p className="text-text-colour text-center text-xs">
                     {resendLocked
                       ? "You've reached the resend limit. Try again after 24 hours."
                       : `${Math.max(0, 2 - resendAttempts)} resend${2 - resendAttempts === 1 ? "" : "s"} left`}
@@ -326,5 +329,15 @@ export default function LoginPage() {
         }
       />
     </>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={<div className="flex min-h-screen items-center justify-center">Loading…</div>}
+    >
+      <LoginPageContent />
+    </Suspense>
   );
 }
