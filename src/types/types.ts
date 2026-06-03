@@ -48,6 +48,17 @@ export interface FishCategory {
   fishTypeParam: string;
 }
 
+export interface FishCategoryGroup {
+  key: string;
+  name: string;
+  description: string;
+  subTypes: { label: string; value: string }[];
+  categoryParam: string;
+  ctaLabel: string;
+  ctaHref: string;
+  isSpecialDemand?: boolean;
+}
+
 export interface HowItWorksCard {
   number: number;
   icon: LucideIcon;

@@ -4,12 +4,16 @@ import type { FishType } from "~/types/constants";
 // === Platform Settings types
 
 export interface FishPriceConfig {
-  catfish: number;
   fingerlings: number;
   juveniles: number;
   table_size: number;
   jumbo: number;
   parent_stocks: number;
+  dried: number;
+  grilled: number;
+  peppersoup: number;
+  peppered: number;
+  smoked: number;
 }
 
 export interface PlatformSettings {

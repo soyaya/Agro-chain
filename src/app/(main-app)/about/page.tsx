@@ -69,7 +69,7 @@ export default function AboutPage() {
     <div className="layout-max-width">
       {/* Section 1: Hero */}
       <section aria-label="About Hero" className="border-gray-border border-b bg-green-50">
-        <div className="content-width px-4 py-20 lg:px-25 lg:py-28">
+        <div className="section-content-max-width px-4 py-20 lg:px-25 lg:py-28">
           <div className="border-theme-green-dark max-w-3xl border-l-4 pl-6">
             <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
               About Agro-chain
@@ -88,7 +88,7 @@ export default function AboutPage() {
 
       {/* Section 2: Our Story */}
       <section aria-label="Our Story" className="bg-white">
-        <div className="content-width px-4 py-16 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-25 lg:py-25">
+        <div className="section-content-max-width px-4 py-16 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-25 lg:py-25">
           <div className="flex flex-col gap-6">
             <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
               Our Story
@@ -133,7 +133,7 @@ export default function AboutPage() {
 
       {/* Section 6: CTA */}
       <section aria-label="About CTA" className="bg-white">
-        <div className="content-width flex flex-col items-center gap-6 px-4 py-16 text-center lg:px-25 lg:py-20">
+        <div className="section-content-max-width flex flex-col items-center gap-6 px-4 py-16 text-center lg:px-25 lg:py-20">
           <h2 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
             Want to be part of this?
           </h2>

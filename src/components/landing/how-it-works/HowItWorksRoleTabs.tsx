@@ -121,7 +121,7 @@ const PANEL_VARIANTS = {
     opacity: 0,
     y: -10,
     filter: "blur(2px)",
-    transition: { duration: 0.25, ease: "easeIn" },
+    transition: { duration: 0.25, ease: "easeIn" as const },
   },
 };
 
@@ -160,7 +160,7 @@ export default function HowItWorksRoleTabs({
     <>
       {/* Section 2 - Role Tabs */}
       <section aria-label="Role Steps" className="bg-white">
-        <div className="content-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+        <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
           {/* Tab buttons */}
           <div
             className="bg-gray-bg flex w-fit gap-2 rounded-full p-1"
@@ -174,7 +174,7 @@ export default function HowItWorksRoleTabs({
                 aria-selected={activeRole === i}
                 aria-controls={`role-panel-${i}`}
                 onClick={() => setActiveRole(i)}
-                className={`font-ubuntu rounded-full px-5 py-2 text-sm font-semibold transition ${
+                className={`font-ubuntu cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-all duration-300 ease-in-out ${
                   activeRole === i
                     ? "bg-theme-green-dark text-white shadow"
                     : "text-text-colour hover:text-heading-colour"
@@ -204,11 +204,7 @@ export default function HowItWorksRoleTabs({
                 className="flex flex-col gap-0"
               >
                 {roles[activeRole].steps.map(({ title, description }, stepIndex) => (
-                  <motion.div
-                    key={title}
-                    variants={STEP_ITEM_VARIANTS}
-                    className="flex gap-6"
-                  >
+                  <motion.div key={title} variants={STEP_ITEM_VARIANTS} className="flex gap-6">
                     {/* Step indicator */}
                     <div className="flex flex-col items-center">
                       <div className="bg-theme-green-dark flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">

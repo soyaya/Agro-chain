@@ -18,7 +18,7 @@ const CARD_TAP: TargetAndTransition = { scale: 0.98, transition: { duration: 0.1
 export default function FeaturesSection() {
   return (
     <section aria-label="Why Agro-chain" className="bg-white">
-      <div className="content-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+      <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         {/* Header */}
         <div className="flex flex-col items-center gap-3 text-center">
           <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
@@ -60,7 +60,7 @@ export default function FeaturesSection() {
         <div className="mt-10 flex justify-center">
           <Link
             href="/register"
-            className="font-ubuntu bg-theme-green-dark hover:bg-theme-green-light rounded-full px-8 py-3 text-sm font-semibold text-white transition inline-flex items-center gap-2"
+            className="font-ubuntu bg-theme-green-dark hover:bg-theme-green-light inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold text-white transition"
           >
             Get Started Free <ArrowRightIcon size={16} />
           </Link>

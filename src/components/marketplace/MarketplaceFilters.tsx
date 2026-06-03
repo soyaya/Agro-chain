@@ -4,7 +4,14 @@ import { motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { SelectInput, DynamicInput } from "~/components/dynamic-input";
 import type { MarketplaceFilters as Filters } from "~/types";
-import { FISH_TYPES, NIGERIAN_STATES, FADE_IN_VARIANT } from "~/types/constants";
+import {
+  LIVE_FISH_TYPES,
+  PROCESSED_FISH_TYPES,
+  LIVE_FISH_TYPE_LABELS,
+  PROCESSED_FISH_TYPE_LABELS,
+  NIGERIAN_STATES,
+  FADE_IN_VARIANT,
+} from "~/types/constants";
 
 interface MarketplaceFiltersProps {
   filters: Filters;
@@ -13,9 +20,29 @@ interface MarketplaceFiltersProps {
 }
 
 export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFiltersProps) {
+  const categoryOptions = [
+    { label: "All Categories", value: "" },
+    { label: "Live Catfish", value: "live" },
+    { label: "Processed Catfish", value: "processed" },
+  ];
+
+  const liveFishTypeOptions = LIVE_FISH_TYPES.map((t) => ({
+    label: LIVE_FISH_TYPE_LABELS[t],
+    value: t,
+  }));
+
+  const processedFishTypeOptions = PROCESSED_FISH_TYPES.map((t) => ({
+    label: PROCESSED_FISH_TYPE_LABELS[t],
+    value: t,
+  }));
+
   const fishTypeOptions = [
-    { label: "All Fish Types", value: "" },
-    ...FISH_TYPES.map((fish) => ({ label: fish, value: fish })),
+    { label: filters.category === "processed" ? "All Processed Types" : filters.category === "live" ? "All Live Types" : "All Fish Types", value: "" },
+    ...(filters.category === "processed"
+      ? processedFishTypeOptions
+      : filters.category === "live"
+      ? liveFishTypeOptions
+      : [...liveFishTypeOptions, ...processedFishTypeOptions]),
   ];
 
   const stateOptions = [
@@ -33,14 +60,15 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
   ];
 
   const handleFilterChange = (key: keyof Filters, value: string | number) => {
-    onChange({
-      ...filters,
-      [key]: value || undefined,
-    });
+    const update: Partial<Filters> = { [key]: value || undefined };
+    // Clear fish type when category changes so stale values don't carry over
+    if (key === "category") update.fishType = undefined;
+    onChange({ ...filters, ...update });
   };
 
   const hasActiveFilters =
     filters.search ||
+    filters.category ||
     filters.fishType ||
     filters.state ||
     filters.minPrice ||
@@ -83,6 +111,16 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
           className="font-roboto-slab focus:border-gray-border text-text-colour border-input-border h-12 w-full rounded-full border pr-(--space-md) pl-10 text-base transition outline-none"
         />
       </div>
+
+      {/* Category */}
+      <SelectInput
+        label="Category"
+        value={filters.category || ""}
+        onValueChange={(value) =>
+          handleFilterChange("category", value as "live" | "processed" | "")
+        }
+        options={categoryOptions}
+      />
 
       {/* Fish Type */}
       <SelectInput
@@ -143,11 +181,7 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
             "price" | "quantity" | "date",
             "asc" | "desc",
           ];
-          onChange({
-            ...filters,
-            sortBy,
-            sortOrder,
-          });
+          onChange({ ...filters, sortBy, sortOrder });
         }}
         options={sortOptions}
       />

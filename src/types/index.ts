@@ -598,6 +598,7 @@ export interface PaginatedResponse<T> {
 
 export interface MarketplaceFilters {
   search?: string;
+  category?: "live" | "processed";
   fishType?: string;
   minPrice?: number;
   maxPrice?: number;

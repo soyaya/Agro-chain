@@ -9,9 +9,22 @@
 
 ---
 
-## Frontend Status — All Done
+## Fish Type Restructure — What Changed
 
-Everything the frontend can do without backend changes is wired. The table below is a complete record of what each page does and what it calls.
+The platform now treats all fish as catfish (the only species), and distinguishes by **processing stage** instead:
+
+| Category | Types |
+|----------|-------|
+| **Live** | `fingerlings`, `juveniles`, `table_size`, `jumbo`, `parent_stocks` |
+| **Processed** | `dried`, `grilled`, `peppersoup`, `peppered`, `smoked` |
+
+- `catfish` as a standalone `fishType` is **deprecated**. Existing records with `fish_type = catfish` remain valid but new submissions will use specific types.
+- `fishVariant` in demands now stores `"live"` or `"processed"` (the category). `fishType` stores the specific sub-type.
+- The frontend `FALLBACK_PRICES_PER_KG` now includes all 10 types. The admin settings page lets admin set per-kg prices for all 10.
+
+---
+
+## Frontend Status
 
 ### Auth
 
@@ -28,9 +41,9 @@ Everything the frontend can do without backend changes is wired. The table below
 |------|--------|-----------|
 | `/farmers-dashboard` | ✅ | `GET /farmers/listings/get`, `GET /farmers/recent-activities` |
 | `/farmers-dashboard/listings` | ✅ | `GET /farmers/listings/get` |
-| `/farmers-dashboard/listings/create` | ✅ | `POST /farmers/listings/create` |
+| `/farmers-dashboard/listings/create` | ✅ | `POST /farmers/listings/create` — fish_type now accepts all 10 types (see B2) |
 | `/farmers-dashboard/orders` | ✅ | `GET /farmers/orders` |
-| `/farmers-dashboard/profile` | ✅ | `GET /auth/me`, `PATCH /farmers/account-profile`, `PATCH /farmers/cluster-farmer-application`, Cloudinary upload |
+| `/farmers-dashboard/profile` | ✅ | `GET /auth/me`, `PATCH /farmers/account-profile`, Cloudinary upload |
 
 ### Cluster Dashboard
 
@@ -41,7 +54,7 @@ Everything the frontend can do without backend changes is wired. The table below
 | `/cluster-dashboard/listings/create` | ✅ | `POST /farmers/listings/create` |
 | `/cluster-dashboard/pending-approvals` | ✅ | `GET /cluster/pending-approvals`, `PATCH /cluster/pending-approvals/:id` |
 | `/cluster-dashboard/farmers` | ✅ | `GET /cluster/farmers` — empty state when no farmers |
-| `/cluster-dashboard/farmers/[id]` | ✅ | `GET /cluster/farmers/:farmerId` — error state until backend implements endpoint |
+| `/cluster-dashboard/farmers/[id]` | ✅ | `GET /cluster/farmers/:farmerId` — error state until B4b |
 | `/cluster-dashboard/orders` | ✅ | `GET /cluster/orders`, `PATCH /cluster/orders/:id` |
 | `/cluster-dashboard/demands` | ✅ | `GET /cluster/demands`, accept/decline/fulfill endpoints |
 | `/cluster-dashboard/profile` | ✅ | `GET /auth/me`, `PATCH /cluster/account-profile` |
@@ -52,11 +65,12 @@ Everything the frontend can do without backend changes is wired. The table below
 |------|--------|-----------|
 | `/buyers-dashboard` | ✅ | `GET /buyers/orders` (stats derived from orders) |
 | `/buyers-dashboard/orders` | ✅ | `GET /buyers/orders` |
-| `/buyers-dashboard/orders/[id]` | ✅ | `GET /buyers/orders/:id`, `GET /buyers/orders/:id/tracking`, `PATCH /buyers/orders/:id/confirm-delivery`, `POST /buyers/orders/:id/pay` |
-| `/buyers-dashboard/demands` | ✅ | `GET /buyers/demands`, `POST /buyers/demands`, `DELETE /buyers/demands/:id` |
-| `/buyers-dashboard/demands/create` | ✅ | `POST /buyers/demands` |
-| `/buyers-dashboard/saved` | ✅ | `GET /buyers/saved`, `DELETE /buyers/saved/:id` — error state until backend implements |
+| `/buyers-dashboard/orders/[id]` | ✅ | `GET /buyers/orders/:id`, confirm delivery, pay |
+| `/buyers-dashboard/demands` | ✅ | `GET /buyers/demands`, `DELETE /buyers/demands/:id` — "Place a Demand" button links to `/marketplace#special-demand` |
+| `/buyers-dashboard/saved` | ✅ | `GET /buyers/saved`, `DELETE /buyers/saved/:id` — error state until B3 |
 | `/buyers-dashboard/profile` | ✅ | `GET /auth/me`, `PATCH /buyers/account-profile` |
+
+> **Note:** `/buyers-dashboard/demands/create` has been removed. Demand creation is now an inline form on the marketplace page triggered by a checkbox under `#special-demand`.
 
 ### Admin Dashboard
 
@@ -64,28 +78,28 @@ Everything the frontend can do without backend changes is wired. The table below
 |------|--------|-----------|
 | `/admin-dashboard` | ✅ | `GET /admin/dashboard/metrics` |
 | `/admin-dashboard/analytics` | ✅ | `GET /admin/dashboard/charts`, `GET /admin/dashboard/activities` |
-| `/admin-dashboard/farmers` | ✅ | `GET /admin/farmers`, `GET /admin/farmers/:id`, `PATCH /admin/farmers/:id/toggle-active` |
+| `/admin-dashboard/farmers` | ✅ | `GET /admin/farmers`, approve/reject |
 | `/admin-dashboard/cluster-applications` | ✅ | `GET /admin/cluster-applications`, approve/reject |
 | `/admin-dashboard/listings` | ✅ | `GET /admin/listings`, approve/reject/flag/remove |
-| `/admin-dashboard/demands` | ✅ | `GET /admin/demands`, `GET /admin/farmers?role=cluster`, `PATCH /admin/demands/:id/assign` |
+| `/admin-dashboard/demands` | ✅ | `GET /admin/demands`, `PATCH /admin/demands/:id/assign` |
 | `/admin-dashboard/orders` | ✅ | `GET /admin/orders`, `GET /admin/orders/:id` |
-| `/admin-dashboard/settings` | ✅ | `GET /admin/settings`, `PATCH /admin/settings/price`, `POST /auth/logout/all` |
+| `/admin-dashboard/settings` | ✅ | `GET /admin/settings`, `PATCH /admin/settings/price` — price editor now shows all 10 fish types |
 
 ### Marketplace (public)
 
 | Page | Status | API calls |
 |------|--------|-----------|
-| `/marketplace` | ✅ | `GET /marketplace`, save/unsave via `buyerService` for logged-in buyers; localStorage fallback for guests |
-| `/marketplace/[id]` | ✅ | `GET /marketplace/:id`, cart operations, Heart button calls `POST/DELETE /buyers/saved` |
-| `/marketplace/checkout` | ✅ | `POST /marketplace/checkout`, then redirect to Paystack |
-| `/payments/verify` | ✅ | `GET /payments/verify?reference=` (Paystack callback) |
+| `/marketplace` | ✅ | `GET /marketplace` + optional `?category=live\|processed` query — see B7 for backend filter support |
+| `/marketplace` | ✅ | Inline Special Demand form (checkbox toggle, AnimatePresence dropdown) → `POST /buyers/demands` |
+| `/marketplace/[id]` | ✅ | `GET /marketplace/:id`, cart operations, heart button calls `POST/DELETE /buyers/saved` |
+| `/marketplace/checkout` | ✅ | `POST /marketplace/checkout`, Paystack redirect |
+| `/payments/verify` | ✅ | `GET /payments/verify?reference=` |
 
 ---
 
 ## Backend — Outstanding Work
 
-> These are everything the backend still needs to implement for the frontend to work fully.
-> **Priority order is listed top to bottom.**
+> Priority order listed top to bottom.
 
 ---
 
@@ -93,7 +107,7 @@ Everything the frontend can do without backend changes is wired. The table below
 
 **File:** `src/routes/admin.routes.ts`
 
-**Problem:** `router.use(authMiddleware)` and `router.use(requireAdmin)` are registered before `router.get("/settings", ...)`. This means `GET /admin/settings` returns 401 for unauthenticated users (all marketplace visitors). The frontend `PlatformSettingsContext` silently falls back to hardcoded `FALLBACK_PRICES_PER_KG` — so marketplace prices are wrong for guests.
+**Problem:** `router.use(authMiddleware)` is registered before `GET /settings`, so marketplace visitors (all guests) get 401 and fall back to wrong hardcoded prices.
 
 **Fix — move GET /settings before the auth middleware:**
 
@@ -113,23 +127,118 @@ router.patch("/settings/price", adminController.updatePrices);
 
 ---
 
-### B2 — Add `catfish` to Zod `FishType` enum ❌
+### B2 — Add processed fish types to Prisma `FishType` enum and Zod schemas ❌
+
+The frontend now supports 10 fish types across two categories. The backend Prisma enum and Zod validation layers need to match.
+
+#### Step 1 — Update Prisma schema
+
+**File:** `prisma/schema.prisma`
+
+Current enum:
+```prisma
+enum FishType {
+  catfish
+  fingerlings
+  juveniles
+  table_size
+  jumbo
+  parent_stocks
+}
+```
+
+Updated enum (keep `catfish` for backwards compat with existing records; add all processed types):
+```prisma
+enum FishType {
+  catfish
+  fingerlings
+  juveniles
+  table_size
+  jumbo
+  parent_stocks
+  dried
+  grilled
+  peppersoup
+  peppered
+  smoked
+}
+```
+
+Run:
+```bash
+npx prisma migrate dev --name add_processed_fish_types
+npx prisma generate
+```
+
+#### Step 2 — Update Zod validation
 
 **File:** `src/models/listing.model.ts`
 
-**Problem:** Both `createListingSchema` and `updateListingSchema` use:
+Change both `createListingSchema` and `updateListingSchema`:
 ```typescript
-fish_type: z.enum(["fingerlings", "juveniles", "table_size", "jumbo", "parent_stocks"])
+fish_type: z.enum([
+  "catfish",
+  "fingerlings",
+  "juveniles",
+  "table_size",
+  "jumbo",
+  "parent_stocks",
+  "dried",
+  "grilled",
+  "peppersoup",
+  "peppered",
+  "smoked",
+])
 ```
-`catfish` is missing. The Prisma schema has `catfish` in the `FishType` enum and the DB accepts it, but the Zod validation layer rejects it before the query runs. Any `POST /farmers/listings/create` with `fishType: "catfish"` returns a 400 validation error.
 
-**Fix — add `catfish` to both schemas:**
+Also check `farmers.controller.ts` for any inline `fishType` validation and mirror this list there.
+
+#### Step 3 — Update admin settings price schema
+
+**File:** wherever `PATCH /admin/settings/price` validates its body (likely `src/models/admin.model.ts` or inline in the controller).
+
+The body now accepts prices for all 10 types:
 ```typescript
-fish_type: z.enum(["catfish", "fingerlings", "juveniles", "table_size", "jumbo", "parent_stocks"])
+pricePerKg: z.object({
+  catfish: z.number().positive().optional(),
+  fingerlings: z.number().positive().optional(),
+  juveniles: z.number().positive().optional(),
+  table_size: z.number().positive().optional(),
+  jumbo: z.number().positive().optional(),
+  parent_stocks: z.number().positive().optional(),
+  dried: z.number().positive().optional(),
+  grilled: z.number().positive().optional(),
+  peppersoup: z.number().positive().optional(),
+  peppered: z.number().positive().optional(),
+  smoked: z.number().positive().optional(),
+}).partial()
 ```
-Apply to both `createListingSchema` and `updateListingSchema`.
 
-Also check `farmers.controller.ts` for any inline fish type validation and add `catfish` there too.
+And the `GET /admin/settings` response `pricePerKg` object should include all 10 keys (fill missing ones with sensible defaults if they are null in the DB).
+
+**Suggested default fallback prices to seed or return when a value is null:**
+
+| Fish Type | ₦ per kg |
+|-----------|----------|
+| catfish | 3500 |
+| fingerlings | 1200 |
+| juveniles | 800 |
+| table_size | 3500 |
+| jumbo | 5000 |
+| parent_stocks | 8000 |
+| dried | 6000 |
+| grilled | 5500 |
+| peppersoup | 7000 |
+| peppered | 6500 |
+| smoked | 6000 |
+
+#### Step 4 — Update Demand model (if fish_type is a Prisma enum there too)
+
+**File:** `prisma/schema.prisma`
+
+If the `Demand` model uses `fish_type FishType` (enum), it automatically picks up the new values from Step 1. If it uses a plain `String`, no change needed.
+
+Also check if there is a Zod demand schema in `src/models/demand.model.ts` and add the same fish type list there.
 
 ---
 
@@ -220,7 +329,6 @@ export const unsaveListing = async (req: Request, res: Response, next: NextFunct
 
 #### Step 3 — Register routes in `src/routes/buyers.routes.ts`
 
-Add these inside the `authMiddleware` block:
 ```typescript
 router.get("/saved", buyersController.getSavedListings);
 router.post("/saved", buyersController.saveListing);
@@ -237,14 +345,13 @@ router.delete("/saved/:listingId", buyersController.unsaveListing);
     "listings": [
       {
         "id": "uuid",
-        "fish_type": "catfish",
+        "fish_type": "table_size",
         "packaging_weight_kg": 5,
         "quantity_available": 100,
         "price_per_fish": 17500,
         "price_per_kg": 3500,
         "location_state": "Kaduna",
-        "location_lga": "Chikun",
-        "images": [{ "image_url": "https://...", "is_primary": true }]
+        "location_lga": "Chikun"
       }
     ]
   }
@@ -262,14 +369,12 @@ router.delete("/saved/:listingId", buyersController.unsaveListing);
 **Routes called by frontend:** `GET /cluster/farmers/:farmerId`
 
 **Frontend pages affected:**
-- `/cluster-dashboard/farmers/[id]` — shows error state "Unable to load profile"
+- `/cluster-dashboard/farmers/[id]` — shows error state
 - `/cluster-dashboard/farmers` list — "Full Profile" button hidden (no `id` in list response — see B4a)
 
 #### B4a — Add `id` to `GET /cluster/farmers` response
 
 **File:** `src/controllers/cluster.controller.ts` — `getFarmers` function
-
-The current response omits the farmer's `id`. The frontend needs it to build the `/cluster-dashboard/farmers/:id` link.
 
 In the `farmersWithStats` map, add:
 ```typescript
@@ -279,8 +384,6 @@ return {
   // ... rest unchanged
 };
 ```
-
-Once this is added, the frontend "Full Profile" button will appear automatically (it's conditionally rendered on `farmer.id`).
 
 #### B4b — Add `getFarmerById` controller function
 
@@ -353,46 +456,8 @@ export const getFarmerById = async (req: Request, res: Response, next: NextFunct
 #### B4c — Register route in `src/routes/cluster.routes.ts`
 
 ```typescript
-// Add AFTER the existing: router.get("/farmers", clusterController.getFarmers)
+// After: router.get("/farmers", clusterController.getFarmers)
 router.get("/farmers/:farmerId", clusterController.getFarmerById);
-```
-
-**Expected response shape (used by frontend `BackendFarmerDetail` type):**
-```json
-{
-  "status": "success",
-  "data": {
-    "farmer": {
-      "id": "uuid",
-      "fullName": "Adebayo Johnson",
-      "email": "adebayo@example.com",
-      "phoneNumber": "08012345678",
-      "profilePhotoUrl": null,
-      "farmName": "Sunrise Fisheries",
-      "state": "Lagos",
-      "localGovernment": "Epe",
-      "farmingCapacityKg": 5000,
-      "yearsOfExperience": 7,
-      "verificationStatus": "unverified",
-      "memberSince": "2024-06-01T00:00:00.000Z",
-      "stats": {
-        "totalListings": 12,
-        "approvedListings": 9,
-        "pendingListings": 2,
-        "totalSupplyKg": 45000
-      },
-      "recentListings": [
-        {
-          "id": "uuid",
-          "fishType": "catfish",
-          "totalAvailableKg": 2000,
-          "status": "active",
-          "createdAt": "2026-03-05T00:00:00.000Z"
-        }
-      ]
-    }
-  }
-}
 ```
 
 ---
@@ -401,9 +466,7 @@ router.get("/farmers/:farmerId", clusterController.getFarmerById);
 
 **Routes called by frontend:** `GET /notifications`, `PATCH /notifications/:id/read`, `PATCH /notifications/read-all`
 
-**Frontend pages affected:** Notifications bell always shows 0, panel always shows "No notifications yet". The hook polls every 60 seconds but receives empty responses. This is by design — the hook and UI are fully built and gracefully handle missing endpoints.
-
-**Full implementation needed:**
+**Frontend pages affected:** Notifications bell always shows 0. Hook polls every 60 seconds and handles empty responses gracefully.
 
 #### Step 1 — Add `Notification` model to `prisma/schema.prisma`
 
@@ -503,49 +566,22 @@ router.use("/notifications", notificationRoutes);
 
 #### Step 5 — Trigger notifications from existing controllers
 
-Add `prisma.notification.create(...)` calls in these locations:
-
 | Event | File | Recipient | Title | Type |
 |-------|------|-----------|-------|------|
-| Listing approved by cluster | `cluster.controller.ts → approveRejectListing` | Farmer (`listing.farmer_id`) | "Listing Approved" | `success` |
+| Listing approved by cluster | `cluster.controller.ts → approveRejectListing` | Farmer | "Listing Approved" | `success` |
 | Listing rejected by cluster | `cluster.controller.ts → approveRejectListing` | Farmer | "Listing Rejected" | `error` |
-| Listing approved by admin | `admin.controller.ts → approveListingAdmin` | Farmer | "Listing Approved" | `success` |
-| Listing rejected by admin | `admin.controller.ts → rejectListingAdmin` | Farmer | "Listing Rejected" | `error` |
 | Order placed | `buyers.controller.ts → createOrder` | Cluster farmer | "New Order Received" | `info` |
 | Order status updated | `cluster.controller.ts → updateOrder` | Buyer | "Order Update" | `info` |
 | Payment confirmed | `buyers.controller.ts → verifyPayment` | Farmer + Cluster farmer | "Payment Received" | `success` |
 | Demand assigned | `admin.controller.ts → assignDemand` | Cluster farmer | "New Demand Assigned" | `info` |
-| Cluster approved | `admin.controller.ts → approveClusterApplication` | Applicant | "Cluster Application Approved" | `success` |
-| Cluster rejected | `admin.controller.ts → rejectClusterApplication` | Applicant | "Cluster Application Rejected" | `error` |
-
-**Expected response shape for `GET /notifications`:**
-```json
-{
-  "status": "success",
-  "data": {
-    "notifications": [
-      {
-        "id": "uuid",
-        "user_id": "uuid",
-        "title": "Listing Approved",
-        "message": "Your catfish listing has been approved and is now live on the marketplace.",
-        "type": "success",
-        "read": false,
-        "created_at": "2026-06-03T10:00:00.000Z"
-      }
-    ],
-    "unreadCount": 1
-  }
-}
-```
+| Cluster approved | `admin.controller.ts → approveClusterApplication` | Applicant | "Application Approved" | `success` |
+| Cluster rejected | `admin.controller.ts → rejectClusterApplication` | Applicant | "Application Rejected" | `error` |
 
 ---
 
 ### B6 — `GET /farmers/payouts` response shape verification
 
-**Route called by frontend:** `GET /farmers/payouts` and `GET /cluster/payouts`
-
-**Verify the backend returns this exact shape** (frontend financial pages depend on it when implemented):
+Verify both `GET /farmers/payouts` and `GET /cluster/payouts` return:
 ```json
 {
   "status": "success",
@@ -569,17 +605,87 @@ Add `prisma.notification.create(...)` calls in these locations:
 
 ---
 
-## Known Intentional Limitations (Not Bugs)
+### B7 — Marketplace category filter (`?category=live|processed`) ❌
 
-These are frontend items that look unfinished but are deliberate — they need backend work that doesn't exist yet:
+**Route:** `GET /marketplace`
+
+**Problem:** The frontend now sends `?category=live` or `?category=processed` from the filters sidebar and from landing page CTAs. The backend currently ignores this param — it only uses `?fishType`.
+
+**Fix — add category filtering to the marketplace controller:**
+
+**File:** `src/controllers/marketplace.controller.ts` (or wherever `GET /marketplace` is handled)
+
+```typescript
+const { fishType, state, lga, minPrice, maxPrice, page = 1, limit = 20, category } = req.query;
+
+// Build where clause
+const where: Prisma.ListingWhereInput = { status: "active", visible_on_marketplace: true };
+
+// fishType exact match (existing logic — keep as-is)
+if (fishType) {
+  where.fish_type = fishType as string;
+}
+
+// category filter — maps to live/processed fish type groups
+if (category && !fishType) {
+  const LIVE_TYPES = ["fingerlings", "juveniles", "table_size", "jumbo", "parent_stocks"];
+  const PROCESSED_TYPES = ["dried", "grilled", "peppersoup", "peppered", "smoked"];
+  if (category === "live") {
+    where.fish_type = { in: LIVE_TYPES };
+  } else if (category === "processed") {
+    where.fish_type = { in: PROCESSED_TYPES };
+  }
+}
+
+// ... rest of existing where clause (state, price, etc.)
+```
+
+> If `fishType` is also present, it takes precedence and `category` is ignored — the frontend always clears `fishType` when `category` changes, so there should be no conflict in practice.
+
+**No schema changes needed — this is query logic only.**
+
+---
+
+### B8 — Demand `fishVariant` field update ❌
+
+**Route:** `POST /buyers/demands`
+
+**What changed:** The inline demand form (now on the marketplace page) sends:
+- `fishType`: the specific sub-type, e.g. `"fingerlings"`, `"dried"`
+- `fishVariant`: the category — `"live"` or `"processed"`
+
+**If the Demand model has `fish_variant` as an enum** (not a free string), the backend Zod validation will reject `"live"` and `"processed"` as invalid values.
+
+**Fix — update the demand Zod schema to accept category values:**
+
+**File:** `src/models/demand.model.ts` (or wherever the create-demand body is validated)
+
+```typescript
+fish_variant: z.enum([
+  // category labels (new — sent by marketplace inline form)
+  "live",
+  "processed",
+  // legacy variant values (keep for backwards compat if old demands exist)
+  "dried",
+  "jumbo",
+  "table_size",
+  "broodstock",
+]).optional(),
+```
+
+If `fish_variant` in the Prisma schema is a plain `String` column, no schema migration is needed — just the Zod validation above.
+
+---
+
+## Known Intentional Limitations (Not Bugs)
 
 | Feature | Location | Notes |
 |---------|----------|-------|
-| "Report an Issue" button | `/buyers-dashboard/orders/[id]` | Shows toast. No support-ticket API endpoint exists. |
-| "View Sessions" button | `/admin-dashboard/settings` | Shows toast. No session-list endpoint. Needs `GET /auth/sessions`. |
+| "Report an Issue" button | `/buyers-dashboard/orders/[id]` | Shows toast. No support-ticket API endpoint. |
+| "View Sessions" button | `/admin-dashboard/settings` | Shows toast. No `GET /auth/sessions` endpoint. |
 | "Invoice" button | `/buyers-dashboard/orders/[id]` | No handler. No invoice-generation endpoint. |
-| Platform config values | `/admin-dashboard/settings` | Shows hardcoded OTP expiry, session duration, etc. No config API endpoint. |
-| Financial services pages | All `/financial/*` routes | Excluded from current scope. Backend financial API not implemented. |
+| Platform config values | `/admin-dashboard/settings` | Shows hardcoded OTP expiry, session duration. No config API endpoint. |
+| Financial services pages | All `/financial/*` routes | Excluded from current scope. |
 
 ---
 
@@ -609,11 +715,11 @@ These are frontend items that look unfinished but are deliberate — they need b
 
 | Method | Path | Auth | Body | Notes |
 |--------|------|------|------|-------|
-| POST | `/farmers/listings/create` | ✓ farmer | `{ fishType, harvestDate, totalFishAvailable, weightKg, listedDate? }` | `catfish` must be valid (see B2) |
+| POST | `/farmers/listings/create` | ✓ farmer | `{ fishType, harvestDate, totalFishAvailable, weightKg, listedDate? }` | fishType accepts all 10 types — see B2 |
 | GET | `/farmers/listings/get` | ✓ farmer | — | Returns `{ summary, listings }` |
 | GET | `/farmers/recent-activities` | ✓ farmer | — | Returns `{ activities }` |
 | PATCH | `/farmers/account-profile` | ✓ farmer | `{ fullName?, phoneNumber?, email?, profileImage?, farmName?, farmAddress?, localGovernment?, state?, fishType?, farmingCapacityKg?, yearsOfExperience? }` | |
-| PATCH | `/farmers/cluster-farmer-application` | ✓ farmer | `{ businessName, cacNumber, warehouseLocation, distributionCapacity, logisticsAvailable?, bvnVerification?, proofOfAddress?, cacRegistration?, businessLicense?, taxClearance? }` | |
+| PATCH | `/farmers/cluster-farmer-application` | ✓ farmer | `{ businessName, cacNumber, warehouseLocation, distributionCapacity, logisticsAvailable?, ... }` | |
 | GET | `/farmers/orders` | ✓ farmer | — | |
 | GET | `/farmers/payouts` | ✓ farmer | — | See B6 for expected shape |
 
@@ -649,7 +755,7 @@ These are frontend items that look unfinished but are deliberate — they need b
 | POST | `/buyers/orders/:orderId/pay` | ✓ buyer | `{ paymentMethod: "card", amount }` | Returns `{ authorizationUrl, transactionReference, amount }` |
 | GET | `/payments/verify` | None | `?reference=` | Paystack callback |
 | GET | `/buyers/demands` | ✓ buyer | — | |
-| POST | `/buyers/demands` | ✓ buyer | `{ fishType, weightKg, fishVariant?, locationState, locationLga, deliveryAddress, notes? }` | |
+| POST | `/buyers/demands` | ✓ buyer | `{ fishType, weightKg, fishVariant?, locationState, locationLga, deliveryAddress, notes? }` | fishType = specific sub-type (e.g. "dried"); fishVariant = "live" or "processed" — see B8 |
 | DELETE | `/buyers/demands/:demandId` | ✓ buyer | — | |
 | GET | `/buyers/saved` | ✓ buyer | — | **Missing — see B3** |
 | POST | `/buyers/saved` | ✓ buyer | `{ listingId }` | **Missing — see B3** |
@@ -659,7 +765,7 @@ These are frontend items that look unfinished but are deliberate — they need b
 
 | Method | Path | Auth | Body / Query | Notes |
 |--------|------|------|------|-------|
-| GET | `/marketplace` | None | `?fishType=&state=&lga=&minPrice=&maxPrice=&page=&limit=` | |
+| GET | `/marketplace` | None | `?fishType=&category=live\|processed&state=&lga=&minPrice=&maxPrice=&page=&limit=` | category filter — see B7 |
 | GET | `/marketplace/:listingId` | None | — | |
 | GET | `/marketplace/cart` | ✓ | — | |
 | POST | `/marketplace/cart` | ✓ | `{ listingId, variant?, processed?, weightKg, quantity, pricePerUnit }` | |
@@ -671,8 +777,8 @@ These are frontend items that look unfinished but are deliberate — they need b
 
 | Method | Path | Auth | Body / Query | Notes |
 |--------|------|------|------|-------|
-| GET | `/admin/settings` | **None — see B1** | — | |
-| PATCH | `/admin/settings/price` | ✓ admin | `{ pricePerKg: { catfish?, fingerlings?, juveniles?, table_size?, jumbo?, parent_stocks? } }` | |
+| GET | `/admin/settings` | **None — see B1** | — | Response `pricePerKg` must include all 10 fish types — see B2 |
+| PATCH | `/admin/settings/price` | ✓ admin | `{ pricePerKg: { fingerlings?, juveniles?, table_size?, jumbo?, parent_stocks?, dried?, grilled?, peppersoup?, peppered?, smoked? } }` | All keys optional |
 | GET | `/admin/dashboard/metrics` | ✓ admin | — | |
 | GET | `/admin/dashboard/charts` | ✓ admin | — | |
 | GET | `/admin/dashboard/activities` | ✓ admin | — | |
@@ -706,9 +812,11 @@ These are frontend items that look unfinished but are deliberate — they need b
 ## Backend Priority Order
 
 1. **B1** — Fix `GET /admin/settings` public access (1-line change in `admin.routes.ts`)
-2. **B2** — Add `catfish` to Zod enum (1-line change in `listing.model.ts`)
-3. **B3** — Saved listings (Prisma migration + 3 controller functions + route wiring)
-4. **B4a** — Add `id` field to `GET /cluster/farmers` response (1-field addition)
-5. **B4b/c** — `GET /cluster/farmers/:farmerId` endpoint (new controller + route)
-6. **B5** — Notifications system (Prisma migration + controller + routes + trigger points)
-7. **B6** — Verify payout response shapes match frontend expectations
+2. **B2** — Add processed fish types to Prisma enum + Zod schemas + admin settings price schema
+3. **B7** — Marketplace `?category=` filter (query logic only, no migration)
+4. **B8** — Demand `fishVariant` Zod schema accepts `"live"` / `"processed"`
+5. **B3** — Saved listings (Prisma migration + 3 controller functions + route wiring)
+6. **B4a** — Add `id` field to `GET /cluster/farmers` response
+7. **B4b/c** — `GET /cluster/farmers/:farmerId` endpoint
+8. **B5** — Notifications system (Prisma migration + controller + routes + trigger points)
+9. **B6** — Verify payout response shapes

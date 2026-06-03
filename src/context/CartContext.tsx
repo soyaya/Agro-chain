@@ -61,7 +61,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const computePricePerUnit = useCallback(
     (pkg: PackagingOption, fishType: string): number => {
       if (pkg.pricePerUnit != null) return Number(pkg.pricePerUnit);
-      const rate = pricePerKg[fishType as FishType] ?? FALLBACK_PRICES_PER_KG.catfish;
+      const rate = pricePerKg[fishType as FishType] ?? FALLBACK_PRICES_PER_KG.table_size;
       return Number(pkg.weightKg) * rate;
     },
     [pricePerKg],

@@ -65,7 +65,7 @@ export default function ContactPage() {
     <div className="layout-max-width">
       {/* Section 1 - Hero */}
       <section aria-label="Contact Hero" className="border-gray-border border-b bg-green-50">
-        <div className="content-width px-4 py-20 lg:px-25 lg:py-28">
+        <div className="section-content-max-width px-4 py-20 lg:px-25 lg:py-28">
           <div className="max-w-2xl">
             <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
               Get In Touch
@@ -82,7 +82,7 @@ export default function ContactPage() {
 
       {/* Section 2 - Contact Options */}
       <section aria-label="Contact Options" className="bg-white">
-        <div className="content-width px-4 py-16 lg:px-25 lg:py-20">
+        <div className="section-content-max-width px-4 py-16 lg:px-25 lg:py-20">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <a
               href="https://wa.me/2347012288798"
@@ -139,7 +139,7 @@ export default function ContactPage() {
 
       {/* Section 4 - Office Info */}
       <section aria-label="Office Information" className="bg-gray-bg">
-        <div className="content-width px-4 py-16 lg:px-25 lg:py-20">
+        <div className="section-content-max-width px-4 py-16 lg:px-25 lg:py-20">
           <h2 className="font-ubuntu text-heading-colour mb-8 text-2xl font-bold lg:text-3xl">
             Find us here.
           </h2>
@@ -162,7 +162,7 @@ export default function ContactPage() {
 
       {/* Section 5 - Social Links */}
       <section aria-label="Social Links" className="border-gray-border border-b bg-white">
-        <div className="content-width px-4 py-12 lg:px-25">
+        <div className="section-content-max-width px-4 py-12 lg:px-25">
           <h2 className="font-ubuntu text-heading-colour mb-6 text-xl font-semibold">Follow us</h2>
           <ul className="flex flex-wrap items-center gap-4">
             {socialLinks.map(({ label, href, icon: Icon, color }) => (

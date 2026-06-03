@@ -70,7 +70,7 @@
   --color-hover-black: var(--hover-black);
   --color-theme-green-dark: var(--theme-green-dark);
   --color-theme-green-light: var(--theme-green-light);
-  --color-debridger-green-dark: var(--debridger-green-dark);
+  --color-debridger-green-dark: vardebridger-green-dark;
   --color-debridger-green-light: var(--debridger-green-light);
   --color-section-dark: var(--section-dark-bg);
   --color-error-red: var(--error-red);
@@ -251,19 +251,14 @@
 }
 
 @layer components {
-  /* Wide layout wrapper: 1440px. Use at the top of every page layout. */
+  /* Wide layout wrapper: 1600px. Use at the top of every page layout. */
   .layout-max-width {
+    @apply mx-auto w-full max-w-400;
+  }
+
+  /* Content area inside a layout: 1440px. Replaces container-max-width. */
+  .section-content-max-width {
     @apply mx-auto w-full max-w-360;
-  }
-
-  /* Content area inside a layout: 1200px. Replaces container-max-width. */
-  .content-width {
-    @apply mx-auto w-full max-w-300;
-  }
-
-  /* Legacy alias kept for backwards compat — prefer .content-width on new code. */
-  .container-max-width {
-    @apply mx-auto w-full max-w-300;
   }
 
   /* Standalone form containers: Use on auth pages and modal forms. */

@@ -1,5 +1,5 @@
 
-import type { NavLink, Object, FAQ, ImpactStat, TestimonialItem, FeatureCard, FishCategory, HowItWorksCard } from "~/types/types";
+import type { NavLink, Object, FAQ, ImpactStat, TestimonialItem, FeatureCard, FishCategoryGroup, HowItWorksCard } from "~/types/types";
 import {
   HomeIcon, ShoppingCart, HelpCircle, Users, Phone,
   Shield, Tag, Truck, Lock, FileText, Users2, Fish,
@@ -121,13 +121,47 @@ export const featureCards: FeatureCard[] = [
   },
 ];
 
-export const fishCategories: FishCategory[] = [
-  { key: "catfish", name: "Catfish", description: "Fresh live and processed catfish", fishTypeParam: "catfish" },
-  { key: "fingerlings", name: "Fingerlings", description: "Young fish for restocking ponds", fishTypeParam: "fingerlings" },
-  { key: "juveniles", name: "Juveniles", description: "Mid-stage catfish ready for grow-out", fishTypeParam: "juveniles" },
-  { key: "table_size", name: "Table Size", description: "Market-ready catfish, 1–1.5kg", fishTypeParam: "table_size" },
-  { key: "jumbo", name: "Jumbo", description: "Large catfish 2kg and above", fishTypeParam: "jumbo" },
-  { key: "parent_stocks", name: "Parent Stocks", description: "Broodstock for breeding programs", fishTypeParam: "parent_stocks" },
+export const fishCategoryGroups: FishCategoryGroup[] = [
+  {
+    key: "live",
+    name: "Live Catfish",
+    description: "Fresh, live catfish sourced direct from verified cluster farms — sold by growth stage.",
+    subTypes: [
+      { label: "Fingerlings", value: "fingerlings" },
+      { label: "Juveniles", value: "juveniles" },
+      { label: "Table Size", value: "table_size" },
+      { label: "Jumbo", value: "jumbo" },
+      { label: "Parent Stocks", value: "parent_stocks" },
+    ],
+    categoryParam: "live",
+    ctaLabel: "Browse Live Catfish",
+    ctaHref: "/marketplace?category=live",
+  },
+  {
+    key: "processed",
+    name: "Processed Catfish",
+    description: "Catfish prepared your way — dried, grilled, peppersoup, and more. Ready to cook.",
+    subTypes: [
+      { label: "Dried", value: "dried" },
+      { label: "Grilled", value: "grilled" },
+      { label: "Peppersoup", value: "peppersoup" },
+      { label: "Peppered", value: "peppered" },
+      { label: "Smoked", value: "smoked" },
+    ],
+    categoryParam: "processed",
+    ctaLabel: "Browse Processed",
+    ctaHref: "/marketplace?category=processed",
+  },
+  {
+    key: "special_demand",
+    name: "Special Demand",
+    description: "Can't find exactly what you need? Submit a custom demand and admin will assign the right cluster farmer to fulfill it.",
+    subTypes: [],
+    categoryParam: "demand",
+    isSpecialDemand: true,
+    ctaLabel: "Place a Demand",
+    ctaHref: "/marketplace#special-demand",
+  },
 ];
 
 export const testimonials: TestimonialItem[] = [

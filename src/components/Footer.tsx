@@ -14,7 +14,7 @@ export default function Footer() {
 
   return (
     <footer className="font-openSans relative">
-      <div className="border-gray-border px-section-px sm:px-section-px-sm lg:px-section-px-lg mx-auto grid h-full w-full max-w-7xl gap-8 rounded-lg border-3">
+      <div className="border-gray-border px-section-px sm:px-section-px-sm lg:px-section-px-lg mx-auto grid h-full w-full gap-8">
         {/* Footer 1 */}
         <div className="grid w-full grid-cols-1 gap-8 pt-22 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12 lg:pt-28">
           {/* Logo Area */}
@@ -23,7 +23,7 @@ export default function Footer() {
               {/* App Logo */}
               <Link href="/" className="flex items-center gap-2">
                 <AppLogo />
-                {/* <span className="text-2xl lg:text-3xl text-(--debridger-green-dark) font-bold">Debridger</span> */}
+                {/* <span className="text-2xl lg:text-3xl text-debridger-green-dark font-bold">Debridger</span> */}
               </Link>
 
               <p className="text-text-colour">Connecting Farms to Global Markets.</p>
@@ -56,7 +56,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div className="flex w-full flex-col gap-4">
-            <h4 className="lg:text-text-colour text-xl font-semibold text-(--debridger-green-dark)">
+            <h4 className="lg:text-text-colour text-debridger-green-dark text-xl font-semibold">
               Quick Link
             </h4>
 
@@ -66,7 +66,7 @@ export default function Footer() {
                   <li key={href}>
                     <Link
                       href={href}
-                      className="text-text-colour hover:text-heading-colour focus:text-heading-colour flex items-center gap-2 transition-all duration-300 ease-in-out lg:text-lg"
+                      className="text-text-colour font-ubuntu hover:text-heading-colour focus:text-heading-colour flex items-center gap-2 transition-all duration-300 ease-in-out lg:text-lg"
                     >
                       {Icon && <Icon className="h-4 w-4" />}
                       <span>{label}</span>
@@ -79,7 +79,7 @@ export default function Footer() {
 
           {/* Support Links */}
           <div className="flex w-full flex-col gap-4">
-            <h4 className="lg:text-text-colour text-xl font-semibold text-(--debridger-green-dark)">
+            <h4 className="lg:text-text-colour text-debridger-green-dark text-xl font-semibold">
               Support
             </h4>
 
@@ -89,7 +89,7 @@ export default function Footer() {
                   <li key={href}>
                     <Link
                       href={href}
-                      className="text-text-colour hover:text-heading-colour focus:text-heading-colour flex items-center gap-2 transition-all duration-300 ease-in-out lg:text-lg"
+                      className="text-text-colour font-ubuntu hover:text-heading-colour focus:text-heading-colour flex items-center gap-2 transition-all duration-300 ease-in-out lg:text-lg"
                     >
                       {Icon && <Icon className="h-4 w-4" />}
                       <span>{label}</span>
@@ -102,11 +102,11 @@ export default function Footer() {
 
           {/* Contact Us */}
           <div className="flex w-full flex-col gap-4">
-            <h4 className="lg:text-text-colour text-xl font-semibold text-(--debridger-green-dark)">
+            <h4 className="lg:text-text-colour text-debridger-green-dark text-xl font-semibold">
               Contact Us
             </h4>
 
-            <ul className="flex flex-col gap-2">
+            <ul className="flex font-ubuntu flex-col gap-2">
               <li>
                 <a
                   href="tel:+2347012288798"

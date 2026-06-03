@@ -14,7 +14,7 @@ const aboutStats: ImpactStat[] = [
 export default function AboutStatsSection() {
   return (
     <section aria-label="About Impact Numbers" className="bg-theme-green-dark">
-      <div className="content-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+      <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         <motion.div
           variants={STAGGER_CONTAINER_VARIANT}
           initial="hidden"

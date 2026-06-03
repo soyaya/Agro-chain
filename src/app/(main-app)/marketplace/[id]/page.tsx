@@ -21,9 +21,10 @@ import type { MarketplaceListing, PackagingOption } from "~/types";
 import {
   FADE_IN_VARIANT,
   SLIDE_UP_VARIANT,
-  FISH_VARIANTS,
-  type FishVariant,
+  PROCESSED_FISH_TYPES,
+  FISH_TYPE_LABELS,
   type FishType,
+  type ProcessedFishType,
 } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
@@ -47,8 +48,7 @@ export default function ListingDetailPage() {
   const listingId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [listing, setListing] = useState<MarketplaceListing | null>(null);
   const [selectedDelivery, setSelectedDelivery] = useState<string>("");
-  const [selectedVariant, setSelectedVariant] = useState<FishVariant>(FISH_VARIANTS[0]);
-  const [processed, setProcessed] = useState(false);
+  const [isProcessed, setIsProcessed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const cart = useCart();
@@ -68,7 +68,8 @@ export default function ListingDetailPage() {
         const payload = extractListing(response);
 
         if (payload && mounted) {
-          const fishPricePerKg = pricePerKg[payload.fishType as FishType] ?? pricePerKg.catfish;
+          const fishPricePerKg = pricePerKg[payload.fishType as FishType] ?? pricePerKg.table_size;
+          setIsProcessed(PROCESSED_FISH_TYPES.includes(payload.fishType as ProcessedFishType));
           setListing({
             ...payload,
             totalAvailableKg: Number(payload.totalAvailableKg),
@@ -104,7 +105,7 @@ export default function ListingDetailPage() {
 
   const addToCart = (pkg: PackagingOption) => {
     if (!listing) return;
-    cart.addToCart(listing, pkg, { variant: selectedVariant, processed });
+    cart.addToCart(listing, pkg, { variant: listing.fishType as FishType, processed: isProcessed });
   };
 
   const handleSave = async () => {
@@ -276,54 +277,18 @@ export default function ListingDetailPage() {
                   <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                     Available Packages
                   </h3>
-                  <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
-                    <div className="border-gray-border flex flex-col gap-2 rounded-2xl border p-(--space-md)">
-                      <span className="text-heading-colour text-sm font-medium">
-                        Choose Fish Type
+                  <div className="flex flex-wrap gap-3">
+                    <div className="border-gray-border flex items-center gap-2 rounded-2xl border p-(--space-md)">
+                      <span className="text-text-colour text-sm">Type</span>
+                      <span className="bg-theme-green-dark/10 text-theme-green-dark font-ubuntu rounded-full px-3 py-1 text-sm font-semibold capitalize">
+                        {FISH_TYPE_LABELS[listing.fishType as FishType] ?? listing.fishType.replace("_", " ")}
                       </span>
-                      <div className="flex flex-wrap gap-2">
-                        {FISH_VARIANTS.map((variant) => (
-                          <button
-                            key={variant}
-                            onClick={() => setSelectedVariant(variant)}
-                            className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
-                              selectedVariant === variant
-                                ? "bg-theme-green-dark text-white"
-                                : "border-gray-border text-text-colour hover:bg-gray-bg border"
-                            }`}
-                          >
-                            {variant}
-                          </button>
-                        ))}
-                      </div>
                     </div>
-
-                    <div className="border-gray-border flex flex-col gap-2 rounded-2xl border p-(--space-md)">
-                      <span className="text-heading-colour text-sm font-medium">
-                        Processing Preference
+                    <div className="border-gray-border flex items-center gap-2 rounded-2xl border p-(--space-md)">
+                      <span className="text-text-colour text-sm">Category</span>
+                      <span className="font-ubuntu rounded-full bg-green-50 px-3 py-1 text-sm font-semibold text-green-700">
+                        {isProcessed ? "Processed" : "Live"}
                       </span>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => setProcessed(false)}
-                          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition ${
-                            !processed
-                              ? "bg-theme-green-dark text-white"
-                              : "border-gray-border text-text-colour hover:bg-gray-bg border"
-                          }`}
-                        >
-                          Unprocessed
-                        </button>
-                        <button
-                          onClick={() => setProcessed(true)}
-                          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition ${
-                            processed
-                              ? "bg-theme-green-dark text-white"
-                              : "border-gray-border text-text-colour hover:bg-gray-bg border"
-                          }`}
-                        >
-                          Processed
-                        </button>
-                      </div>
                     </div>
                   </div>
 
@@ -331,9 +296,8 @@ export default function ListingDetailPage() {
                     {listing.packaging.map((pkg, index) => {
                       const cartItemIndex = cart.items.findIndex(
                         (item) =>
-                          item.weightKg === pkg.weightKg &&
-                          item.variant === selectedVariant &&
-                          item.processed === processed,
+                          item.listingId === listing.id &&
+                          item.weightKg === pkg.weightKg,
                       );
                       const cartItem = cartItemIndex >= 0 ? cart.items[cartItemIndex] : null;
 

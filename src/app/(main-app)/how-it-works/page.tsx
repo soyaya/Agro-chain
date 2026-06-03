@@ -67,7 +67,7 @@ export default function HowItWorksPage() {
     <div className="layout-max-width">
       {/* Section 1 - Hero */}
       <section aria-label="How It Works Hero" className="border-gray-border border-b bg-green-50">
-        <div className="content-width px-4 py-20 lg:px-25 lg:py-28">
+        <div className="section-content-max-width px-4 py-20 lg:px-25 lg:py-28">
           <div className="max-w-2xl">
             <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
               How It Works
@@ -91,7 +91,7 @@ export default function HowItWorksPage() {
 
       {/* Section 4 - CTA */}
       <section aria-label="How It Works CTA" className="bg-gray-bg border-gray-border border-t">
-        <div className="content-width px-4 py-16 text-center lg:px-25 lg:py-20">
+        <div className="section-content-max-width px-4 py-16 text-center lg:px-25 lg:py-20">
           <h2 className="font-ubuntu text-heading-colour mb-6 text-3xl font-bold lg:text-4xl">
             Ready to get started?
           </h2>

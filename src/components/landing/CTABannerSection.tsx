@@ -13,7 +13,7 @@ export default function CTABannerSection() {
         background: "linear-gradient(135deg, var(--theme-green-dark), var(--theme-green-light))",
       }}
     >
-      <div className="content-width flex flex-col items-center gap-6 py-section-py sm:py-section-py-sm lg:py-section-py-lg text-center px-section-px sm:px-section-px-sm lg:px-section-px-lg">
+      <div className="section-content-max-width py-section-py sm:py-section-py-sm lg:py-section-py-lg px-section-px sm:px-section-px-sm lg:px-section-px-lg flex flex-col items-center gap-6 text-center">
         <motion.h2
           initial={{ opacity: 0, y: 32, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}

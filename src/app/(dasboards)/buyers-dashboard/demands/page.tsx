@@ -132,11 +132,11 @@ export default function BuyerDemandsPage() {
           </p>
         </div>
         <button
-          onClick={() => router.push("/buyers-dashboard/demands/create")}
+          onClick={() => router.push("/marketplace#special-demand")}
           className="font-roboto-slab bg-theme-green-dark flex items-center justify-center gap-2 rounded-full px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
         >
           <Plus size={18} />
-          Create Demand
+          Place a Demand
         </button>
       </motion.div>
 
@@ -262,10 +262,10 @@ export default function BuyerDemandsPage() {
               ? "Create a demand to request a custom quantity of fish directly from a cluster farmer."
               : `No ${filterStatus} demands at the moment`
           }
-          actionLabel={filterStatus === "all" ? "Create Demand" : undefined}
+          actionLabel={filterStatus === "all" ? "Place a Demand" : undefined}
           onAction={
             filterStatus === "all"
-              ? () => router.push("/buyers-dashboard/demands/create")
+              ? () => router.push("/marketplace#special-demand")
               : undefined
           }
           size="lg"

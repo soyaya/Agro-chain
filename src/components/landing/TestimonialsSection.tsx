@@ -16,7 +16,7 @@ const CARD_TAP: TargetAndTransition = { scale: 0.98, transition: { duration: 0.1
 export default function TestimonialsSection() {
   return (
     <section aria-label="Testimonials" className="bg-theme-green-dark">
-      <div className="content-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+      <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         {/* Header */}
         <div className="flex flex-col items-center gap-3 text-center">
           <span className="font-ubuntu text-xs font-semibold tracking-widest text-green-300 uppercase">
@@ -41,7 +41,7 @@ export default function TestimonialsSection() {
               variants={SLIDE_UP_VARIANT}
               whileHover={CARD_HOVER}
               whileTap={CARD_TAP}
-              className="flex flex-col gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 cursor-default"
+              className="flex cursor-default flex-col gap-4 rounded-2xl border border-white/20 bg-white/10 p-6"
             >
               <span className="font-serif text-6xl leading-none text-white/20" aria-hidden="true">
                 &quot;

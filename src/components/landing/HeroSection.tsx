@@ -5,13 +5,18 @@ import { motion } from "framer-motion";
 import { ArrowRightIcon } from "lucide-react";
 import { EASE_OUT_EXPO } from "~/types/constants";
 
-const TRUST_BADGES = ["Paystack Secured", "Verified Sellers", "Admin-Set Pricing", "Traceable Supply"];
+const TRUST_BADGES = [
+  "Paystack Secured",
+  "Verified Sellers",
+  "Admin-Set Pricing",
+  "Traceable Supply",
+];
 
 export default function HeroSection() {
   return (
     <section
       aria-label="Hero Section"
-      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-theme-green-dark"
+      className="bg-theme-green-dark relative flex min-h-screen w-full items-center justify-center overflow-hidden"
     >
       {/* Background image overlay */}
       <div
@@ -26,7 +31,7 @@ export default function HeroSection() {
         aria-hidden="true"
       />
 
-      <div className="content-width relative z-10 flex flex-col items-center gap-8 px-section-px sm:px-section-px-sm lg:px-section-px-lg text-center py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+      <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg relative z-10 flex flex-col items-center gap-8 text-center">
         {/* Label */}
         <motion.span
           initial={{ opacity: 0, y: 16 }}
@@ -55,9 +60,9 @@ export default function HeroSection() {
           transition={{ duration: 0.7, ease: EASE_OUT_EXPO, delay: 0.26 }}
           className="font-roboto-slab max-w-2xl text-lg text-white/80"
         >
-          Agro-chain digitises the catfish supply chain: farm listing, secure
-          payment, and coordinated delivery. No middlemen. No price
-          opacity. Just fresh fish, fair prices, and reliable logistics.
+          Agro-chain digitises the catfish supply chain: farm listing, secure payment, and
+          coordinated delivery. No middlemen. No price opacity. Just fresh fish, fair prices, and
+          reliable logistics.
         </motion.p>
 
         {/* CTAs */}
@@ -69,7 +74,7 @@ export default function HeroSection() {
         >
           <Link
             href="/marketplace"
-            className="font-ubuntu rounded-full bg-white px-8 py-3 gap-3 flex items-center text-sm font-semibold text-theme-green-dark shadow-md transition hover:bg-white/90 active:scale-95"
+            className="font-ubuntu text-theme-green-dark flex items-center gap-3 rounded-full bg-white px-8 py-3 text-sm font-semibold shadow-md transition hover:bg-white/90 active:scale-95"
           >
             Browse Marketplace <ArrowRightIcon size={16} />
           </Link>

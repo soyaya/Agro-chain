@@ -15,7 +15,7 @@ const CARD_TAP: TargetAndTransition = { scale: 0.97, transition: { duration: 0.1
 export default function HowItWorksSection() {
   return (
     <section aria-label="How It Works" className="bg-section-dark">
-      <div className="content-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+      <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         {/* Section label */}
         <span className="font-ubuntu text-xs font-semibold tracking-widest text-green-400 uppercase">
           How It Works
@@ -48,7 +48,7 @@ export default function HowItWorksSection() {
               variants={SLIDE_UP_VARIANT}
               whileHover={CARD_HOVER}
               whileTap={CARD_TAP}
-              className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/5 p-6 cursor-default"
+              className="flex cursor-default flex-col gap-5 rounded-2xl border border-white/10 bg-white/5 p-6"
             >
               <div className="flex items-center gap-3">
                 <span className="bg-theme-green-dark flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white">

@@ -34,7 +34,7 @@ const values = [
 export default function AboutValuesSection() {
   return (
     <section aria-label="Our Values" className="bg-gray-bg">
-      <div className="content-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+      <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         <div className="flex flex-col items-center gap-3 text-center">
           <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
             Our Values

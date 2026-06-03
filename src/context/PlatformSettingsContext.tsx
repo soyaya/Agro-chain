@@ -19,7 +19,7 @@ const PlatformSettingsContext = createContext<PlatformSettingsContextValue>({
   pricePerKg: FALLBACK_PRICES_PER_KG,
   isLoaded: false,
   getPricePerUnit: (fishType, weightKg) => {
-    const price = FALLBACK_PRICES_PER_KG[fishType as FishType] ?? FALLBACK_PRICES_PER_KG.catfish;
+    const price = FALLBACK_PRICES_PER_KG[fishType as FishType] ?? FALLBACK_PRICES_PER_KG.table_size;
     return weightKg * price;
   },
 });
@@ -44,7 +44,7 @@ export function PlatformSettingsProvider({ children }: { children: ReactNode }) 
   }, []);
 
   const getPricePerUnit = (fishType: string, weightKg: number): number => {
-    const pricePerKgForType = pricePerKg[fishType as FishType] ?? pricePerKg.catfish;
+    const pricePerKgForType = pricePerKg[fishType as FishType] ?? pricePerKg.table_size;
     return weightKg * pricePerKgForType;
   };
 

@@ -5,8 +5,7 @@
 // FISH TYPES
 // ============================================
 
-export const FISH_TYPES = [
-  "catfish",
+export const LIVE_FISH_TYPES = [
   "fingerlings",
   "juveniles",
   "table_size",
@@ -14,10 +13,39 @@ export const FISH_TYPES = [
   "parent_stocks",
 ] as const;
 
+export type LiveFishType = typeof LIVE_FISH_TYPES[number];
+
+export const PROCESSED_FISH_TYPES = [
+  "dried",
+  "grilled",
+  "peppersoup",
+  "peppered",
+  "smoked",
+] as const;
+
+export type ProcessedFishType = typeof PROCESSED_FISH_TYPES[number];
+
+export const FISH_TYPES = [...LIVE_FISH_TYPES, ...PROCESSED_FISH_TYPES] as const;
+
 export type FishType = typeof FISH_TYPES[number];
 
+// Backwards-compat alias — variant concept is now the same as FishType
+export type FishVariant = FishType;
+
 export const FISH_TYPE_LABELS: Record<FishType, string> = {
-  catfish: "Catfish",
+  fingerlings: "Fingerlings",
+  juveniles: "Juveniles",
+  table_size: "Table Size",
+  jumbo: "Jumbo",
+  parent_stocks: "Parent Stocks",
+  dried: "Dried",
+  grilled: "Grilled",
+  peppersoup: "Peppersoup",
+  peppered: "Peppered",
+  smoked: "Smoked",
+};
+
+export const LIVE_FISH_TYPE_LABELS: Record<LiveFishType, string> = {
   fingerlings: "Fingerlings",
   juveniles: "Juveniles",
   table_size: "Table Size",
@@ -25,20 +53,28 @@ export const FISH_TYPE_LABELS: Record<FishType, string> = {
   parent_stocks: "Parent Stocks",
 };
 
-export const FISH_VARIANTS = ["Dried", "Jumbo", "Table Size", "Broodstock"] as const;
-
-export type FishVariant = typeof FISH_VARIANTS[number];
+export const PROCESSED_FISH_TYPE_LABELS: Record<ProcessedFishType, string> = {
+  dried: "Dried",
+  grilled: "Grilled",
+  peppersoup: "Peppersoup",
+  peppered: "Peppered",
+  smoked: "Smoked",
+};
 
 // Fallback prices used before platform settings are fetched from the backend.
 // The admin sets the live values via PATCH /admin/settings/price.
 // These are dev-time defaults only - do not rely on them in production logic.
 export const FALLBACK_PRICES_PER_KG: Record<FishType, number> = {
-  catfish: 3500,
   fingerlings: 1200,
   juveniles: 800,
   table_size: 3500,
   jumbo: 5000,
   parent_stocks: 8000,
+  dried: 6000,
+  grilled: 5500,
+  peppersoup: 7000,
+  peppered: 6500,
+  smoked: 6000,
 };
 
 export const BASE_DELIVERY_FEE_NAIRA = 1500;

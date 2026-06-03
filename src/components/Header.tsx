@@ -55,7 +55,7 @@ export default function Header() {
   return (
     <>
       <header className="border-border/40 font-inter sticky top-0 left-0 z-50 w-full border-b bg-linear-to-b from-navbar-bg to-navbar-bg/10 backdrop-blur-sm supports-backdrop-filter:bg-navbar-bg/60">
-        <div className="px-section-px sm:px-section-px-sm lg:px-section-px-lg mx-auto flex h-(--navbar-h) w-full max-w-7xl items-center justify-between gap-2">
+        <div className="px-section-px sm:px-section-px-sm lg:px-section-px-lg mx-auto flex h-(--navbar-h) w-full items-center justify-between gap-2">
           {/* Left: Menu + Logo */}
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -189,7 +189,7 @@ export default function Header() {
                             >
                               {Icon && (
                                 <Icon
-                                  className={`h-5 w-5 text-(--debridger-green-dark) transition-all duration-300 ease-in-out ${isActive ? "fill-current" : "group-hover:fill-current"}`}
+                                  className={`h-5 w-5 text-debridger-green-dark transition-all duration-300 ease-in-out ${isActive ? "fill-current" : "group-hover:fill-current"}`}
                                 />
                               )}
                               <span>{label}</span>
