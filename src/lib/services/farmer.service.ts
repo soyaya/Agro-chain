@@ -37,8 +37,8 @@ export interface FarmerListingRecord {
   listedDate: string;
   totalFishAvailable: number;
   totalAvailableKg: number;
-  weightKg: number;     // Weight per fish in kg
-  quantity: number;     // Derived: floor(totalAvailableKg / weightKg)
+  weightKg: number; // Weight per fish in kg
+  quantity: number; // Derived: floor(totalAvailableKg / weightKg)
   status: "approved" | "pending" | "rejected";
   isApproved: boolean;
   createdAt: string;
@@ -56,7 +56,7 @@ export interface CreateListingPayload {
   harvestDate: string;
   listedDate?: string;
   totalFishAvailable: number;
-  weightKg: number;   // Weight per fish in kg - pricePerUnit is computed by backend from admin config
+  weightKg: number; // Weight per fish in kg - pricePerUnit is computed by backend from admin config
 }
 
 export interface UpdateFarmerProfilePayload {
@@ -127,16 +127,18 @@ export const farmerService = {
 
   /** Get all listings belonging to the logged-in farmer. */
   getListings() {
-    return apiFetch<{ status: string; data: { summary: FarmerListingSummary; listings: FarmerListingRecord[] } }>(
-      "/farmers/listings/get",
-    );
+    return apiFetch<{
+      status: string;
+      data: { summary: FarmerListingSummary; listings: FarmerListingRecord[] };
+    }>("/farmers/listings/get");
   },
 
   /** Get recent activities for the farmer's dashboard. */
   getRecentActivities() {
-    return apiFetch<{ status: string; data: { activities: BackendActivity[] } }>(
-      "/farmers/recent-activities",
-    );
+    return apiFetch<{
+      status: string;
+      data: { activities: BackendActivity[] };
+    }>("/farmers/recent-activities");
   },
 
   /** Update the farmer's account profile. */
@@ -157,14 +159,20 @@ export const farmerService = {
 
   /** Get all orders for the farmer's listings. */
   getOrders() {
-    return apiFetch<{ status: string; data: { orders: BackendFarmerOrder[] } }>("/farmers/orders");
+    return apiFetch<{ status: string; data: { orders: BackendFarmerOrder[] } }>(
+      "/farmers/orders",
+    );
   },
 
   /** Get payout history. */
   getPayouts() {
     return apiFetch<{
       status: string;
-      data: { payouts: FarmerPayout[]; totalEarnings: number; pendingPayouts: number };
+      data: {
+        payouts: FarmerPayout[];
+        totalEarnings: number;
+        pendingPayouts: number;
+      };
     }>("/farmers/payouts");
   },
 };

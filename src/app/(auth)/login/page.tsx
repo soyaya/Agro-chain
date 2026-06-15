@@ -39,12 +39,13 @@ function LoginPageContent() {
   const [resendAttempts, setResendAttempts] = useState(0);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [resendLocked, setResendLocked] = useState(false);
-  const [statusModal, setStatusModal] = useState<{ open: boolean; variant: "loading" | "success" }>(
-    {
-      open: false,
-      variant: "loading",
-    },
-  );
+  const [statusModal, setStatusModal] = useState<{
+    open: boolean;
+    variant: "loading" | "success";
+  }>({
+    open: false,
+    variant: "loading",
+  });
 
   const {
     register,
@@ -64,11 +65,16 @@ function LoginPageContent() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emailAddress: data.email, password: data.password }),
+        body: JSON.stringify({
+          emailAddress: data.email,
+          password: data.password,
+        }),
       });
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        throw new Error((err as { message?: string }).message || "Login failed");
+        throw new Error(
+          (err as { message?: string }).message || "Login failed",
+        );
       }
       toast.success(`OTP sent to ${data.email}`);
       setEmailAddress(data.email);
@@ -77,7 +83,11 @@ function LoginPageContent() {
       setResendLocked(false);
       setCooldownSeconds(60);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send OTP. Please try again.");
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Failed to send OTP. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -124,18 +134,20 @@ function LoginPageContent() {
       const destination = redirectTo || dashboardPath;
       setTimeout(() => router.push(destination), 800);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Invalid or expired code";
+      const msg =
+        err instanceof Error ? err.message : "Invalid or expired code";
       setError(msg);
       setStatusModal({ open: false, variant: "loading" });
       toast.error(msg);
     } finally {
       setLoading(false);
     }
-  }, [loading, success, loginOtp, emailAddress, router]);
+  }, [loading, success, loginOtp, emailAddress, router, redirectTo]);
 
   // Auto-submit when 6 digits entered
   useEffect(() => {
     if (step === 2 && loginOtp.length === 6 && !loading && !success) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       void handleVerify();
     }
   }, [loginOtp, step, loading, success, handleVerify]);
@@ -164,7 +176,9 @@ function LoginPageContent() {
       });
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        throw new Error((err as { message?: string }).message || "Failed to resend OTP");
+        throw new Error(
+          (err as { message?: string }).message || "Failed to resend OTP",
+        );
       }
       const nextAttempts = resendAttempts + 1;
       setResendAttempts(nextAttempts);
@@ -193,7 +207,10 @@ function LoginPageContent() {
           className="default-page-max-width flex w-full flex-col gap-(--section-gap)"
           initial="hidden"
           animate="visible"
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.15 } },
+          }}
         >
           {step === 1 ? (
             <form
@@ -224,7 +241,11 @@ function LoginPageContent() {
               />
 
               <div className="mt-(--submit-button-mt) flex w-full flex-col gap-(--gap-base)">
-                <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
+                <SubmitPrimaryButton
+                  loading={loading}
+                  disabled={!isValid || loading}
+                  type="submit"
+                >
                   Send OTP
                 </SubmitPrimaryButton>
                 <p className="text-text-colour text-center text-sm">
@@ -274,7 +295,9 @@ function LoginPageContent() {
                 </InputOTP>
 
                 {error && (
-                  <p className="text-destructive text-center text-sm font-medium">{error}</p>
+                  <p className="text-destructive text-center text-sm font-medium">
+                    {error}
+                  </p>
                 )}
 
                 <div className="mt-16 flex w-full flex-col gap-(--gap-base)">
@@ -282,7 +305,9 @@ function LoginPageContent() {
                     onClick={handleVerify}
                     disabled={loginOtp.length < 6 || loading || success}
                     loading={loading}
-                    className={cn(success && "bg-theme-green-dark hover:opacity-96")}
+                    className={cn(
+                      success && "bg-theme-green-dark hover:opacity-96",
+                    )}
                   >
                     {success
                       ? "Verified! Redirecting..."
@@ -297,7 +322,12 @@ function LoginPageContent() {
                       type="button"
                       className="cursor-pointer font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
                       onClick={handleResendOtp}
-                      disabled={loading || success || cooldownSeconds > 0 || resendLocked}
+                      disabled={
+                        loading ||
+                        success ||
+                        cooldownSeconds > 0 ||
+                        resendLocked
+                      }
                     >
                       {resendLocked
                         ? "Retry after 24 hours"
@@ -322,10 +352,14 @@ function LoginPageContent() {
         open={statusModal.open}
         variant={statusModal.variant}
         title={
-          statusModal.variant === "loading" ? "Verifying your account..." : "Login Successful!"
+          statusModal.variant === "loading"
+            ? "Verifying your account..."
+            : "Login Successful!"
         }
         description={
-          statusModal.variant === "success" ? "Redirecting you to your dashboard." : undefined
+          statusModal.variant === "success"
+            ? "Redirecting you to your dashboard."
+            : undefined
         }
       />
     </>
@@ -335,7 +369,11 @@ function LoginPageContent() {
 export default function LoginPage() {
   return (
     <Suspense
-      fallback={<div className="flex min-h-screen items-center justify-center">Loading…</div>}
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          Loading…
+        </div>
+      }
     >
       <LoginPageContent />
     </Suspense>

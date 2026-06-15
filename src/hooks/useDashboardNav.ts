@@ -1,18 +1,18 @@
 import { useMemo } from "react";
-import type { 
-  DashboardConfig, 
-  EnhancedDashboardConfig, 
+import type {
+  DashboardConfig,
+  EnhancedDashboardConfig,
   DashboardNavLink,
   FinancialFeature,
 } from "~/types/index";
-import { 
-  hasFinancialServices, 
+import {
+  hasFinancialServices,
   isFinancialFeatureEnabled,
   getFinancialNavigationItems,
   shouldShowFinancialServices,
   getFinancialNavigationBadges,
   isFinancialNavItemVisible,
-  getActiveFinancialNavItem
+  getActiveFinancialNavItem,
 } from "~/lib/financial-services";
 
 interface UseDashboardNavReturn {
@@ -33,7 +33,7 @@ interface UseDashboardNavReturn {
  */
 export function useDashboardNav(
   config: DashboardConfig | EnhancedDashboardConfig,
-  pathname: string
+  pathname: string,
 ): UseDashboardNavReturn {
   const activeItem = useMemo(() => {
     // Find the active navigation item based on pathname
@@ -77,7 +77,8 @@ export function useDashboardNav(
   }, [config]);
 
   const checkFinancialFeature = useMemo(() => {
-    return (feature: FinancialFeature) => isFinancialFeatureEnabled(config, feature);
+    return (feature: FinancialFeature) =>
+      isFinancialFeatureEnabled(config, feature);
   }, [config]);
 
   const checkFinancialNavItemVisibility = useMemo(() => {

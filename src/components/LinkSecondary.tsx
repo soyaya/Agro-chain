@@ -8,7 +8,11 @@ interface SecondaryLinkProps {
   className?: string;
 }
 
-export default function SecondaryLink({ href, label, className = "" }: SecondaryLinkProps) {
+export default function SecondaryLink({
+  href,
+  label,
+  className = "",
+}: SecondaryLinkProps) {
   return (
     <Link
       href={href}

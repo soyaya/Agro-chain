@@ -2,7 +2,13 @@ import { apiFetch } from "~/lib/api";
 
 // === Types
 
-export type DemandStatus = "pending" | "assigned" | "accepted" | "declined" | "fulfilled" | "cancelled";
+export type DemandStatus =
+  | "pending"
+  | "assigned"
+  | "accepted"
+  | "declined"
+  | "fulfilled"
+  | "cancelled";
 
 export interface BackendDemand {
   id: string;
@@ -93,7 +99,11 @@ export const buyerService = {
   },
 
   /** Create a new order. */
-  createOrder(data: { listingId: string; quantity: number; weightKg?: number }) {
+  createOrder(data: {
+    listingId: string;
+    quantity: number;
+    weightKg?: number;
+  }) {
     return apiFetch("/buyers/orders", {
       method: "POST",
       body: JSON.stringify(data),
@@ -102,7 +112,9 @@ export const buyerService = {
 
   /** Get all orders placed by the buyer. */
   getOrders() {
-    return apiFetch<{ status: string; data: { orders: BackendOrder[] } }>("/buyers/orders");
+    return apiFetch<{ status: string; data: { orders: BackendOrder[] } }>(
+      "/buyers/orders",
+    );
   },
 
   /** Get a single order's details. */
@@ -122,7 +134,9 @@ export const buyerService = {
 
   /** Confirm delivery of an order. */
   confirmDelivery(orderId: string) {
-    return apiFetch(`/buyers/orders/${orderId}/confirm-delivery`, { method: "PATCH" });
+    return apiFetch(`/buyers/orders/${orderId}/confirm-delivery`, {
+      method: "PATCH",
+    });
   },
 
   /** Initiate payment for an order. */
@@ -137,7 +151,9 @@ export const buyerService = {
 
   /** Get all demands created by this buyer. */
   getDemands() {
-    return apiFetch<{ status: string; data: { demands: BackendDemand[] } }>("/buyers/demands");
+    return apiFetch<{ status: string; data: { demands: BackendDemand[] } }>(
+      "/buyers/demands",
+    );
   },
 
   /** Create a new demand. */
@@ -157,7 +173,9 @@ export const buyerService = {
 
   /** Get all listings saved/bookmarked by this buyer. */
   getSavedListings() {
-    return apiFetch<{ status: string; data: { listings: unknown[] } }>("/buyers/saved");
+    return apiFetch<{ status: string; data: { listings: unknown[] } }>(
+      "/buyers/saved",
+    );
   },
 
   /** Save a listing. */

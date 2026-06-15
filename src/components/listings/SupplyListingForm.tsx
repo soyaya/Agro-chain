@@ -20,7 +20,9 @@ import {
 const supplyListingSchema = z.object({
   fishType: z.string().min(1, "Fish type is required"),
   harvestDate: z.string().min(1, "Harvest date is required"),
-  totalAvailableKg: z.number().min(MIN_SUPPLY_KG, `Minimum supply is ${MIN_SUPPLY_KG}kg`),
+  totalAvailableKg: z
+    .number()
+    .min(MIN_SUPPLY_KG, `Minimum supply is ${MIN_SUPPLY_KG}kg`),
   weightKg: z.number().min(0.1, "Weight must be at least 0.1kg"),
 });
 
@@ -37,7 +39,9 @@ export function SupplyListingForm({
   onSubmit,
   isLoading = false,
 }: SupplyListingFormProps) {
-  const [selectedFishType, setSelectedFishType] = useState(initialData?.fishType ?? "");
+  const [selectedFishType, setSelectedFishType] = useState(
+    initialData?.fishType ?? "",
+  );
 
   const {
     register,
@@ -50,7 +54,9 @@ export function SupplyListingForm({
     defaultValues: initialData
       ? {
           fishType: initialData.fishType,
-          harvestDate: new Date(initialData.harvestDate).toISOString().split("T")[0],
+          harvestDate: new Date(initialData.harvestDate)
+            .toISOString()
+            .split("T")[0],
           totalAvailableKg: initialData.totalAvailableKg,
           weightKg: initialData.packaging?.[0]?.weightKg ?? 1,
         }
@@ -66,7 +72,8 @@ export function SupplyListingForm({
         weightKg: data.weightKg,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to submit listing";
+      const message =
+        error instanceof Error ? error.message : "Failed to submit listing";
       toast.error(message);
     }
   };
@@ -133,26 +140,41 @@ export function SupplyListingForm({
       </motion.div>
 
       {/* Info Box */}
-      <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl bg-blue-50 p-(--space-lg)">
+      <motion.div
+        variants={FADE_IN_VARIANT}
+        className="rounded-2xl bg-blue-50 p-(--space-lg)"
+      >
         <p className="text-sm text-blue-800">
           <span className="font-medium">Pricing note: </span>
-          Price per unit is set platform-wide by the admin and applied automatically based on your
-          fish type and weight. You do not need to enter a price.
+          Price per unit is set platform-wide by the admin and applied
+          automatically based on your fish type and weight. You do not need to
+          enter a price.
         </p>
       </motion.div>
 
       {/* Approval note */}
-      <motion.div variants={FADE_IN_VARIANT} className="rounded-2xl bg-yellow-50 p-(--space-lg)">
+      <motion.div
+        variants={FADE_IN_VARIANT}
+        className="rounded-2xl bg-yellow-50 p-(--space-lg)"
+      >
         <p className="text-sm text-yellow-800">
           <span className="font-medium">Note: </span>
-          Your listing will be reviewed by a cluster farmer. Once approved, it will appear on the
-          marketplace under their name. You will be notified of the approval status.
+          Your listing will be reviewed by a cluster farmer. Once approved, it
+          will appear on the marketplace under their name. You will be notified
+          of the approval status.
         </p>
       </motion.div>
 
       {/* Submit */}
-      <motion.div variants={FADE_IN_VARIANT} className="mt-(--submit-button-mt)">
-        <SubmitPrimaryButton loading={isLoading} disabled={!isValid || isLoading} type="submit">
+      <motion.div
+        variants={FADE_IN_VARIANT}
+        className="mt-(--submit-button-mt)"
+      >
+        <SubmitPrimaryButton
+          loading={isLoading}
+          disabled={!isValid || isLoading}
+          type="submit"
+        >
           {initialData ? "Update Listing" : "Submit Listing"}
         </SubmitPrimaryButton>
       </motion.div>

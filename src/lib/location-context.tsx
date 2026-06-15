@@ -14,7 +14,9 @@ interface LocationContextType {
   clearLocation: () => void;
 }
 
-const LocationContext = createContext<LocationContextType | undefined>(undefined);
+const LocationContext = createContext<LocationContextType | undefined>(
+  undefined,
+);
 
 export function LocationProvider({ children }: { children: ReactNode }) {
   const [location, setLocationState] = useState<LocationData | null>(null);

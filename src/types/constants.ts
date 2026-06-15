@@ -1,9 +1,7 @@
 // Constants for AgroChainMarketPlace
 // Centralized constants for consistency across the platform
 
-// ============================================
-// FISH TYPES
-// ============================================
+// === Fish Types
 
 export const LIVE_FISH_TYPES = [
   "fingerlings",
@@ -13,7 +11,7 @@ export const LIVE_FISH_TYPES = [
   "parent_stocks",
 ] as const;
 
-export type LiveFishType = typeof LIVE_FISH_TYPES[number];
+export type LiveFishType = (typeof LIVE_FISH_TYPES)[number];
 
 export const PROCESSED_FISH_TYPES = [
   "dried",
@@ -23,11 +21,14 @@ export const PROCESSED_FISH_TYPES = [
   "smoked",
 ] as const;
 
-export type ProcessedFishType = typeof PROCESSED_FISH_TYPES[number];
+export type ProcessedFishType = (typeof PROCESSED_FISH_TYPES)[number];
 
-export const FISH_TYPES = [...LIVE_FISH_TYPES, ...PROCESSED_FISH_TYPES] as const;
+export const FISH_TYPES = [
+  ...LIVE_FISH_TYPES,
+  ...PROCESSED_FISH_TYPES,
+] as const;
 
-export type FishType = typeof FISH_TYPES[number];
+export type FishType = (typeof FISH_TYPES)[number];
 
 // Backwards-compat alias — variant concept is now the same as FishType
 export type FishVariant = FishType;
@@ -79,9 +80,7 @@ export const FALLBACK_PRICES_PER_KG: Record<FishType, number> = {
 
 export const BASE_DELIVERY_FEE_NAIRA = 1500;
 
-// ============================================
-// NIGERIAN STATES
-// ============================================
+// === Nigerian States
 
 export const NIGERIAN_STATES = [
   "Abia",
@@ -123,11 +122,9 @@ export const NIGERIAN_STATES = [
   "Zamfara",
 ] as const;
 
-export type NigerianState = typeof NIGERIAN_STATES[number];
+export type NigerianState = (typeof NIGERIAN_STATES)[number];
 
-// ============================================
-// BUSINESS TYPES
-// ============================================
+// === Business Types
 
 export const BUSINESS_TYPES = [
   "Restaurant",
@@ -142,11 +139,9 @@ export const BUSINESS_TYPES = [
   "Other",
 ] as const;
 
-export type BusinessType = typeof BUSINESS_TYPES[number];
+export type BusinessType = (typeof BUSINESS_TYPES)[number];
 
-// ============================================
-// DELIVERY OPTIONS
-// ============================================
+// === Delivery Options
 
 export const DELIVERY_OPTIONS = [
   "Pickup from warehouse",
@@ -155,51 +150,47 @@ export const DELIVERY_OPTIONS = [
   "Express delivery",
 ] as const;
 
-export type DeliveryOption = typeof DELIVERY_OPTIONS[number];
+export type DeliveryOption = (typeof DELIVERY_OPTIONS)[number];
 
-// ============================================
-// PACKAGING WEIGHTS
-// ============================================
+// === Packaging Weights
 
 export const STANDARD_PACKAGING_WEIGHTS = [1, 2, 3, 5, 10, 25, 50] as const;
 
-export type PackagingWeight = typeof STANDARD_PACKAGING_WEIGHTS[number];
+export type PackagingWeight = (typeof STANDARD_PACKAGING_WEIGHTS)[number];
 
-// ============================================
-// MINIMUM REQUIREMENTS
-// ============================================
+// === Minimum Requirements
 
 export const MIN_SUPPLY_KG = 1000;
 export const MIN_FARMING_CAPACITY_KG = 500;
 export const MIN_YEARS_EXPERIENCE = 0;
 export const MAX_YEARS_EXPERIENCE = 50;
 
-// ============================================
-// VALIDATION PATTERNS
-// ============================================
+// === Validation Patterns
 
 export const PHONE_REGEX = /^(0|\+234)[789][01]\d{8}$/;
 export const CAC_REGEX = /^(RC|BN|IT)\d{6,8}$/;
 
-// ============================================
-// FILE UPLOAD
-// ============================================
+// === File Upload
 
-export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
-export const ALLOWED_DOCUMENT_TYPES = ["application/pdf", "image/jpeg", "image/png"] as const;
+export const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+export const ALLOWED_DOCUMENT_TYPES = [
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+] as const;
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 export const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10MB
 
-// ============================================
-// PAGINATION
-// ============================================
+// === Pagination
 
 export const DEFAULT_PAGE_SIZE = 12;
 export const PAGE_SIZE_OPTIONS = [12, 24, 48, 96] as const;
 
-// ============================================
-// DASHBOARD ROUTES
-// ============================================
+// === Dashboard Routes
 
 export const DASHBOARD_ROUTES = {
   FARMER: "/farmer-dashboard",
@@ -208,24 +199,20 @@ export const DASHBOARD_ROUTES = {
   ADMIN: "/admin-dashboard",
 } as const;
 
-// ============================================
-// STATUS COLORS
-// ============================================
+// === Status Colors
 
 export const STATUS_COLORS = {
   pending: "bg-yellow-100 text-yellow-800",
-  approved: "bg-green-100 text-green-800",
+  approved: "bg-green-tint text-theme-green-dark",
   rejected: "bg-red-100 text-red-800",
   confirmed: "bg-blue-100 text-blue-800",
   processing: "bg-purple-100 text-purple-800",
   shipped: "bg-indigo-100 text-indigo-800",
-  delivered: "bg-green-100 text-green-800",
-  cancelled: "bg-gray-100 text-gray-800",
+  delivered: "bg-green-tint text-theme-green-dark",
+  cancelled: "bg-gray-bg text-text-colour-2",
 } as const;
 
-// ============================================
-// ANIMATION VARIANTS
-// ============================================
+// === Animation Variants
 
 // Expo-out: snappy start, silky settle — the signature of premium motion
 export const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;

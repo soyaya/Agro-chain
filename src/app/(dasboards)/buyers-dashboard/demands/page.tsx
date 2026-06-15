@@ -2,10 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, FileText, Clock, CheckCircle, XCircle, Truck, X } from "lucide-react";
+import {
+  Plus,
+  FileText,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Truck,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { buyerService, type BackendDemand, type DemandStatus } from "~/lib/services/buyer.service";
+import {
+  buyerService,
+  type BackendDemand,
+  type DemandStatus,
+} from "~/lib/services/buyer.service";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
@@ -28,7 +40,7 @@ const STATUS_CONFIG: Record<
   },
   accepted: {
     label: "Accepted",
-    className: "bg-green-50 text-green-700 border-green-200",
+    className: "bg-green-tint text-theme-green-dark border-gray-border",
     icon: CheckCircle,
   },
   declined: {
@@ -38,10 +50,14 @@ const STATUS_CONFIG: Record<
   },
   fulfilled: {
     label: "Fulfilled",
-    className: "bg-gray-50 text-gray-700 border-gray-200",
+    className: "bg-gray-bg text-text-colour-2 border-gray-border",
     icon: Truck,
   },
-  cancelled: { label: "Cancelled", className: "bg-gray-50 text-gray-500 border-gray-200", icon: X },
+  cancelled: {
+    label: "Cancelled",
+    className: "bg-gray-bg text-muted-text border-gray-border",
+    icon: X,
+  },
 };
 
 // === Page
@@ -64,7 +80,9 @@ export default function BuyerDemandsPage() {
         if (mounted) setDemands(response.data.demands ?? []);
       } catch (error) {
         if (mounted)
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load demands");
+          setErrorMessage(
+            error instanceof Error ? error.message : "Failed to load demands",
+          );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -82,14 +100,18 @@ export default function BuyerDemandsPage() {
       setDemands((prev) => prev.filter((d) => d.id !== id));
       toast.success("Demand cancelled.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to cancel demand");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to cancel demand",
+      );
     } finally {
       setCancelling(null);
     }
   };
 
   const filtered =
-    filterStatus === "all" ? demands : demands.filter((d) => d.status === filterStatus);
+    filterStatus === "all"
+      ? demands
+      : demands.filter((d) => d.status === filterStatus);
 
   const counts = {
     all: demands.length,
@@ -101,7 +123,8 @@ export default function BuyerDemandsPage() {
     cancelled: demands.filter((d) => d.status === "cancelled").length,
   };
 
-  if (loading) return <LoadingState message="Loading your demands..." size="lg" />;
+  if (loading)
+    return <LoadingState message="Loading your demands..." size="lg" />;
 
   if (errorMessage) {
     return (
@@ -126,7 +149,9 @@ export default function BuyerDemandsPage() {
         className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">My Demands</h1>
+          <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
+            My Demands
+          </h1>
           <p className="font-roboto-slab text-text-colour">
             Request custom quantities of fish - any weight, any variant
           </p>
@@ -148,21 +173,31 @@ export default function BuyerDemandsPage() {
         className="grid grid-cols-3 gap-(--gap-base) sm:grid-cols-4 lg:grid-cols-7"
       >
         {(
-          ["all", "pending", "assigned", "accepted", "declined", "fulfilled", "cancelled"] as const
+          [
+            "all",
+            "pending",
+            "assigned",
+            "accepted",
+            "declined",
+            "fulfilled",
+            "cancelled",
+          ] as const
         ).map((status) => (
           <button
             key={status}
             onClick={() => setFilterStatus(status)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
               filterStatus === status
-                ? "border-theme-green-dark bg-green-50"
+                ? "border-theme-green-dark bg-green-tint"
                 : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
             <span className="font-ubuntu text-heading-colour text-xl font-bold">
               {counts[status]}
             </span>
-            <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">
+              {status}
+            </span>
           </button>
         ))}
       </motion.div>
@@ -194,36 +229,47 @@ export default function BuyerDemandsPage() {
                         <StatusIcon size={13} />
                         {config.label}
                       </span>
-                      <span className="font-roboto-slab text-xs text-gray-400">
-                        {new Date(demand.createdAt).toLocaleDateString("en-NG", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                      <span className="font-roboto-slab text-muted-text text-xs">
+                        {new Date(demand.createdAt).toLocaleDateString(
+                          "en-NG",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-x-6 gap-y-2">
                       <div>
-                        <p className="font-roboto-slab text-xs text-gray-500">Fish Type</p>
+                        <p className="font-roboto-slab text-muted-text text-xs">
+                          Fish Type
+                        </p>
                         <p className="font-ubuntu text-heading-colour font-semibold capitalize">
                           {demand.fishType}
                         </p>
                       </div>
                       <div>
-                        <p className="font-roboto-slab text-xs text-gray-500">Weight</p>
+                        <p className="font-roboto-slab text-muted-text text-xs">
+                          Weight
+                        </p>
                         <p className="font-ubuntu text-heading-colour font-semibold">
                           {demand.weightKg} kg
                         </p>
                       </div>
                       <div>
-                        <p className="font-roboto-slab text-xs text-gray-500">Variant</p>
+                        <p className="font-roboto-slab text-muted-text text-xs">
+                          Variant
+                        </p>
                         <p className="font-ubuntu text-heading-colour font-semibold capitalize">
                           {demand.fishVariant.replace("_", " ")}
                         </p>
                       </div>
                       <div>
-                        <p className="font-roboto-slab text-xs text-gray-500">Location</p>
+                        <p className="font-roboto-slab text-muted-text text-xs">
+                          Location
+                        </p>
                         <p className="font-ubuntu text-heading-colour font-semibold">
                           {demand.locationLga}, {demand.locationState}
                         </p>
@@ -232,7 +278,8 @@ export default function BuyerDemandsPage() {
 
                     {demand.notes && (
                       <p className="font-roboto-slab text-text-colour text-sm">
-                        <span className="font-medium">Note:</span> {demand.notes}
+                        <span className="font-medium">Note:</span>{" "}
+                        {demand.notes}
                       </p>
                     )}
                   </div>

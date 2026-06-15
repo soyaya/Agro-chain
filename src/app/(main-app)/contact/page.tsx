@@ -55,7 +55,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Contact Agro-chain | Get in Touch",
-    description: "Have a question or need support? We respond within 24 hours on business days.",
+    description:
+      "Have a question or need support? We respond within 24 hours on business days.",
     images: ["/images/og-hero.png"],
   },
 };
@@ -64,8 +65,11 @@ export default function ContactPage() {
   return (
     <div className="layout-max-width">
       {/* Section 1 - Hero */}
-      <section aria-label="Contact Hero" className="border-gray-border border-b bg-green-50">
-        <div className="section-content-max-width px-4 py-20 lg:px-25 lg:py-28">
+      <section
+        aria-label="Contact Hero"
+        className="border-gray-border bg-green-tint border-b"
+      >
+        <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
           <div className="max-w-2xl">
             <span className="font-ubuntu text-theme-green-dark text-xs font-semibold tracking-widest uppercase">
               Get In Touch
@@ -74,7 +78,8 @@ export default function ContactPage() {
               Get in Touch
             </h1>
             <p className="font-roboto-slab text-text-colour mt-4 text-lg">
-              Have a question, partnership inquiry, or need support? We&apos;re here to help.
+              Have a question, partnership inquiry, or need support? We&apos;re
+              here to help.
             </p>
           </div>
         </div>
@@ -82,7 +87,7 @@ export default function ContactPage() {
 
       {/* Section 2 - Contact Options */}
       <section aria-label="Contact Options" className="bg-white">
-        <div className="section-content-max-width px-4 py-16 lg:px-25 lg:py-20">
+        <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <a
               href="https://wa.me/2347012288798"
@@ -90,10 +95,12 @@ export default function ContactPage() {
               rel="noopener noreferrer"
               className="border-gray-border flex flex-col items-center gap-4 rounded-2xl border p-6 text-center shadow-sm transition hover:shadow-md"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50">
+              <div className="bg-green-tint flex h-12 w-12 items-center justify-center rounded-xl">
                 <MessageSquare className="text-theme-green-dark h-6 w-6" />
               </div>
-              <h3 className="font-ubuntu text-heading-colour font-semibold">WhatsApp</h3>
+              <h3 className="font-ubuntu text-heading-colour font-semibold">
+                WhatsApp
+              </h3>
               <p className="font-roboto-slab text-text-colour text-sm">
                 +234 701 228 8798
                 <br />
@@ -105,10 +112,12 @@ export default function ContactPage() {
               href="mailto:shownzy001@gmail.com"
               className="border-gray-border flex flex-col items-center gap-4 rounded-2xl border p-6 text-center shadow-sm transition hover:shadow-md"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50">
+              <div className="bg-green-tint flex h-12 w-12 items-center justify-center rounded-xl">
                 <Mail className="text-theme-green-dark h-6 w-6" />
               </div>
-              <h3 className="font-ubuntu text-heading-colour font-semibold">Email</h3>
+              <h3 className="font-ubuntu text-heading-colour font-semibold">
+                Email
+              </h3>
               <p className="font-roboto-slab text-text-colour text-sm">
                 shownzy001@gmail.com
                 <br />
@@ -120,10 +129,12 @@ export default function ContactPage() {
               href="tel:+2347012288798"
               className="border-gray-border flex flex-col items-center gap-4 rounded-2xl border p-6 text-center shadow-sm transition hover:shadow-md"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50">
+              <div className="bg-green-tint flex h-12 w-12 items-center justify-center rounded-xl">
                 <Phone className="text-theme-green-dark h-6 w-6" />
               </div>
-              <h3 className="font-ubuntu text-heading-colour font-semibold">Phone</h3>
+              <h3 className="font-ubuntu text-heading-colour font-semibold">
+                Phone
+              </h3>
               <p className="font-roboto-slab text-text-colour text-sm">
                 +234 701 228 8798
                 <br />
@@ -139,7 +150,7 @@ export default function ContactPage() {
 
       {/* Section 4 - Office Info */}
       <section aria-label="Office Information" className="bg-gray-bg">
-        <div className="section-content-max-width px-4 py-16 lg:px-25 lg:py-20">
+        <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
           <h2 className="font-ubuntu text-heading-colour mb-8 text-2xl font-bold lg:text-3xl">
             Find us here.
           </h2>
@@ -161,9 +172,14 @@ export default function ContactPage() {
       </section>
 
       {/* Section 5 - Social Links */}
-      <section aria-label="Social Links" className="border-gray-border border-b bg-white">
-        <div className="section-content-max-width px-4 py-12 lg:px-25">
-          <h2 className="font-ubuntu text-heading-colour mb-6 text-xl font-semibold">Follow us</h2>
+      <section
+        aria-label="Social Links"
+        className="border-gray-border border-b bg-white"
+      >
+        <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
+          <h2 className="font-ubuntu text-heading-colour mb-6 text-xl font-semibold">
+            Follow us
+          </h2>
           <ul className="flex flex-wrap items-center gap-4">
             {socialLinks.map(({ label, href, icon: Icon, color }) => (
               <li key={href}>

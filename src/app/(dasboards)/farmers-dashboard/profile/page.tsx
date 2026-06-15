@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { CheckCircle, Clock, AlertCircle } from "lucide-react";
@@ -155,7 +155,9 @@ export default function FarmerProfilePage() {
         // Pre-expand cluster section if already applied
         if (u.is_cluster_farmer) setWantsCluster(true);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to load profile");
+        toast.error(
+          error instanceof Error ? error.message : "Failed to load profile",
+        );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -185,7 +187,9 @@ export default function FarmerProfilePage() {
       setIsEditing(false);
       toast.success("Profile updated successfully.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update profile");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update profile",
+      );
     } finally {
       setSavingProfile(false);
     }
@@ -197,7 +201,9 @@ export default function FarmerProfilePage() {
     setApplyingCluster(true);
     try {
       // Upload any new files - skip if already have a URL for that doc
-      const uploadDoc = async (key: keyof DocFiles): Promise<string | undefined> => {
+      const uploadDoc = async (
+        key: keyof DocFiles,
+      ): Promise<string | undefined> => {
         const file = docFiles[key];
         if (file) return uploadFile(file);
         return existingDocUrls[key as keyof DocUrls];
@@ -229,7 +235,9 @@ export default function FarmerProfilePage() {
       const res = await authService.getMe();
       setUser(res.data.user);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to submit application");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to submit application",
+      );
     } finally {
       setApplyingCluster(false);
     }
@@ -240,7 +248,8 @@ export default function FarmerProfilePage() {
   const isApproved = user?.cluster_approved ?? false;
 
   const allDocsPresent = DOC_FIELDS.every(
-    ({ key }) => docFiles[key] !== null || !!existingDocUrls[key as keyof DocUrls],
+    ({ key }) =>
+      docFiles[key] !== null || !!existingDocUrls[key as keyof DocUrls],
   );
 
   const clusterFormComplete =
@@ -261,7 +270,9 @@ export default function FarmerProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">My Profile</h1>
+        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+          My Profile
+        </h1>
         <p className="font-roboto-slab text-text-colour">
           Manage your farmer profile and cluster application
         </p>
@@ -316,7 +327,8 @@ export default function FarmerProfilePage() {
               ["Local Government", "localGovernment"],
             ] as [string, keyof ProfileForm][]
           ).map(([label, key]) => {
-            const isNa = String(form[key]) === "N/A" || String(form[key]) === "";
+            const isNa =
+              String(form[key]) === "N/A" || String(form[key]) === "";
             const locked =
               key === "fullName" ||
               key === "phoneNumber" ||
@@ -326,10 +338,18 @@ export default function FarmerProfilePage() {
               <DynamicInput
                 key={key}
                 label={label}
-                fieldType={key === "email" ? "email" : key === "phoneNumber" ? "tel" : "text"}
+                fieldType={
+                  key === "email"
+                    ? "email"
+                    : key === "phoneNumber"
+                      ? "tel"
+                      : "text"
+                }
                 value={String(form[key])}
                 disabled={locked || !isEditing}
-                onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, [key]: e.target.value }))
+                }
               />
             );
           })}
@@ -343,14 +363,16 @@ export default function FarmerProfilePage() {
               <SelectInput
                 label=""
                 value={form.fishType}
-                onValueChange={(v) => setForm((prev) => ({ ...prev, fishType: v }))}
+                onValueChange={(v) =>
+                  setForm((prev) => ({ ...prev, fishType: v }))
+                }
                 options={FISH_TYPE_OPTIONS}
               />
             ) : (
               <input
                 value={form.fishType}
                 disabled
-                className="font-roboto-slab border-input-border w-full rounded-lg border px-3 py-2 text-sm disabled:bg-gray-50"
+                className="font-roboto-slab border-input-border disabled:bg-gray-bg w-full rounded-lg border px-3 py-2 text-sm"
               />
             )}
           </div>
@@ -360,7 +382,10 @@ export default function FarmerProfilePage() {
             value={String(form.farmingCapacityKg)}
             disabled={!isEditing}
             onChange={(e) =>
-              setForm((prev) => ({ ...prev, farmingCapacityKg: Number(e.target.value || 0) }))
+              setForm((prev) => ({
+                ...prev,
+                farmingCapacityKg: Number(e.target.value || 0),
+              }))
             }
           />
 
@@ -369,7 +394,10 @@ export default function FarmerProfilePage() {
             value={String(form.yearsOfExperience)}
             disabled={!isEditing}
             onChange={(e) =>
-              setForm((prev) => ({ ...prev, yearsOfExperience: Number(e.target.value || 0) }))
+              setForm((prev) => ({
+                ...prev,
+                yearsOfExperience: Number(e.target.value || 0),
+              }))
             }
           />
         </div>
@@ -390,7 +418,7 @@ export default function FarmerProfilePage() {
             checked={wantsCluster}
             onChange={(e) => setWantsCluster(e.target.checked)}
             disabled={hasApplied}
-            className="text-theme-green-dark focus:ring-theme-green-dark mt-1 h-5 w-5 cursor-pointer rounded border-gray-300 focus:ring-2 disabled:cursor-default"
+            className="text-theme-green-dark focus:ring-theme-green-dark border-gray-border mt-1 h-5 w-5 cursor-pointer rounded focus:ring-2 disabled:cursor-default"
           />
           <div>
             <label
@@ -400,8 +428,8 @@ export default function FarmerProfilePage() {
               Apply to become a Cluster Farmer
             </label>
             <p className="font-roboto-slab text-text-colour mt-0.5 text-sm">
-              Cluster farmers aggregate supply from multiple farmers and sell on the marketplace
-              under their name.
+              Cluster farmers aggregate supply from multiple farmers and sell on
+              the marketplace under their name.
             </p>
           </div>
         </div>
@@ -418,17 +446,20 @@ export default function FarmerProfilePage() {
               <div
                 className={`mt-4 flex items-center gap-3 rounded-xl p-4 ${
                   isApproved
-                    ? "border border-green-200 bg-green-50"
+                    ? "border-gray-border bg-green-tint border"
                     : "border border-yellow-200 bg-yellow-50"
                 }`}
               >
                 {isApproved ? (
-                  <CheckCircle size={20} className="shrink-0 text-green-600" />
+                  <CheckCircle
+                    size={20}
+                    className="text-theme-green-dark shrink-0"
+                  />
                 ) : (
                   <Clock size={20} className="shrink-0 text-yellow-600" />
                 )}
                 <p
-                  className={`font-roboto-slab text-sm font-medium ${isApproved ? "text-green-800" : "text-yellow-800"}`}
+                  className={`font-roboto-slab text-sm font-medium ${isApproved ? "text-theme-green-dark" : "text-yellow-800"}`}
                 >
                   {isApproved
                     ? "Approved - you are a Cluster Farmer. Log out and back in to access your cluster dashboard."
@@ -456,7 +487,10 @@ export default function FarmerProfilePage() {
                     label="Business Name"
                     value={clusterForm.businessName}
                     onChange={(e) =>
-                      setClusterForm((p) => ({ ...p, businessName: e.target.value }))
+                      setClusterForm((p) => ({
+                        ...p,
+                        businessName: e.target.value,
+                      }))
                     }
                     placeholder="Your registered business name"
                     required
@@ -464,7 +498,12 @@ export default function FarmerProfilePage() {
                   <DynamicInput
                     label="CAC Number"
                     value={clusterForm.cacNumber}
-                    onChange={(e) => setClusterForm((p) => ({ ...p, cacNumber: e.target.value }))}
+                    onChange={(e) =>
+                      setClusterForm((p) => ({
+                        ...p,
+                        cacNumber: e.target.value,
+                      }))
+                    }
                     placeholder="CAC registration number"
                     required
                   />
@@ -472,7 +511,10 @@ export default function FarmerProfilePage() {
                     label="Warehouse Location"
                     value={clusterForm.warehouseLocation}
                     onChange={(e) =>
-                      setClusterForm((p) => ({ ...p, warehouseLocation: e.target.value }))
+                      setClusterForm((p) => ({
+                        ...p,
+                        warehouseLocation: e.target.value,
+                      }))
                     }
                     placeholder="Address of your warehouse"
                     required
@@ -498,9 +540,12 @@ export default function FarmerProfilePage() {
                     id="logisticsAvailable"
                     checked={clusterForm.logisticsAvailable}
                     onChange={(e) =>
-                      setClusterForm((p) => ({ ...p, logisticsAvailable: e.target.checked }))
+                      setClusterForm((p) => ({
+                        ...p,
+                        logisticsAvailable: e.target.checked,
+                      }))
                     }
-                    className="text-theme-green-dark focus:ring-theme-green-dark h-5 w-5 cursor-pointer rounded border-gray-300 focus:ring-2"
+                    className="text-theme-green-dark focus:ring-theme-green-dark border-gray-border h-5 w-5 cursor-pointer rounded focus:ring-2"
                   />
                   <label
                     htmlFor="logisticsAvailable"
@@ -516,12 +561,13 @@ export default function FarmerProfilePage() {
                     <h3 className="font-ubuntu text-heading-colour text-base font-semibold">
                       Required Documents
                     </h3>
-                    <span className="font-roboto-slab text-xs text-gray-400">
+                    <span className="font-roboto-slab text-muted-text text-xs">
                       (
                       {
                         DOC_FIELDS.filter(
                           ({ key }) =>
-                            docFiles[key] !== null || !!existingDocUrls[key as keyof DocUrls],
+                            docFiles[key] !== null ||
+                            !!existingDocUrls[key as keyof DocUrls],
                         ).length
                       }
                       /{DOC_FIELDS.length} uploaded)
@@ -536,8 +582,11 @@ export default function FarmerProfilePage() {
                         {/* Show existing URL badge if already uploaded and no new file selected */}
                         {hasExisting && !hasNew && (
                           <div className="mb-1 flex items-center gap-2">
-                            <CheckCircle size={14} className="text-green-600" />
-                            <span className="font-roboto-slab text-xs text-green-700">
+                            <CheckCircle
+                              size={14}
+                              className="text-theme-green-dark"
+                            />
+                            <span className="font-roboto-slab text-theme-green-dark text-xs">
                               Previously uploaded - upload a new file to replace
                             </span>
                           </div>
@@ -546,8 +595,12 @@ export default function FarmerProfilePage() {
                           label={label}
                           required={!hasExisting}
                           isOpen={openDoc === key}
-                          onToggle={() => setOpenDoc((prev) => (prev === key ? null : key))}
-                          onFileChange={(file) => setDocFiles((prev) => ({ ...prev, [key]: file }))}
+                          onToggle={() =>
+                            setOpenDoc((prev) => (prev === key ? null : key))
+                          }
+                          onFileChange={(file) =>
+                            setDocFiles((prev) => ({ ...prev, [key]: file }))
+                          }
                           onUploadComplete={(file) =>
                             setDocFiles((prev) => ({ ...prev, [key]: file }))
                           }
@@ -560,7 +613,10 @@ export default function FarmerProfilePage() {
                 {/* Validation hint */}
                 {!canSubmitCluster && (
                   <div className="flex items-center gap-2 rounded-xl bg-yellow-50 p-3">
-                    <AlertCircle size={16} className="shrink-0 text-yellow-600" />
+                    <AlertCircle
+                      size={16}
+                      className="shrink-0 text-yellow-600"
+                    />
                     <p className="font-roboto-slab text-xs text-yellow-800">
                       {!clusterFormComplete
                         ? "Fill in all business fields above."

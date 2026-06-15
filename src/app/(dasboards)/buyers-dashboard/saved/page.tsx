@@ -33,7 +33,9 @@ export default function SavedListingsPage() {
       }
     };
     void load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleRemove = async (listingId: string) => {
@@ -50,7 +52,8 @@ export default function SavedListingsPage() {
     router.push(`/marketplace/${listing.id}`);
   };
 
-  if (loading) return <LoadingState message="Loading saved listings..." size="lg" />;
+  if (loading)
+    return <LoadingState message="Loading saved listings..." size="lg" />;
 
   return (
     <div className="flex flex-col gap-8">
@@ -64,10 +67,13 @@ export default function SavedListingsPage() {
             <Heart size={28} className="text-pink-600" />
           </div>
           <div>
-            <h1 className="font-ubuntu text-3xl font-bold text-gray-900">Saved Listings</h1>
-            <p className="font-roboto-slab mt-1 text-gray-600">
+            <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+              Saved Listings
+            </h1>
+            <p className="font-roboto-slab text-text-colour mt-1">
               {savedListings.length}{" "}
-              {savedListings.length === 1 ? "listing" : "listings"} saved for later
+              {savedListings.length === 1 ? "listing" : "listings"} saved for
+              later
             </p>
           </div>
         </div>
@@ -81,7 +87,11 @@ export default function SavedListingsPage() {
           className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
         >
           {savedListings.map((listing) => (
-            <motion.div key={listing.id} variants={FADE_IN_VARIANT} className="group relative">
+            <motion.div
+              key={listing.id}
+              variants={FADE_IN_VARIANT}
+              className="group relative"
+            >
               <MarketplaceCard
                 listing={listing}
                 onClick={() => router.push(`/marketplace/${listing.id}`)}
@@ -92,7 +102,7 @@ export default function SavedListingsPage() {
                   e.stopPropagation();
                   void handleRemove(listing.id);
                 }}
-                className="text-error-red absolute top-4 right-4 rounded-full border border-gray-200 bg-(--white)/90 p-2 opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+                className="text-error-red border-gray-border absolute top-4 right-4 rounded-full border bg-(--white)/90 p-2 opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
                 aria-label="Remove from saved"
               >
                 <Trash2 size={18} />

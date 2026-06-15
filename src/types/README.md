@@ -5,6 +5,7 @@ Complete TypeScript type definitions for the AgroChainMarketPlace platform.
 ## Overview
 
 This directory contains all type definitions following strict TypeScript rules:
+
 - **NO `any` types**
 - **NO unsafe casting**
 - All interfaces and types are strongly typed
@@ -13,80 +14,97 @@ This directory contains all type definitions following strict TypeScript rules:
 ## Files
 
 ### `index.ts`
+
 Main type definitions file containing all interfaces and types.
 
 ### `constants.ts`
+
 Platform constants, enums, and configuration values.
 
 ### `types.ts` (legacy)
+
 Original types file - will be migrated to use new type system.
 
 ## Type Categories
 
 ### 1. User & Authentication
+
 ```typescript
-BaseUser
-AuthUser
-UserRole: "farmer" | "buyer" | "admin"
+BaseUser;
+AuthUser;
+UserRole: "farmer" | "buyer" | "admin";
 ```
 
 ### 2. Farmer System
+
 ```typescript
-FarmerProfile
-FarmerProfileFormData
+FarmerProfile;
+FarmerProfileFormData;
 ```
 
 ### 3. Cluster Farmer System
+
 ```typescript
-ClusterFarmerProfile
-ClusterApplication
-ClusterApplicationFormData
-ApplicationStatus: "pending" | "approved" | "rejected"
+ClusterFarmerProfile;
+ClusterApplication;
+ClusterApplicationFormData;
+ApplicationStatus: "pending" | "approved" | "rejected";
 ```
 
 ### 4. Buyer System
+
 ```typescript
-BuyerProfile
-BuyerProfileFormData
+BuyerProfile;
+BuyerProfileFormData;
 ```
 
 ### 5. Supply Listing System
+
 ```typescript
-PackagingOption
-FarmerSupplyListing
-ClusterFarmerListing
-SupplyListingFormData
-ListingStatus: "pending" | "approved" | "rejected"
+PackagingOption;
+FarmerSupplyListing;
+ClusterFarmerListing;
+SupplyListingFormData;
+ListingStatus: "pending" | "approved" | "rejected";
 ```
 
 ### 6. Marketplace & Orders
+
 ```typescript
-MarketplaceListing
-Order
-OrderItem
-OrderStatus: "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled"
+MarketplaceListing;
+Order;
+OrderItem;
+OrderStatus: "pending" |
+  "confirmed" |
+  "processing" |
+  "shipped" |
+  "delivered" |
+  "cancelled";
 ```
 
 ### 7. Admin System
+
 ```typescript
-AdminProfile
-PlatformAnalytics
+AdminProfile;
+PlatformAnalytics;
 ```
 
 ### 8. Common Types
+
 ```typescript
-NavLink
-SelectOption
-Notification
-ApiResponse<T>
-PaginatedResponse<T>
-MarketplaceFilters
-ListingFilters
+NavLink;
+SelectOption;
+Notification;
+ApiResponse<T>;
+PaginatedResponse<T>;
+MarketplaceFilters;
+ListingFilters;
 ```
 
 ## Usage Examples
 
 ### Import Types
+
 ```typescript
 import type {
   FarmerProfile,
@@ -97,6 +115,7 @@ import type {
 ```
 
 ### Import Constants
+
 ```typescript
 import {
   FISH_TYPES,
@@ -107,6 +126,7 @@ import {
 ```
 
 ### Using Types in Components
+
 ```typescript
 interface ProfileFormProps {
   initialData?: FarmerProfile;
@@ -119,34 +139,36 @@ export function ProfileForm({ initialData, onSubmit }: ProfileFormProps) {
 ```
 
 ### Using Types in API Routes
+
 ```typescript
 import type { ApiResponse, FarmerProfile } from "~/types";
 
 export async function POST(request: Request): Promise<Response> {
   const data = await request.json();
-  
+
   const response: ApiResponse<FarmerProfile> = {
     success: true,
     data: farmerProfile,
     message: "Profile created successfully",
   };
-  
+
   return Response.json(response);
 }
 ```
 
 ### Using Types with React Hook Form
+
 ```typescript
 import { useForm } from "react-hook-form";
 import type { FarmerProfileFormData } from "~/types";
 
 export function FarmerProfileForm() {
   const { register, handleSubmit } = useForm<FarmerProfileFormData>();
-  
+
   const onSubmit = (data: FarmerProfileFormData) => {
     // Handle form submission
   };
-  
+
   return <form onSubmit={handleSubmit(onSubmit)}>...</form>;
 }
 ```
@@ -154,6 +176,7 @@ export function FarmerProfileForm() {
 ## Type Safety Rules
 
 ### ✅ DO
+
 ```typescript
 // Use explicit types
 const user: FarmerProfile = { ... };
@@ -169,6 +192,7 @@ type Status = "pending" | "approved" | "rejected";
 ```
 
 ### ❌ DON'T
+
 ```typescript
 // Never use any
 const data: any = { ... }; // ❌
@@ -183,17 +207,19 @@ function handleData(data) { ... } // ❌
 ## Constants Usage
 
 ### Fish Types
+
 ```typescript
 import { FISH_TYPES } from "~/types/constants";
 
 // Use in select options
-const fishOptions = FISH_TYPES.map(fish => ({
+const fishOptions = FISH_TYPES.map((fish) => ({
   label: fish,
   value: fish,
 }));
 ```
 
 ### States
+
 ```typescript
 import { NIGERIAN_STATES } from "~/types/constants";
 
@@ -202,6 +228,7 @@ import { NIGERIAN_STATES } from "~/types/constants";
 ```
 
 ### Validation
+
 ```typescript
 import { MIN_SUPPLY_KG, PHONE_REGEX } from "~/types/constants";
 
@@ -213,15 +240,16 @@ const schema = z.object({
 ```
 
 ### Dashboard Routes
+
 ```typescript
 import { DASHBOARD_ROUTES } from "~/types/constants";
 
 // Use in navigation
 if (user.role === "farmer") {
   router.push(
-    user.isClusterFarmer 
-      ? DASHBOARD_ROUTES.CLUSTER_FARMER 
-      : DASHBOARD_ROUTES.FARMER
+    user.isClusterFarmer
+      ? DASHBOARD_ROUTES.CLUSTER_FARMER
+      : DASHBOARD_ROUTES.FARMER,
   );
 }
 ```
@@ -300,6 +328,7 @@ if (isFarmerProfile(data)) {
 To migrate existing code to use new types:
 
 1. Replace old type imports:
+
 ```typescript
 // Old
 import { Object } from "~/types/types";
@@ -309,6 +338,7 @@ import type { SelectOption } from "~/types";
 ```
 
 2. Update component props:
+
 ```typescript
 // Old
 interface Props {
@@ -324,6 +354,7 @@ interface Props {
 ```
 
 3. Use constants instead of hardcoded values:
+
 ```typescript
 // Old
 if (totalKg < 1000) { ... }
@@ -336,6 +367,7 @@ if (totalKg < MIN_SUPPLY_KG) { ... }
 ## Next Steps
 
 With types defined, you can now:
+
 1. Build farmer profile system with type-safe forms
 2. Create supply listing flow with validated data
 3. Build marketplace with filtered listings

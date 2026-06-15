@@ -41,9 +41,11 @@ export const metadata = {
   },
 };
 
-export default function MainLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function MainLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="relative min-h-screen layout-max-width">
+    <div className="layout-max-width relative min-h-screen">
       <Header />
       <main>{children}</main>
       <Footer />

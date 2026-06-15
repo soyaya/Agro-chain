@@ -265,7 +265,8 @@ const filteredListings = listings.filter((listing) => {
   if (filters.state && listing.state !== filters.state) return false;
   if (filters.minPrice && listing.pricePerKg < filters.minPrice) return false;
   if (filters.maxPrice && listing.pricePerKg > filters.maxPrice) return false;
-  if (filters.minQuantity && listing.totalAvailableKg < filters.minQuantity) return false;
+  if (filters.minQuantity && listing.totalAvailableKg < filters.minQuantity)
+    return false;
   return true;
 });
 ```
@@ -283,7 +284,10 @@ const sortedListings = [...filteredListings].sort((a, b) => {
       return (a.totalAvailableKg - b.totalAvailableKg) * order;
     case "date":
     default:
-      return (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) * order;
+      return (
+        (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) *
+        order
+      );
   }
 });
 ```
@@ -356,7 +360,11 @@ transition={{ duration: 0.2 }}
 All components are fully typed:
 
 ```typescript
-import type { MarketplaceListing, MarketplaceFilters, PackagingOption } from "~/types";
+import type {
+  MarketplaceListing,
+  MarketplaceFilters,
+  PackagingOption,
+} from "~/types";
 ```
 
 No `any` types used. All props strictly typed.

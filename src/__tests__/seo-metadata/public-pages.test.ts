@@ -33,74 +33,115 @@ const pageNames = [
 ];
 
 describe("Public page metadata - Property 1: completeness", () => {
-  it(
-    "every public page metadata object has all required SEO and social fields",
-    () => {
-      fc.assert(
-        fc.property(
-          fc.integer({ min: 0, max: publicPageMetadata.length - 1 }),
-          (index) => {
-            const meta = publicPageMetadata[index];
-            const name = pageNames[index];
+  it("every public page metadata object has all required SEO and social fields", () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 0, max: publicPageMetadata.length - 1 }),
+        (index) => {
+          const meta = publicPageMetadata[index];
+          const name = pageNames[index];
 
-            // Non-empty title
-            const title = meta.title;
-            expect(title, `${name}: title should be a non-empty string`).toBeTruthy();
-            expect(typeof title, `${name}: title should be a string`).toBe("string");
-            expect((title as string).length, `${name}: title should not be empty`).toBeGreaterThan(0);
+          // Non-empty title
+          const title = meta.title;
+          expect(
+            title,
+            `${name}: title should be a non-empty string`,
+          ).toBeTruthy();
+          expect(typeof title, `${name}: title should be a string`).toBe(
+            "string",
+          );
+          expect(
+            (title as string).length,
+            `${name}: title should not be empty`,
+          ).toBeGreaterThan(0);
 
-            // Non-empty description
-            const description = meta.description;
-            expect(description, `${name}: description should be a non-empty string`).toBeTruthy();
-            expect(typeof description, `${name}: description should be a string`).toBe("string");
-            expect((description as string).length, `${name}: description should not be empty`).toBeGreaterThan(0);
+          // Non-empty description
+          const description = meta.description;
+          expect(
+            description,
+            `${name}: description should be a non-empty string`,
+          ).toBeTruthy();
+          expect(
+            typeof description,
+            `${name}: description should be a string`,
+          ).toBe("string");
+          expect(
+            (description as string).length,
+            `${name}: description should not be empty`,
+          ).toBeGreaterThan(0);
 
-            // Non-empty keywords array
-            const keywords = meta.keywords;
-            expect(keywords, `${name}: keywords should be defined`).toBeDefined();
-            expect(Array.isArray(keywords), `${name}: keywords should be an array`).toBe(true);
-            expect((keywords as unknown[]).length, `${name}: keywords should not be empty`).toBeGreaterThan(0);
+          // Non-empty keywords array
+          const keywords = meta.keywords;
+          expect(keywords, `${name}: keywords should be defined`).toBeDefined();
+          expect(
+            Array.isArray(keywords),
+            `${name}: keywords should be an array`,
+          ).toBe(true);
+          expect(
+            (keywords as unknown[]).length,
+            `${name}: keywords should not be empty`,
+          ).toBeGreaterThan(0);
 
-            // robots.index === true
-            const robots = meta.robots as { index: boolean; follow: boolean } | undefined;
-            expect(robots, `${name}: robots should be defined`).toBeDefined();
-            expect(robots!.index, `${name}: robots.index should be true`).toBe(true);
+          // robots.index === true
+          const robots = meta.robots as
+            | { index: boolean; follow: boolean }
+            | undefined;
+          expect(robots, `${name}: robots should be defined`).toBeDefined();
+          expect(robots!.index, `${name}: robots.index should be true`).toBe(
+            true,
+          );
 
-            // robots.follow === true
-            expect(robots!.follow, `${name}: robots.follow should be true`).toBe(true);
+          // robots.follow === true
+          expect(robots!.follow, `${name}: robots.follow should be true`).toBe(
+            true,
+          );
 
-            // openGraph checks
-            const og = meta.openGraph as Record<string, unknown> | undefined;
-            expect(og, `${name}: openGraph should be defined`).toBeDefined();
+          // openGraph checks
+          const og = meta.openGraph as Record<string, unknown> | undefined;
+          expect(og, `${name}: openGraph should be defined`).toBeDefined();
 
-            // openGraph.type === "website" OR undefined (inherited from root)
-            if (og!.type !== undefined) {
-              expect(og!.type, `${name}: openGraph.type should be "website"`).toBe("website");
-            }
-
-            // openGraph.locale === "en_NG" OR undefined (inherited from root)
-            if (og!.locale !== undefined) {
-              expect(og!.locale, `${name}: openGraph.locale should be "en_NG"`).toBe("en_NG");
-            }
-
-            // Non-empty openGraph.url
-            const ogUrl = og!.url;
-            expect(ogUrl, `${name}: openGraph.url should be defined`).toBeDefined();
-            expect(typeof ogUrl, `${name}: openGraph.url should be a string`).toBe("string");
-            expect((ogUrl as string).length, `${name}: openGraph.url should not be empty`).toBeGreaterThan(0);
-
-            // twitter.card === "summary_large_image" OR undefined (inherited from root)
-            const twitter = meta.twitter as Record<string, unknown> | undefined;
-            if (twitter !== undefined && twitter.card !== undefined) {
-              expect(
-                twitter.card,
-                `${name}: twitter.card should be "summary_large_image"`
-              ).toBe("summary_large_image");
-            }
+          // openGraph.type === "website" OR undefined (inherited from root)
+          if (og!.type !== undefined) {
+            expect(
+              og!.type,
+              `${name}: openGraph.type should be "website"`,
+            ).toBe("website");
           }
-        ),
-        { numRuns: 100 }
-      );
-    }
-  );
+
+          // openGraph.locale === "en_NG" OR undefined (inherited from root)
+          if (og!.locale !== undefined) {
+            expect(
+              og!.locale,
+              `${name}: openGraph.locale should be "en_NG"`,
+            ).toBe("en_NG");
+          }
+
+          // Non-empty openGraph.url
+          const ogUrl = og!.url;
+          expect(
+            ogUrl,
+            `${name}: openGraph.url should be defined`,
+          ).toBeDefined();
+          expect(
+            typeof ogUrl,
+            `${name}: openGraph.url should be a string`,
+          ).toBe("string");
+          expect(
+            (ogUrl as string).length,
+            `${name}: openGraph.url should not be empty`,
+          ).toBeGreaterThan(0);
+
+          // twitter.card === "summary_large_image" OR undefined (inherited from root)
+          const twitter = meta.twitter as Record<string, unknown> | undefined;
+          if (twitter !== undefined && twitter.card !== undefined) {
+            expect(
+              twitter.card,
+              `${name}: twitter.card should be "summary_large_image"`,
+            ).toBe("summary_large_image");
+          }
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
 });

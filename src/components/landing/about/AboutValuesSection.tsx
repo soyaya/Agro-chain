@@ -56,14 +56,22 @@ export default function AboutValuesSection() {
               >
                 {/* Text — slides in from the leading side */}
                 <motion.div
-                  initial={{ opacity: 0, x: isEven ? -40 : 40, filter: "blur(4px)" }}
+                  initial={{
+                    opacity: 0,
+                    x: isEven ? -40 : 40,
+                    filter: "blur(4px)",
+                  }}
                   whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                   viewport={{ once: true, margin: "-80px" }}
                   transition={{ duration: 0.75, ease: EASE_OUT_EXPO }}
                   className="flex flex-col gap-4"
                 >
-                  <h3 className="font-ubuntu text-heading-colour text-2xl font-bold">{title}</h3>
-                  <p className="font-roboto-slab text-text-colour text-lg">{body}</p>
+                  <h3 className="font-ubuntu text-heading-colour text-2xl font-bold">
+                    {title}
+                  </h3>
+                  <p className="font-roboto-slab text-text-colour text-lg">
+                    {body}
+                  </p>
                 </motion.div>
 
                 {/* Image — scales in from opposite side */}
@@ -71,7 +79,11 @@ export default function AboutValuesSection() {
                   initial={{ opacity: 0, x: isEven ? 40 : -40, scale: 0.96 }}
                   whileInView={{ opacity: 1, x: 0, scale: 1 }}
                   viewport={{ once: true, margin: "-80px" }}
-                  transition={{ duration: 0.75, ease: EASE_OUT_EXPO, delay: 0.08 }}
+                  transition={{
+                    duration: 0.75,
+                    ease: EASE_OUT_EXPO,
+                    delay: 0.08,
+                  }}
                   className="relative h-64 w-full overflow-hidden rounded-2xl lg:h-80"
                 >
                   <Image

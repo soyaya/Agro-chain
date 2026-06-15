@@ -17,8 +17,11 @@ export function useNotifications() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchNotifications();
-    const id = setInterval(() => { void fetchNotifications(); }, POLL_INTERVAL_MS);
+    const id = setInterval(() => {
+      void fetchNotifications();
+    }, POLL_INTERVAL_MS);
     return () => clearInterval(id);
   }, [fetchNotifications]);
 
@@ -36,5 +39,11 @@ export function useNotifications() {
     setUnreadCount(0);
   };
 
-  return { notifications, unreadCount, markRead, markAllRead, refresh: fetchNotifications };
+  return {
+    notifications,
+    unreadCount,
+    markRead,
+    markAllRead,
+    refresh: fetchNotifications,
+  };
 }

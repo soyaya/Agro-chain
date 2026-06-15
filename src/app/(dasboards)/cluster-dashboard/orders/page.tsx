@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, Package, Truck, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { clusterService, type BackendClusterOrder } from "~/lib/services/cluster.service";
+import {
+  clusterService,
+  type BackendClusterOrder,
+} from "~/lib/services/cluster.service";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
@@ -27,7 +30,9 @@ export default function ClusterOrdersPage() {
         }
       } catch (error) {
         if (mounted) {
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load orders");
+          setErrorMessage(
+            error instanceof Error ? error.message : "Failed to load orders",
+          );
         }
       } finally {
         if (mounted) {
@@ -46,10 +51,14 @@ export default function ClusterOrdersPage() {
   const updateOrderStatus = async (orderId: string, status: string) => {
     try {
       await clusterService.updateOrderStatus(orderId, status);
-      setOrders((prev) => prev.map((o) => (o.orderId === orderId ? { ...o, status } : o)));
+      setOrders((prev) =>
+        prev.map((o) => (o.orderId === orderId ? { ...o, status } : o)),
+      );
       toast.success("Order updated");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update order");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update order",
+      );
     }
   };
 
@@ -73,7 +82,9 @@ export default function ClusterOrdersPage() {
   return (
     <div className="flex flex-col gap-(--section-gap)">
       <motion.div variants={FADE_IN_VARIANT} initial="hidden" animate="visible">
-        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Orders</h1>
+        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+          Orders
+        </h1>
         <p className="font-roboto-slab text-text-colour">
           Review buyer orders and update fulfillment status
         </p>
@@ -108,7 +119,7 @@ export default function ClusterOrdersPage() {
                     {order.buyerName} • {order.buyerPhone}
                   </p>
                 </div>
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+                <span className="bg-gray-bg text-text-colour-2 rounded-full px-3 py-1 text-xs font-semibold">
                   {order.status}
                 </span>
               </div>
@@ -128,14 +139,18 @@ export default function ClusterOrdersPage() {
                 {order.status === "pending" && (
                   <>
                     <button
-                      onClick={() => updateOrderStatus(order.orderId, "confirmed")}
+                      onClick={() =>
+                        updateOrderStatus(order.orderId, "confirmed")
+                      }
                       className="bg-theme-green-dark flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
                     >
                       <CheckCircle size={14} />
                       Accept
                     </button>
                     <button
-                      onClick={() => updateOrderStatus(order.orderId, "cancelled")}
+                      onClick={() =>
+                        updateOrderStatus(order.orderId, "cancelled")
+                      }
                       className="flex items-center gap-2 rounded-full border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50"
                     >
                       <XCircle size={14} />
@@ -146,7 +161,9 @@ export default function ClusterOrdersPage() {
 
                 {order.status === "confirmed" && (
                   <button
-                    onClick={() => updateOrderStatus(order.orderId, "processing")}
+                    onClick={() =>
+                      updateOrderStatus(order.orderId, "processing")
+                    }
                     className="border-gray-border text-heading-colour hover:bg-gray-bg flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition"
                   >
                     <Package size={14} />
@@ -166,7 +183,9 @@ export default function ClusterOrdersPage() {
 
                 {order.status === "shipped" && (
                   <button
-                    onClick={() => updateOrderStatus(order.orderId, "delivered")}
+                    onClick={() =>
+                      updateOrderStatus(order.orderId, "delivered")
+                    }
                     className="border-gray-border text-heading-colour hover:bg-gray-bg flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition"
                   >
                     <CheckCircle size={14} />

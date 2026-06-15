@@ -2,9 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Users, FileText, Clock, CheckCircle } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
-import { clusterService, type ClusterListingSummary } from "~/lib/services/cluster.service";
+import {
+  clusterService,
+  type ClusterListingSummary,
+} from "~/lib/services/cluster.service";
 
 export default function ClusterDashboardPage() {
   const [summary, setSummary] = useState<ClusterListingSummary>({
@@ -13,7 +17,9 @@ export default function ClusterDashboardPage() {
     allListings: 0,
     totalSupply: 0,
   });
-  const [activities, setActivities] = useState<Array<{ id: string; text: string; at: string }>>([]);
+  const [activities, setActivities] = useState<
+    Array<{ id: string; text: string; at: string }>
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,10 +53,26 @@ export default function ClusterDashboardPage() {
 
   const stats = useMemo(
     () => [
-      { label: "Farmers Under Me", value: summary.farmersUnderMe.toLocaleString(), icon: Users },
-      { label: "Pending Approvals", value: summary.pendingApproval.toLocaleString(), icon: Clock },
-      { label: "Active Listings", value: summary.allListings.toLocaleString(), icon: CheckCircle },
-      { label: "Total Supply (kg)", value: summary.totalSupply.toLocaleString(), icon: FileText },
+      {
+        label: "Farmers Under Me",
+        value: summary.farmersUnderMe.toLocaleString(),
+        icon: Users,
+      },
+      {
+        label: "Pending Approvals",
+        value: summary.pendingApproval.toLocaleString(),
+        icon: Clock,
+      },
+      {
+        label: "Active Listings",
+        value: summary.allListings.toLocaleString(),
+        icon: CheckCircle,
+      },
+      {
+        label: "Total Supply (kg)",
+        value: summary.totalSupply.toLocaleString(),
+        icon: FileText,
+      },
     ],
     [summary],
   );
@@ -87,12 +109,14 @@ export default function ClusterDashboardPage() {
               className="border-gray-border rounded-2xl border bg-(--white) p-6 shadow-sm"
             >
               <div className="mb-4 flex items-center justify-between">
-                <Icon className="text-green-700" size={22} />
+                <Icon className="text-theme-green-dark" size={22} />
               </div>
               <p className="font-ubuntu text-heading-colour mb-1 text-3xl font-bold">
                 {loading ? "..." : stat.value}
               </p>
-              <p className="font-roboto-slab text-text-colour text-sm">{stat.label}</p>
+              <p className="font-roboto-slab text-text-colour text-sm">
+                {stat.label}
+              </p>
             </motion.div>
           );
         })}
@@ -109,18 +133,18 @@ export default function ClusterDashboardPage() {
           Quick Actions
         </h2>
         <div className="flex flex-col gap-(--gap-base) sm:flex-row">
-          <a
+          <Link
             href="/cluster-dashboard/pending-approvals"
             className="font-roboto-slab bg-theme-green-dark focus:ring-theme-green-dark flex-1 rounded-xl px-(--space-lg) py-(--space-lg) text-center font-medium text-white transition-opacity duration-200 hover:opacity-90 focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             Review Pending Listings
-          </a>
-          <a
+          </Link>
+          <Link
             href="/cluster-dashboard/farmers"
             className="font-roboto-slab border-gray-border text-heading-colour hover:bg-pink-bg focus:ring-border-gray flex-1 rounded-xl border bg-(--white) px-(--space-lg) py-(--space-lg) text-center font-medium transition-colors duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             View My Farmers
-          </a>
+          </Link>
         </div>
       </motion.div>
 
@@ -136,16 +160,20 @@ export default function ClusterDashboardPage() {
         </h2>
         <div className="flex flex-col gap-(--space-md)">
           {activities.length === 0 ? (
-            <p className="font-roboto-slab text-text-colour text-sm">No recent activity yet.</p>
+            <p className="font-roboto-slab text-text-colour text-sm">
+              No recent activity yet.
+            </p>
           ) : (
             activities.map((activity) => (
               <div
                 key={activity.id}
                 className="hover:bg-pink-bg flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors"
               >
-                <div className="h-2 w-2 rounded-full bg-green-500" />
-                <p className="font-roboto-slab text-text-colour text-sm">{activity.text}</p>
-                <span className="ml-auto text-xs text-gray-400">
+                <div className="bg-theme-green-light h-2 w-2 rounded-full" />
+                <p className="font-roboto-slab text-text-colour text-sm">
+                  {activity.text}
+                </p>
+                <span className="text-muted-text ml-auto text-xs">
                   {new Date(activity.at).toLocaleDateString()}
                 </span>
               </div>

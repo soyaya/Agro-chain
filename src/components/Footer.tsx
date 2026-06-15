@@ -4,13 +4,19 @@ import Link from "next/link";
 import AppLogo from "./AppLogo";
 import { PhoneIcon, MailIcon } from "lucide-react";
 
-import { navLinks, socialLinks, supportLinks, footer2Links } from "~/models/models";
+import {
+  navLinks,
+  socialLinks,
+  supportLinks,
+  footer2Links,
+} from "~/models/models";
 
 const devYear: number = 2024;
 const currentYear: number = new Date().getFullYear();
 
 export default function Footer() {
-  const displayYear = currentYear > devYear ? `${devYear} - ${currentYear}` : `${devYear}`;
+  const displayYear =
+    currentYear > devYear ? `${devYear} - ${currentYear}` : `${devYear}`;
 
   return (
     <footer className="font-openSans relative">
@@ -26,14 +32,19 @@ export default function Footer() {
                 {/* <span className="text-2xl lg:text-3xl text-debridger-green-dark font-bold">Debridger</span> */}
               </Link>
 
-              <p className="text-text-colour">Connecting Farms to Global Markets.</p>
+              <p className="text-text-colour">
+                Connecting Farms to Global Markets.
+              </p>
             </div>
 
             {/* Social Links */}
             <ul className="flex items-center gap-3">
               {socialLinks.map(({ label, href, icon: Icon, color }) => {
                 return (
-                  <li key={href} className="group relative flex flex-col items-center">
+                  <li
+                    key={href}
+                    className="group relative flex flex-col items-center"
+                  >
                     {/* Label */}
                     <span
                       className={`absolute -top-6 rounded-md bg-(--white)/80 px-2 py-0.5 text-xs text-black opacity-0 backdrop-blur-sm transition-all duration-300 ease-in-out group-hover:translate-y-0.5 group-hover:opacity-100 dark:bg-(--black)/50 dark:text-white ${color?.replace("hover:", "")} `}
@@ -106,7 +117,7 @@ export default function Footer() {
               Contact Us
             </h4>
 
-            <ul className="flex font-ubuntu flex-col gap-2">
+            <ul className="font-ubuntu flex flex-col gap-2">
               <li>
                 <a
                   href="tel:+2347012288798"

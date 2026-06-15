@@ -3,25 +3,25 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Store, ShoppingBag, ArrowLeft, Sparkles } from "lucide-react";
 import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import { MarketplaceFilters } from "~/components/marketplace/MarketplaceFilters";
-import type { MarketplaceListing, MarketplaceFilters as Filters } from "~/types";
+import type {
+  MarketplaceListing,
+  MarketplaceFilters as Filters,
+} from "~/types";
 import {
   FADE_IN_VARIANT,
   STAGGER_CONTAINER_VARIANT,
-  SLIDE_UP_VARIANT,
   LIVE_FISH_TYPES,
   PROCESSED_FISH_TYPES,
   LIVE_FISH_TYPE_LABELS,
   PROCESSED_FISH_TYPE_LABELS,
   NIGERIAN_STATES,
-  type LiveFishType,
-  type ProcessedFishType,
   type FishType,
 } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
@@ -38,7 +38,12 @@ type MarketplaceResponse = {
   status: string;
   data: {
     listings: MarketplaceListing[];
-    pagination?: { total: number; page: number; limit: number; totalPages: number };
+    pagination?: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
   };
 };
 
@@ -72,17 +77,22 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors, isValid },
   } = useForm<DemandFormValues>({
     resolver: zodResolver(demandSchema),
     mode: "onChange",
-    defaultValues: { processingCategory: undefined, fishType: "", locationState: "", locationLga: "" },
+    defaultValues: {
+      processingCategory: undefined,
+      fishType: "",
+      locationState: "",
+      locationLga: "",
+    },
   });
 
-  const processingCategory = watch("processingCategory");
-  const fishType = watch("fishType");
-  const locationState = watch("locationState");
+  const processingCategory = useWatch({ control, name: "processingCategory" });
+  const fishType = useWatch({ control, name: "fishType" });
+  const locationState = useWatch({ control, name: "locationState" });
 
   const categoryOptions = [
     { label: "Live Catfish", value: "live" },
@@ -91,10 +101,16 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
 
   const fishTypeOptions =
     processingCategory === "live"
-      ? LIVE_FISH_TYPES.map((t) => ({ label: LIVE_FISH_TYPE_LABELS[t], value: t }))
+      ? LIVE_FISH_TYPES.map((t) => ({
+          label: LIVE_FISH_TYPE_LABELS[t],
+          value: t,
+        }))
       : processingCategory === "processed"
-      ? PROCESSED_FISH_TYPES.map((t) => ({ label: PROCESSED_FISH_TYPE_LABELS[t], value: t }))
-      : [];
+        ? PROCESSED_FISH_TYPES.map((t) => ({
+            label: PROCESSED_FISH_TYPE_LABELS[t],
+            value: t,
+          }))
+        : [];
 
   const stateOptions = NIGERIAN_STATES.map((s) => ({ label: s, value: s }));
 
@@ -115,18 +131,25 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
         deliveryAddress: data.deliveryAddress,
         notes: data.notes,
       });
-      toast.success("Demand submitted! Admin will assign a cluster farmer shortly.");
+      toast.success(
+        "Demand submitted! Admin will assign a cluster farmer shortly.",
+      );
       onSuccess();
       router.push("/buyers-dashboard/demands");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to submit demand");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to submit demand",
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-(--gap-lg) pt-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-(--gap-lg) pt-6"
+    >
       {/* Category + Fish Type */}
       <div className="grid grid-cols-1 gap-(--gap-base) sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
@@ -137,14 +160,18 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
             label=""
             value={processingCategory ?? ""}
             onValueChange={(v) => {
-              setValue("processingCategory", v as "live" | "processed", { shouldValidate: true });
+              setValue("processingCategory", v as "live" | "processed", {
+                shouldValidate: true,
+              });
               setValue("fishType", "", { shouldValidate: false });
             }}
             options={categoryOptions}
             required
           />
           {errors.processingCategory && (
-            <p className="font-roboto-slab text-xs text-red-500">{errors.processingCategory.message}</p>
+            <p className="font-roboto-slab text-xs text-red-500">
+              {errors.processingCategory.message}
+            </p>
           )}
         </div>
 
@@ -155,12 +182,20 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
           <SelectInput
             label=""
             value={fishType}
-            onValueChange={(v) => setValue("fishType", v, { shouldValidate: true })}
-            options={fishTypeOptions.length ? fishTypeOptions : [{ label: "Select a category first", value: "" }]}
+            onValueChange={(v) =>
+              setValue("fishType", v, { shouldValidate: true })
+            }
+            options={
+              fishTypeOptions.length
+                ? fishTypeOptions
+                : [{ label: "Select a category first", value: "" }]
+            }
             required
           />
           {errors.fishType && (
-            <p className="font-roboto-slab text-xs text-red-500">{errors.fishType.message}</p>
+            <p className="font-roboto-slab text-xs text-red-500">
+              {errors.fishType.message}
+            </p>
           )}
         </div>
       </div>
@@ -174,7 +209,7 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
           {...register("weightKg", { valueAsNumber: true })}
           required
         />
-        <p className="font-roboto-slab text-xs text-gray-500">
+        <p className="font-roboto-slab text-muted-text text-xs">
           No minimum — request any amount.
         </p>
       </div>
@@ -188,12 +223,16 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
           <SelectInput
             label=""
             value={locationState}
-            onValueChange={(v) => setValue("locationState", v, { shouldValidate: true })}
+            onValueChange={(v) =>
+              setValue("locationState", v, { shouldValidate: true })
+            }
             options={[{ label: "Select state", value: "" }, ...stateOptions]}
             required
           />
           {errors.locationState && (
-            <p className="font-roboto-slab text-xs text-red-500">{errors.locationState.message}</p>
+            <p className="font-roboto-slab text-xs text-red-500">
+              {errors.locationState.message}
+            </p>
           )}
         </div>
         <DynamicInput
@@ -217,7 +256,8 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
       {/* Notes */}
       <div className="flex flex-col gap-1.5">
         <label className="font-roboto-slab text-heading-colour text-sm font-medium">
-          Additional Notes <span className="font-normal text-gray-400">(optional)</span>
+          Additional Notes{" "}
+          <span className="text-muted-text font-normal">(optional)</span>
         </label>
         <textarea
           {...register("notes")}
@@ -226,7 +266,9 @@ function SpecialDemandForm({ onSuccess }: { onSuccess: () => void }) {
           className="font-roboto-slab focus:border-gray-border text-text-colour border-input-border w-full rounded-2xl border p-(--space-md) text-sm transition outline-none"
         />
         {errors.notes && (
-          <p className="font-roboto-slab text-xs text-red-500">{errors.notes.message}</p>
+          <p className="font-roboto-slab text-xs text-red-500">
+            {errors.notes.message}
+          </p>
         )}
       </div>
 
@@ -260,7 +302,10 @@ export default function MarketplacePage() {
   });
   const [likedListings, setLikedListings] = useState<string[]>(() => {
     try {
-      const saved = typeof window !== "undefined" ? localStorage.getItem("liked_listings") : null;
+      const saved =
+        typeof window !== "undefined"
+          ? localStorage.getItem("liked_listings")
+          : null;
       return saved ? (JSON.parse(saved) as string[]) : [];
     } catch {
       return [];
@@ -279,12 +324,16 @@ export default function MarketplacePage() {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("category") as "live" | "processed" | null;
     if (cat === "live" || cat === "processed") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFilters((prev) => ({ ...prev, category: cat }));
     }
     if (window.location.hash === "#special-demand") {
       setShowDemandForm(true);
       setTimeout(() => {
-        demandSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        demandSectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }, 300);
     }
   }, []);
@@ -311,13 +360,15 @@ export default function MarketplacePage() {
             pricePerUnit:
               Number(pkg.pricePerUnit) ||
               Number(pkg.weightKg) *
-                (pricePerKg[listing.fishType as FishType] ?? pricePerKg.table_size),
+                (pricePerKg[listing.fishType as FishType] ??
+                  pricePerKg.table_size),
           })),
         }));
 
         if (mounted) setListings(normalized);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to load listings";
+        const message =
+          error instanceof Error ? error.message : "Failed to load listings";
         if (mounted) setErrorMessage(message);
       } finally {
         if (mounted) setLoading(false);
@@ -335,7 +386,9 @@ export default function MarketplacePage() {
     const isLiked = likedListings.includes(listing.id);
 
     setLikedListings((prev) => {
-      const newLikes = isLiked ? prev.filter((id) => id !== listing.id) : [...prev, listing.id];
+      const newLikes = isLiked
+        ? prev.filter((id) => id !== listing.id)
+        : [...prev, listing.id];
       localStorage.setItem("liked_listings", JSON.stringify(newLikes));
       return newLikes;
     });
@@ -360,7 +413,10 @@ export default function MarketplacePage() {
       toast.error("No packages available for this listing");
       return;
     }
-    cart.addToCart(listing, defaultPkg, { variant: "table_size", processed: false });
+    cart.addToCart(listing, defaultPkg, {
+      variant: "table_size",
+      processed: false,
+    });
     setCartOpen(true);
   };
 
@@ -373,8 +429,13 @@ export default function MarketplacePage() {
   const PROCESSED_SET = new Set<string>(PROCESSED_FISH_TYPES);
 
   const filteredListings = listings.filter((listing) => {
-    if (filters.category === "live" && !LIVE_SET.has(listing.fishType)) return false;
-    if (filters.category === "processed" && !PROCESSED_SET.has(listing.fishType)) return false;
+    if (filters.category === "live" && !LIVE_SET.has(listing.fishType))
+      return false;
+    if (
+      filters.category === "processed" &&
+      !PROCESSED_SET.has(listing.fishType)
+    )
+      return false;
     if (filters.search) {
       const q = filters.search.toLowerCase();
       const match =
@@ -388,7 +449,8 @@ export default function MarketplacePage() {
     if (filters.state && listing.state !== filters.state) return false;
     if (filters.minPrice && listing.pricePerKg < filters.minPrice) return false;
     if (filters.maxPrice && listing.pricePerKg > filters.maxPrice) return false;
-    if (filters.minQuantity && listing.totalAvailableKg < filters.minQuantity) return false;
+    if (filters.minQuantity && listing.totalAvailableKg < filters.minQuantity)
+      return false;
     return true;
   });
 
@@ -401,7 +463,10 @@ export default function MarketplacePage() {
         return (a.totalAvailableKg - b.totalAvailableKg) * order;
       case "date":
       default:
-        return (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) * order;
+        return (
+          (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) *
+          order
+        );
     }
   });
 
@@ -424,13 +489,14 @@ export default function MarketplacePage() {
               Back
             </button>
             <div className="flex items-center gap-(--gap-base)">
-              <Store size={28} className="text-green-700" />
+              <Store size={28} className="text-theme-green-dark" />
               <div>
                 <h1 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
                   Fish Marketplace
                 </h1>
                 <p className="text-text-colour mt-1">
-                  Browse fresh catfish — live or processed — from verified cluster farmers
+                  Browse fresh catfish — live or processed — from verified
+                  cluster farmers
                 </p>
               </div>
               <div className="ml-auto">
@@ -460,7 +526,9 @@ export default function MarketplacePage() {
               <span className="text-heading-colour text-2xl font-bold">
                 {sortedListings.length}
               </span>
-              <span className="text-text-colour text-sm">Available Listings</span>
+              <span className="text-text-colour text-sm">
+                Available Listings
+              </span>
             </div>
             <div className="border-gray-border flex flex-col gap-2 rounded-2xl border bg-(--white) p-(--space-lg)">
               <span className="text-heading-colour text-2xl font-bold">
@@ -476,7 +544,9 @@ export default function MarketplacePage() {
             </div>
             <div className="border-gray-border flex flex-col gap-2 rounded-2xl border bg-(--white) p-(--space-lg)">
               <span className="text-heading-colour text-2xl font-bold">
-                {sortedListings.reduce((sum, l) => sum + l.totalAvailableKg, 0).toLocaleString()}
+                {sortedListings
+                  .reduce((sum, l) => sum + l.totalAvailableKg, 0)
+                  .toLocaleString()}
                 kg
               </span>
               <span className="text-text-colour text-sm">Total Available</span>
@@ -502,7 +572,9 @@ export default function MarketplacePage() {
                   className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
                 >
                   <ShoppingBag size={48} className="text-text-colour" />
-                  <p className="text-text-colour">Loading marketplace listings...</p>
+                  <p className="text-text-colour">
+                    Loading marketplace listings...
+                  </p>
                 </motion.div>
               ) : errorMessage ? (
                 <motion.div
@@ -545,7 +617,8 @@ export default function MarketplacePage() {
                       No listings found
                     </h3>
                     <p className="text-text-colour">
-                      Try adjusting your filters or place a special demand below.
+                      Try adjusting your filters or place a special demand
+                      below.
                     </p>
                   </div>
                   <button
@@ -560,7 +633,11 @@ export default function MarketplacePage() {
           </div>
 
           {/* Special Demand Section */}
-          <motion.div variants={FADE_IN_VARIANT} ref={demandSectionRef} id="special-demand">
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            ref={demandSectionRef}
+            id="special-demand"
+          >
             <div className="border-gray-border rounded-3xl border-2 border-dashed bg-(--white) p-(--space-xl) shadow-sm">
               {/* Checkbox toggle row */}
               <label
@@ -580,10 +657,11 @@ export default function MarketplacePage() {
                   </span>
                   <div>
                     <h3 className="font-ubuntu text-heading-colour text-lg font-bold">
-                      I can't find what I need — place a special demand
+                      I can&apos;t find what I need — place a special demand
                     </h3>
                     <p className="font-roboto-slab text-text-colour text-sm">
-                      Submit a custom demand and admin will assign the right cluster farmer to fulfill it.
+                      Submit a custom demand and admin will assign the right
+                      cluster farmer to fulfill it.
                     </p>
                   </div>
                 </div>
@@ -599,7 +677,9 @@ export default function MarketplacePage() {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
-                    <SpecialDemandForm onSuccess={() => setShowDemandForm(false)} />
+                    <SpecialDemandForm
+                      onSuccess={() => setShowDemandForm(false)}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>

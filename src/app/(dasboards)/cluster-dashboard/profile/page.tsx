@@ -39,12 +39,18 @@ export default function ClusterProfilePage() {
           phoneNumber: user.phone_number ?? "",
           email: user.email ?? "",
           clusterName: user.business_name ?? user.farm_name ?? "",
-          location: [user.location_address, user.location_lga, user.location_state]
+          location: [
+            user.location_address,
+            user.location_lga,
+            user.location_state,
+          ]
             .filter(Boolean)
             .join(", "),
         });
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to load profile");
+        toast.error(
+          error instanceof Error ? error.message : "Failed to load profile",
+        );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -68,7 +74,9 @@ export default function ClusterProfilePage() {
       setEditing(false);
       toast.success("Profile updated successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update profile");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update profile",
+      );
     } finally {
       setSaving(false);
     }
@@ -86,8 +94,12 @@ export default function ClusterProfilePage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Cluster Profile</h1>
-          <p className="font-roboto-slab text-text-colour">Manage your cluster account details</p>
+          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+            Cluster Profile
+          </h1>
+          <p className="font-roboto-slab text-text-colour">
+            Manage your cluster account details
+          </p>
         </div>
         {editing ? (
           <div className="flex gap-2">
@@ -133,12 +145,16 @@ export default function ClusterProfilePage() {
             (key === "location" && !isNa);
           return (
             <label key={key} className="text-text-colour text-sm">
-              <span className="text-heading-colour mb-1 block font-medium">{label}</span>
+              <span className="text-heading-colour mb-1 block font-medium">
+                {label}
+              </span>
               <input
                 value={form[key]}
                 disabled={locked || !editing}
-                onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
-                className="border-input-border w-full rounded-lg border px-3 py-2 disabled:bg-gray-50"
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, [key]: e.target.value }))
+                }
+                className="border-input-border disabled:bg-gray-bg w-full rounded-lg border px-3 py-2"
               />
             </label>
           );

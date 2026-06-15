@@ -5,7 +5,9 @@ import { NextResponse } from "next/server";
 const getBaseUrl = () => process.env.BASE_BACKEND_URL?.trim() ?? "";
 
 const buildUrl = (path: string) => {
-  const base = getBaseUrl().replace(/\/+$/, "").replace(/\/api$/, "");
+  const base = getBaseUrl()
+    .replace(/\/+$/, "")
+    .replace(/\/api$/, "");
   const normalized = path.startsWith("/") ? path : `/${path}`;
   return base ? `${base}/api${normalized}` : normalized;
 };
@@ -19,7 +21,10 @@ export async function forwardAuthGet(req: Request, path: string) {
   const baseUrl = getBaseUrl();
   if (!baseUrl) {
     return NextResponse.json(
-      { status: "error", message: "Backend base URL not configured. Set BASE_BACKEND_URL." },
+      {
+        status: "error",
+        message: "Backend base URL not configured. Set BASE_BACKEND_URL.",
+      },
       { status: 500 },
     );
   }
@@ -36,7 +41,7 @@ export async function forwardAuthGet(req: Request, path: string) {
   let response: Response;
   try {
     response = await fetch(url, { method: "GET", headers });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { status: "error", message: "Unable to reach backend service." },
       { status: 502 },
@@ -44,7 +49,9 @@ export async function forwardAuthGet(req: Request, path: string) {
   }
 
   const responseBody = await response.text();
-  const nextResponse = new NextResponse(responseBody, { status: response.status });
+  const nextResponse = new NextResponse(responseBody, {
+    status: response.status,
+  });
   const contentType = response.headers.get("content-type");
   if (contentType) nextResponse.headers.set("content-type", contentType);
   return nextResponse;
@@ -56,7 +63,10 @@ export async function forwardAuthRequest(req: Request, path: string) {
   const baseUrl = getBaseUrl();
   if (!baseUrl) {
     return NextResponse.json(
-      { status: "error", message: "Backend base URL not configured. Set BASE_BACKEND_URL." },
+      {
+        status: "error",
+        message: "Backend base URL not configured. Set BASE_BACKEND_URL.",
+      },
       { status: 500 },
     );
   }
@@ -65,7 +75,10 @@ export async function forwardAuthRequest(req: Request, path: string) {
   const url = buildUrl(path);
 
   const headers = new Headers();
-  headers.set("Content-Type", req.headers.get("content-type") ?? "application/json");
+  headers.set(
+    "Content-Type",
+    req.headers.get("content-type") ?? "application/json",
+  );
 
   const cookie = req.headers.get("cookie");
   if (cookie) headers.set("cookie", cookie);
@@ -75,7 +88,11 @@ export async function forwardAuthRequest(req: Request, path: string) {
 
   let response: Response;
   try {
-    response = await fetch(url, { method: req.method, headers, body: body || undefined });
+    response = await fetch(url, {
+      method: req.method,
+      headers,
+      body: body || undefined,
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -88,7 +105,9 @@ export async function forwardAuthRequest(req: Request, path: string) {
   }
 
   const responseBody = await response.text();
-  const nextResponse = new NextResponse(responseBody, { status: response.status });
+  const nextResponse = new NextResponse(responseBody, {
+    status: response.status,
+  });
 
   const contentType = response.headers.get("content-type");
   if (contentType) nextResponse.headers.set("content-type", contentType);
@@ -108,7 +127,10 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
   const baseUrl = getBaseUrl();
   if (!baseUrl) {
     return NextResponse.json(
-      { status: "error", message: "Backend base URL not configured. Set BASE_BACKEND_URL." },
+      {
+        status: "error",
+        message: "Backend base URL not configured. Set BASE_BACKEND_URL.",
+      },
       { status: 500 },
     );
   }
@@ -117,14 +139,21 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
   const url = buildUrl(path);
 
   const headers = new Headers();
-  headers.set("Content-Type", req.headers.get("content-type") ?? "application/json");
+  headers.set(
+    "Content-Type",
+    req.headers.get("content-type") ?? "application/json",
+  );
 
   const cookie = req.headers.get("cookie");
   if (cookie) headers.set("cookie", cookie);
 
   let response: Response;
   try {
-    response = await fetch(url, { method: req.method, headers, body: body || undefined });
+    response = await fetch(url, {
+      method: req.method,
+      headers,
+      body: body || undefined,
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -139,7 +168,9 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
   const responseBody = await response.text();
 
   if (!response.ok) {
-    const nextResponse = new NextResponse(responseBody, { status: response.status });
+    const nextResponse = new NextResponse(responseBody, {
+      status: response.status,
+    });
     const contentType = response.headers.get("content-type");
     if (contentType) nextResponse.headers.set("content-type", contentType);
     return nextResponse;
@@ -183,7 +214,8 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
       id: user.id,
       role: user.role,
       fullName: user.full_name,
-      isClusterFarmer: user.is_cluster_farmer === true || user.role === "cluster",
+      isClusterFarmer:
+        user.is_cluster_farmer === true || user.role === "cluster",
     };
     nextResponse.cookies.set("current_user", JSON.stringify(currentUser), {
       httpOnly: false,

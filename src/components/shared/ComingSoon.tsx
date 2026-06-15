@@ -13,7 +13,7 @@ export function ComingSoon() {
       className="flex h-full min-h-[60vh] flex-col items-center justify-center gap-3"
     >
       <motion.div variants={FADE_IN_VARIANT} transition={{ duration: 0.4 }}>
-        <Loader2 className="h-10 w-10 animate-spin text-theme-green-dark" />
+        <Loader2 className="text-theme-green-dark h-10 w-10 animate-spin" />
       </motion.div>
       <motion.p
         variants={FADE_IN_VARIANT}

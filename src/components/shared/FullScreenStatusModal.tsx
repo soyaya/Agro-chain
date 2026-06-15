@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import { cn } from "~/lib/utils";
 
 type Variant = "loading" | "success";
 
@@ -49,7 +48,9 @@ export function FullScreenStatusModal({
                   transition={{ duration: 0.2 }}
                   className="flex flex-col items-center gap-(--gap-base) text-center"
                 >
-                  <p className="text-text-colour text-lg font-medium">{title}</p>
+                  <p className="text-text-colour text-lg font-medium">
+                    {title}
+                  </p>
                   <Loader2 className="h-12 w-12 animate-spin text-(--black)" />
                 </motion.div>
               ) : (
@@ -61,11 +62,15 @@ export function FullScreenStatusModal({
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                   className="flex flex-col items-center gap-(--gap-base) text-center"
                 >
-                  <CheckCircle2 className="h-14 w-14 text-theme-green-dark" />
+                  <CheckCircle2 className="text-theme-green-dark h-14 w-14" />
                   <div>
-                    <p className="text-text-colour text-lg font-semibold">{title}</p>
+                    <p className="text-text-colour text-lg font-semibold">
+                      {title}
+                    </p>
                     {description && (
-                      <p className="text-muted-foreground mt-2 text-sm">{description}</p>
+                      <p className="text-muted-foreground mt-2 text-sm">
+                        {description}
+                      </p>
                     )}
                   </div>
                 </motion.div>

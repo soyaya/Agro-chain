@@ -24,12 +24,18 @@ export async function POST(req: Request) {
   try {
     formData = await req.formData();
   } catch {
-    return NextResponse.json({ status: "error", message: "Invalid form data." }, { status: 400 });
+    return NextResponse.json(
+      { status: "error", message: "Invalid form data." },
+      { status: 400 },
+    );
   }
 
   const file = formData.get("file");
   if (!file || !(file instanceof File)) {
-    return NextResponse.json({ status: "error", message: "No file provided." }, { status: 400 });
+    return NextResponse.json(
+      { status: "error", message: "No file provided." },
+      { status: 400 },
+    );
   }
 
   // Forward to Cloudinary unsigned upload endpoint
@@ -55,11 +61,15 @@ export async function POST(req: Request) {
     );
   }
 
-  const result = await cloudinaryResponse.json() as Record<string, unknown>;
+  const result = (await cloudinaryResponse.json()) as Record<string, unknown>;
 
   if (!cloudinaryResponse.ok) {
     return NextResponse.json(
-      { status: "error", message: (result.error as { message?: string })?.message ?? "Upload failed." },
+      {
+        status: "error",
+        message:
+          (result.error as { message?: string })?.message ?? "Upload failed.",
+      },
       { status: cloudinaryResponse.status },
     );
   }

@@ -12,7 +12,10 @@ export default defineConfig({
     alias: {
       "~": path.resolve(__dirname, "./src"),
       // next/font/google is not available in the vitest node environment
-      "next/font/google": path.resolve(__dirname, "./src/__tests__/__mocks__/next-font.ts"),
+      "next/font/google": path.resolve(
+        __dirname,
+        "./src/__tests__/__mocks__/next-font.ts",
+      ),
     },
   },
 });

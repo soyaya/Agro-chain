@@ -1,16 +1,18 @@
-import type { 
-  EnhancedDashboardConfig, 
-  FinancialFeature, 
-  DashboardConfig 
+import type {
+  EnhancedDashboardConfig,
+  FinancialFeature,
+  DashboardConfig,
 } from "~/types/index";
 
 /**
  * Check if a dashboard configuration has financial services enabled
  */
 export function hasFinancialServices(
-  config: DashboardConfig | EnhancedDashboardConfig
+  config: DashboardConfig | EnhancedDashboardConfig,
 ): config is EnhancedDashboardConfig {
-  return 'financialServices' in config && config.financialServices !== undefined;
+  return (
+    "financialServices" in config && config.financialServices !== undefined
+  );
 }
 
 /**
@@ -18,7 +20,7 @@ export function hasFinancialServices(
  */
 export function isFinancialFeatureEnabled(
   config: DashboardConfig | EnhancedDashboardConfig,
-  feature: FinancialFeature
+  feature: FinancialFeature,
 ): boolean {
   if (!hasFinancialServices(config) || !config.financialServices?.enabled) {
     return false;
@@ -27,13 +29,23 @@ export function isFinancialFeatureEnabled(
   const { loanServices, creditServices } = config.financialServices;
 
   switch (feature) {
-    case 'loans':
-      return loanServices.applicationEnabled || loanServices.trackingEnabled || loanServices.historyEnabled;
-    case 'credit':
-      return creditServices.purchaseEnabled || creditServices.catalogEnabled || creditServices.paymentTrackingEnabled;
-    case 'payments':
-      return loanServices.historyEnabled || creditServices.paymentTrackingEnabled;
-    case 'profile':
+    case "loans":
+      return (
+        loanServices.applicationEnabled ||
+        loanServices.trackingEnabled ||
+        loanServices.historyEnabled
+      );
+    case "credit":
+      return (
+        creditServices.purchaseEnabled ||
+        creditServices.catalogEnabled ||
+        creditServices.paymentTrackingEnabled
+      );
+    case "payments":
+      return (
+        loanServices.historyEnabled || creditServices.paymentTrackingEnabled
+      );
+    case "profile":
       return true; // Always available if financial services are enabled
     default:
       return false;
@@ -44,15 +56,16 @@ export function isFinancialFeatureEnabled(
  * Get financial navigation items based on configuration
  */
 export function getFinancialNavigationItems(
-  config: DashboardConfig | EnhancedDashboardConfig
+  config: DashboardConfig | EnhancedDashboardConfig,
 ) {
   if (!hasFinancialServices(config)) {
     return [];
   }
 
   // Find the financial services navigation item and return its submenu items
-  const financialNavItem = config.navLinks.find(link => 
-    link.href.includes('/financial') || link.label === 'Financial Services'
+  const financialNavItem = config.navLinks.find(
+    (link) =>
+      link.href.includes("/financial") || link.label === "Financial Services",
   );
 
   if (financialNavItem && financialNavItem.submenu) {
@@ -60,9 +73,11 @@ export function getFinancialNavigationItems(
   }
 
   // Fallback: return any navigation items that contain 'financial' in the href
-  return config.navLinks.filter(link => 
-    link.href.includes('/financial') || 
-    (link.submenu && link.submenu.some(subLink => subLink.href.includes('/financial')))
+  return config.navLinks.filter(
+    (link) =>
+      link.href.includes("/financial") ||
+      (link.submenu &&
+        link.submenu.some((subLink) => subLink.href.includes("/financial"))),
   );
 }
 
@@ -71,7 +86,10 @@ export function getFinancialNavigationItems(
  */
 export function shouldShowFinancialServices(pathname: string): boolean {
   // Only show financial services for farmer and cluster farmer dashboards
-  return pathname.startsWith("/farmers-dashboard") || pathname.startsWith("/cluster-dashboard");
+  return (
+    pathname.startsWith("/farmers-dashboard") ||
+    pathname.startsWith("/cluster-dashboard")
+  );
 }
 
 /**
@@ -79,7 +97,7 @@ export function shouldShowFinancialServices(pathname: string): boolean {
  * This would typically integrate with real-time data in a production app
  */
 export function getFinancialNavigationBadges(
-  config: DashboardConfig | EnhancedDashboardConfig
+  config: DashboardConfig | EnhancedDashboardConfig,
 ): Record<string, string> {
   if (!hasFinancialServices(config)) {
     return {};
@@ -95,7 +113,7 @@ export function getFinancialNavigationBadges(
  */
 export function isFinancialNavItemVisible(
   config: DashboardConfig | EnhancedDashboardConfig,
-  itemHref: string
+  itemHref: string,
 ): boolean {
   if (!hasFinancialServices(config) || !config.financialServices?.enabled) {
     return false;
@@ -104,19 +122,23 @@ export function isFinancialNavItemVisible(
   const { loanServices, creditServices } = config.financialServices;
 
   // Check specific navigation items based on their href
-  if (itemHref.includes('/loans')) {
-    return loanServices.applicationEnabled || loanServices.trackingEnabled || loanServices.historyEnabled;
+  if (itemHref.includes("/loans")) {
+    return (
+      loanServices.applicationEnabled ||
+      loanServices.trackingEnabled ||
+      loanServices.historyEnabled
+    );
   }
-  
-  if (itemHref.includes('/credit')) {
+
+  if (itemHref.includes("/credit")) {
     return creditServices.purchaseEnabled || creditServices.catalogEnabled;
   }
-  
-  if (itemHref.includes('/payments')) {
+
+  if (itemHref.includes("/payments")) {
     return loanServices.historyEnabled || creditServices.paymentTrackingEnabled;
   }
-  
-  if (itemHref.includes('/profile')) {
+
+  if (itemHref.includes("/profile")) {
     return true; // Always visible if financial services are enabled
   }
 
@@ -129,14 +151,14 @@ export function isFinancialNavItemVisible(
  */
 export function getActiveFinancialNavItem(
   config: DashboardConfig | EnhancedDashboardConfig,
-  pathname: string
+  pathname: string,
 ): string {
   if (!hasFinancialServices(config)) {
     return "";
   }
 
   const financialItems = getFinancialNavigationItems(config);
-  
+
   for (const item of financialItems) {
     if (pathname === item.href) {
       return item.label;

@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Flag, Trash2, Search, CheckCircle, XCircle } from "lucide-react";
+import {
+  FileText,
+  Flag,
+  Trash2,
+  Search,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { adminService, type AdminListing } from "~/lib/services/admin.service";
 import { FADE_IN_VARIANT } from "~/types/constants";
@@ -10,17 +17,23 @@ import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
 const STATUS_STYLES: Record<string, string> = {
-  active: "bg-green-50 text-green-700 border-green-200",
+  active: "bg-green-tint text-theme-green-dark border-gray-border",
   pending: "bg-amber-50 text-amber-700 border-amber-200",
   sold: "bg-blue-50 text-blue-700 border-blue-200",
   flagged: "bg-red-50 text-red-700 border-red-200",
-  expired: "bg-gray-50 text-gray-500 border-gray-200",
+  expired: "bg-gray-bg text-muted-text border-gray-border",
   draft: "bg-yellow-50 text-yellow-700 border-yellow-200",
-  archived: "bg-gray-50 text-gray-500 border-gray-200",
+  archived: "bg-gray-bg text-muted-text border-gray-border",
   deleted: "bg-red-50 text-red-400 border-red-100",
 };
 
-type StatusFilter = "all" | "pending" | "active" | "sold" | "flagged" | "expired";
+type StatusFilter =
+  | "all"
+  | "pending"
+  | "active"
+  | "sold"
+  | "flagged"
+  | "expired";
 
 export default function AdminListingsPage() {
   const [listings, setListings] = useState<AdminListing[]>([]);
@@ -40,7 +53,9 @@ export default function AdminListingsPage() {
         if (mounted) setListings(response.data.listings ?? []);
       } catch (error) {
         if (mounted)
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load listings");
+          setErrorMessage(
+            error instanceof Error ? error.message : "Failed to load listings",
+          );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -56,11 +71,15 @@ export default function AdminListingsPage() {
     try {
       await adminService.approveListing(id);
       setListings((prev) =>
-        prev.map((l) => (l.id === id ? { ...l, status: "active", clusterApproved: true } : l)),
+        prev.map((l) =>
+          l.id === id ? { ...l, status: "active", clusterApproved: true } : l,
+        ),
       );
       toast.success("Listing approved and now live on the marketplace.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to approve listing");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to approve listing",
+      );
     } finally {
       setActionLoading(null);
     }
@@ -70,10 +89,14 @@ export default function AdminListingsPage() {
     setActionLoading(id);
     try {
       await adminService.rejectListing(id);
-      setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: "flagged" } : l)));
+      setListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status: "flagged" } : l)),
+      );
       toast.success("Listing rejected.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to reject listing");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to reject listing",
+      );
     } finally {
       setActionLoading(null);
     }
@@ -83,10 +106,14 @@ export default function AdminListingsPage() {
     setActionLoading(id);
     try {
       await adminService.flagListing(id);
-      setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: "flagged" } : l)));
+      setListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status: "flagged" } : l)),
+      );
       toast.success("Listing flagged.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to flag listing");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to flag listing",
+      );
     } finally {
       setActionLoading(null);
     }
@@ -99,7 +126,9 @@ export default function AdminListingsPage() {
       setListings((prev) => prev.filter((l) => l.id !== id));
       toast.success("Listing removed.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to remove listing");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to remove listing",
+      );
     } finally {
       setActionLoading(null);
     }
@@ -157,7 +186,10 @@ export default function AdminListingsPage() {
           </p>
         </div>
         <div className="relative w-full max-w-xs">
-          <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+          <Search
+            size={16}
+            className="text-muted-text absolute top-1/2 left-3 -translate-y-1/2"
+          />
           <input
             type="text"
             placeholder="Search fish type, farmer, state..."
@@ -175,20 +207,24 @@ export default function AdminListingsPage() {
         animate="visible"
         className="grid grid-cols-3 gap-(--gap-base) sm:grid-cols-6"
       >
-        {(["all", "pending", "active", "sold", "flagged", "expired"] as const).map((status) => (
+        {(
+          ["all", "pending", "active", "sold", "flagged", "expired"] as const
+        ).map((status) => (
           <button
             key={status}
             onClick={() => setFilterStatus(status)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
               filterStatus === status
-                ? "border-theme-green-dark bg-green-50"
+                ? "border-theme-green-dark bg-green-tint"
                 : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
             <span className="font-ubuntu text-heading-colour text-xl font-bold">
               {counts[status]}
             </span>
-            <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">
+              {status}
+            </span>
           </button>
         ))}
       </motion.div>
@@ -236,7 +272,9 @@ export default function AdminListingsPage() {
                     <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                       {listing.quantityAvailable} fish
                       <br />
-                      <span className="text-xs text-gray-400">{listing.totalAvailableKg} kg</span>
+                      <span className="text-muted-text text-xs">
+                        {listing.totalAvailableKg} kg
+                      </span>
                     </td>
                     <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                       ₦{Number(listing.pricePerKg).toLocaleString()}
@@ -261,7 +299,7 @@ export default function AdminListingsPage() {
                             <button
                               onClick={() => void handleApprove(listing.id)}
                               disabled={actionLoading === listing.id}
-                              className="font-roboto-slab flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                              className="font-roboto-slab border-gray-border bg-green-tint text-theme-green-dark hover:bg-green-tint flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition disabled:opacity-50"
                             >
                               <CheckCircle size={12} />
                               Approve

@@ -203,29 +203,35 @@ export default function HowItWorksRoleTabs({
                 animate="visible"
                 className="flex flex-col gap-0"
               >
-                {roles[activeRole].steps.map(({ title, description }, stepIndex) => (
-                  <motion.div key={title} variants={STEP_ITEM_VARIANTS} className="flex gap-6">
-                    {/* Step indicator */}
-                    <div className="flex flex-col items-center">
-                      <div className="bg-theme-green-dark flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-                        {stepIndex + 1}
+                {roles[activeRole].steps.map(
+                  ({ title, description }, stepIndex) => (
+                    <motion.div
+                      key={title}
+                      variants={STEP_ITEM_VARIANTS}
+                      className="flex gap-6"
+                    >
+                      {/* Step indicator */}
+                      <div className="flex flex-col items-center">
+                        <div className="bg-theme-green-dark flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+                          {stepIndex + 1}
+                        </div>
+                        {stepIndex < roles[activeRole].steps.length - 1 && (
+                          <div className="bg-gray-border mt-1 w-0.5 flex-1" />
+                        )}
                       </div>
-                      {stepIndex < roles[activeRole].steps.length - 1 && (
-                        <div className="bg-gray-border mt-1 w-0.5 flex-1" />
-                      )}
-                    </div>
 
-                    {/* Step content */}
-                    <div className="pb-8">
-                      <h3 className="font-ubuntu text-heading-colour text-lg font-semibold">
-                        {title}
-                      </h3>
-                      <p className="font-roboto-slab text-text-colour mt-1 text-base">
-                        {description}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
+                      {/* Step content */}
+                      <div className="pb-8">
+                        <h3 className="font-ubuntu text-heading-colour text-lg font-semibold">
+                          {title}
+                        </h3>
+                        <p className="font-roboto-slab text-text-colour mt-1 text-base">
+                          {description}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ),
+                )}
               </motion.div>
             </motion.div>
           </AnimatePresence>

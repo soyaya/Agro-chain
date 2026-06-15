@@ -48,10 +48,9 @@ export function AnimatedBackground() {
           duration: 18,
           repeat: Infinity,
           ease: "easeInOut",
-          delay: 4
+          delay: 4,
         }}
       />
     </div>
   );
 }
-    

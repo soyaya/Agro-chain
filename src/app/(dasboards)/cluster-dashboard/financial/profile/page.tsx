@@ -37,7 +37,7 @@ export default function FinancialProfilePage() {
   };
 
   const getCreditScoreConfig = (score: number) => {
-    if (score >= 750) return { label: "Excellent", color: "text-green-600", bgColor: "bg-green-50", description: "You have excellent credit standing" };
+    if (score >= 750) return { label: "Excellent", color: "text-theme-green-dark", bgColor: "bg-green-tint", description: "You have excellent credit standing" };
     if (score >= 700) return { label: "Good", color: "text-blue-600", bgColor: "bg-blue-50", description: "You have good credit standing" };
     if (score >= 650) return { label: "Fair", color: "text-yellow-600", bgColor: "bg-yellow-50", description: "You have fair credit standing" };
     return { label: "Poor", color: "text-red-600", bgColor: "bg-red-50", description: "Your credit needs improvement" };
@@ -45,7 +45,7 @@ export default function FinancialProfilePage() {
 
   const getRiskLevelConfig = (level: RiskLevel) => {
     const configs = {
-      low: { label: "Low Risk", color: "text-green-600", bgColor: "bg-green-50", icon: CheckCircle },
+      low: { label: "Low Risk", color: "text-theme-green-dark", bgColor: "bg-green-tint", icon: CheckCircle },
       medium: { label: "Medium Risk", color: "text-yellow-600", bgColor: "bg-yellow-50", icon: AlertCircle },
       high: { label: "High Risk", color: "text-red-600", bgColor: "bg-red-50", icon: AlertCircle },
     };
@@ -82,8 +82,8 @@ export default function FinancialProfilePage() {
       label: "Available Credit",
       value: `₦${financialProfile.availableCredit.toLocaleString()}`,
       icon: DollarSign,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      color: "text-theme-green-dark",
+      bgColor: "bg-green-tint",
     },
     {
       label: "Active Loans",
@@ -153,15 +153,15 @@ export default function FinancialProfilePage() {
           <div className="flex-1">
             <div className="mb-(--space-md)">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-roboto-slab text-sm text-gray-600">Credit Score Range</span>
+                <span className="font-roboto-slab text-sm text-text-colour">Credit Score Range</span>
                 <span className="font-roboto-slab text-sm font-medium text-heading-colour">
                   {financialProfile.creditScore} / 850
                 </span>
               </div>
-              <div className="h-4 w-full rounded-full bg-gray-200 overflow-hidden">
+              <div className="h-4 w-full rounded-full bg-gray-border overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    financialProfile.creditScore >= 750 ? "bg-green-600" :
+                    financialProfile.creditScore >= 750 ? "bg-theme-green-dark" :
                     financialProfile.creditScore >= 700 ? "bg-blue-600" :
                     financialProfile.creditScore >= 650 ? "bg-yellow-600" : "bg-red-600"
                   }`}
@@ -173,30 +173,30 @@ export default function FinancialProfilePage() {
               <p className={`font-ubuntu text-lg font-semibold mb-1 ${creditScoreConfig.color}`}>
                 {creditScoreConfig.label} Credit Score
               </p>
-              <p className="font-roboto-slab text-sm text-gray-700">
+              <p className="font-roboto-slab text-sm text-text-colour-2">
                 {creditScoreConfig.description}
               </p>
             </div>
           </div>
           <div className="lg:w-1/3">
-            <div className="rounded-xl border border-input-border p-(--space-lg) bg-gray-50">
-              <p className="font-roboto-slab text-xs text-gray-600 mb-2">Score Breakdown</p>
+            <div className="rounded-xl border border-input-border p-(--space-lg) bg-gray-bg">
+              <p className="font-roboto-slab text-xs text-text-colour mb-2">Score Breakdown</p>
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between">
-                  <span className="font-roboto-slab text-sm text-gray-700">Poor</span>
-                  <span className="font-roboto-slab text-sm text-gray-500">300-649</span>
+                  <span className="font-roboto-slab text-sm text-text-colour-2">Poor</span>
+                  <span className="font-roboto-slab text-sm text-muted-text">300-649</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-roboto-slab text-sm text-gray-700">Fair</span>
-                  <span className="font-roboto-slab text-sm text-gray-500">650-699</span>
+                  <span className="font-roboto-slab text-sm text-text-colour-2">Fair</span>
+                  <span className="font-roboto-slab text-sm text-muted-text">650-699</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-roboto-slab text-sm text-gray-700">Good</span>
-                  <span className="font-roboto-slab text-sm text-gray-500">700-749</span>
+                  <span className="font-roboto-slab text-sm text-text-colour-2">Good</span>
+                  <span className="font-roboto-slab text-sm text-muted-text">700-749</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-roboto-slab text-sm text-gray-700">Excellent</span>
-                  <span className="font-roboto-slab text-sm text-gray-500">750-850</span>
+                  <span className="font-roboto-slab text-sm text-text-colour-2">Excellent</span>
+                  <span className="font-roboto-slab text-sm text-muted-text">750-850</span>
                 </div>
               </div>
             </div>
@@ -215,17 +215,17 @@ export default function FinancialProfilePage() {
         </h2>
         <div className="mb-(--space-md)">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-roboto-slab text-sm text-gray-600">
+            <span className="font-roboto-slab text-sm text-text-colour">
               ₦{(financialProfile.creditLimit - financialProfile.availableCredit).toLocaleString()} of ₦{financialProfile.creditLimit.toLocaleString()} used
             </span>
             <span className="font-roboto-slab text-sm font-medium text-heading-colour">
               {creditUtilization.toFixed(1)}%
             </span>
           </div>
-          <div className="h-3 w-full rounded-full bg-gray-200 overflow-hidden">
+          <div className="h-3 w-full rounded-full bg-gray-border overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
-                creditUtilization < 30 ? "bg-green-600" :
+                creditUtilization < 30 ? "bg-theme-green-dark" :
                 creditUtilization < 50 ? "bg-blue-600" :
                 creditUtilization < 75 ? "bg-yellow-600" : "bg-red-600"
               }`}
@@ -233,7 +233,7 @@ export default function FinancialProfilePage() {
             />
           </div>
         </div>
-        <p className="font-roboto-slab text-sm text-gray-600">
+        <p className="font-roboto-slab text-sm text-text-colour">
           {creditUtilization < 30 ? "Excellent! Keep your utilization below 30% for the best credit score." :
            creditUtilization < 50 ? "Good utilization rate. Try to keep it below 30% for better credit." :
            creditUtilization < 75 ? "Consider paying down some balances to improve your credit score." :
@@ -259,8 +259,8 @@ export default function FinancialProfilePage() {
         <div className="flex flex-col gap-(--space-md)">
           {financialProfile.riskAssessment.factors.map((factor, index) => {
             const ImpactIcon = getImpactIcon(factor.impact);
-            const impactColor = factor.impact === "positive" ? "text-green-600" :
-                               factor.impact === "negative" ? "text-red-600" : "text-gray-600";
+            const impactColor = factor.impact === "positive" ? "text-theme-green-dark" :
+                               factor.impact === "negative" ? "text-red-600" : "text-text-colour";
             return (
               <div
                 key={index}
@@ -276,10 +276,10 @@ export default function FinancialProfilePage() {
                   <span className={`font-roboto-slab text-xs capitalize ${impactColor}`}>
                     {factor.impact}
                   </span>
-                  <div className="h-2 w-20 rounded-full bg-gray-200 overflow-hidden">
+                  <div className="h-2 w-20 rounded-full bg-gray-border overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
-                        factor.impact === "positive" ? "bg-green-600" :
+                        factor.impact === "positive" ? "bg-theme-green-dark" :
                         factor.impact === "negative" ? "bg-red-600" : "bg-gray-600"
                       }`}
                       style={{ width: `${factor.weight * 100}%` }}

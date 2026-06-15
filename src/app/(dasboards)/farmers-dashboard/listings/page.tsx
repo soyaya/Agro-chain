@@ -14,7 +14,9 @@ export default function FarmerListingsPage() {
   const [listings, setListings] = useState<FarmerSupplyListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<ListingStatus | "all">("all");
+  const [filterStatus, setFilterStatus] = useState<ListingStatus | "all">(
+    "all",
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -47,7 +49,9 @@ export default function FarmerListingsPage() {
         );
       } catch (error) {
         if (!mounted) return;
-        setErrorMessage(error instanceof Error ? error.message : "Failed to load listings");
+        setErrorMessage(
+          error instanceof Error ? error.message : "Failed to load listings",
+        );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -61,7 +65,9 @@ export default function FarmerListingsPage() {
   }, []);
 
   const filteredListings =
-    filterStatus === "all" ? listings : listings.filter((l) => l.status === filterStatus);
+    filterStatus === "all"
+      ? listings
+      : listings.filter((l) => l.status === filterStatus);
 
   const statusCounts = {
     all: listings.length,
@@ -107,22 +113,26 @@ export default function FarmerListingsPage() {
             variants={FADE_IN_VARIANT}
             className="grid grid-cols-2 gap-(--gap-base) md:grid-cols-4"
           >
-            {(["all", "pending", "approved", "rejected"] as const).map((status) => (
-              <button
-                key={status}
-                onClick={() => setFilterStatus(status)}
-                className={`flex flex-col gap-2 rounded-2xl border p-(--space-lg) transition ${
-                  filterStatus === status
-                    ? "border-theme-green-dark bg-green-50"
-                    : "border-gray-border hover:bg-gray-bg bg-(--white)"
-                }`}
-              >
-                <span className="text-heading-colour text-2xl font-bold">
-                  {statusCounts[status]}
-                </span>
-                <span className="text-text-colour text-sm capitalize">{status}</span>
-              </button>
-            ))}
+            {(["all", "pending", "approved", "rejected"] as const).map(
+              (status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilterStatus(status)}
+                  className={`flex flex-col gap-2 rounded-2xl border p-(--space-lg) transition ${
+                    filterStatus === status
+                      ? "border-theme-green-dark bg-green-tint"
+                      : "border-gray-border hover:bg-gray-bg bg-(--white)"
+                  }`}
+                >
+                  <span className="text-heading-colour text-2xl font-bold">
+                    {statusCounts[status]}
+                  </span>
+                  <span className="text-text-colour text-sm capitalize">
+                    {status}
+                  </span>
+                </button>
+              ),
+            )}
           </motion.div>
 
           {loading ? (
@@ -148,7 +158,9 @@ export default function FarmerListingsPage() {
                 <ListingCard
                   key={listing.id}
                   listing={listing}
-                  onClick={() => router.push(`/farmers-dashboard/listings/${listing.id}`)}
+                  onClick={() =>
+                    router.push(`/farmers-dashboard/listings/${listing.id}`)
+                  }
                 />
               ))}
             </motion.div>
@@ -170,7 +182,9 @@ export default function FarmerListingsPage() {
               </div>
               {filterStatus === "all" && (
                 <button
-                  onClick={() => router.push("/farmers-dashboard/listings/create")}
+                  onClick={() =>
+                    router.push("/farmers-dashboard/listings/create")
+                  }
                   className="bg-theme-green-dark flex items-center gap-2 rounded-full px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
                 >
                   <Plus size={18} />

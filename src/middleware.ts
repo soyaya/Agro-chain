@@ -9,7 +9,8 @@ function getDashboardFromCookie(request: NextRequest): string {
       isClusterFarmer?: boolean;
     };
     if (user.role === "admin") return "/admin-dashboard";
-    if (user.isClusterFarmer || user.role === "cluster") return "/cluster-dashboard";
+    if (user.isClusterFarmer || user.role === "cluster")
+      return "/cluster-dashboard";
     if (user.role === "farmer") return "/farmers-dashboard";
     return "/buyers-dashboard";
   } catch {
@@ -40,9 +41,13 @@ export function middleware(request: NextRequest) {
 
   if (
     hasSession &&
-    (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname === "/")
+    (pathname.startsWith("/login") ||
+      pathname.startsWith("/register") ||
+      pathname === "/")
   ) {
-    return NextResponse.redirect(new URL(getDashboardFromCookie(request), request.url));
+    return NextResponse.redirect(
+      new URL(getDashboardFromCookie(request), request.url),
+    );
   }
 
   return NextResponse.next();

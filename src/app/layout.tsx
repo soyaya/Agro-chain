@@ -1,4 +1,4 @@
-import { inter, openSans } from "./fonts";
+import { inter, openSans, ubuntu, robotoSlab } from "./fonts";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { LocationProvider } from "~/lib/location-context";
@@ -121,10 +121,16 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${openSans.variable} antialiased`}>
+      <body
+        className={`${inter.variable} ${openSans.variable} ${ubuntu.variable} ${robotoSlab.variable} antialiased`}
+      >
         <AuthProvider>
           <PlatformSettingsProvider>
             <LocationProvider>

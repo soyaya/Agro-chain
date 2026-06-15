@@ -28,7 +28,9 @@ describe("Root layout metadata", () => {
     });
 
     it('template equals "%s | Agro-chain"', () => {
-      expect((metadata.title as { template: string }).template).toBe("%s | Agro-chain");
+      expect((metadata.title as { template: string }).template).toBe(
+        "%s | Agro-chain",
+      );
     });
 
     it("has a non-empty default", () => {

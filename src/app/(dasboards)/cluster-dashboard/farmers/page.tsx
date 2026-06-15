@@ -17,7 +17,10 @@ import {
   Clock,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { clusterService, type BackendClusterFarmer } from "~/lib/services/cluster.service";
+import {
+  clusterService,
+  type BackendClusterFarmer,
+} from "~/lib/services/cluster.service";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
@@ -61,14 +64,14 @@ function FarmerDetailModal({
         </button>
 
         <div className="mb-(--space-xl) flex flex-col items-center gap-(--space-md) text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-2xl font-bold text-green-700">
+          <div className="bg-green-tint text-theme-green-dark flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold">
             {initials}
           </div>
           <div>
             <h2 className="font-ubuntu text-heading-colour text-2xl font-bold">
               {farmer.farmerName}
             </h2>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-0.5 text-xs font-medium text-green-700">
+            <span className="border-gray-border bg-green-tint text-theme-green-dark inline-flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-medium">
               <Fish size={12} />
               {farmer.fishType} Farmer
             </span>
@@ -80,13 +83,17 @@ function FarmerDetailModal({
             <p className="font-ubuntu text-heading-colour text-2xl font-bold">
               {farmer.totalListings}
             </p>
-            <p className="font-roboto-slab text-text-colour text-xs">Total Listings</p>
+            <p className="font-roboto-slab text-text-colour text-xs">
+              Total Listings
+            </p>
           </div>
           <div className="text-center">
-            <p className="font-ubuntu text-2xl font-bold text-green-600">
+            <p className="font-ubuntu text-theme-green-dark text-2xl font-bold">
               {farmer.totalApprovedListings}
             </p>
-            <p className="font-roboto-slab text-text-colour text-xs">Approved</p>
+            <p className="font-roboto-slab text-text-colour text-xs">
+              Approved
+            </p>
           </div>
           <div className="text-center">
             <p className="font-ubuntu text-2xl font-bold text-yellow-600">
@@ -98,19 +105,39 @@ function FarmerDetailModal({
 
         <div className="flex flex-col gap-(--space-md)">
           {[
-            { icon: <Building2 size={16} />, label: "Farm Name", value: farmer.farmName ?? "—" },
-            { icon: <MapPin size={16} />, label: "Location", value: farmer.location },
-            { icon: <Phone size={16} />, label: "Phone", value: farmer.phoneNumber },
-            { icon: <Mail size={16} />, label: "Email", value: farmer.emailAddress ?? "—" },
+            {
+              icon: <Building2 size={16} />,
+              label: "Farm Name",
+              value: farmer.farmName ?? "—",
+            },
+            {
+              icon: <MapPin size={16} />,
+              label: "Location",
+              value: farmer.location,
+            },
+            {
+              icon: <Phone size={16} />,
+              label: "Phone",
+              value: farmer.phoneNumber,
+            },
+            {
+              icon: <Mail size={16} />,
+              label: "Email",
+              value: farmer.emailAddress ?? "—",
+            },
             {
               icon: <Package size={16} />,
               label: "Capacity",
-              value: farmer.capacity != null ? `${Number(farmer.capacity).toLocaleString()} kg` : "—",
+              value:
+                farmer.capacity != null
+                  ? `${Number(farmer.capacity).toLocaleString()} kg`
+                  : "—",
             },
             {
               icon: <TrendingUp size={16} />,
               label: "Experience",
-              value: farmer.experience != null ? `${farmer.experience} years` : "—",
+              value:
+                farmer.experience != null ? `${farmer.experience} years` : "—",
             },
             {
               icon: <Calendar size={16} />,
@@ -131,12 +158,14 @@ function FarmerDetailModal({
             },
           ].map(({ icon, label, value }) => (
             <div key={label} className="flex items-start gap-(--space-md)">
-              <span className="mt-0.5 shrink-0 text-gray-400">{icon}</span>
+              <span className="text-muted-text mt-0.5 shrink-0">{icon}</span>
               <div>
-                <p className="font-roboto-slab text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                <p className="font-roboto-slab text-muted-text text-xs font-semibold tracking-wider uppercase">
                   {label}
                 </p>
-                <p className="font-roboto-slab text-heading-colour text-sm">{value}</p>
+                <p className="font-roboto-slab text-heading-colour text-sm">
+                  {value}
+                </p>
               </div>
             </div>
           ))}
@@ -149,11 +178,16 @@ function FarmerDetailModal({
 export default function ClusterFarmersPage() {
   const router = useRouter();
   const [farmers, setFarmers] = useState<BackendClusterFarmer[]>([]);
-  const [summary, setSummary] = useState({ totalFarmers: 0, totalFarmersCapacity: 0, locationCovering: 0 });
+  const [summary, setSummary] = useState({
+    totalFarmers: 0,
+    totalFarmersCapacity: 0,
+    locationCovering: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFarmer, setSelectedFarmer] = useState<BackendClusterFarmer | null>(null);
+  const [selectedFarmer, setSelectedFarmer] =
+    useState<BackendClusterFarmer | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -167,13 +201,18 @@ export default function ClusterFarmersPage() {
           setSummary(res.data.summary);
         }
       } catch (err) {
-        if (mounted) setError(err instanceof Error ? err.message : "Failed to load farmers");
+        if (mounted)
+          setError(
+            err instanceof Error ? err.message : "Failed to load farmers",
+          );
       } finally {
         if (mounted) setLoading(false);
       }
     };
     void load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const filtered = farmers.filter(
@@ -209,19 +248,24 @@ export default function ClusterFarmersPage() {
         className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">My Farmers</h1>
+          <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
+            My Farmers
+          </h1>
           <p className="font-roboto-slab text-text-colour">
             View and manage the farmers registered under your cluster
           </p>
         </div>
         <div className="relative w-full max-w-sm">
-          <Search size={18} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+          <Search
+            size={18}
+            className="text-muted-text absolute top-1/2 left-3 -translate-y-1/2"
+          />
           <input
             type="text"
             placeholder="Search by name, farm, location, or fish type..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="font-roboto-slab border-input-border h-10 w-full rounded-xl border pr-4 pl-10 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+            className="font-roboto-slab border-input-border focus:border-theme-green-light focus:ring-theme-green-light h-10 w-full rounded-xl border pr-4 pl-10 text-sm focus:ring-1 focus:outline-none"
           />
         </div>
       </motion.div>
@@ -235,8 +279,8 @@ export default function ClusterFarmersPage() {
       >
         {[
           {
-            icon: <Users size={24} className="text-green-600" />,
-            bg: "bg-green-50",
+            icon: <Users size={24} className="text-theme-green-dark" />,
+            bg: "bg-green-tint",
             value: summary.totalFarmers,
             label: "Total Farmers",
           },
@@ -258,8 +302,12 @@ export default function ClusterFarmersPage() {
             variants={FADE_IN_VARIANT}
             className="border-gray-border rounded-2xl border bg-(--white) p-6 shadow-sm"
           >
-            <div className={`mb-4 inline-flex rounded-xl p-3 ${bg}`}>{icon}</div>
-            <p className="font-ubuntu text-heading-colour text-3xl font-bold">{value}</p>
+            <div className={`mb-4 inline-flex rounded-xl p-3 ${bg}`}>
+              {icon}
+            </div>
+            <p className="font-ubuntu text-heading-colour text-3xl font-bold">
+              {value}
+            </p>
             <p className="font-roboto-slab text-text-colour text-sm">{label}</p>
           </motion.div>
         ))}
@@ -302,40 +350,43 @@ export default function ClusterFarmersPage() {
                 className="border-gray-border flex flex-col gap-4 rounded-3xl border bg-(--white) p-6 shadow-sm transition hover:shadow-md"
               >
                 <div className="flex items-center gap-4">
-                  <div className="font-ubuntu flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-green-100 text-lg font-bold text-green-700">
+                  <div className="font-ubuntu bg-green-tint text-theme-green-dark flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-lg font-bold">
                     {initials}
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-ubuntu text-heading-colour truncate text-lg font-bold">
                       {farmer.farmerName}
                     </h3>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                    <span className="bg-green-tint text-theme-green-dark inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
                       <Fish size={11} />
                       {farmer.fishType}
                     </span>
                   </div>
                 </div>
 
-                <div className="h-px w-full bg-gray-100" />
+                <div className="bg-gray-bg h-px w-full" />
 
                 <div className="flex flex-col gap-2.5">
                   {farmer.farmName && (
                     <div className="text-text-colour flex items-center gap-2 text-sm">
-                      <Building2 size={15} className="shrink-0 text-gray-400" />
+                      <Building2
+                        size={15}
+                        className="text-muted-text shrink-0"
+                      />
                       <span className="truncate">{farmer.farmName}</span>
                     </div>
                   )}
                   <div className="text-text-colour flex items-center gap-2 text-sm">
-                    <MapPin size={15} className="shrink-0 text-gray-400" />
+                    <MapPin size={15} className="text-muted-text shrink-0" />
                     <span>{farmer.location}</span>
                   </div>
                   <div className="text-text-colour flex items-center gap-2 text-sm">
-                    <Phone size={15} className="shrink-0 text-gray-400" />
+                    <Phone size={15} className="text-muted-text shrink-0" />
                     <span>{farmer.phoneNumber}</span>
                   </div>
                   {farmer.capacity != null && (
                     <div className="text-text-colour flex items-center gap-2 text-sm">
-                      <Package size={15} className="shrink-0 text-gray-400" />
+                      <Package size={15} className="text-muted-text shrink-0" />
                       <span>
                         Capacity:{" "}
                         <span className="text-heading-colour font-medium">
@@ -351,32 +402,42 @@ export default function ClusterFarmersPage() {
                     <p className="font-ubuntu text-heading-colour text-lg font-bold">
                       {farmer.totalListings}
                     </p>
-                    <p className="font-roboto-slab text-text-colour text-xs">Listings</p>
+                    <p className="font-roboto-slab text-text-colour text-xs">
+                      Listings
+                    </p>
                   </div>
                   <div className="text-center">
-                    <p className="font-ubuntu text-lg font-bold text-green-600">
+                    <p className="font-ubuntu text-theme-green-dark text-lg font-bold">
                       {farmer.totalApprovedListings}
                     </p>
-                    <p className="font-roboto-slab text-text-colour text-xs">Approved</p>
+                    <p className="font-roboto-slab text-text-colour text-xs">
+                      Approved
+                    </p>
                   </div>
                   <div className="text-center">
                     <p className="font-ubuntu text-lg font-bold text-yellow-600">
                       {farmer.totalPendingListings}
                     </p>
-                    <p className="font-roboto-slab text-text-colour text-xs">Pending</p>
+                    <p className="font-roboto-slab text-text-colour text-xs">
+                      Pending
+                    </p>
                   </div>
                 </div>
 
-                <div className={`grid gap-2 ${farmer.id ? "grid-cols-2" : "grid-cols-1"}`}>
+                <div
+                  className={`grid gap-2 ${farmer.id ? "grid-cols-2" : "grid-cols-1"}`}
+                >
                   <button
                     onClick={() => setSelectedFarmer(farmer)}
-                    className="font-roboto-slab text-theme-green-dark bg-pink-bg flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition hover:bg-green-50"
+                    className="font-roboto-slab text-theme-green-dark bg-pink-bg hover:bg-green-tint flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition"
                   >
                     Quick View
                   </button>
                   {farmer.id && (
                     <button
-                      onClick={() => router.push(`/cluster-dashboard/farmers/${farmer.id}`)}
+                      onClick={() =>
+                        router.push(`/cluster-dashboard/farmers/${farmer.id}`)
+                      }
                       className="font-roboto-slab border-gray-border text-heading-colour hover:bg-gray-bg flex w-full items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition"
                     >
                       Full Profile
@@ -391,7 +452,10 @@ export default function ClusterFarmersPage() {
 
       <AnimatePresence>
         {selectedFarmer && (
-          <FarmerDetailModal farmer={selectedFarmer} onClose={() => setSelectedFarmer(null)} />
+          <FarmerDetailModal
+            farmer={selectedFarmer}
+            onClose={() => setSelectedFarmer(null)}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -10,7 +10,8 @@ export default function CTABannerSection() {
       aria-label="Call to Action"
       className="w-full"
       style={{
-        background: "linear-gradient(135deg, var(--theme-green-dark), var(--theme-green-light))",
+        background:
+          "linear-gradient(135deg, var(--theme-green-dark), var(--theme-green-light))",
       }}
     >
       <div className="section-content-max-width py-section-py sm:py-section-py-sm lg:py-section-py-lg px-section-px sm:px-section-px-sm lg:px-section-px-lg flex flex-col items-center gap-6 text-center">
@@ -31,8 +32,8 @@ export default function CTABannerSection() {
           transition={{ duration: 0.65, ease: EASE_OUT_EXPO, delay: 0.1 }}
           className="font-roboto-slab max-w-xl text-lg text-white/70"
         >
-          Join hundreds of farmers and buyers already using Agro-chain to source and sell fresh
-          catfish across Nigeria.
+          Join hundreds of farmers and buyers already using Agro-chain to source
+          and sell fresh catfish across Nigeria.
         </motion.p>
 
         <motion.div

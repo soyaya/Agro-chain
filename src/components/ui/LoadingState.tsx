@@ -8,7 +8,10 @@ interface LoadingStateProps {
   size?: "sm" | "md" | "lg";
 }
 
-export function LoadingState({ message = "Loading...", size = "md" }: LoadingStateProps) {
+export function LoadingState({
+  message = "Loading...",
+  size = "md",
+}: LoadingStateProps) {
   const sizeClasses = {
     sm: "h-32",
     md: "h-64",
@@ -31,9 +34,9 @@ export function LoadingState({ message = "Loading...", size = "md" }: LoadingSta
         animate={{ rotate: 360 }}
         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
       >
-        <Loader2 size={iconSizes[size]} className="text-green-600" />
+        <Loader2 size={iconSizes[size]} className="text-theme-green-dark" />
       </motion.div>
-      <p className="text-gray-600 font-roboto-slab text-sm">{message}</p>
+      <p className="text-text-colour font-roboto-slab text-sm">{message}</p>
     </motion.div>
   );
 }

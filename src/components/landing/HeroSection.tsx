@@ -37,7 +37,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE_OUT_EXPO, delay: 0 }}
-          className="font-ubuntu text-xs font-semibold tracking-widest text-green-300 uppercase"
+          className="font-ubuntu text-green-on-dark text-xs font-semibold tracking-widest uppercase"
         >
           Nigeria&apos;s Catfish Marketplace
         </motion.span>
@@ -60,9 +60,9 @@ export default function HeroSection() {
           transition={{ duration: 0.7, ease: EASE_OUT_EXPO, delay: 0.26 }}
           className="font-roboto-slab max-w-2xl text-lg text-white/80"
         >
-          Agro-chain digitises the catfish supply chain: farm listing, secure payment, and
-          coordinated delivery. No middlemen. No price opacity. Just fresh fish, fair prices, and
-          reliable logistics.
+          Agro-chain digitises the catfish supply chain: farm listing, secure
+          payment, and coordinated delivery. No middlemen. No price opacity.
+          Just fresh fish, fair prices, and reliable logistics.
         </motion.p>
 
         {/* CTAs */}
@@ -98,7 +98,7 @@ export default function HeroSection() {
               key={badge}
               className="font-roboto-slab flex items-center gap-1.5 text-sm text-white/60"
             >
-              <span className="text-green-400">✓</span>
+              <span className="text-green-icon-dark">✓</span>
               {badge}
             </span>
           ))}

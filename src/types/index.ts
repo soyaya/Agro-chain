@@ -3,9 +3,7 @@
 
 import type { LucideIcon } from "lucide-react";
 
-// ============================================
-// COMMON TYPES
-// ============================================
+// === Common Types
 
 export type UserRole = "farmer" | "buyer" | "admin";
 
@@ -13,13 +11,17 @@ export type ApplicationStatus = "pending" | "approved" | "rejected";
 
 export type ListingStatus = "pending" | "approved" | "rejected";
 
-export type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
 
 export type DeliveryType = "pickup" | "delivery";
 
-// ============================================
-// NAVIGATION & UI
-// ============================================
+// === Navigation & UI
 
 export interface NavLink {
   label: string;
@@ -42,9 +44,7 @@ export interface DashboardConfig {
   navLinks: DashboardNavLink[];
 }
 
-// ============================================
-// ENHANCED DASHBOARD CONFIGURATION
-// ============================================
+// === Enhanced Dashboard Configuration
 
 /**
  * Enhanced dashboard configuration that extends the base DashboardConfig
@@ -115,34 +115,57 @@ export interface UseDashboardNavReturn {
   shouldShowFinancialServices: boolean;
 }
 
-// ============================================
-// FINANCIAL SERVICES TYPES
-// ============================================
+// === Financial Services Types
 
-export type FinancialFeature = 'loans' | 'credit' | 'payments' | 'profile';
+export type FinancialFeature = "loans" | "credit" | "payments" | "profile";
 
-export type LoanType = 'equipment' | 'seed' | 'fertilizer' | 'expansion' | 'emergency';
+export type LoanType =
+  | "equipment"
+  | "seed"
+  | "fertilizer"
+  | "expansion"
+  | "emergency";
 
-export type LoanApplicationStatus = 'draft' | 'submitted' | 'under_review' | 'approved' | 'rejected' | 'disbursed';
+export type LoanApplicationStatus =
+  | "draft"
+  | "submitted"
+  | "under_review"
+  | "approved"
+  | "rejected"
+  | "disbursed";
 
-export type CreditPurchaseStatus = 'pending' | 'approved' | 'shipped' | 'delivered' | 'completed';
+export type CreditPurchaseStatus =
+  | "pending"
+  | "approved"
+  | "shipped"
+  | "delivered"
+  | "completed";
 
-export type ProductCategory = 'seeds' | 'fertilizers' | 'pesticides' | 'equipment' | 'tools';
+export type ProductCategory =
+  | "seeds"
+  | "fertilizers"
+  | "pesticides"
+  | "equipment"
+  | "tools";
 
-export type PaymentStatus = 'pending' | 'paid' | 'overdue' | 'on_time' | 'late' | 'missed';
+export type PaymentStatus =
+  | "pending"
+  | "paid"
+  | "overdue"
+  | "on_time"
+  | "late"
+  | "missed";
 
-export type RiskLevel = 'low' | 'medium' | 'high';
+export type RiskLevel = "low" | "medium" | "high";
 
-export type RiskImpact = 'positive' | 'negative' | 'neutral';
+export type RiskImpact = "positive" | "negative" | "neutral";
 
 export interface SelectOption {
   label: string;
   value: string;
 }
 
-// ============================================
-// USER & AUTHENTICATION
-// ============================================
+// === User & Authentication
 
 export interface BaseUser {
   id: string;
@@ -159,9 +182,7 @@ export interface AuthUser extends BaseUser {
   profileComplete: boolean;
 }
 
-// ============================================
-// FARMER PROFILE
-// ============================================
+// === Farmer Profile
 
 export interface FarmerProfile {
   id: string;
@@ -183,9 +204,7 @@ export interface FarmerProfile {
   updatedAt: Date;
 }
 
-// ============================================
-// CLUSTER FARMER
-// ============================================
+// === Cluster Farmer
 
 export interface ClusterFarmerProfile extends FarmerProfile {
   businessName: string;
@@ -217,9 +236,7 @@ export interface ClusterApplication {
   updatedAt: Date;
 }
 
-// ============================================
-// BUYER PROFILE
-// ============================================
+// === Buyer Profile
 
 export interface BuyerProfile {
   id: string;
@@ -238,14 +255,12 @@ export interface BuyerProfile {
   updatedAt: Date;
 }
 
-// ============================================
-// SUPPLY LISTING & PACKAGING
-// ============================================
+// === Supply Listing & Packaging
 
 export interface PackagingOption {
   weightKg: number;
   quantity: number;
-  pricePerUnit?: number;   // Backend-computed on marketplace responses; absent on farmer-side listing data
+  pricePerUnit?: number; // Backend-computed on marketplace responses; absent on farmer-side listing data
 }
 
 export interface FarmerSupplyListing {
@@ -283,9 +298,7 @@ export interface ClusterFarmerListing {
   updatedAt: Date;
 }
 
-// ============================================
-// FINANCIAL SERVICES DATA MODELS
-// ============================================
+// === Financial Services Data Models
 
 /**
  * Loan application data model
@@ -324,7 +337,7 @@ export interface EquipmentItem {
   name: string;
   type: string;
   value: number;
-  condition: 'new' | 'good' | 'fair' | 'poor';
+  condition: "new" | "good" | "fair" | "poor";
   purchaseDate?: Date;
 }
 
@@ -409,7 +422,7 @@ export interface FarmerFinancialProfile {
 
 export interface PaymentHistoryRecord {
   date: Date;
-  type: 'loan_payment' | 'credit_payment';
+  type: "loan_payment" | "credit_payment";
   amount: number;
   status: PaymentStatus;
   referenceId: string;
@@ -431,9 +444,7 @@ export interface RiskFactor {
   weight: number;
 }
 
-// ============================================
-// MARKETPLACE & ORDERS
-// ============================================
+// === Marketplace & Orders
 
 export interface MarketplaceListing extends ClusterFarmerListing {
   clusterFarmerContact: string;
@@ -475,9 +486,7 @@ export interface Order {
   updatedAt: Date;
 }
 
-// ============================================
-// ADMIN
-// ============================================
+// === Admin
 
 export interface AdminProfile {
   id: string;
@@ -501,9 +510,7 @@ export interface PlatformAnalytics {
   activeListings: number;
 }
 
-// ============================================
-// NOTIFICATIONS
-// ============================================
+// === Notifications
 
 export interface Notification {
   id: string;
@@ -516,9 +523,7 @@ export interface Notification {
   createdAt: Date;
 }
 
-// ============================================
-// FORM TYPES
-// ============================================
+// === Form Types
 
 export interface FarmerProfileFormData {
   fullName: string;
@@ -557,7 +562,7 @@ export interface SupplyListingFormData {
   fishType: string;
   harvestDate: Date;
   totalAvailableKg: number;
-  weightKg: number;   // Weight per fish in kg - replaces packaging array
+  weightKg: number; // Weight per fish in kg - replaces packaging array
 }
 
 export interface ClusterApplicationFormData {
@@ -573,9 +578,7 @@ export interface ClusterApplicationFormData {
   governmentId: File;
 }
 
-// ============================================
-// API RESPONSE TYPES
-// ============================================
+// === API Response Types
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -592,9 +595,7 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// ============================================
-// FILTER & SEARCH TYPES
-// ============================================
+// === Filter & Search Types
 
 export interface MarketplaceFilters {
   search?: string;

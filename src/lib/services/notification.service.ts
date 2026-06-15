@@ -12,7 +12,10 @@ export interface NotificationsResponse {
 export const notificationService = {
   getNotifications(): Promise<NotificationsResponse> {
     return apiFetch<NotificationsResponse>("/notifications").catch((err) => {
-      if (err instanceof ApiError && (err.status === 404 || err.status === 401 || err.status === 0)) {
+      if (
+        err instanceof ApiError &&
+        (err.status === 404 || err.status === 401 || err.status === 0)
+      ) {
         return { status: "ok", data: { notifications: [], unreadCount: 0 } };
       }
       return { status: "ok", data: { notifications: [], unreadCount: 0 } };
@@ -20,10 +23,14 @@ export const notificationService = {
   },
 
   markRead(notificationId: string) {
-    return apiFetch(`/notifications/${notificationId}/read`, { method: "PATCH" }).catch(() => null);
+    return apiFetch(`/notifications/${notificationId}/read`, {
+      method: "PATCH",
+    }).catch(() => null);
   },
 
   markAllRead() {
-    return apiFetch("/notifications/read-all", { method: "PATCH" }).catch(() => null);
+    return apiFetch("/notifications/read-all", { method: "PATCH" }).catch(
+      () => null,
+    );
   },
 };

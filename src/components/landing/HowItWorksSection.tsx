@@ -1,7 +1,10 @@
 "use client";
 
 import { motion, type TargetAndTransition } from "framer-motion";
-import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import {
+  SLOW_STAGGER_CONTAINER_VARIANT,
+  SLIDE_UP_VARIANT,
+} from "~/types/constants";
 import { howItWorksCards } from "~/models/models";
 
 const CARD_HOVER: TargetAndTransition = {
@@ -10,14 +13,17 @@ const CARD_HOVER: TargetAndTransition = {
   transition: { duration: 0.25, ease: "easeOut" },
 };
 
-const CARD_TAP: TargetAndTransition = { scale: 0.97, transition: { duration: 0.1 } };
+const CARD_TAP: TargetAndTransition = {
+  scale: 0.97,
+  transition: { duration: 0.1 },
+};
 
 export default function HowItWorksSection() {
   return (
     <section aria-label="How It Works" className="bg-section-dark">
       <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg">
         {/* Section label */}
-        <span className="font-ubuntu text-xs font-semibold tracking-widest text-green-400 uppercase">
+        <span className="font-ubuntu text-green-icon-dark text-xs font-semibold tracking-widest uppercase">
           How It Works
         </span>
 
@@ -29,8 +35,8 @@ export default function HowItWorksSection() {
             One platform.
           </h2>
           <p className="font-roboto-slab text-lg text-white/60 lg:pt-2">
-            Whether you grow fish, aggregate supply, or buy in bulk, Agro-chain has a dedicated flow
-            built for you.
+            Whether you grow fish, aggregate supply, or buy in bulk, Agro-chain
+            has a dedicated flow built for you.
           </p>
         </div>
 
@@ -54,12 +60,17 @@ export default function HowItWorksSection() {
                 <span className="bg-theme-green-dark flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white">
                   {number}
                 </span>
-                <Icon className="h-5 w-5 text-green-400" />
+                <Icon className="text-green-icon-dark h-5 w-5" />
               </div>
-              <h3 className="font-ubuntu text-xl font-semibold text-white">{title}</h3>
+              <h3 className="font-ubuntu text-xl font-semibold text-white">
+                {title}
+              </h3>
               <ul className="flex flex-col gap-2">
                 {steps.map((step) => (
-                  <li key={step} className="font-roboto-slab text-sm text-white/60">
+                  <li
+                    key={step}
+                    className="font-roboto-slab text-sm text-white/60"
+                  >
                     {step}
                   </li>
                 ))}

@@ -54,7 +54,10 @@ export default function Onboarding({ steps, onFinish }: OnboardingProps) {
       </div>
 
       {/* Button */}
-      <Button onClick={handleNext} className="--space-lg rounded-full px-10 text-base font-medium">
+      <Button
+        onClick={handleNext}
+        className="--space-lg rounded-full px-10 text-base font-medium"
+      >
         {isLastStep ? "Get Started" : "Next"}
       </Button>
     </div>

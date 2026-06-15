@@ -9,10 +9,6 @@ import type { FarmerSupplyListing } from "~/types";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { clusterService } from "~/lib/services/cluster.service";
 
-type PendingListingsResponse =
-  | FarmerSupplyListing[]
-  | { listings?: FarmerSupplyListing[]; data?: FarmerSupplyListing[] };
-
 interface RejectModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -57,7 +53,9 @@ function RejectModal({ isOpen, onClose, onConfirm }: RejectModalProps) {
                   <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                     Reject Listing
                   </h3>
-                  <p className="text-text-colour text-sm">Please provide a reason for rejection</p>
+                  <p className="text-text-colour text-sm">
+                    Please provide a reason for rejection
+                  </p>
                 </div>
               </div>
 
@@ -95,7 +93,9 @@ export default function PendingApprovalsPage() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
-  const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
+  const [selectedListingId, setSelectedListingId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -129,7 +129,8 @@ export default function PendingApprovalsPage() {
           );
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to load listings";
+        const message =
+          error instanceof Error ? error.message : "Failed to load listings";
         if (mounted) {
           setErrorMessage(message);
         }
@@ -154,7 +155,8 @@ export default function PendingApprovalsPage() {
       setListings((prev) => prev.filter((l) => l.id !== id));
       toast.success("Listing approved successfully!");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to approve listing";
+      const message =
+        error instanceof Error ? error.message : "Failed to approve listing";
       toast.error(message);
     }
   };
@@ -175,7 +177,8 @@ export default function PendingApprovalsPage() {
       setRejectModalOpen(false);
       setSelectedListingId(null);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to reject listing";
+      const message =
+        error instanceof Error ? error.message : "Failed to reject listing";
       toast.error(message);
     }
   };
@@ -190,7 +193,10 @@ export default function PendingApprovalsPage() {
           className="flex flex-col gap-(--section-gap)"
         >
           {/* Header */}
-          <motion.div variants={FADE_IN_VARIANT} className="flex flex-col gap-(--gap-sm)">
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="flex flex-col gap-(--gap-sm)"
+          >
             <h1 className="font-ubuntu text-heading-colour text-3xl font-bold lg:text-4xl">
               Pending Approvals
             </h1>
@@ -207,7 +213,8 @@ export default function PendingApprovalsPage() {
             <AlertCircle size={24} className="text-yellow-600" />
             <div>
               <p className="font-roboto-slab flex items-center text-sm font-medium text-yellow-800">
-                <span className="font-semibold">{listings.length} </span> listing
+                <span className="font-semibold">{listings.length} </span>{" "}
+                listing
                 {listings.length !== 1 ? "s" : ""} awaiting review
               </p>
               <p className="text-sm text-yellow-700">
@@ -245,12 +252,14 @@ export default function PendingApprovalsPage() {
               variants={FADE_IN_VARIANT}
               className="border-gray-border flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border bg-(--white) p-(--section-gap)"
             >
-              <CheckCircle size={48} className="text-green-600" />
+              <CheckCircle size={48} className="text-theme-green-dark" />
               <div className="flex flex-col items-center gap-2 text-center">
                 <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
                   All caught up!
                 </h3>
-                <p className="text-text-colour">No pending listings to review at the moment</p>
+                <p className="text-text-colour">
+                  No pending listings to review at the moment
+                </p>
               </div>
             </motion.div>
           )}

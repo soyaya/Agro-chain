@@ -123,8 +123,8 @@ export default function CreditPurchasesPage() {
       pending: { label: "Pending", color: "text-yellow-600", bgColor: "bg-yellow-100", icon: Clock },
       approved: { label: "Approved", color: "text-blue-600", bgColor: "bg-blue-100", icon: CheckCircle },
       shipped: { label: "Shipped", color: "text-purple-600", bgColor: "bg-purple-100", icon: Truck },
-      delivered: { label: "Delivered", color: "text-green-600", bgColor: "bg-green-100", icon: Package },
-      completed: { label: "Completed", color: "text-gray-600", bgColor: "bg-gray-100", icon: CheckCircle },
+      delivered: { label: "Delivered", color: "text-theme-green-dark", bgColor: "bg-green-tint", icon: Package },
+      completed: { label: "Completed", color: "text-text-colour", bgColor: "bg-gray-bg", icon: CheckCircle },
     };
     return configs[status];
   };
@@ -138,8 +138,8 @@ export default function CreditPurchasesPage() {
       label: "Available Credit",
       value: `₦${availableCredit.toLocaleString()}`,
       icon: CreditCard,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      color: "text-theme-green-dark",
+      bgColor: "bg-green-tint",
     },
     {
       label: "Credit Limit",
@@ -235,14 +235,14 @@ export default function CreditPurchasesPage() {
               {((totalCreditUsed / creditLimit) * 100).toFixed(1)}%
             </span>
           </div>
-          <div className="h-3 w-full rounded-full bg-gray-200 overflow-hidden">
+          <div className="h-3 w-full rounded-full bg-gray-border overflow-hidden">
             <div
               className="h-full rounded-full bg-linear-to-r from-green-500 to-green-600 transition-all duration-500"
               style={{ width: `${(totalCreditUsed / creditLimit) * 100}%` }}
             />
           </div>
         </div>
-        <p className="font-roboto-slab text-xs text-gray-500">
+        <p className="font-roboto-slab text-xs text-muted-text">
           You have ₦{availableCredit.toLocaleString()} available for new purchases
         </p>
       </motion.div>
@@ -259,8 +259,8 @@ export default function CreditPurchasesPage() {
 
         {creditPurchases.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-(--space-2xl) text-center">
-            <ShoppingCart size={48} className="text-gray-300 mb-(--space-md)" />
-            <p className="font-roboto-slab text-gray-500 mb-(--space-lg)">
+            <ShoppingCart size={48} className="text-muted-text mb-(--space-md)" />
+            <p className="font-roboto-slab text-muted-text mb-(--space-lg)">
               You haven&apos;t made any credit purchases yet
             </p>
             <Link
@@ -281,7 +281,7 @@ export default function CreditPurchasesPage() {
               return (
                 <div
                   key={purchase.id}
-                  className="rounded-xl border border-input-border p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-105"
+                  className="rounded-xl border border-input-border p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-border hover:scale-105"
                 >
                   <div className="flex flex-col gap-(--space-md)">
                     <div className="flex items-start justify-between">
@@ -295,19 +295,19 @@ export default function CreditPurchasesPage() {
                             {statusConfig.label}
                           </span>
                         </div>
-                        <p className="font-roboto-slab text-xs text-gray-500 mb-(--space-md)">
+                        <p className="font-roboto-slab text-xs text-muted-text mb-(--space-md)">
                           Ordered on {purchase.createdAt.toLocaleDateString()}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-roboto-slab text-xs text-gray-500">Total Amount</p>
+                        <p className="font-roboto-slab text-xs text-muted-text">Total Amount</p>
                         <p className="font-ubuntu text-xl font-bold text-heading-colour">
                           ₦{purchase.totalAmount.toLocaleString()}
                         </p>
                       </div>
                     </div>
-                    <div className="rounded-lg bg-gray-50 p-(--space-md)">
-                      <p className="font-roboto-slab text-xs text-gray-600 mb-2">Items ({purchase.items.length})</p>
+                    <div className="rounded-lg bg-gray-bg p-(--space-md)">
+                      <p className="font-roboto-slab text-xs text-text-colour mb-2">Items ({purchase.items.length})</p>
                       <div className="flex flex-col gap-2">
                         {purchase.items.map((item, index) => (
                           <div key={index} className="flex items-center justify-between">
@@ -315,7 +315,7 @@ export default function CreditPurchasesPage() {
                               <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                                 {item.productName}
                               </p>
-                              <p className="font-roboto-slab text-xs text-gray-500">
+                              <p className="font-roboto-slab text-xs text-muted-text">
                                 Qty: {item.quantity} × ₦{item.unitPrice.toLocaleString()}
                               </p>
                             </div>

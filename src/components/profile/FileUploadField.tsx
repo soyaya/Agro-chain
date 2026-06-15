@@ -2,8 +2,15 @@
 
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
-import { Upload as UploadIcon, X, Dot, CheckCircle2, Trash2, Loader, FileUp } from "lucide-react";
+import {
+  Upload as UploadIcon,
+  X,
+  Dot,
+  CheckCircle2,
+  Trash2,
+  Loader,
+  FileUp,
+} from "lucide-react";
 import { cn } from "~/lib/utils";
 
 type FileUploadFieldProps = {
@@ -105,7 +112,7 @@ export function FileUploadField({
             }}
             className={cn(
               "border-input-border relative cursor-pointer overflow-hidden rounded-lg border shadow-sm transition-all duration-300 ease-in-out hover:shadow-md",
-              state === "success" ? "bg-green-50/40" : "bg-(--white)",
+              state === "success" ? "bg-green-tint/40" : "bg-(--white)",
             )}
           >
             <div className="flex flex-col gap-(--gap-xl) p-(--space-base)">
@@ -128,7 +135,8 @@ export function FileUploadField({
                       {state === "uploading" && file && (
                         <div className="text-text-colour flex items-center gap-2 text-xs">
                           <span>
-                            {formatSize((file.size * progress) / 100)} of {formatSize(file.size)}
+                            {formatSize((file.size * progress) / 100)} of{" "}
+                            {formatSize(file.size)}
                           </span>
                           <span className="flex items-center gap-(--gap-sm)">
                             <Loader
@@ -136,7 +144,9 @@ export function FileUploadField({
                               size={12}
                               className="text-theme-green-dark animate-spin"
                             />
-                            <span className="font-roboto-slab">Uploading...</span>
+                            <span className="font-roboto-slab">
+                              Uploading...
+                            </span>
                           </span>
                         </div>
                       )}
@@ -146,7 +156,7 @@ export function FileUploadField({
                             {formatSize(file.size)}
                           </span>
                           <Dot className="text-text-colour" />
-                          <span className="flex items-center gap-1 font-medium text-green-600">
+                          <span className="text-theme-green-dark flex items-center gap-1 font-medium">
                             <CheckCircle2
                               fill="currentColor"
                               stroke="white"
@@ -165,15 +175,17 @@ export function FileUploadField({
                     <button
                       type="button"
                       onClick={reset}
-                      className="hover:text-error-red cursor-pointer p-(--space-sm) text-gray-500 transition-all duration-300 ease-in-out"
+                      className="hover:text-error-red text-muted-text cursor-pointer p-(--space-sm) transition-all duration-300 ease-in-out"
                     >
                       <Trash2 size={18} />
                     </button>
                   ) : (
                     state !== "uploading" && (
-                      <div className="text-heading-colour border-input-border flex items-center gap-(--gap-sm) rounded-xl border bg-gray-50 px-(--space-sm) py-1.5 shadow-sm">
+                      <div className="text-heading-colour border-input-border bg-gray-bg flex items-center gap-(--gap-sm) rounded-xl border px-(--space-sm) py-1.5 shadow-sm">
                         <UploadIcon size={18} strokeWidth={3} />
-                        <span className="font-roboto-slab text-sm font-semibold">Upload</span>
+                        <span className="font-roboto-slab text-sm font-semibold">
+                          Upload
+                        </span>
                       </div>
                     )
                   )}
@@ -181,7 +193,7 @@ export function FileUploadField({
               </div>
               {state === "uploading" && (
                 <div className="relative">
-                  <div className="absolute bottom-0 left-0 h-1 w-full rounded-full bg-gray-200">
+                  <div className="bg-gray-border absolute bottom-0 left-0 h-1 w-full rounded-full">
                     <motion.div
                       className="bg-theme-green-dark h-full rounded-full"
                       initial={{ width: 0 }}
@@ -202,7 +214,9 @@ export function FileUploadField({
             className="flex flex-col gap-(--space-sm) rounded-xl"
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-ubuntu text-heading-colour font-semibold">Upload {label}</h3>
+              <h3 className="font-ubuntu text-heading-colour font-semibold">
+                Upload {label}
+              </h3>
               <button
                 type="button"
                 onClick={onToggle}
@@ -215,7 +229,7 @@ export function FileUploadField({
               onDrop={onDrop}
               onDragOver={(e) => e.preventDefault()}
               onClick={openFileDialog}
-              className="border-input-border cursor-pointer rounded-lg border-2 border-dashed bg-(--white) p-(--space-3xl) text-center shadow-sm transition-all duration-300 ease-in-out hover:border-gray-400"
+              className="border-input-border hover:border-gray-border cursor-pointer rounded-lg border-2 border-dashed bg-(--white) p-(--space-3xl) text-center shadow-sm transition-all duration-300 ease-in-out"
             >
               {state === "uploading" ? (
                 <div className="flex flex-col gap-(--gap-md) py-(--space-base)">
@@ -254,7 +268,9 @@ export function FileUploadField({
           </motion.div>
         )}
       </AnimatePresence>
-      {error && <p className="font-roboto-slab text-error-red text-xs">{error}</p>}
+      {error && (
+        <p className="font-roboto-slab text-error-red text-xs">{error}</p>
+      )}
     </div>
   );
 }

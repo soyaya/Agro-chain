@@ -63,24 +63,24 @@ processed before sale. The frontend organises fish types into two hard categorie
 These are live catfish at different growth stages. A buyer orders them alive.
 
 | `fishType` value | Display label | Default price per kg |
-|-----------------|---------------|----------------------|
-| `fingerlings` | Fingerlings | ₦1,200 |
-| `juveniles` | Juveniles | ₦800 |
-| `table_size` | Table Size | ₦3,500 |
-| `jumbo` | Jumbo | ₦5,000 |
-| `parent_stocks` | Parent Stocks | ₦8,000 |
+| ---------------- | ------------- | -------------------- |
+| `fingerlings`    | Fingerlings   | ₦1,200               |
+| `juveniles`      | Juveniles     | ₦800                 |
+| `table_size`     | Table Size    | ₦3,500               |
+| `jumbo`          | Jumbo         | ₦5,000               |
+| `parent_stocks`  | Parent Stocks | ₦8,000               |
 
 ### Category: Processed
 
 These are catfish that have already been processed (smoked, grilled, etc.) before sale.
 
 | `fishType` value | Display label | Default price per kg |
-|-----------------|---------------|----------------------|
-| `dried` | Dried | ₦6,000 |
-| `grilled` | Grilled | ₦5,500 |
-| `peppersoup` | Peppersoup | ₦7,000 |
-| `peppered` | Peppered | ₦6,500 |
-| `smoked` | Smoked | ₦6,000 |
+| ---------------- | ------------- | -------------------- |
+| `dried`          | Dried         | ₦6,000               |
+| `grilled`        | Grilled       | ₦5,500               |
+| `peppersoup`     | Peppersoup    | ₦7,000               |
+| `peppered`       | Peppered      | ₦6,500               |
+| `smoked`         | Smoked        | ₦6,000               |
 
 ### The `catfish` legacy value
 
@@ -102,13 +102,13 @@ The `FishVariant` Prisma enum currently only contains legacy values (`dried`, `j
 
 ### Current backend enum vs what the frontend sends
 
-| Layer | Currently accepts | Must accept after B2 |
-|-------|-------------------|----------------------|
-| Prisma `FishType` enum | `catfish`, `fingerlings`, `juveniles`, `table_size`, `jumbo`, `parent_stocks` | + `dried`, `grilled`, `peppersoup`, `peppered`, `smoked` |
-| Prisma `FishVariant` enum | `dried`, `jumbo`, `table_size`, `broodstock` | + `live`, `processed` |
-| Zod `createListingSchema` | `fingerlings`, `juveniles`, `table_size`, `jumbo`, `parent_stocks` | + `catfish` + all 5 processed types |
-| Zod demand schema | No dedicated schema found — inline validation only | Must validate all 10 `fishType` values |
-| `DEFAULT_PRICES` object | 6 keys | 11 keys |
+| Layer                     | Currently accepts                                                             | Must accept after B2                                     |
+| ------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Prisma `FishType` enum    | `catfish`, `fingerlings`, `juveniles`, `table_size`, `jumbo`, `parent_stocks` | + `dried`, `grilled`, `peppersoup`, `peppered`, `smoked` |
+| Prisma `FishVariant` enum | `dried`, `jumbo`, `table_size`, `broodstock`                                  | + `live`, `processed`                                    |
+| Zod `createListingSchema` | `fingerlings`, `juveniles`, `table_size`, `jumbo`, `parent_stocks`            | + `catfish` + all 5 processed types                      |
+| Zod demand schema         | No dedicated schema found — inline validation only                            | Must validate all 10 `fishType` values                   |
+| `DEFAULT_PRICES` object   | 6 keys                                                                        | 11 keys                                                  |
 
 ---
 
@@ -151,7 +151,7 @@ const router = Router();
 router.use(authMiddleware);
 router.use(adminController.requireAdmin);
 
-router.get("/settings", adminController.getSettings);       // ← blocked by the line above
+router.get("/settings", adminController.getSettings); // ← blocked by the line above
 router.patch("/settings/price", adminController.updatePrices);
 ```
 
@@ -173,8 +173,14 @@ router.patch("/settings/price", adminController.updatePrices);
 
 // ── Cluster Applications ──────────────────────────────────────────────────────
 router.get("/cluster-applications", adminController.getClusterApplications);
-router.put("/cluster-applications/:id/approve", adminController.approveClusterApplication);
-router.put("/cluster-applications/:id/reject", adminController.rejectClusterApplication);
+router.put(
+  "/cluster-applications/:id/approve",
+  adminController.approveClusterApplication,
+);
+router.put(
+  "/cluster-applications/:id/reject",
+  adminController.rejectClusterApplication,
+);
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 router.get("/dashboard/metrics", adminController.getDashboardMetrics);
@@ -305,6 +311,7 @@ ALTER TYPE "FishVariant" ADD VALUE IF NOT EXISTS 'processed';
 ```
 
 Then mark the migration as applied:
+
 ```bash
 npx prisma migrate resolve --applied "expand_fish_types_and_fish_variant"
 npx prisma generate
@@ -318,19 +325,31 @@ npx prisma generate
 
 ```typescript
 export const createListingSchema = z.object({
-    body: z.object({
-        fish_type: z.enum(["fingerlings", "juveniles", "table_size", "jumbo", "parent_stocks"]),
-        // ...
-    }),
+  body: z.object({
+    fish_type: z.enum([
+      "fingerlings",
+      "juveniles",
+      "table_size",
+      "jumbo",
+      "parent_stocks",
+    ]),
+    // ...
+  }),
 });
 
 export const updateListingSchema = z.object({
-    body: z.object({
-        fish_type: z
-            .enum(["fingerlings", "juveniles", "table_size", "jumbo", "parent_stocks"])
-            .optional(),
-        // ...
-    }),
+  body: z.object({
+    fish_type: z
+      .enum([
+        "fingerlings",
+        "juveniles",
+        "table_size",
+        "jumbo",
+        "parent_stocks",
+      ])
+      .optional(),
+    // ...
+  }),
 });
 ```
 
@@ -345,66 +364,66 @@ import { z } from "zod";
 // All valid fish types accepted by the platform.
 // Keep this in sync with the FishType enum in prisma/schema.prisma.
 const FISH_TYPE_VALUES = [
-    "catfish",
-    "fingerlings",
-    "juveniles",
-    "table_size",
-    "jumbo",
-    "parent_stocks",
-    "dried",
-    "grilled",
-    "peppersoup",
-    "peppered",
-    "smoked",
+  "catfish",
+  "fingerlings",
+  "juveniles",
+  "table_size",
+  "jumbo",
+  "parent_stocks",
+  "dried",
+  "grilled",
+  "peppersoup",
+  "peppered",
+  "smoked",
 ] as const;
 
 export const createListingSchema = z.object({
-    body: z.object({
-        fish_type: z.enum(FISH_TYPE_VALUES),
-        quantity_available: z.number().int().positive(),
-        price_per_fish: z.number().positive(),
-        price_per_kg: z.number().positive().optional(),
-        size_min_cm: z.number().positive().optional(),
-        size_max_cm: z.number().positive().optional(),
-        weight_min_grams: z.number().positive().optional(),
-        weight_max_grams: z.number().positive().optional(),
-        harvest_date: z.string().datetime(),
-        location_state: z.string().min(2),
-        location_lga: z.string().min(2),
-        location_address: z.string().min(2),
-        delivery_available: z.boolean().default(false),
-        delivery_fee: z.number().nonnegative().optional(),
-        is_draft: z.boolean().default(false),
-    }),
+  body: z.object({
+    fish_type: z.enum(FISH_TYPE_VALUES),
+    quantity_available: z.number().int().positive(),
+    price_per_fish: z.number().positive(),
+    price_per_kg: z.number().positive().optional(),
+    size_min_cm: z.number().positive().optional(),
+    size_max_cm: z.number().positive().optional(),
+    weight_min_grams: z.number().positive().optional(),
+    weight_max_grams: z.number().positive().optional(),
+    harvest_date: z.string().datetime(),
+    location_state: z.string().min(2),
+    location_lga: z.string().min(2),
+    location_address: z.string().min(2),
+    delivery_available: z.boolean().default(false),
+    delivery_fee: z.number().nonnegative().optional(),
+    is_draft: z.boolean().default(false),
+  }),
 });
 
 export type CreateListingInput = z.infer<typeof createListingSchema>["body"];
 
 export const updateListingSchema = z.object({
-    body: z.object({
-        fish_type: z.enum(FISH_TYPE_VALUES).optional(),
-        quantity_available: z.number().int().positive().optional(),
-        price_per_fish: z.number().positive().optional(),
-        price_per_kg: z.number().positive().optional(),
-        size_min_cm: z.number().positive().optional(),
-        size_max_cm: z.number().positive().optional(),
-        weight_min_grams: z.number().positive().optional(),
-        weight_max_grams: z.number().positive().optional(),
-        harvest_date: z.string().datetime().optional(),
-        location_state: z.string().min(2).optional(),
-        location_lga: z.string().min(2).optional(),
-        location_address: z.string().min(2).optional(),
-        delivery_available: z.boolean().optional(),
-        delivery_fee: z.number().nonnegative().optional(),
-    }),
+  body: z.object({
+    fish_type: z.enum(FISH_TYPE_VALUES).optional(),
+    quantity_available: z.number().int().positive().optional(),
+    price_per_fish: z.number().positive().optional(),
+    price_per_kg: z.number().positive().optional(),
+    size_min_cm: z.number().positive().optional(),
+    size_max_cm: z.number().positive().optional(),
+    weight_min_grams: z.number().positive().optional(),
+    weight_max_grams: z.number().positive().optional(),
+    harvest_date: z.string().datetime().optional(),
+    location_state: z.string().min(2).optional(),
+    location_lga: z.string().min(2).optional(),
+    location_address: z.string().min(2).optional(),
+    delivery_available: z.boolean().optional(),
+    delivery_fee: z.number().nonnegative().optional(),
+  }),
 });
 
 export type UpdateListingInput = z.infer<typeof updateListingSchema>["body"];
 
 export const changeListingStatusSchema = z.object({
-    body: z.object({
-        status: z.enum(["active", "sold", "draft", "archived", "deleted"]),
-    }),
+  body: z.object({
+    status: z.enum(["active", "sold", "draft", "archived", "deleted"]),
+  }),
 });
 ```
 
@@ -427,33 +446,39 @@ so the response is always guaranteed to have all 11 keys.
 
 ```typescript
 const DEFAULT_PRICES = {
-    catfish: 1800,
-    fingerlings: 500,
-    juveniles: 800,
-    table_size: 1800,
-    jumbo: 2500,
-    parent_stocks: 3000,
+  catfish: 1800,
+  fingerlings: 500,
+  juveniles: 800,
+  table_size: 1800,
+  jumbo: 2500,
+  parent_stocks: 3000,
 };
 
-export const getSettings = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        let settings = await prisma.platformSettings.findFirst();
-        if (!settings) {
-            settings = await prisma.platformSettings.create({
-                data: { price_per_kg: DEFAULT_PRICES },
-            });
-        }
-        res.status(200).json({
-            status: "success",
-            data: {
-                settings: {
-                    pricePerKg: settings.price_per_kg,   // ← may be missing processed keys
-                    updatedAt: settings.updated_at,
-                    updatedBy: settings.updated_by,
-                },
-            },
-        });
-    } catch (error) { next(error); }
+export const getSettings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    let settings = await prisma.platformSettings.findFirst();
+    if (!settings) {
+      settings = await prisma.platformSettings.create({
+        data: { price_per_kg: DEFAULT_PRICES },
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      data: {
+        settings: {
+          pricePerKg: settings.price_per_kg, // ← may be missing processed keys
+          updatedAt: settings.updated_at,
+          updatedBy: settings.updated_by,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 ```
 
@@ -466,46 +491,52 @@ export const getSettings = async (req: Request, res: Response, next: NextFunctio
 //   (b) the DB row predates a new fish type being added
 // The admin can override any of these via PATCH /admin/settings/price.
 const DEFAULT_PRICES: Record<string, number> = {
-    catfish:        3500,
-    fingerlings:    1200,
-    juveniles:       800,
-    table_size:     3500,
-    jumbo:          5000,
-    parent_stocks:  8000,
-    dried:          6000,
-    grilled:        5500,
-    peppersoup:     7000,
-    peppered:       6500,
-    smoked:         6000,
+  catfish: 3500,
+  fingerlings: 1200,
+  juveniles: 800,
+  table_size: 3500,
+  jumbo: 5000,
+  parent_stocks: 8000,
+  dried: 6000,
+  grilled: 5500,
+  peppersoup: 7000,
+  peppered: 6500,
+  smoked: 6000,
 };
 
-export const getSettings = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        let settings = await prisma.platformSettings.findFirst();
-        if (!settings) {
-            settings = await prisma.platformSettings.create({
-                data: { price_per_kg: DEFAULT_PRICES },
-            });
-        }
-        // Merge: DEFAULT_PRICES provides all 11 keys as a baseline.
-        // Whatever the admin has set in the DB overwrites the defaults.
-        // This guarantees the response always contains all 11 keys even
-        // if the DB row is from before processed types were introduced.
-        const pricePerKg = {
-            ...DEFAULT_PRICES,
-            ...(settings.price_per_kg as Record<string, number>),
-        };
-        res.status(200).json({
-            status: "success",
-            data: {
-                settings: {
-                    pricePerKg,
-                    updatedAt: settings.updated_at,
-                    updatedBy: settings.updated_by,
-                },
-            },
-        });
-    } catch (error) { next(error); }
+export const getSettings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    let settings = await prisma.platformSettings.findFirst();
+    if (!settings) {
+      settings = await prisma.platformSettings.create({
+        data: { price_per_kg: DEFAULT_PRICES },
+      });
+    }
+    // Merge: DEFAULT_PRICES provides all 11 keys as a baseline.
+    // Whatever the admin has set in the DB overwrites the defaults.
+    // This guarantees the response always contains all 11 keys even
+    // if the DB row is from before processed types were introduced.
+    const pricePerKg = {
+      ...DEFAULT_PRICES,
+      ...(settings.price_per_kg as Record<string, number>),
+    };
+    res.status(200).json({
+      status: "success",
+      data: {
+        settings: {
+          pricePerKg,
+          updatedAt: settings.updated_at,
+          updatedBy: settings.updated_by,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 ```
 
@@ -514,40 +545,51 @@ merges the body into the DB value, so no structural change is needed there — t
 is that `DEFAULT_PRICES` is now larger, so the base merge includes all 11 keys:
 
 ```typescript
-export const updatePrices = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const adminId = req.user?.user_id;
-        const { pricePerKg } = req.body;
-        if (!pricePerKg || typeof pricePerKg !== "object") {
-            throw new ApiError(400, "pricePerKg must be an object.");
-        }
+export const updatePrices = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const adminId = req.user?.user_id;
+    const { pricePerKg } = req.body;
+    if (!pricePerKg || typeof pricePerKg !== "object") {
+      throw new ApiError(400, "pricePerKg must be an object.");
+    }
 
-        // Validate that no unknown keys sneak in
-        const allowedKeys = Object.keys(DEFAULT_PRICES);
-        const unknownKeys = Object.keys(pricePerKg).filter((k) => !allowedKeys.includes(k));
-        if (unknownKeys.length > 0) {
-            throw new ApiError(400, `Unknown fish type(s): ${unknownKeys.join(", ")}`);
-        }
+    // Validate that no unknown keys sneak in
+    const allowedKeys = Object.keys(DEFAULT_PRICES);
+    const unknownKeys = Object.keys(pricePerKg).filter(
+      (k) => !allowedKeys.includes(k),
+    );
+    if (unknownKeys.length > 0) {
+      throw new ApiError(
+        400,
+        `Unknown fish type(s): ${unknownKeys.join(", ")}`,
+      );
+    }
 
-        let settings = await prisma.platformSettings.findFirst();
-        // Start from defaults, overlay whatever is in DB, then overlay the patch body
-        const existing = settings?.price_per_kg as Record<string, number> ?? {};
-        const merged = { ...DEFAULT_PRICES, ...existing, ...pricePerKg };
+    let settings = await prisma.platformSettings.findFirst();
+    // Start from defaults, overlay whatever is in DB, then overlay the patch body
+    const existing = (settings?.price_per_kg as Record<string, number>) ?? {};
+    const merged = { ...DEFAULT_PRICES, ...existing, ...pricePerKg };
 
-        if (settings) {
-            settings = await prisma.platformSettings.update({
-                where: { id: settings.id },
-                data: { price_per_kg: merged, updated_by: adminId },
-            });
-        } else {
-            settings = await prisma.platformSettings.create({
-                data: { price_per_kg: merged, updated_by: adminId },
-            });
-        }
+    if (settings) {
+      settings = await prisma.platformSettings.update({
+        where: { id: settings.id },
+        data: { price_per_kg: merged, updated_by: adminId },
+      });
+    } else {
+      settings = await prisma.platformSettings.create({
+        data: { price_per_kg: merged, updated_by: adminId },
+      });
+    }
 
-        // Sync active listings that match the updated fish types
-        for (const [fishType, newPricePerKg] of Object.entries(pricePerKg as Record<string, number>)) {
-            await prisma.$executeRaw`
+    // Sync active listings that match the updated fish types
+    for (const [fishType, newPricePerKg] of Object.entries(
+      pricePerKg as Record<string, number>,
+    )) {
+      await prisma.$executeRaw`
                 UPDATE listings
                 SET
                     price_per_kg   = ${newPricePerKg},
@@ -555,20 +597,25 @@ export const updatePrices = async (req: Request, res: Response, next: NextFuncti
                 WHERE fish_type = ${fishType}::\"FishType\"
                   AND status NOT IN ('deleted', 'sold', 'archived')
             `;
-        }
+    }
 
-        const pricePerKgOut = { ...DEFAULT_PRICES, ...(settings.price_per_kg as Record<string, number>) };
-        res.status(200).json({
-            status: "success",
-            data: {
-                settings: {
-                    pricePerKg: pricePerKgOut,
-                    updatedAt: settings.updated_at,
-                    updatedBy: settings.updated_by,
-                },
-            },
-        });
-    } catch (error) { next(error); }
+    const pricePerKgOut = {
+      ...DEFAULT_PRICES,
+      ...(settings.price_per_kg as Record<string, number>),
+    };
+    res.status(200).json({
+      status: "success",
+      data: {
+        settings: {
+          pricePerKg: pricePerKgOut,
+          updatedAt: settings.updated_at,
+          updatedBy: settings.updated_by,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 ```
 
@@ -583,43 +630,50 @@ map. After B2 the processed types will be in the map, but the fallback should be
 to use `"table_size"` (not `"catfish"`) to give a sensible price for unlisted types.
 
 Find this line:
+
 ```typescript
-const adminPricePerKg = priceMap[normalizedFishType] ?? priceMap["catfish"] ?? 0;
+const adminPricePerKg =
+  priceMap[normalizedFishType] ?? priceMap["catfish"] ?? 0;
 ```
 
 Replace with:
+
 ```typescript
-const adminPricePerKg = priceMap[normalizedFishType] ?? priceMap["table_size"] ?? 0;
+const adminPricePerKg =
+  priceMap[normalizedFishType] ?? priceMap["table_size"] ?? 0;
 ```
 
 Also, the `fish_type` is currently defaulted to `"catfish"` when the field is missing:
+
 ```typescript
 fish_type: fishType?.toLowerCase() ?? "catfish",
 ```
 
 Replace with:
+
 ```typescript
 fish_type: fishType?.toLowerCase() ?? "table_size",
 ```
 
 **Expected `GET /admin/settings` response after B2:**
+
 ```json
 {
   "status": "success",
   "data": {
     "settings": {
       "pricePerKg": {
-        "catfish":        3500,
-        "fingerlings":    1200,
-        "juveniles":       800,
-        "table_size":     3500,
-        "jumbo":          5000,
-        "parent_stocks":  8000,
-        "dried":          6000,
-        "grilled":        5500,
-        "peppersoup":     7000,
-        "peppered":       6500,
-        "smoked":         6000
+        "catfish": 3500,
+        "fingerlings": 1200,
+        "juveniles": 800,
+        "table_size": 3500,
+        "jumbo": 5000,
+        "parent_stocks": 8000,
+        "dried": 6000,
+        "grilled": 5500,
+        "peppersoup": 7000,
+        "peppered": 6500,
+        "smoked": 6000
       },
       "updatedAt": "2026-06-04T00:00:00.000Z",
       "updatedBy": null
@@ -673,22 +727,26 @@ model SavedListing {
 ```
 
 `onDelete: Cascade` on both foreign keys means:
+
 - If a user is deleted → all their saved listings are automatically removed.
 - If a listing is deleted → it is automatically removed from all buyers' saved lists.
 
 You also need to add back-relations on the two models Prisma already knows about.
 
 Find the `User` model and add inside it (anywhere in the relations block):
+
 ```prisma
 savedListings SavedListing[] @relation("UserSavedListings")
 ```
 
 Find the `Listing` model and add inside it:
+
 ```prisma
 savedBy SavedListing[] @relation("ListingSavedBy")
 ```
 
 Run:
+
 ```bash
 npx prisma migrate dev --name "add_saved_listings"
 npx prisma generate
@@ -704,72 +762,94 @@ functions. Keep them together for readability.
 ```typescript
 // ─── Saved Listings ───────────────────────────────────────────────────────────
 
-export const getSavedListings = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user?.user_id;
-        if (!userId) throw new ApiError(401, "Unauthorized.");
+export const getSavedListings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.user_id;
+    if (!userId) throw new ApiError(401, "Unauthorized.");
 
-        const saved = await prisma.savedListing.findMany({
-            where: { user_id: userId },
-            include: {
-                listing: {
-                    include: {
-                        // Only pull the primary image to avoid over-fetching
-                        images: { where: { is_primary: true }, take: 1 },
-                    },
-                },
-            },
-            orderBy: { created_at: "desc" },
-        });
+    const saved = await prisma.savedListing.findMany({
+      where: { user_id: userId },
+      include: {
+        listing: {
+          include: {
+            // Only pull the primary image to avoid over-fetching
+            images: { where: { is_primary: true }, take: 1 },
+          },
+        },
+      },
+      orderBy: { created_at: "desc" },
+    });
 
-        // Return the listing objects directly — not the SavedListing wrappers.
-        // The frontend expects data.listings to be an array of listing objects.
-        res.status(200).json({
-            status: "success",
-            data: { listings: saved.map((s) => s.listing) },
-        });
-    } catch (error) { next(error); }
+    // Return the listing objects directly — not the SavedListing wrappers.
+    // The frontend expects data.listings to be an array of listing objects.
+    res.status(200).json({
+      status: "success",
+      data: { listings: saved.map((s) => s.listing) },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const saveListing = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user?.user_id;
-        if (!userId) throw new ApiError(401, "Unauthorized.");
+export const saveListing = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.user_id;
+    if (!userId) throw new ApiError(401, "Unauthorized.");
 
-        const { listingId } = req.body as { listingId: string };
-        if (!listingId) throw new ApiError(400, "listingId is required.");
+    const { listingId } = req.body as { listingId: string };
+    if (!listingId) throw new ApiError(400, "listingId is required.");
 
-        // Verify the listing actually exists and is active before saving it.
-        const listing = await prisma.listing.findUnique({ where: { id: listingId } });
-        if (!listing) throw new ApiError(404, "Listing not found.");
+    // Verify the listing actually exists and is active before saving it.
+    const listing = await prisma.listing.findUnique({
+      where: { id: listingId },
+    });
+    if (!listing) throw new ApiError(404, "Listing not found.");
 
-        // upsert: if the save already exists, do nothing (update: {}).
-        // This makes POST /buyers/saved idempotent.
-        await prisma.savedListing.upsert({
-            where: { user_id_listing_id: { user_id: userId, listing_id: listingId } },
-            update: {},
-            create: { user_id: userId, listing_id: listingId },
-        });
+    // upsert: if the save already exists, do nothing (update: {}).
+    // This makes POST /buyers/saved idempotent.
+    await prisma.savedListing.upsert({
+      where: { user_id_listing_id: { user_id: userId, listing_id: listingId } },
+      update: {},
+      create: { user_id: userId, listing_id: listingId },
+    });
 
-        res.status(200).json({ status: "success", message: "Listing saved." });
-    } catch (error) { next(error); }
+    res.status(200).json({ status: "success", message: "Listing saved." });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const unsaveListing = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user?.user_id;
-        if (!userId) throw new ApiError(401, "Unauthorized.");
+export const unsaveListing = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.user_id;
+    if (!userId) throw new ApiError(401, "Unauthorized.");
 
-        const { listingId } = req.params;
+    const { listingId } = req.params;
 
-        // deleteMany instead of delete: does not throw if the record does not exist.
-        // This makes DELETE /buyers/saved/:listingId idempotent.
-        await prisma.savedListing.deleteMany({
-            where: { user_id: userId, listing_id: listingId },
-        });
+    // deleteMany instead of delete: does not throw if the record does not exist.
+    // This makes DELETE /buyers/saved/:listingId idempotent.
+    await prisma.savedListing.deleteMany({
+      where: { user_id: userId, listing_id: listingId },
+    });
 
-        res.status(200).json({ status: "success", message: "Listing removed from saved." });
-    } catch (error) { next(error); }
+    res
+      .status(200)
+      .json({ status: "success", message: "Listing removed from saved." });
+  } catch (error) {
+    next(error);
+  }
 };
 ```
 
@@ -839,6 +919,7 @@ If no listings have been saved: `"listings": []` — not an error, not a 404.
 ```
 
 Response (200 OK):
+
 ```json
 { "status": "success", "message": "Listing saved." }
 ```
@@ -846,6 +927,7 @@ Response (200 OK):
 #### `DELETE /buyers/saved/:listingId` — no body
 
 Response (200 OK — even if it was already removed):
+
 ```json
 { "status": "success", "message": "Listing removed from saved." }
 ```
@@ -869,19 +951,19 @@ Find the return value inside the `farmersWithStats` map. It currently looks like
 
 ```typescript
 return {
-    farmerName: f.full_name,
-    fishType: f.fish_type_preference ?? "catfish",
-    totalListings,
-    totalApprovedListings,
-    totalPendingListings,
-    farmName: f.farm_name,
-    location: `${f.location_lga}, ${f.location_state}`,
-    phoneNumber: f.phone_number,
-    emailAddress: f.email,
-    capacity: f.farming_capacity_kg,
-    experience: f.years_of_experience,
-    memberSince: f.created_at,
-    lastActive: lastActivity?.created_at ?? f.created_at,
+  farmerName: f.full_name,
+  fishType: f.fish_type_preference ?? "catfish",
+  totalListings,
+  totalApprovedListings,
+  totalPendingListings,
+  farmName: f.farm_name,
+  location: `${f.location_lga}, ${f.location_state}`,
+  phoneNumber: f.phone_number,
+  emailAddress: f.email,
+  capacity: f.farming_capacity_kg,
+  experience: f.years_of_experience,
+  memberSince: f.created_at,
+  lastActive: lastActivity?.created_at ?? f.created_at,
 };
 ```
 
@@ -889,20 +971,20 @@ Change it to:
 
 ```typescript
 return {
-    id: f.id,                                                   // ← ADD THIS
-    farmerName: f.full_name,
-    fishType: f.fish_type_preference ?? "table_size",          // ← change default away from "catfish"
-    totalListings,
-    totalApprovedListings,
-    totalPendingListings,
-    farmName: f.farm_name,
-    location: `${f.location_lga}, ${f.location_state}`,
-    phoneNumber: f.phone_number,
-    emailAddress: f.email,
-    capacity: f.farming_capacity_kg ? Number(f.farming_capacity_kg) : null,
-    experience: f.years_of_experience,
-    memberSince: f.created_at,
-    lastActive: lastActivity?.created_at ?? f.created_at,
+  id: f.id, // ← ADD THIS
+  farmerName: f.full_name,
+  fishType: f.fish_type_preference ?? "table_size", // ← change default away from "catfish"
+  totalListings,
+  totalApprovedListings,
+  totalPendingListings,
+  farmName: f.farm_name,
+  location: `${f.location_lga}, ${f.location_state}`,
+  phoneNumber: f.phone_number,
+  emailAddress: f.email,
+  capacity: f.farming_capacity_kg ? Number(f.farming_capacity_kg) : null,
+  experience: f.years_of_experience,
+  memberSince: f.created_at,
+  lastActive: lastActivity?.created_at ?? f.created_at,
 };
 ```
 
@@ -915,86 +997,93 @@ return {
 Add this new export after the `getFarmers` function:
 
 ```typescript
-export const getFarmerById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const clusterFarmerId = req.user?.user_id;
-        if (!clusterFarmerId) throw new ApiError(401, "Unauthorized.");
+export const getFarmerById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const clusterFarmerId = req.user?.user_id;
+    if (!clusterFarmerId) throw new ApiError(401, "Unauthorized.");
 
-        await requireClusterFarmer(clusterFarmerId);
+    await requireClusterFarmer(clusterFarmerId);
 
-        const { farmerId } = req.params;
+    const { farmerId } = req.params;
 
-        // Scope the query to farmers that belong to THIS cluster farmer.
-        // A cluster farmer must not be able to view farmers from another cluster.
-        const farmer = await prisma.user.findFirst({
-            where: {
-                id: farmerId,
-                cluster_farmer_id: clusterFarmerId,
-                role: "farmer",
-            },
-        });
+    // Scope the query to farmers that belong to THIS cluster farmer.
+    // A cluster farmer must not be able to view farmers from another cluster.
+    const farmer = await prisma.user.findFirst({
+      where: {
+        id: farmerId,
+        cluster_farmer_id: clusterFarmerId,
+        role: "farmer",
+      },
+    });
 
-        if (!farmer) throw new ApiError(404, "Farmer not found in your cluster.");
+    if (!farmer) throw new ApiError(404, "Farmer not found in your cluster.");
 
-        // Run listing counts in parallel to avoid sequential DB round-trips.
-        const [totalListings, approvedListings, pendingListings] = await Promise.all([
-            prisma.listing.count({
-                where: { farmer_id: farmerId, status: { not: "deleted" } },
-            }),
-            prisma.listing.count({
-                where: { farmer_id: farmerId, cluster_approved: true },
-            }),
-            prisma.listing.count({
-                where: { farmer_id: farmerId, status: "pending" },
-            }),
-        ]);
+    // Run listing counts in parallel to avoid sequential DB round-trips.
+    const [totalListings, approvedListings, pendingListings] =
+      await Promise.all([
+        prisma.listing.count({
+          where: { farmer_id: farmerId, status: { not: "deleted" } },
+        }),
+        prisma.listing.count({
+          where: { farmer_id: farmerId, cluster_approved: true },
+        }),
+        prisma.listing.count({
+          where: { farmer_id: farmerId, status: "pending" },
+        }),
+      ]);
 
-        const totalKgResult = await prisma.listing.aggregate({
-            where: { farmer_id: farmerId, status: "active" },
-            _sum: { total_available_kg: true },
-        });
+    const totalKgResult = await prisma.listing.aggregate({
+      where: { farmer_id: farmerId, status: "active" },
+      _sum: { total_available_kg: true },
+    });
 
-        const recentListings = await prisma.listing.findMany({
-            where: { farmer_id: farmerId, status: { not: "deleted" } },
-            orderBy: { listed_date: "desc" },
-            take: 5,
-        });
+    const recentListings = await prisma.listing.findMany({
+      where: { farmer_id: farmerId, status: { not: "deleted" } },
+      orderBy: { listed_date: "desc" },
+      take: 5,
+    });
 
-        res.status(200).json({
-            status: "success",
-            data: {
-                farmer: {
-                    id: farmer.id,
-                    fullName: farmer.full_name,
-                    email: farmer.email,
-                    phoneNumber: farmer.phone_number,
-                    profilePhotoUrl: farmer.profile_photo_url,
-                    farmName: farmer.farm_name,
-                    state: farmer.location_state,
-                    localGovernment: farmer.location_lga,
-                    farmingCapacityKg: farmer.farming_capacity_kg
-                        ? Number(farmer.farming_capacity_kg)
-                        : null,
-                    yearsOfExperience: farmer.years_of_experience,
-                    verificationStatus: farmer.verification_status,
-                    memberSince: farmer.created_at,
-                    stats: {
-                        totalListings,
-                        approvedListings,
-                        pendingListings,
-                        totalSupplyKg: Number(totalKgResult._sum.total_available_kg ?? 0),
-                    },
-                    recentListings: recentListings.map((l) => ({
-                        id: l.id,
-                        fishType: l.fish_type,
-                        totalAvailableKg: Number(l.total_available_kg),
-                        status: l.status,
-                        createdAt: l.created_at,
-                    })),
-                },
-            },
-        });
-    } catch (error) { next(error); }
+    res.status(200).json({
+      status: "success",
+      data: {
+        farmer: {
+          id: farmer.id,
+          fullName: farmer.full_name,
+          email: farmer.email,
+          phoneNumber: farmer.phone_number,
+          profilePhotoUrl: farmer.profile_photo_url,
+          farmName: farmer.farm_name,
+          state: farmer.location_state,
+          localGovernment: farmer.location_lga,
+          farmingCapacityKg: farmer.farming_capacity_kg
+            ? Number(farmer.farming_capacity_kg)
+            : null,
+          yearsOfExperience: farmer.years_of_experience,
+          verificationStatus: farmer.verification_status,
+          memberSince: farmer.created_at,
+          stats: {
+            totalListings,
+            approvedListings,
+            pendingListings,
+            totalSupplyKg: Number(totalKgResult._sum.total_available_kg ?? 0),
+          },
+          recentListings: recentListings.map((l) => ({
+            id: l.id,
+            fishType: l.fish_type,
+            totalAvailableKg: Number(l.total_available_kg),
+            status: l.status,
+            createdAt: l.created_at,
+          })),
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 ```
 
@@ -1009,7 +1098,7 @@ instead of the list.
 
 ```typescript
 router.get("/farmers", clusterController.getFarmers);
-router.get("/farmers/:farmerId", clusterController.getFarmerById);  // ← add after the line above
+router.get("/farmers/:farmerId", clusterController.getFarmerById); // ← add after the line above
 ```
 
 ---
@@ -1136,11 +1225,13 @@ model Notification {
 ```
 
 Add the back-relation on the `User` model:
+
 ```prisma
 notifications Notification[] @relation("UserNotifications")
 ```
 
 Run:
+
 ```bash
 npx prisma migrate dev --name "add_notifications"
 npx prisma generate
@@ -1158,56 +1249,77 @@ import { prisma } from "../models/user.model.js";
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-export const getNotifications = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user?.user_id;
-        if (!userId) throw new Error("Unauthorized");
+export const getNotifications = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.user_id;
+    if (!userId) throw new Error("Unauthorized");
 
-        const notifications = await prisma.notification.findMany({
-            where: { user_id: userId },
-            orderBy: { created_at: "desc" },
-            take: 50,   // cap at 50 — the bell doesn't paginate
-        });
+    const notifications = await prisma.notification.findMany({
+      where: { user_id: userId },
+      orderBy: { created_at: "desc" },
+      take: 50, // cap at 50 — the bell doesn't paginate
+    });
 
-        const unreadCount = notifications.filter((n) => !n.read).length;
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
-        res.status(200).json({
-            status: "success",
-            data: { notifications, unreadCount },
-        });
-    } catch (error) { next(error); }
+    res.status(200).json({
+      status: "success",
+      data: { notifications, unreadCount },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const markRead = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user?.user_id;
-        if (!userId) throw new Error("Unauthorized");
+export const markRead = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.user_id;
+    if (!userId) throw new Error("Unauthorized");
 
-        // Use updateMany + user_id scope so a user cannot mark another user's notification.
-        await prisma.notification.updateMany({
-            where: {
-                id: req.params.notificationId,
-                user_id: userId,
-            },
-            data: { read: true },
-        });
+    // Use updateMany + user_id scope so a user cannot mark another user's notification.
+    await prisma.notification.updateMany({
+      where: {
+        id: req.params.notificationId,
+        user_id: userId,
+      },
+      data: { read: true },
+    });
 
-        res.status(200).json({ status: "success", message: "Marked as read." });
-    } catch (error) { next(error); }
+    res.status(200).json({ status: "success", message: "Marked as read." });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const markAllRead = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user?.user_id;
-        if (!userId) throw new Error("Unauthorized");
+export const markAllRead = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.user_id;
+    if (!userId) throw new Error("Unauthorized");
 
-        await prisma.notification.updateMany({
-            where: { user_id: userId, read: false },
-            data: { read: true },
-        });
+    await prisma.notification.updateMany({
+      where: { user_id: userId, read: false },
+      data: { read: true },
+    });
 
-        res.status(200).json({ status: "success", message: "All notifications marked as read." });
-    } catch (error) { next(error); }
+    res.status(200).json({
+      status: "success",
+      message: "All notifications marked as read.",
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // ─── Internal utility (not a route handler) ───────────────────────────────────
@@ -1218,14 +1330,14 @@ export const markAllRead = async (req: Request, res: Response, next: NextFunctio
 //   void createNotification(order.buyer_id, "Order Update", "Your order was shipped.", "info");
 
 export const createNotification = async (
-    userId: string,
-    title: string,
-    message: string,
-    type: "info" | "success" | "warning" | "error" = "info",
+  userId: string,
+  title: string,
+  message: string,
+  type: "info" | "success" | "warning" | "error" = "info",
 ): Promise<void> => {
-    await prisma.notification.create({
-        data: { user_id: userId, title, message, type },
-    });
+  await prisma.notification.create({
+    data: { user_id: userId, title, message, type },
+  });
 };
 ```
 
@@ -1275,7 +1387,7 @@ import farmersRoutes from "./farmers.routes.js";
 import clusterRoutes from "./cluster.routes.js";
 import buyersRoutes from "./buyers.routes.js";
 import marketplaceRoutes from "./marketplace.routes.js";
-import notificationRoutes from "./notifications.routes.js";   // ← NEW
+import notificationRoutes from "./notifications.routes.js"; // ← NEW
 
 const router = Router();
 
@@ -1286,7 +1398,7 @@ router.use("/farmers", farmersRoutes);
 router.use("/cluster", clusterRoutes);
 router.use("/buyers", buyersRoutes);
 router.use("/marketplace", marketplaceRoutes);
-router.use("/notifications", notificationRoutes);              // ← NEW
+router.use("/notifications", notificationRoutes); // ← NEW
 router.use("/users", userRoutes);
 router.use("/admin", adminRoutes);
 router.use("/listings", listingRoutes);
@@ -1319,19 +1431,19 @@ Find the block that runs when `status === "approved"`. It currently ends with a
 ```typescript
 // After: await logActivity(listing.user.cluster_farmer_id ?? userId, `listing_${status}`, ...)
 if (status === "approved") {
-    void createNotification(
-        listing.farmer_id,
-        "Listing Approved",
-        `Your listing "${updated.fish_type} ${Number(updated.total_available_kg ?? 0)}kg" has been approved and is now live on the marketplace.`,
-        "success",
-    );
+  void createNotification(
+    listing.farmer_id,
+    "Listing Approved",
+    `Your listing "${updated.fish_type} ${Number(updated.total_available_kg ?? 0)}kg" has been approved and is now live on the marketplace.`,
+    "success",
+  );
 } else {
-    void createNotification(
-        listing.farmer_id,
-        "Listing Rejected",
-        `Your listing "${updated.fish_type} ${Number(updated.total_available_kg ?? 0)}kg" was not approved. Reason: ${rejectionReason || "No reason provided."}`,
-        "error",
-    );
+  void createNotification(
+    listing.farmer_id,
+    "Listing Rejected",
+    `Your listing "${updated.fish_type} ${Number(updated.total_available_kg ?? 0)}kg" was not approved. Reason: ${rejectionReason || "No reason provided."}`,
+    "error",
+  );
 }
 ```
 
@@ -1346,12 +1458,12 @@ Find the section after `prisma.orderTracking.create`. Add:
 ```typescript
 // Notify cluster farmer that a new order has arrived
 if (clusterFarmerId) {
-    void createNotification(
-        clusterFarmerId,
-        "New Order Received",
-        `A buyer placed a new order (#${order.order_number}). Please confirm and begin processing.`,
-        "info",
-    );
+  void createNotification(
+    clusterFarmerId,
+    "New Order Received",
+    `A buyer placed a new order (#${order.order_number}). Please confirm and begin processing.`,
+    "info",
+  );
 }
 ```
 
@@ -1366,10 +1478,10 @@ Find the section after `prisma.orderTracking.create`. Add:
 ```typescript
 // Notify buyer that their order status changed
 void createNotification(
-    order.buyer_id,
-    "Order Update",
-    `Your order #${order.order_number} has been updated to "${status}".`,
-    "info",
+  order.buyer_id,
+  "Order Update",
+  `Your order #${order.order_number} has been updated to "${status}".`,
+  "info",
 );
 ```
 
@@ -1387,18 +1499,18 @@ Find the section after `prisma.orderTracking.create`. Add:
 ```typescript
 // Notify both the farmer and the cluster farmer that payment was received
 void createNotification(
-    order.farmer_id,
-    "Payment Received",
-    `Payment for order #${order.order_number} has been confirmed. Funds are in escrow.`,
-    "success",
+  order.farmer_id,
+  "Payment Received",
+  `Payment for order #${order.order_number} has been confirmed. Funds are in escrow.`,
+  "success",
 );
 if (order.cluster_farmer_id) {
-    void createNotification(
-        order.cluster_farmer_id,
-        "Payment Received",
-        `Payment for order #${order.order_number} has been confirmed. Prepare for fulfilment.`,
-        "success",
-    );
+  void createNotification(
+    order.cluster_farmer_id,
+    "Payment Received",
+    `Payment for order #${order.order_number} has been confirmed. Prepare for fulfilment.`,
+    "success",
+  );
 }
 ```
 
@@ -1412,10 +1524,10 @@ Find the section after `prisma.demand.update`. Add:
 
 ```typescript
 void createNotification(
-    cluster_farmer_id,
-    "New Demand Assigned",
-    `A demand for ${Number(demand.weight_kg)}kg of ${demand.fish_type} has been assigned to you. Review it in your Demands dashboard.`,
-    "info",
+  cluster_farmer_id,
+  "New Demand Assigned",
+  `A demand for ${Number(demand.weight_kg)}kg of ${demand.fish_type} has been assigned to you. Review it in your Demands dashboard.`,
+  "info",
 );
 ```
 
@@ -1433,10 +1545,10 @@ Find the section after `prisma.activityLog.create`. Add:
 
 ```typescript
 void createNotification(
-    applicantId,
-    "Application Approved",
-    "Your cluster farmer application has been approved. You can now manage farmers and listings from your Cluster Dashboard.",
-    "success",
+  applicantId,
+  "Application Approved",
+  "Your cluster farmer application has been approved. You can now manage farmers and listings from your Cluster Dashboard.",
+  "success",
 );
 ```
 
@@ -1450,10 +1562,10 @@ Find the section after `prisma.user.update`. Add:
 
 ```typescript
 void createNotification(
-    applicantId,
-    "Application Rejected",
-    "Your cluster farmer application was not approved at this time. Please contact support if you have questions.",
-    "error",
+  applicantId,
+  "Application Rejected",
+  "Your cluster farmer application was not approved at this time. Please contact support if you have questions.",
+  "error",
 );
 ```
 
@@ -1513,12 +1625,13 @@ If the user has no notifications: `"notifications": []`, `"unreadCount": 0` — 
 ### What the user sees right now
 
 - On `/farmers-dashboard` and `/cluster-dashboard`, the payouts section shows `₦0 total
-  earnings` and `₦0 pending` even when real payouts exist.
+earnings` and `₦0 pending` even when real payouts exist.
 - The payout list itself renders rows but shows no order number next to each payout.
 
 ### Why it happens
 
 The current `getPayouts` in both `farmers.controller.ts` and `cluster.controller.ts`:
+
 1. Does not join the `Order` table, so `orderNumber` is unavailable.
 2. Does not include `paidAt` (the column does not exist yet on the `Payout` model).
 3. Returns `{ payouts }` only — the top-level `totalEarnings` and `pendingPayouts` fields
@@ -1549,6 +1662,7 @@ model Payout {
 ```
 
 Run:
+
 ```bash
 npx prisma migrate dev --name "add_payout_paid_at"
 npx prisma generate
@@ -1563,44 +1677,50 @@ npx prisma generate
 Replace the existing `getPayouts` function entirely:
 
 ```typescript
-export const getPayouts = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user?.user_id;
-        if (!userId) throw new ApiError(401, "Unauthorized.");
+export const getPayouts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.user_id;
+    if (!userId) throw new ApiError(401, "Unauthorized.");
 
-        const payouts = await prisma.payout.findMany({
-            where: { user_id: userId },
-            include: {
-                // Join order to get the order number for display
-                order: { select: { order_number: true } },
-            },
-            orderBy: { created_at: "desc" },
-        });
+    const payouts = await prisma.payout.findMany({
+      where: { user_id: userId },
+      include: {
+        // Join order to get the order number for display
+        order: { select: { order_number: true } },
+      },
+      orderBy: { created_at: "desc" },
+    });
 
-        const formatted = payouts.map((p) => ({
-            id: p.id,
-            orderId: p.order_id,
-            orderNumber: p.order.order_number,
-            amount: Number(p.amount),
-            status: p.status,
-            createdAt: p.created_at,
-            paidAt: p.paid_at ?? null,
-        }));
+    const formatted = payouts.map((p) => ({
+      id: p.id,
+      orderId: p.order_id,
+      orderNumber: p.order.order_number,
+      amount: Number(p.amount),
+      status: p.status,
+      createdAt: p.created_at,
+      paidAt: p.paid_at ?? null,
+    }));
 
-        // Compute totals from the fetched rows to avoid a second DB round-trip
-        const totalEarnings = payouts
-            .filter((p) => p.status === "paid")
-            .reduce((sum, p) => sum + Number(p.amount), 0);
+    // Compute totals from the fetched rows to avoid a second DB round-trip
+    const totalEarnings = payouts
+      .filter((p) => p.status === "paid")
+      .reduce((sum, p) => sum + Number(p.amount), 0);
 
-        const pendingPayouts = payouts
-            .filter((p) => p.status === "pending" || p.status === "processing")
-            .reduce((sum, p) => sum + Number(p.amount), 0);
+    const pendingPayouts = payouts
+      .filter((p) => p.status === "pending" || p.status === "processing")
+      .reduce((sum, p) => sum + Number(p.amount), 0);
 
-        res.status(200).json({
-            status: "success",
-            data: { payouts: formatted, totalEarnings, pendingPayouts },
-        });
-    } catch (error) { next(error); }
+    res.status(200).json({
+      status: "success",
+      data: { payouts: formatted, totalEarnings, pendingPayouts },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 ```
 
@@ -1610,44 +1730,50 @@ Apply the same logic but use `totalClusterEarnings` as the key name — the fron
 TypeScript type for cluster payouts uses that name specifically:
 
 ```typescript
-export const getPayouts = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user?.user_id;
-        if (!userId) throw new ApiError(401, "Unauthorized.");
+export const getPayouts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.user_id;
+    if (!userId) throw new ApiError(401, "Unauthorized.");
 
-        await requireClusterFarmer(userId);
+    await requireClusterFarmer(userId);
 
-        const payouts = await prisma.payout.findMany({
-            where: { user_id: userId },
-            include: {
-                order: { select: { order_number: true } },
-            },
-            orderBy: { created_at: "desc" },
-        });
+    const payouts = await prisma.payout.findMany({
+      where: { user_id: userId },
+      include: {
+        order: { select: { order_number: true } },
+      },
+      orderBy: { created_at: "desc" },
+    });
 
-        const formatted = payouts.map((p) => ({
-            id: p.id,
-            orderId: p.order_id,
-            orderNumber: p.order.order_number,
-            amount: Number(p.amount),
-            status: p.status,
-            createdAt: p.created_at,
-            paidAt: p.paid_at ?? null,
-        }));
+    const formatted = payouts.map((p) => ({
+      id: p.id,
+      orderId: p.order_id,
+      orderNumber: p.order.order_number,
+      amount: Number(p.amount),
+      status: p.status,
+      createdAt: p.created_at,
+      paidAt: p.paid_at ?? null,
+    }));
 
-        const totalClusterEarnings = payouts
-            .filter((p) => p.status === "paid")
-            .reduce((sum, p) => sum + Number(p.amount), 0);
+    const totalClusterEarnings = payouts
+      .filter((p) => p.status === "paid")
+      .reduce((sum, p) => sum + Number(p.amount), 0);
 
-        const pendingPayouts = payouts
-            .filter((p) => p.status === "pending" || p.status === "processing")
-            .reduce((sum, p) => sum + Number(p.amount), 0);
+    const pendingPayouts = payouts
+      .filter((p) => p.status === "pending" || p.status === "processing")
+      .reduce((sum, p) => sum + Number(p.amount), 0);
 
-        res.status(200).json({
-            status: "success",
-            data: { payouts: formatted, totalClusterEarnings, pendingPayouts },
-        });
-    } catch (error) { next(error); }
+    res.status(200).json({
+      status: "success",
+      data: { payouts: formatted, totalClusterEarnings, pendingPayouts },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 ```
 
@@ -1721,13 +1847,21 @@ Add `category` to the query param handling in the `getListings` controller. `fis
 #### Current state (query extraction + where clause)
 
 ```typescript
-const { fishType, state, lga, minPrice, maxPrice, page = "1", limit = "20" } = req.query;
+const {
+  fishType,
+  state,
+  lga,
+  minPrice,
+  maxPrice,
+  page = "1",
+  limit = "20",
+} = req.query;
 
 const where: any = {
-    status: "active",
-    cluster_approved: true,
-    is_draft: false,
-    expires_at: { gte: new Date() },
+  status: "active",
+  cluster_approved: true,
+  is_draft: false,
+  expires_at: { gte: new Date() },
 };
 
 if (fishType) where.fish_type = fishType;
@@ -1739,43 +1873,63 @@ if (state) where.location_state = { contains: state, mode: "insensitive" };
 
 ```typescript
 const {
-    fishType,
-    state,
-    lga,
-    minPrice,
-    maxPrice,
-    page = "1",
-    limit = "20",
-    category,        // ← new: "live" | "processed" | undefined
+  fishType,
+  state,
+  lga,
+  minPrice,
+  maxPrice,
+  page = "1",
+  limit = "20",
+  category, // ← new: "live" | "processed" | undefined
 } = req.query;
 
 // These must stay in sync with the LIVE_FISH_TYPES and PROCESSED_FISH_TYPES
 // constants in the frontend (frontend/src/types/constants.ts).
-const LIVE_TYPES     = ["fingerlings", "juveniles", "table_size", "jumbo", "parent_stocks"];
-const PROCESSED_TYPES = ["dried", "grilled", "peppersoup", "peppered", "smoked"];
+const LIVE_TYPES = [
+  "fingerlings",
+  "juveniles",
+  "table_size",
+  "jumbo",
+  "parent_stocks",
+];
+const PROCESSED_TYPES = [
+  "dried",
+  "grilled",
+  "peppersoup",
+  "peppered",
+  "smoked",
+];
 
 const where: any = {
-    status: "active",
-    cluster_approved: true,
-    is_draft: false,
-    expires_at: { gte: new Date() },
+  status: "active",
+  cluster_approved: true,
+  is_draft: false,
+  expires_at: { gte: new Date() },
 };
 
 if (fishType) {
-    // Exact type match — ignore category if fishType is also present
-    where.fish_type = fishType;
+  // Exact type match — ignore category if fishType is also present
+  where.fish_type = fishType;
 } else if (category === "live") {
-    where.fish_type = { in: LIVE_TYPES };
+  where.fish_type = { in: LIVE_TYPES };
 } else if (category === "processed") {
-    where.fish_type = { in: PROCESSED_TYPES };
+  where.fish_type = { in: PROCESSED_TYPES };
 }
 // If neither fishType nor category is provided, no fish_type filter is applied
 // and all approved listings are returned.
 
 if (state) where.location_state = { contains: state, mode: "insensitive" };
 if (lga) where.location_lga = { contains: lga, mode: "insensitive" };
-if (minPrice) where.price_per_kg = { ...where.price_per_kg, gte: parseFloat(minPrice as string) };
-if (maxPrice) where.price_per_kg = { ...where.price_per_kg, lte: parseFloat(maxPrice as string) };
+if (minPrice)
+  where.price_per_kg = {
+    ...where.price_per_kg,
+    gte: parseFloat(minPrice as string),
+  };
+if (maxPrice)
+  where.price_per_kg = {
+    ...where.price_per_kg,
+    lte: parseFloat(maxPrice as string),
+  };
 ```
 
 **No schema migration needed.**
@@ -1807,17 +1961,30 @@ has any inline validation that checks `fishVariant` against a hardcoded list, up
 list too. Search for `fishVariant` in the controller. If you find something like:
 
 ```typescript
-if (fishVariant && !["dried", "jumbo", "table_size", "broodstock"].includes(fishVariant)) {
-    throw new ApiError(400, "Invalid fish variant.");
+if (
+  fishVariant &&
+  !["dried", "jumbo", "table_size", "broodstock"].includes(fishVariant)
+) {
+  throw new ApiError(400, "Invalid fish variant.");
 }
 ```
 
 Change it to:
 
 ```typescript
-const VALID_VARIANTS = ["dried", "jumbo", "table_size", "broodstock", "live", "processed"];
+const VALID_VARIANTS = [
+  "dried",
+  "jumbo",
+  "table_size",
+  "broodstock",
+  "live",
+  "processed",
+];
 if (fishVariant && !VALID_VARIANTS.includes(fishVariant)) {
-    throw new ApiError(400, `Invalid fish variant. Must be one of: ${VALID_VARIANTS.join(", ")}`);
+  throw new ApiError(
+    400,
+    `Invalid fish variant. Must be one of: ${VALID_VARIANTS.join(", ")}`,
+  );
 }
 ```
 
@@ -1837,17 +2004,18 @@ if (fishVariant && !VALID_VARIANTS.includes(fishVariant)) {
 }
 ```
 
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| `fishType` | string | Yes | One of the 10 valid types (not `catfish`) |
-| `weightKg` | number | Yes | Positive number, in kilograms |
-| `fishVariant` | string | No | `"live"` or `"processed"` — the category label |
-| `locationState` | string | Yes | Nigerian state name |
-| `locationLga` | string | Yes | LGA within that state |
-| `deliveryAddress` | string | Yes | Street address for delivery |
-| `notes` | string | No | Free-text notes from the buyer |
+| Field             | Type   | Required | Notes                                          |
+| ----------------- | ------ | -------- | ---------------------------------------------- |
+| `fishType`        | string | Yes      | One of the 10 valid types (not `catfish`)      |
+| `weightKg`        | number | Yes      | Positive number, in kilograms                  |
+| `fishVariant`     | string | No       | `"live"` or `"processed"` — the category label |
+| `locationState`   | string | Yes      | Nigerian state name                            |
+| `locationLga`     | string | Yes      | LGA within that state                          |
+| `deliveryAddress` | string | Yes      | Street address for delivery                    |
+| `notes`           | string | No       | Free-text notes from the buyer                 |
 
 Expected 201 response:
+
 ```json
 {
   "status": "success",
@@ -1902,37 +2070,37 @@ Bearer <token>`, `—` = public.
 
 ### AUTH
 
-| Method | Path | Auth | Request Body | Success Response |
-|--------|------|------|-------------|-----------------|
-| POST | `/auth/role` | — | `{ role: "farmer"\|"buyer"\|"cluster"\|"admin" }` | 200 |
-| POST | `/auth/register` | — | `{ fullName, phone, email, state, localGovernment, password }` | 201 |
-| POST | `/auth/register/otp` | — | `{ emailAddress, registerOtp }` | 200 |
-| POST | `/auth/register/otp/resend` | — | `{ emailAddress }` | 200 |
-| POST | `/auth/login` | — | `{ emailAddress, password }` | 200 → sends OTP |
-| POST | `/auth/login/otp` | — | `{ emailAddress, loginOtp }` | 200 → `{ access_token, refresh_token, user }` |
-| POST | `/auth/login/otp/resend` | — | `{ emailAddress }` | 200 |
-| POST | `/auth/forgot-password` | — | `{ emailAddress }` | 200 |
-| POST | `/auth/forgot-password/otp` | — | `{ emailAddress, resetOtp, newPassword }` | 200 |
-| POST | `/auth/forgot-password/otp/resend` | — | `{ emailAddress }` | 200 |
-| GET | `/auth/me` | ✓ | — | 200 → full user object |
-| POST | `/auth/verify` | ✓ | `{ bvn, creditConsent }` | 200 |
-| POST | `/auth/refresh` | — | `{ refresh_token }` | 200 → `{ access_token }` |
-| POST | `/auth/logout` | ✓ | — | 200 |
-| POST | `/auth/logout/all` | ✓ | — | 200 |
+| Method | Path                               | Auth | Request Body                                                   | Success Response                              |
+| ------ | ---------------------------------- | ---- | -------------------------------------------------------------- | --------------------------------------------- |
+| POST   | `/auth/role`                       | —    | `{ role: "farmer"\|"buyer"\|"cluster"\|"admin" }`              | 200                                           |
+| POST   | `/auth/register`                   | —    | `{ fullName, phone, email, state, localGovernment, password }` | 201                                           |
+| POST   | `/auth/register/otp`               | —    | `{ emailAddress, registerOtp }`                                | 200                                           |
+| POST   | `/auth/register/otp/resend`        | —    | `{ emailAddress }`                                             | 200                                           |
+| POST   | `/auth/login`                      | —    | `{ emailAddress, password }`                                   | 200 → sends OTP                               |
+| POST   | `/auth/login/otp`                  | —    | `{ emailAddress, loginOtp }`                                   | 200 → `{ access_token, refresh_token, user }` |
+| POST   | `/auth/login/otp/resend`           | —    | `{ emailAddress }`                                             | 200                                           |
+| POST   | `/auth/forgot-password`            | —    | `{ emailAddress }`                                             | 200                                           |
+| POST   | `/auth/forgot-password/otp`        | —    | `{ emailAddress, resetOtp, newPassword }`                      | 200                                           |
+| POST   | `/auth/forgot-password/otp/resend` | —    | `{ emailAddress }`                                             | 200                                           |
+| GET    | `/auth/me`                         | ✓    | —                                                              | 200 → full user object                        |
+| POST   | `/auth/verify`                     | ✓    | `{ bvn, creditConsent }`                                       | 200                                           |
+| POST   | `/auth/refresh`                    | —    | `{ refresh_token }`                                            | 200 → `{ access_token }`                      |
+| POST   | `/auth/logout`                     | ✓    | —                                                              | 200                                           |
+| POST   | `/auth/logout/all`                 | ✓    | —                                                              | 200                                           |
 
 ---
 
 ### FARMER
 
-| Method | Path | Auth | Request Body | Notes |
-|--------|------|------|-------------|-------|
-| POST | `/farmers/listings/create` | ✓ farmer | `{ fishType, harvestDate, totalFishAvailable, weightKg, listedDate? }` | After B2: accepts all 10 `fishType` values |
-| GET | `/farmers/listings/get` | ✓ farmer | — | See response shape below |
-| GET | `/farmers/recent-activities` | ✓ farmer | — | `{ activities: [{ id, description, type, created_at }] }` |
-| PATCH | `/farmers/account-profile` | ✓ farmer | `{ fullName?, phoneNumber?, email?, profileImage?, farmName?, farmAddress?, localGovernment?, state?, fishType?, farmingCapacityKg?, yearsOfExperience? }` | `profileImage` is a Cloudinary URL string |
-| PATCH | `/farmers/cluster-farmer-application` | ✓ farmer | `{ businessName, cacNumber, warehouseLocation, distributionCapacity, logisticsAvailable?, bvnVerification?, proofOfAddress?, cacRegistration?, businessLicense?, taxClearance? }` | All doc fields are Cloudinary URLs |
-| GET | `/farmers/orders` | ✓ farmer | — | `{ orders: [{ orderId, orderNumber, buyerName, buyerPhone?, fishType, variant?, weightKg, quantity, processed?, deliveryOption, status, paymentStatus?, totalAmount?, createdAt }] }` |
-| GET | `/farmers/payouts` | ✓ farmer | — | See B6 — must return `totalEarnings` and `pendingPayouts` |
+| Method | Path                                  | Auth     | Request Body                                                                                                                                                                      | Notes                                                                                                                                                                                 |
+| ------ | ------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/farmers/listings/create`            | ✓ farmer | `{ fishType, harvestDate, totalFishAvailable, weightKg, listedDate? }`                                                                                                            | After B2: accepts all 10 `fishType` values                                                                                                                                            |
+| GET    | `/farmers/listings/get`               | ✓ farmer | —                                                                                                                                                                                 | See response shape below                                                                                                                                                              |
+| GET    | `/farmers/recent-activities`          | ✓ farmer | —                                                                                                                                                                                 | `{ activities: [{ id, description, type, created_at }] }`                                                                                                                             |
+| PATCH  | `/farmers/account-profile`            | ✓ farmer | `{ fullName?, phoneNumber?, email?, profileImage?, farmName?, farmAddress?, localGovernment?, state?, fishType?, farmingCapacityKg?, yearsOfExperience? }`                        | `profileImage` is a Cloudinary URL string                                                                                                                                             |
+| PATCH  | `/farmers/cluster-farmer-application` | ✓ farmer | `{ businessName, cacNumber, warehouseLocation, distributionCapacity, logisticsAvailable?, bvnVerification?, proofOfAddress?, cacRegistration?, businessLicense?, taxClearance? }` | All doc fields are Cloudinary URLs                                                                                                                                                    |
+| GET    | `/farmers/orders`                     | ✓ farmer | —                                                                                                                                                                                 | `{ orders: [{ orderId, orderNumber, buyerName, buyerPhone?, fishType, variant?, weightKg, quantity, processed?, deliveryOption, status, paymentStatus?, totalAmount?, createdAt }] }` |
+| GET    | `/farmers/payouts`                    | ✓ farmer | —                                                                                                                                                                                 | See B6 — must return `totalEarnings` and `pendingPayouts`                                                                                                                             |
 
 **`GET /farmers/listings/get` full expected response:**
 
@@ -1970,43 +2138,43 @@ Bearer <token>`, `—` = public.
 
 ### CLUSTER
 
-| Method | Path | Auth | Request Body | Notes |
-|--------|------|------|-------------|-------|
-| PATCH | `/cluster/account-profile` | ✓ cluster | `{ fullName?, phoneNumber?, email?, profileImage? }` | |
-| GET | `/cluster/listings/get` | ✓ cluster | — | Same summary+listings shape as farmer listings |
-| GET | `/cluster/current-activities` | ✓ cluster | — | `{ activities: [] }` |
-| GET | `/cluster/pending-approvals` | ✓ cluster | — | `{ listings: [{ id, fishType, farmerName, harvestDate, listedDate, totalFishAvailable, packaging: { weightKg, quantity }, createdAt, updatedAt }] }` |
-| PATCH | `/cluster/pending-approvals/:listingId` | ✓ cluster | `{ status: "approved"\|"rejected", rejectionReason? }` | |
-| GET | `/cluster/farmers` | ✓ cluster | — | Must include `id` per farmer — see B4a |
-| GET | `/cluster/farmers/:farmerId` | ✓ cluster | — | Missing — see B4b |
-| GET | `/cluster/orders` | ✓ cluster | — | `{ orders: [{ orderId, buyerName, buyerPhone, fishType, variant?, processed?, weightKg, quantity, deliveryOption, status, createdAt }] }` |
-| PATCH | `/cluster/orders/:orderId` | ✓ cluster | `{ status: "confirmed"\|"processing"\|"shipped"\|"delivered"\|"cancelled", notes? }` | |
-| GET | `/cluster/demands` | ✓ cluster | — | `{ demands: [{ id, buyerName, buyerPhone?, fishType, weightKg, fishVariant, locationState, locationLga, deliveryAddress, notes?, status, assignedAt?, acceptedAt?, createdAt }] }` |
-| PATCH | `/cluster/demands/:demandId/accept` | ✓ cluster | — | |
-| PATCH | `/cluster/demands/:demandId/decline` | ✓ cluster | `{ reason? }` | |
-| PATCH | `/cluster/demands/:demandId/fulfill` | ✓ cluster | — | |
-| GET | `/cluster/payouts` | ✓ cluster | — | See B6 — must return `totalClusterEarnings` and `pendingPayouts` |
+| Method | Path                                    | Auth      | Request Body                                                                         | Notes                                                                                                                                                                              |
+| ------ | --------------------------------------- | --------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PATCH  | `/cluster/account-profile`              | ✓ cluster | `{ fullName?, phoneNumber?, email?, profileImage? }`                                 |                                                                                                                                                                                    |
+| GET    | `/cluster/listings/get`                 | ✓ cluster | —                                                                                    | Same summary+listings shape as farmer listings                                                                                                                                     |
+| GET    | `/cluster/current-activities`           | ✓ cluster | —                                                                                    | `{ activities: [] }`                                                                                                                                                               |
+| GET    | `/cluster/pending-approvals`            | ✓ cluster | —                                                                                    | `{ listings: [{ id, fishType, farmerName, harvestDate, listedDate, totalFishAvailable, packaging: { weightKg, quantity }, createdAt, updatedAt }] }`                               |
+| PATCH  | `/cluster/pending-approvals/:listingId` | ✓ cluster | `{ status: "approved"\|"rejected", rejectionReason? }`                               |                                                                                                                                                                                    |
+| GET    | `/cluster/farmers`                      | ✓ cluster | —                                                                                    | Must include `id` per farmer — see B4a                                                                                                                                             |
+| GET    | `/cluster/farmers/:farmerId`            | ✓ cluster | —                                                                                    | Missing — see B4b                                                                                                                                                                  |
+| GET    | `/cluster/orders`                       | ✓ cluster | —                                                                                    | `{ orders: [{ orderId, buyerName, buyerPhone, fishType, variant?, processed?, weightKg, quantity, deliveryOption, status, createdAt }] }`                                          |
+| PATCH  | `/cluster/orders/:orderId`              | ✓ cluster | `{ status: "confirmed"\|"processing"\|"shipped"\|"delivered"\|"cancelled", notes? }` |                                                                                                                                                                                    |
+| GET    | `/cluster/demands`                      | ✓ cluster | —                                                                                    | `{ demands: [{ id, buyerName, buyerPhone?, fishType, weightKg, fishVariant, locationState, locationLga, deliveryAddress, notes?, status, assignedAt?, acceptedAt?, createdAt }] }` |
+| PATCH  | `/cluster/demands/:demandId/accept`     | ✓ cluster | —                                                                                    |                                                                                                                                                                                    |
+| PATCH  | `/cluster/demands/:demandId/decline`    | ✓ cluster | `{ reason? }`                                                                        |                                                                                                                                                                                    |
+| PATCH  | `/cluster/demands/:demandId/fulfill`    | ✓ cluster | —                                                                                    |                                                                                                                                                                                    |
+| GET    | `/cluster/payouts`                      | ✓ cluster | —                                                                                    | See B6 — must return `totalClusterEarnings` and `pendingPayouts`                                                                                                                   |
 
 ---
 
 ### BUYER
 
-| Method | Path | Auth | Request Body | Notes |
-|--------|------|------|-------------|-------|
-| PATCH | `/buyers/account-profile` | ✓ buyer | `{ fullName?, companyName?, phoneNumber?, email?, profileImage?, deliveryAddress?, localGovernment?, state?, businessType? }` | |
-| POST | `/buyers/orders` | ✓ buyer | `{ deliveryType: "pickup"\|"delivery", deliveryAddress?, deliveryFee?, items: [{ listingId, quantity, weightKg, pricePerUnit }], totalAmount }` | 201 |
-| GET | `/buyers/orders` | ✓ buyer | — | `{ orders: [{ orderId, orderNumber, clusterFarmerName, deliveryOption, status, payment_status, createdAt, updatedAt }] }` |
-| GET | `/buyers/orders/:orderId` | ✓ buyer | — | Full order detail — see shape below |
-| GET | `/buyers/orders/:orderId/tracking` | ✓ buyer | — | `{ tracking: [{ status, message, createdAt }] }` |
-| PATCH | `/buyers/orders/:orderId/confirm-delivery` | ✓ buyer | `{ payoutDelay?: "24 hours" }` | |
-| POST | `/buyers/orders/:orderId/pay` | ✓ buyer | `{ paymentMethod: "card", amount: number }` | Returns `{ authorizationUrl, transactionReference, amount }` |
-| GET | `/payments/verify` | — | `?reference=` | Paystack redirect — no auth required |
-| GET | `/buyers/demands` | ✓ buyer | — | |
-| POST | `/buyers/demands` | ✓ buyer | `{ fishType, weightKg, fishVariant?, locationState, locationLga, deliveryAddress, notes? }` | See B8 |
-| DELETE | `/buyers/demands/:demandId` | ✓ buyer | — | |
-| GET | `/buyers/saved` | ✓ buyer | — | Missing — see B3 |
-| POST | `/buyers/saved` | ✓ buyer | `{ listingId: "uuid" }` | Missing — see B3 |
-| DELETE | `/buyers/saved/:listingId` | ✓ buyer | — | Missing — see B3 |
+| Method | Path                                       | Auth    | Request Body                                                                                                                                    | Notes                                                                                                                     |
+| ------ | ------------------------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| PATCH  | `/buyers/account-profile`                  | ✓ buyer | `{ fullName?, companyName?, phoneNumber?, email?, profileImage?, deliveryAddress?, localGovernment?, state?, businessType? }`                   |                                                                                                                           |
+| POST   | `/buyers/orders`                           | ✓ buyer | `{ deliveryType: "pickup"\|"delivery", deliveryAddress?, deliveryFee?, items: [{ listingId, quantity, weightKg, pricePerUnit }], totalAmount }` | 201                                                                                                                       |
+| GET    | `/buyers/orders`                           | ✓ buyer | —                                                                                                                                               | `{ orders: [{ orderId, orderNumber, clusterFarmerName, deliveryOption, status, payment_status, createdAt, updatedAt }] }` |
+| GET    | `/buyers/orders/:orderId`                  | ✓ buyer | —                                                                                                                                               | Full order detail — see shape below                                                                                       |
+| GET    | `/buyers/orders/:orderId/tracking`         | ✓ buyer | —                                                                                                                                               | `{ tracking: [{ status, message, createdAt }] }`                                                                          |
+| PATCH  | `/buyers/orders/:orderId/confirm-delivery` | ✓ buyer | `{ payoutDelay?: "24 hours" }`                                                                                                                  |                                                                                                                           |
+| POST   | `/buyers/orders/:orderId/pay`              | ✓ buyer | `{ paymentMethod: "card", amount: number }`                                                                                                     | Returns `{ authorizationUrl, transactionReference, amount }`                                                              |
+| GET    | `/payments/verify`                         | —       | `?reference=`                                                                                                                                   | Paystack redirect — no auth required                                                                                      |
+| GET    | `/buyers/demands`                          | ✓ buyer | —                                                                                                                                               |                                                                                                                           |
+| POST   | `/buyers/demands`                          | ✓ buyer | `{ fishType, weightKg, fishVariant?, locationState, locationLga, deliveryAddress, notes? }`                                                     | See B8                                                                                                                    |
+| DELETE | `/buyers/demands/:demandId`                | ✓ buyer | —                                                                                                                                               |                                                                                                                           |
+| GET    | `/buyers/saved`                            | ✓ buyer | —                                                                                                                                               | Missing — see B3                                                                                                          |
+| POST   | `/buyers/saved`                            | ✓ buyer | `{ listingId: "uuid" }`                                                                                                                         | Missing — see B3                                                                                                          |
+| DELETE | `/buyers/saved/:listingId`                 | ✓ buyer | —                                                                                                                                               | Missing — see B3                                                                                                          |
 
 **`GET /buyers/orders/:orderId` full expected response:**
 
@@ -2057,15 +2225,15 @@ Bearer <token>`, `—` = public.
 
 ### MARKETPLACE
 
-| Method | Path | Auth | Query / Body | Notes |
-|--------|------|------|-------------|-------|
-| GET | `/marketplace` | — | `?fishType=&category=live\|processed&state=&lga=&minPrice=&maxPrice=&page=&limit=` | Server-side `category` filter — see B7 |
-| GET | `/marketplace/:listingId` | — | — | Single listing |
-| GET | `/marketplace/cart` | ✓ | — | |
-| POST | `/marketplace/cart` | ✓ | `{ listingId, variant?, processed?, weightKg, quantity, pricePerUnit }` | |
-| PATCH | `/marketplace/cart/:cartItemId` | ✓ | `{ quantity?, weightKg? }` | |
-| DELETE | `/marketplace/cart/:cartItemId` | ✓ | — | |
-| POST | `/marketplace/checkout` | ✓ | `{ deliveryType: "pickup"\|"delivery", deliveryAddress?, deliveryFee: number, totalAmount: number, cartItems: [{ cartItemId, quantity }] }` | 201 → `{ order: { id, order_number, status, grand_total } }` |
+| Method | Path                            | Auth | Query / Body                                                                                                                                | Notes                                                        |
+| ------ | ------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| GET    | `/marketplace`                  | —    | `?fishType=&category=live\|processed&state=&lga=&minPrice=&maxPrice=&page=&limit=`                                                          | Server-side `category` filter — see B7                       |
+| GET    | `/marketplace/:listingId`       | —    | —                                                                                                                                           | Single listing                                               |
+| GET    | `/marketplace/cart`             | ✓    | —                                                                                                                                           |                                                              |
+| POST   | `/marketplace/cart`             | ✓    | `{ listingId, variant?, processed?, weightKg, quantity, pricePerUnit }`                                                                     |                                                              |
+| PATCH  | `/marketplace/cart/:cartItemId` | ✓    | `{ quantity?, weightKg? }`                                                                                                                  |                                                              |
+| DELETE | `/marketplace/cart/:cartItemId` | ✓    | —                                                                                                                                           |                                                              |
+| POST   | `/marketplace/checkout`         | ✓    | `{ deliveryType: "pickup"\|"delivery", deliveryAddress?, deliveryFee: number, totalAmount: number, cartItems: [{ cartItemId, quantity }] }` | 201 → `{ order: { id, order_number, status, grand_total } }` |
 
 **`GET /marketplace` individual listing object shape:**
 
@@ -2081,9 +2249,7 @@ Bearer <token>`, `—` = public.
   "fishType": "table_size",
   "harvestDate": "2026-05-01T00:00:00.000Z",
   "totalAvailableKg": 2500,
-  "packaging": [
-    { "weightKg": 5, "quantity": 500, "pricePerUnit": 17500 }
-  ],
+  "packaging": [{ "weightKg": 5, "quantity": 500, "pricePerUnit": 17500 }],
   "location": "12 Farm Road, Chikun",
   "state": "Kaduna",
   "localGovernment": "Chikun",
@@ -2100,39 +2266,39 @@ Bearer <token>`, `—` = public.
 
 ### ADMIN
 
-| Method | Path | Auth | Request Body / Query | Notes |
-|--------|------|------|---------------------|-------|
-| GET | `/admin/settings` | **—** | — | Public — see B1. Always returns all 11 fish type prices |
-| PATCH | `/admin/settings/price` | ✓ admin | `{ pricePerKg: { [fishType]: number } }` — all keys optional | |
-| GET | `/admin/dashboard/metrics` | ✓ admin | — | |
-| GET | `/admin/dashboard/charts` | ✓ admin | — | |
-| GET | `/admin/dashboard/activities` | ✓ admin | — | |
-| GET | `/admin/cluster-applications` | ✓ admin | — | |
-| PUT | `/admin/cluster-applications/:id/approve` | ✓ admin | — | |
-| PUT | `/admin/cluster-applications/:id/reject` | ✓ admin | `{ reason? }` | |
-| GET | `/admin/listings` | ✓ admin | `?status=&fishType=&state=` | |
-| PUT | `/admin/listings/:id/approve` | ✓ admin | — | |
-| PUT | `/admin/listings/:id/reject` | ✓ admin | `{ reason? }` | |
-| PATCH | `/admin/listings/:id/flag` | ✓ admin | — | |
-| DELETE | `/admin/listings/:id` | ✓ admin | — | |
-| GET | `/admin/farmers` | ✓ admin | `?role=&state=&verificationStatus=` | |
-| GET | `/admin/farmers/:id` | ✓ admin | — | |
-| PATCH | `/admin/farmers/:id/toggle-active` | ✓ admin | — | |
-| GET | `/admin/orders` | ✓ admin | `?status=&paymentStatus=` | |
-| GET | `/admin/orders/:id` | ✓ admin | — | |
-| GET | `/admin/demands` | ✓ admin | `?status=&state=` | |
-| GET | `/admin/demands/:id` | ✓ admin | — | |
-| PATCH | `/admin/demands/:id/assign` | ✓ admin | `{ cluster_farmer_id: "uuid" }` | |
+| Method | Path                                      | Auth    | Request Body / Query                                         | Notes                                                   |
+| ------ | ----------------------------------------- | ------- | ------------------------------------------------------------ | ------------------------------------------------------- |
+| GET    | `/admin/settings`                         | **—**   | —                                                            | Public — see B1. Always returns all 11 fish type prices |
+| PATCH  | `/admin/settings/price`                   | ✓ admin | `{ pricePerKg: { [fishType]: number } }` — all keys optional |                                                         |
+| GET    | `/admin/dashboard/metrics`                | ✓ admin | —                                                            |                                                         |
+| GET    | `/admin/dashboard/charts`                 | ✓ admin | —                                                            |                                                         |
+| GET    | `/admin/dashboard/activities`             | ✓ admin | —                                                            |                                                         |
+| GET    | `/admin/cluster-applications`             | ✓ admin | —                                                            |                                                         |
+| PUT    | `/admin/cluster-applications/:id/approve` | ✓ admin | —                                                            |                                                         |
+| PUT    | `/admin/cluster-applications/:id/reject`  | ✓ admin | `{ reason? }`                                                |                                                         |
+| GET    | `/admin/listings`                         | ✓ admin | `?status=&fishType=&state=`                                  |                                                         |
+| PUT    | `/admin/listings/:id/approve`             | ✓ admin | —                                                            |                                                         |
+| PUT    | `/admin/listings/:id/reject`              | ✓ admin | `{ reason? }`                                                |                                                         |
+| PATCH  | `/admin/listings/:id/flag`                | ✓ admin | —                                                            |                                                         |
+| DELETE | `/admin/listings/:id`                     | ✓ admin | —                                                            |                                                         |
+| GET    | `/admin/farmers`                          | ✓ admin | `?role=&state=&verificationStatus=`                          |                                                         |
+| GET    | `/admin/farmers/:id`                      | ✓ admin | —                                                            |                                                         |
+| PATCH  | `/admin/farmers/:id/toggle-active`        | ✓ admin | —                                                            |                                                         |
+| GET    | `/admin/orders`                           | ✓ admin | `?status=&paymentStatus=`                                    |                                                         |
+| GET    | `/admin/orders/:id`                       | ✓ admin | —                                                            |                                                         |
+| GET    | `/admin/demands`                          | ✓ admin | `?status=&state=`                                            |                                                         |
+| GET    | `/admin/demands/:id`                      | ✓ admin | —                                                            |                                                         |
+| PATCH  | `/admin/demands/:id/assign`               | ✓ admin | `{ cluster_farmer_id: "uuid" }`                              |                                                         |
 
 ---
 
 ### NOTIFICATIONS
 
-| Method | Path | Auth | Notes |
-|--------|------|------|-------|
-| GET | `/notifications` | ✓ | Returns `{ notifications: [...], unreadCount: number }` — see B5 |
-| PATCH | `/notifications/read-all` | ✓ | Must be registered **before** `/:notificationId/read` in the router |
-| PATCH | `/notifications/:notificationId/read` | ✓ | |
+| Method | Path                                  | Auth | Notes                                                               |
+| ------ | ------------------------------------- | ---- | ------------------------------------------------------------------- |
+| GET    | `/notifications`                      | ✓    | Returns `{ notifications: [...], unreadCount: number }` — see B5    |
+| PATCH  | `/notifications/read-all`             | ✓    | Must be registered **before** `/:notificationId/read` in the router |
+| PATCH  | `/notifications/:notificationId/read` | ✓    |                                                                     |
 
 ---
 
@@ -2141,13 +2307,13 @@ Bearer <token>`, `—` = public.
 These features show a toast message in the UI and take no further action. They are
 deliberately out of scope for the current phase. Do not add backend support for them.
 
-| UI Element | Page | Reason not implemented |
-|-----------|------|----------------------|
-| "Report an Issue" button | `/buyers-dashboard/orders/[id]` | No support ticket system in scope |
-| "View Sessions" button | `/admin-dashboard/settings` | No session management API planned |
-| "Invoice" button | `/buyers-dashboard/orders/[id]` | No invoice generation service |
-| OTP expiry / session duration config | `/admin-dashboard/settings` | Hardcoded server-side for now |
-| All `/financial/*` routes | Farmer + Cluster dashboards | Financial services excluded from v1 |
+| UI Element                           | Page                            | Reason not implemented              |
+| ------------------------------------ | ------------------------------- | ----------------------------------- |
+| "Report an Issue" button             | `/buyers-dashboard/orders/[id]` | No support ticket system in scope   |
+| "View Sessions" button               | `/admin-dashboard/settings`     | No session management API planned   |
+| "Invoice" button                     | `/buyers-dashboard/orders/[id]` | No invoice generation service       |
+| OTP expiry / session duration config | `/admin-dashboard/settings`     | Hardcoded server-side for now       |
+| All `/financial/*` routes            | Farmer + Cluster dashboards     | Financial services excluded from v1 |
 
 ---
 

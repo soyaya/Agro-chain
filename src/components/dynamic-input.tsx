@@ -82,7 +82,7 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
           {/* Leading icon (email, text, etc.) */}
           {LeadingIcon && (
             <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-              <LeadingIcon size={18} className="text-gray-400" />
+              <LeadingIcon size={18} className="text-muted-text" />
             </div>
           )}
 
@@ -95,7 +95,9 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
             className={cn(
               "font-roboto-slab hover:bg-pink-bg h-12 w-full cursor-default rounded-full border bg-transparent py-(--space-lg) text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none hover:cursor-pointer focus:cursor-text focus:bg-transparent focus:ring focus:ring-(--theme-green)",
               LeadingIcon ? "pl-(--space-forty)" : "pl-(--space-md)",
-              fieldType === "password" || fieldType === "confirm-password" ? "pr-10" : "pr-3",
+              fieldType === "password" || fieldType === "confirm-password"
+                ? "pr-10"
+                : "pr-3",
               hasError ? "border-error-red" : "border-input-border",
               "focus:border-gray-border text-text-colour border-input-border caret-input-field-green placeholder:text-base",
             )}
@@ -107,7 +109,7 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
             <button
               aria-label={visible ? "Hide password" : "Show password"}
               onClick={() => setVisible((v) => !v)}
-              className="absolute inset-y-0 right-0 flex cursor-pointer items-center px-(--space-md) transition-all duration-300 ease-in-out hover:text-gray-700"
+              className="hover:text-text-colour-2 absolute inset-y-0 right-0 flex cursor-pointer items-center px-(--space-md) transition-all duration-300 ease-in-out"
             >
               {visible ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -115,7 +117,9 @@ export const DynamicInput = forwardRef<HTMLInputElement, DynamicInputProps>(
         </div>
 
         {/* Error message */}
-        {typeof error === "string" && error && <p className="text-error-red text-sm">{error}</p>}
+        {typeof error === "string" && error && (
+          <p className="text-error-red text-sm">{error}</p>
+        )}
       </div>
     );
   },
@@ -147,7 +151,18 @@ export type SelectInputProps = {
 };
 
 export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
-  ({ label, required = false, error, options = [], value, onValueChange, className }, ref) => {
+  (
+    {
+      label,
+      required = false,
+      error,
+      options = [],
+      value,
+      onValueChange,
+      className,
+    },
+    ref,
+  ) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const triggerRef = useRef<HTMLDivElement>(null);
@@ -180,7 +195,10 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
     }, []);
 
     return (
-      <div ref={ref} className={cn("flex flex-col gap-(--space-md)", className)}>
+      <div
+        ref={ref}
+        className={cn("flex flex-col gap-(--space-md)", className)}
+      >
         {/* Label */}
         {label && (
           <label className="font-roboto-slab text-heading-colour flex items-center gap-1 text-base font-medium">
@@ -217,14 +235,18 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
               "focus:border-theme-green-dark focus:ring-theme-green-dark focus:ring-[0.2px]",
             )}
           >
-            <span className={cn(selectedOption ? "text-text-colour" : "text-gray-400")}>
+            <span
+              className={cn(
+                selectedOption ? "text-text-colour" : "text-muted-text",
+              )}
+            >
               {display}
             </span>
 
             <ChevronDown
               size={18}
               className={cn(
-                "text-gray-400 transition-transform duration-300",
+                "text-muted-text transition-transform duration-300",
                 isOpen && "rotate-180",
               )}
             />
@@ -276,7 +298,9 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
         </div>
 
         {/* Error */}
-        {typeof error === "string" && error && <p className="text-error-red text-sm">{error}</p>}
+        {typeof error === "string" && error && (
+          <p className="text-error-red text-sm">{error}</p>
+        )}
       </div>
     );
   },

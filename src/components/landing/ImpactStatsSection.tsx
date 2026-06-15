@@ -3,12 +3,18 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { STAGGER_CONTAINER_VARIANT, STAT_ITEM_VARIANT } from "~/types/constants";
+import {
+  STAGGER_CONTAINER_VARIANT,
+  STAT_ITEM_VARIANT,
+} from "~/types/constants";
 import { impactStats } from "~/models/models";
 
 export default function ImpactStatsSection() {
   return (
-    <section aria-label="Impact Stats" className="border-gray-border border-y bg-white">
+    <section
+      aria-label="Impact Stats"
+      className="border-gray-border border-y bg-white"
+    >
       <div className="section-content-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg flex flex-col gap-6">
         <motion.div
           variants={STAGGER_CONTAINER_VARIANT}
@@ -29,7 +35,9 @@ export default function ImpactStatsSection() {
               >
                 {value}
               </span>
-              <span className="font-roboto-slab text-text-colour text-sm">{label}</span>
+              <span className="font-roboto-slab text-text-colour text-sm">
+                {label}
+              </span>
             </motion.div>
           ))}
         </motion.div>

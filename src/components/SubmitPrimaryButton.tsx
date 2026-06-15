@@ -11,7 +11,10 @@ interface SubmitPrimaryButtonProps extends React.ButtonHTMLAttributes<HTMLButton
   className?: string;
 }
 
-export const SubmitPrimaryButton = React.forwardRef<HTMLButtonElement, SubmitPrimaryButtonProps>(
+export const SubmitPrimaryButton = React.forwardRef<
+  HTMLButtonElement,
+  SubmitPrimaryButtonProps
+>(
   (
     {
       loading = false,
@@ -34,7 +37,8 @@ export const SubmitPrimaryButton = React.forwardRef<HTMLButtonElement, SubmitPri
           "hover:scale-[1.01] hover:opacity-96 hover:shadow-sm",
           "focus:ring-theme-green-dark focus:ring-1 focus:outline-none",
           "active:scale-[0.99]",
-          (loading || disabled) && "cursor-not-allowed opacity-70 hover:scale-100 active:scale-100",
+          (loading || disabled) &&
+            "cursor-not-allowed opacity-70 hover:scale-100 active:scale-100",
           className,
         )}
         {...props}

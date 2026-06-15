@@ -8,16 +8,14 @@ export interface NavLink {
   href: string;
   icon?: LucideIcon;
   color?: string;
-};
+}
 
 export interface Object {
   label: string;
   value: string;
 }
 
-// ============================================
-// LANDING PAGE TYPES
-// ============================================
+// === Landing Page Types
 
 export interface FAQ {
   question: string;

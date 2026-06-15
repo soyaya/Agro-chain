@@ -57,17 +57,18 @@ export default function BuyerProfilePage() {
           fullName: user.full_name,
           phoneNumber: user.phone_number,
           email: user.email,
-          role: (user.role === "cluster" || user.role === "pending" ? "farmer" : user.role) as
-            | "farmer"
-            | "buyer"
-            | "admin",
+          role: (user.role === "cluster" || user.role === "pending"
+            ? "farmer"
+            : user.role) as "farmer" | "buyer" | "admin",
           isClusterFarmer: user.is_cluster_farmer || user.role === "cluster",
           profileComplete: user.profile_completed,
           createdAt: new Date(user.created_at),
           updatedAt: new Date(user.updated_at),
         });
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to load profile");
+        toast.error(
+          error instanceof Error ? error.message : "Failed to load profile",
+        );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -76,7 +77,7 @@ export default function BuyerProfilePage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [updateUser]);
 
   const save = async () => {
     setSaving(true);
@@ -93,7 +94,9 @@ export default function BuyerProfilePage() {
       setEditing(false);
       toast.success("Profile updated successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update profile");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update profile",
+      );
     } finally {
       setSaving(false);
     }
@@ -111,8 +114,12 @@ export default function BuyerProfilePage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Buyer Profile</h1>
-          <p className="font-roboto-slab text-text-colour">Manage your business details</p>
+          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+            Buyer Profile
+          </h1>
+          <p className="font-roboto-slab text-text-colour">
+            Manage your business details
+          </p>
         </div>
         {editing ? (
           <div className="flex gap-2">
@@ -161,12 +168,16 @@ export default function BuyerProfilePage() {
             ((key === "state" || key === "localGovernment") && !isNa);
           return (
             <label key={key} className="text-text-colour text-sm">
-              <span className="text-heading-colour mb-1 block font-medium">{label}</span>
+              <span className="text-heading-colour mb-1 block font-medium">
+                {label}
+              </span>
               <input
                 value={form[key]}
                 disabled={locked || !editing}
-                onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
-                className="border-input-border w-full rounded-lg border px-3 py-2 disabled:bg-gray-50"
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, [key]: e.target.value }))
+                }
+                className="border-input-border disabled:bg-gray-bg w-full rounded-lg border px-3 py-2"
               />
             </label>
           );

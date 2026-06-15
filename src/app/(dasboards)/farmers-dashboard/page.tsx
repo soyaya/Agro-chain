@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Package, FileText, Clock, CheckCircle } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
-import { farmerService, type FarmerListingSummary } from "~/lib/services/farmer.service";
+import {
+  farmerService,
+  type FarmerListingSummary,
+} from "~/lib/services/farmer.service";
 
 export default function FarmersDashboardPage() {
   const [summary, setSummary] = useState<FarmerListingSummary>({
@@ -14,7 +17,9 @@ export default function FarmersDashboardPage() {
     rejected: 0,
     totalSupply: 0,
   });
-  const [activities, setActivities] = useState<Array<{ id: string; text: string; at: string }>>([]);
+  const [activities, setActivities] = useState<
+    Array<{ id: string; text: string; at: string }>
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,8 +78,8 @@ export default function FarmersDashboardPage() {
         label: "Approved",
         value: summary.approved.toLocaleString(),
         icon: CheckCircle,
-        color: "text-green-600",
-        bgColor: "bg-green-50",
+        color: "text-theme-green-dark",
+        bgColor: "bg-green-tint",
       },
       {
         label: "Total Supply (kg)",
@@ -126,7 +131,9 @@ export default function FarmersDashboardPage() {
               <p className="font-ubuntu text-heading-colour mb-1 text-3xl font-bold">
                 {loading ? "..." : stat.value}
               </p>
-              <p className="font-roboto-slab text-text-colour text-sm">{stat.label}</p>
+              <p className="font-roboto-slab text-text-colour text-sm">
+                {stat.label}
+              </p>
             </motion.div>
           );
         })}
@@ -170,16 +177,20 @@ export default function FarmersDashboardPage() {
         </h2>
         <div className="flex flex-col gap-(--space-md)">
           {activities.length === 0 ? (
-            <p className="font-roboto-slab text-text-colour text-sm">No recent activity yet.</p>
+            <p className="font-roboto-slab text-text-colour text-sm">
+              No recent activity yet.
+            </p>
           ) : (
             activities.map((item) => (
               <div
                 key={item.id}
                 className="hover:bg-pink-bg flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors"
               >
-                <div className="h-2 w-2 rounded-full bg-green-500" />
-                <p className="font-roboto-slab text-text-colour text-sm">{item.text}</p>
-                <span className="ml-auto text-xs text-gray-400">
+                <div className="bg-theme-green-light h-2 w-2 rounded-full" />
+                <p className="font-roboto-slab text-text-colour text-sm">
+                  {item.text}
+                </p>
+                <span className="text-muted-text ml-auto text-xs">
                   {new Date(item.at).toLocaleString()}
                 </span>
               </div>

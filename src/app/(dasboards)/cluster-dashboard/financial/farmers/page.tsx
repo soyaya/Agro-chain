@@ -2,9 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Users, Phone, MapPin, Search, TrendingUp, Package } from "lucide-react";
+import {
+  Users,
+  Phone,
+  MapPin,
+  Search,
+  TrendingUp,
+  Package,
+} from "lucide-react";
 import { toast } from "sonner";
-import { clusterService, type BackendClusterFarmer } from "~/lib/services/cluster.service";
+import {
+  clusterService,
+  type BackendClusterFarmer,
+} from "~/lib/services/cluster.service";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
@@ -34,7 +44,9 @@ export default function ClusterFarmersFinancialPage() {
       }
     };
     void load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const filtered = farmers.filter((f) =>
@@ -46,28 +58,54 @@ export default function ClusterFarmersFinancialPage() {
   );
 
   const stats = [
-    { label: "Total Farmers", value: totalFarmers.toString(), icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Total Capacity", value: `${totalCapacity.toLocaleString()} kg`, icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },
+    {
+      label: "Total Farmers",
+      value: totalFarmers.toString(),
+      icon: Users,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+    },
+    {
+      label: "Total Capacity",
+      value: `${totalCapacity.toLocaleString()} kg`,
+      icon: TrendingUp,
+      color: "text-theme-green-dark",
+      bg: "bg-green-tint",
+    },
     {
       label: "Active Listings",
-      value: farmers.reduce((s, f) => s + f.totalApprovedListings, 0).toString(),
-      icon: Package, color: "text-purple-600", bg: "bg-purple-50",
+      value: farmers
+        .reduce((s, f) => s + f.totalApprovedListings, 0)
+        .toString(),
+      icon: Package,
+      color: "text-purple-600",
+      bg: "bg-purple-50",
     },
     {
       label: "Pending Listings",
       value: farmers.reduce((s, f) => s + f.totalPendingListings, 0).toString(),
-      icon: Package, color: "text-yellow-600", bg: "bg-yellow-50",
+      icon: Package,
+      color: "text-yellow-600",
+      bg: "bg-yellow-50",
     },
   ];
 
-  if (loading) return <LoadingState message="Loading farmer data..." size="lg" />;
+  if (loading)
+    return <LoadingState message="Loading farmer data..." size="lg" />;
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <h1 className="font-ubuntu mb-2 text-3xl font-bold text-heading-colour">Farmer Finances</h1>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
+          Farmer Finances
+        </h1>
         <p className="font-roboto-slab text-text-colour">
-          Overview of farmers under your cluster — listings, capacity, and activity
+          Overview of farmers under your cluster — listings, capacity, and
+          activity
         </p>
       </motion.div>
 
@@ -83,13 +121,19 @@ export default function ClusterFarmersFinancialPage() {
             <motion.div
               key={s.label}
               variants={SLIDE_UP_VARIANT}
-              className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md"
+              className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md"
             >
-              <div className={`mb-(--space-md) inline-flex rounded-xl p-(--space-md) ${s.bg}`}>
+              <div
+                className={`mb-(--space-md) inline-flex rounded-xl p-(--space-md) ${s.bg}`}
+              >
                 <Icon size={22} className={s.color} />
               </div>
-              <p className="font-ubuntu mb-1 text-2xl font-bold text-heading-colour">{s.value}</p>
-              <p className="font-roboto-slab text-sm text-text-colour">{s.label}</p>
+              <p className="font-ubuntu text-heading-colour mb-1 text-2xl font-bold">
+                {s.value}
+              </p>
+              <p className="font-roboto-slab text-text-colour text-sm">
+                {s.label}
+              </p>
             </motion.div>
           );
         })}
@@ -99,18 +143,23 @@ export default function ClusterFarmersFinancialPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="rounded-2xl border border-input-border bg-(--white) p-(--space-xl) shadow-sm"
+        className="border-input-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="mb-(--space-lg) flex flex-wrap items-center justify-between gap-4">
-          <h2 className="font-ubuntu text-xl font-semibold text-heading-colour">All Farmers</h2>
+          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">
+            All Farmers
+          </h2>
           <div className="relative">
-            <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+            <Search
+              size={16}
+              className="text-muted-text absolute top-1/2 left-3 -translate-y-1/2"
+            />
             <input
               type="text"
               placeholder="Search farmers..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="font-roboto-slab rounded-xl border border-input-border py-(--space-sm) pr-(--space-lg) pl-9 text-sm text-heading-colour placeholder-gray-400 focus:ring-2 focus:ring-theme-green-dark focus:outline-none"
+              className="font-roboto-slab border-input-border text-heading-colour focus:ring-theme-green-dark rounded-xl border py-(--space-sm) pr-(--space-lg) pl-9 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
             />
           </div>
         </div>
@@ -119,7 +168,11 @@ export default function ClusterFarmersFinancialPage() {
           <EmptyState
             icon={Users}
             title={search ? "No farmers match your search" : "No farmers yet"}
-            description={search ? "Try a different name or location" : "Farmers assigned to your cluster will appear here"}
+            description={
+              search
+                ? "Try a different name or location"
+                : "Farmers assigned to your cluster will appear here"
+            }
             size="md"
           />
         ) : (
@@ -128,33 +181,46 @@ export default function ClusterFarmersFinancialPage() {
               <motion.div
                 key={`${farmer.farmerName}-${i}`}
                 variants={SLIDE_UP_VARIANT}
-                className="rounded-xl border border-input-border p-(--space-lg) transition-all duration-200 hover:border-gray-300 hover:shadow-sm"
+                className="border-input-border hover:border-gray-border rounded-xl border p-(--space-lg) transition-all duration-200 hover:shadow-sm"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <p className="font-ubuntu text-base font-semibold text-heading-colour">
+                      <p className="font-ubuntu text-heading-colour text-base font-semibold">
                         {farmer.farmerName}
                       </p>
-                      <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                      <span className="bg-green-tint text-theme-green-dark rounded-full px-2 py-1 text-xs font-medium">
                         {farmer.fishType}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-3">
                       <div className="flex items-center gap-1">
-                        <MapPin size={13} className="shrink-0 text-gray-400" />
-                        <p className="font-roboto-slab text-sm text-text-colour">{farmer.location}</p>
+                        <MapPin
+                          size={13}
+                          className="text-muted-text shrink-0"
+                        />
+                        <p className="font-roboto-slab text-text-colour text-sm">
+                          {farmer.location}
+                        </p>
                       </div>
                       {farmer.phoneNumber && (
                         <div className="flex items-center gap-1">
-                          <Phone size={13} className="shrink-0 text-gray-400" />
-                          <p className="font-roboto-slab text-sm text-text-colour">{farmer.phoneNumber}</p>
+                          <Phone
+                            size={13}
+                            className="text-muted-text shrink-0"
+                          />
+                          <p className="font-roboto-slab text-text-colour text-sm">
+                            {farmer.phoneNumber}
+                          </p>
                         </div>
                       )}
                       {farmer.capacity != null && (
                         <div className="flex items-center gap-1">
-                          <TrendingUp size={13} className="shrink-0 text-gray-400" />
-                          <p className="font-roboto-slab text-sm text-text-colour">
+                          <TrendingUp
+                            size={13}
+                            className="text-muted-text shrink-0"
+                          />
+                          <p className="font-roboto-slab text-text-colour text-sm">
                             {farmer.capacity.toLocaleString()} kg capacity
                           </p>
                         </div>
@@ -164,16 +230,28 @@ export default function ClusterFarmersFinancialPage() {
 
                   <div className="flex gap-4 text-center">
                     <div>
-                      <p className="font-ubuntu text-lg font-bold text-green-600">{farmer.totalApprovedListings}</p>
-                      <p className="font-roboto-slab text-xs text-gray-500">Approved</p>
+                      <p className="font-ubuntu text-theme-green-dark text-lg font-bold">
+                        {farmer.totalApprovedListings}
+                      </p>
+                      <p className="font-roboto-slab text-muted-text text-xs">
+                        Approved
+                      </p>
                     </div>
                     <div>
-                      <p className="font-ubuntu text-lg font-bold text-yellow-600">{farmer.totalPendingListings}</p>
-                      <p className="font-roboto-slab text-xs text-gray-500">Pending</p>
+                      <p className="font-ubuntu text-lg font-bold text-yellow-600">
+                        {farmer.totalPendingListings}
+                      </p>
+                      <p className="font-roboto-slab text-muted-text text-xs">
+                        Pending
+                      </p>
                     </div>
                     <div>
-                      <p className="font-ubuntu text-lg font-bold text-heading-colour">{farmer.totalListings}</p>
-                      <p className="font-roboto-slab text-xs text-gray-500">Total</p>
+                      <p className="font-ubuntu text-heading-colour text-lg font-bold">
+                        {farmer.totalListings}
+                      </p>
+                      <p className="font-roboto-slab text-muted-text text-xs">
+                        Total
+                      </p>
                     </div>
                   </div>
                 </div>

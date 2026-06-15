@@ -82,7 +82,8 @@ export default function ForgotPasswordPage() {
       setResendAttempts(0);
       setResendLocked(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to send OTP";
+      const message =
+        error instanceof Error ? error.message : "Failed to send OTP";
       toast.error(message);
     } finally {
       setLoading(false);
@@ -116,7 +117,8 @@ export default function ForgotPasswordPage() {
         window.location.href = "/login";
       }, 1200);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to reset password";
+      const message =
+        error instanceof Error ? error.message : "Failed to reset password";
       setOtpError(message);
       toast.error(message);
     } finally {
@@ -163,7 +165,8 @@ export default function ForgotPasswordPage() {
           : "OTP resent.",
       );
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to resend OTP";
+      const message =
+        error instanceof Error ? error.message : "Failed to resend OTP";
       toast.error(message);
     } finally {
       setLoading(false);
@@ -177,110 +180,120 @@ export default function ForgotPasswordPage() {
       </h2>
 
       <AnimatePresence mode="wait">
-      {step === 1 ? (
-        <motion.form
-          key="step-1"
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          onSubmit={handleSubmit(onSendOtp)}
-          className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
-        >
-          <DynamicInput
-            fieldType="email"
-            label="Email Address"
-            placeholder="you@example.com"
-            error={errors.email?.message}
-            {...register("email")}
-            required
-            disabled={loading}
-          />
-          <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
-            Send OTP
-          </SubmitPrimaryButton>
-        </motion.form>
-      ) : (
-        <motion.form
-          key="step-2"
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          onSubmit={handleResetSubmit(handleResetPassword)}
-          className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
-        >
-          <p className="text-text-colour text-center text-sm">
-            Enter the OTP sent to {emailAddress}
-          </p>
-          <div className="flex flex-col items-center gap-6">
-            <InputOTP
-              maxLength={6}
-              value={otp}
-              onChange={setOtp}
-              containerClassName={cn("gap-3", otpError && "animate-shake")}
+        {step === 1 ? (
+          <motion.form
+            key="step-1"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            onSubmit={handleSubmit(onSendOtp)}
+            className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
+          >
+            <DynamicInput
+              fieldType="email"
+              label="Email Address"
+              placeholder="you@example.com"
+              error={errors.email?.message}
+              {...register("email")}
+              required
+              disabled={loading}
+            />
+            <SubmitPrimaryButton
+              loading={loading}
+              disabled={!isValid || loading}
+              type="submit"
             >
-              <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
-                <InputOTPSlot index={0} aria-invalid={!!otpError} />
-                <InputOTPSlot index={1} aria-invalid={!!otpError} />
-                <InputOTPSlot index={2} aria-invalid={!!otpError} />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
-                <InputOTPSlot index={3} aria-invalid={!!otpError} />
-                <InputOTPSlot index={4} aria-invalid={!!otpError} />
-                <InputOTPSlot index={5} aria-invalid={!!otpError} />
-              </InputOTPGroup>
-            </InputOTP>
+              Send OTP
+            </SubmitPrimaryButton>
+          </motion.form>
+        ) : (
+          <motion.form
+            key="step-2"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            onSubmit={handleResetSubmit(handleResetPassword)}
+            className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
+          >
+            <p className="text-text-colour text-center text-sm">
+              Enter the OTP sent to {emailAddress}
+            </p>
+            <div className="flex flex-col items-center gap-6">
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={setOtp}
+                containerClassName={cn("gap-3", otpError && "animate-shake")}
+              >
+                <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
+                  <InputOTPSlot index={0} aria-invalid={!!otpError} />
+                  <InputOTPSlot index={1} aria-invalid={!!otpError} />
+                  <InputOTPSlot index={2} aria-invalid={!!otpError} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
+                  <InputOTPSlot index={3} aria-invalid={!!otpError} />
+                  <InputOTPSlot index={4} aria-invalid={!!otpError} />
+                  <InputOTPSlot index={5} aria-invalid={!!otpError} />
+                </InputOTPGroup>
+              </InputOTP>
 
-            {otpError && (
-              <p className="text-destructive text-center text-sm font-medium">{otpError}</p>
-            )}
-          </div>
+              {otpError && (
+                <p className="text-destructive text-center text-sm font-medium">
+                  {otpError}
+                </p>
+              )}
+            </div>
 
-          <DynamicInput
-            fieldType="password"
-            label="New Password"
-            error={resetErrors.newPassword?.message}
-            {...registerReset("newPassword")}
-            required
-          />
-          <DynamicInput
-            fieldType="password"
-            label="Confirm New Password"
-            error={resetErrors.confirmPassword?.message}
-            {...registerReset("confirmPassword")}
-            required
-          />
+            <DynamicInput
+              fieldType="password"
+              label="New Password"
+              error={resetErrors.newPassword?.message}
+              {...registerReset("newPassword")}
+              required
+            />
+            <DynamicInput
+              fieldType="password"
+              label="Confirm New Password"
+              error={resetErrors.confirmPassword?.message}
+              {...registerReset("confirmPassword")}
+              required
+            />
 
-          <SubmitPrimaryButton loading={loading} disabled={!resetValid || loading} type="submit">
-            Reset Password
-          </SubmitPrimaryButton>
-
-          <p className="text-text-colour text-center text-sm">
-            Didn&apos;t receive a code?{" "}
-            <button
-              type="button"
-              className="cursor-pointer font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
-              onClick={handleResendOtp}
-              disabled={loading || cooldownSeconds > 0 || resendLocked}
+            <SubmitPrimaryButton
+              loading={loading}
+              disabled={!resetValid || loading}
+              type="submit"
             >
+              Reset Password
+            </SubmitPrimaryButton>
+
+            <p className="text-text-colour text-center text-sm">
+              Didn&apos;t receive a code?{" "}
+              <button
+                type="button"
+                className="cursor-pointer font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
+                onClick={handleResendOtp}
+                disabled={loading || cooldownSeconds > 0 || resendLocked}
+              >
+                {resendLocked
+                  ? "Retry after 24 hours"
+                  : cooldownSeconds > 0
+                    ? `Resend in ${cooldownSeconds}s`
+                    : "Resend OTP"}
+              </button>
+            </p>
+            <p className="text-text-colour text-center text-xs">
               {resendLocked
-                ? "Retry after 24 hours"
-                : cooldownSeconds > 0
-                  ? `Resend in ${cooldownSeconds}s`
-                  : "Resend OTP"}
-            </button>
-          </p>
-          <p className="text-text-colour text-center text-xs">
-            {resendLocked
-              ? "You’ve reached the resend limit. Try again after 24 hours."
-              : `${Math.max(0, 2 - resendAttempts)} resend${
-                  2 - resendAttempts === 1 ? "" : "s"
-                } left`}
-          </p>
-        </motion.form>
-      )}
+                ? "You’ve reached the resend limit. Try again after 24 hours."
+                : `${Math.max(0, 2 - resendAttempts)} resend${
+                    2 - resendAttempts === 1 ? "" : "s"
+                  } left`}
+            </p>
+          </motion.form>
+        )}
       </AnimatePresence>
     </div>
   );

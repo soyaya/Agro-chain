@@ -45,7 +45,9 @@ export function ListingCard({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
-          <h3 className="font-ubuntu text-heading-colour text-xl font-bold">{listing.fishType}</h3>
+          <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
+            {listing.fishType}
+          </h3>
           <p className="text-text-colour text-sm">{listing.farmerName}</p>
         </div>
         <span
@@ -78,7 +80,9 @@ export function ListingCard({
 
       {/* Packaging Options */}
       <div className="bg-gray-bg flex flex-col gap-(--space-md) rounded-2xl p-(--space-md)">
-        <p className="text-heading-colour text-sm font-medium">Packaging Options:</p>
+        <p className="text-heading-colour text-sm font-medium">
+          Packaging Options:
+        </p>
         <div className="flex flex-col gap-1">
           {listing.packaging.map((pkg, index) => (
             <div key={index} className="text-text-colour text-sm">

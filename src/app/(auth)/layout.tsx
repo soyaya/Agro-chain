@@ -9,7 +9,12 @@ interface AuthLayoutProps {
   children: ReactNode;
 }
 
-type AuthRouteKey = "authentication" | "register" | "login" | "verify" | "forgot-password";
+type AuthRouteKey =
+  | "authentication"
+  | "register"
+  | "login"
+  | "verify"
+  | "forgot-password";
 
 const routeTitleMap: Record<AuthRouteKey, string> = {
   authentication: "Authentication",
@@ -39,13 +44,13 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   }, [pathname]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50/40 dark:bg-gray-950/40">
+    <div className="bg-gray-bg/40 flex min-h-screen flex-col dark:bg-gray-950/40">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-gray-200 bg-(--white)/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80">
+      <header className="border-gray-border sticky top-0 z-10 border-b bg-(--white)/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80">
         <div className="container-max-width px-section-px sm:px-section-px-sm lg:px-section-px-lg flex items-center gap-4 py-3">
           <Link
             href="/"
-            className="rounded-full p-2 transition-all duration-300 ease-in-out hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="hover:bg-gray-bg rounded-full p-2 transition-all duration-300 ease-in-out dark:hover:bg-gray-800"
             aria-label="Back to home"
           >
             <ArrowLeft className="h-5 w-5" />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useId, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,6 +30,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     },
     ref,
   ) => {
+    const listboxId = useId();
     const [isOpen, setIsOpen] = useState(false);
     const [internalValue, setInternalValue] = useState(value || "");
 
@@ -85,6 +86,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 role="combobox"
                 aria-expanded={isOpen}
                 aria-haspopup="listbox"
+                aria-controls={listboxId}
                 aria-label={label || "Select a number"}
                 className={cn(
                   "font-roboto-slab flex h-12 w-full cursor-pointer items-center justify-between rounded-full border text-base shadow-xs ring-0 transition-all duration-300 ease-in-out outline-none",
@@ -95,14 +97,18 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                   "focus:border-theme-green-dark focus:ring-theme-green-dark focus:ring-2 focus:ring-offset-1",
                 )}
               >
-                <span className={cn(internalValue ? "text-text-colour" : "text-gray-400")}>
+                <span
+                  className={cn(
+                    internalValue ? "text-text-colour" : "text-muted-text",
+                  )}
+                >
                   {displayValue || placeholder}
                 </span>
 
                 <ChevronDown
                   size={18}
                   className={cn(
-                    "text-gray-400 transition-transform duration-300",
+                    "text-muted-text transition-transform duration-300",
                     isOpen && "rotate-180",
                   )}
                 />
@@ -116,6 +122,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.2 }}
+                    id={listboxId}
                     role="listbox"
                     aria-label={label ? `${label} options` : "Number options"}
                     className="border-input-border absolute right-0 left-0 z-50 mt-2 max-h-60 overflow-auto rounded-xl border bg-(--white) shadow-lg"
@@ -180,7 +187,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           )}
         </div>
 
-        {typeof error === "string" && error && <p className="text-error-red text-sm">{error}</p>}
+        {typeof error === "string" && error && (
+          <p className="text-error-red text-sm">{error}</p>
+        )}
       </div>
     );
   },

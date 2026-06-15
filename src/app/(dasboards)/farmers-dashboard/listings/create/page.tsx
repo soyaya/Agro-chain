@@ -27,7 +27,8 @@ export default function CreateListingPage() {
       toast.success("Listing submitted successfully.");
       router.push("/farmers-dashboard/listings");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to create listing";
+      const message =
+        error instanceof Error ? error.message : "Failed to create listing";
       toast.error(message);
       throw error;
     } finally {
@@ -48,7 +49,10 @@ export default function CreateListingPage() {
           className="flex flex-col gap-(--section-gap)"
         >
           {/* Header */}
-          <motion.div variants={FADE_IN_VARIANT} className="flex flex-col gap-(--gap-base)">
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="flex flex-col gap-(--gap-base)"
+          >
             <button
               onClick={() => router.back()}
               className="text-text-colour hover:text-heading-colour flex w-fit items-center gap-2 transition"

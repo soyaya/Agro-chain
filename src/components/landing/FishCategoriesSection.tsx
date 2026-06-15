@@ -13,7 +13,10 @@ const CARD_HOVER: TargetAndTransition = {
   transition: { duration: 0.22, ease: "easeOut" },
 };
 
-const CARD_TAP: TargetAndTransition = { scale: 0.97, transition: { duration: 0.1 } };
+const CARD_TAP: TargetAndTransition = {
+  scale: 0.97,
+  transition: { duration: 0.1 },
+};
 
 const CATEGORY_ICONS = {
   live: Fish,
@@ -22,7 +25,8 @@ const CATEGORY_ICONS = {
 };
 
 function CategoryCard({ group }: { group: FishCategoryGroup }) {
-  const Icon = CATEGORY_ICONS[group.categoryParam as keyof typeof CATEGORY_ICONS] ?? Fish;
+  const Icon =
+    CATEGORY_ICONS[group.categoryParam as keyof typeof CATEGORY_ICONS] ?? Fish;
 
   if (group.isSpecialDemand) {
     return (
@@ -36,7 +40,9 @@ function CategoryCard({ group }: { group: FishCategoryGroup }) {
           <span className="bg-theme-green-dark/10 flex h-10 w-10 items-center justify-center rounded-xl">
             <Icon size={20} className="text-theme-green-dark" />
           </span>
-          <h3 className="font-ubuntu text-heading-colour text-lg font-bold">{group.name}</h3>
+          <h3 className="font-ubuntu text-heading-colour text-lg font-bold">
+            {group.name}
+          </h3>
         </div>
 
         <p className="font-roboto-slab text-text-colour flex-1 text-sm leading-relaxed">
@@ -62,10 +68,12 @@ function CategoryCard({ group }: { group: FishCategoryGroup }) {
       className="border-gray-border flex cursor-pointer flex-col gap-5 rounded-2xl border bg-white p-6 shadow-sm"
     >
       <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50">
+        <span className="bg-green-tint flex h-10 w-10 items-center justify-center rounded-xl">
           <Icon size={20} className="text-theme-green-dark" />
         </span>
-        <h3 className="font-ubuntu text-heading-colour text-lg font-bold">{group.name}</h3>
+        <h3 className="font-ubuntu text-heading-colour text-lg font-bold">
+          {group.name}
+        </h3>
       </div>
 
       <p className="font-roboto-slab text-text-colour text-sm leading-relaxed">
@@ -76,7 +84,7 @@ function CategoryCard({ group }: { group: FishCategoryGroup }) {
         {group.subTypes.map((sub) => (
           <span
             key={sub.value}
-            className="font-roboto-slab border-gray-border rounded-full border bg-gray-50 px-3 py-1 text-xs font-medium text-gray-600"
+            className="font-roboto-slab border-gray-border text-text-colour bg-gray-bg rounded-full border px-3 py-1 text-xs font-medium"
           >
             {sub.label}
           </span>
@@ -106,7 +114,8 @@ export default function FishCategoriesSection() {
             Find the catfish you need.
           </h2>
           <p className="font-roboto-slab text-text-colour max-w-xl text-lg">
-            Live or processed — verified catfish supply across every category, with a special demand option when you need something custom.
+            Live or processed — verified catfish supply across every category,
+            with a special demand option when you need something custom.
           </p>
         </div>
 

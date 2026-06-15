@@ -14,7 +14,11 @@ import {
   Users,
   ChevronDown,
 } from "lucide-react";
-import { FADE_IN_VARIANT, SLIDE_UP_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import {
+  FADE_IN_VARIANT,
+  SLIDE_UP_VARIANT,
+  STAGGER_CONTAINER_VARIANT,
+} from "~/types/constants";
 
 type SupportOption = {
   icon: typeof MessageCircle;
@@ -107,7 +111,7 @@ export default function SupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
+    <div className="min-h-screen bg-white">
       <div className="mx-auto w-full max-w-6xl px-6 py-12 lg:px-8">
         {/* Back Button */}
         <motion.div
@@ -117,7 +121,7 @@ export default function SupportPage() {
         >
           <Link
             href="/"
-            className="font-roboto-slab mb-8 inline-flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-900"
+            className="font-roboto-slab text-text-colour hover:text-heading-colour mb-8 inline-flex items-center gap-2 text-sm transition-colors"
           >
             <ArrowLeft size={16} />
             Back to Home
@@ -131,15 +135,15 @@ export default function SupportPage() {
           variants={FADE_IN_VARIANT}
           className="mb-12 text-center"
         >
-          <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <HelpCircle size={32} className="text-green-600" />
+          <div className="bg-green-tint mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full">
+            <HelpCircle size={32} className="text-theme-green-dark" />
           </div>
-          <h1 className="font-ubuntu mb-4 text-4xl font-bold text-gray-900 lg:text-5xl">
+          <h1 className="font-ubuntu text-heading-colour mb-4 text-4xl font-bold lg:text-5xl">
             How Can We Help?
           </h1>
-          <p className="font-roboto-slab mx-auto max-w-2xl text-gray-600">
-            We&apos;re here to assist you. Choose your preferred way to get in touch with our
-            support team.
+          <p className="font-roboto-slab text-text-colour mx-auto max-w-2xl">
+            We&apos;re here to assist you. Choose your preferred way to get in
+            touch with our support team.
           </p>
         </motion.div>
 
@@ -154,7 +158,7 @@ export default function SupportPage() {
             const Icon = option.icon;
             const colorClasses = {
               blue: "bg-blue-100 text-blue-600",
-              green: "bg-green-100 text-green-600",
+              green: "bg-green-tint text-theme-green-dark",
               purple: "bg-purple-100 text-purple-600",
             };
 
@@ -172,13 +176,17 @@ export default function SupportPage() {
                 >
                   <Icon size={24} />
                 </div>
-                <h3 className="font-ubuntu mb-2 text-xl font-bold text-gray-900">{option.title}</h3>
-                <p className="font-roboto-slab mb-4 text-gray-600">{option.description}</p>
+                <h3 className="font-ubuntu text-heading-colour mb-2 text-xl font-bold">
+                  {option.title}
+                </h3>
+                <p className="font-roboto-slab text-text-colour mb-4">
+                  {option.description}
+                </p>
                 <div className="flex items-center justify-between">
-                  <p className="font-roboto-slab text-sm font-medium text-gray-900">
+                  <p className="font-roboto-slab text-heading-colour text-sm font-medium">
                     {option.action}
                   </p>
-                  <ArrowRight size={16} className="text-gray-900" />
+                  <ArrowRight size={16} className="text-heading-colour" />
                 </div>
               </motion.a>
             );
@@ -192,7 +200,7 @@ export default function SupportPage() {
           variants={SLIDE_UP_VARIANT}
           className="mb-16 rounded-2xl bg-(--white) p-8 shadow-lg lg:p-12"
         >
-          <h2 className="font-ubuntu mb-8 text-center text-3xl font-bold text-gray-900">
+          <h2 className="font-ubuntu text-heading-colour mb-8 text-center text-3xl font-bold">
             Frequently Asked Questions
           </h2>
           <div className="space-y-6">
@@ -201,7 +209,10 @@ export default function SupportPage() {
               const displayIndex = String(index + 1).padStart(2, "0");
 
               return (
-                <div key={faq.question} className="border-b border-gray-200 pb-6 last:border-0">
+                <div
+                  key={faq.question}
+                  className="border-gray-border border-b pb-6 last:border-0"
+                >
                   <button
                     type="button"
                     onClick={() => setOpenFaqIndex(isOpen ? null : index)}
@@ -210,16 +221,16 @@ export default function SupportPage() {
                     aria-controls={`faq-panel-${index}`}
                   >
                     <div className="flex items-center gap-4">
-                      <span className="font-ubuntu text-lg font-semibold text-gray-500">
+                      <span className="font-ubuntu text-muted-text text-lg font-semibold">
                         {displayIndex}
                       </span>
-                      <span className="font-ubuntu text-lg font-semibold text-gray-900">
+                      <span className="font-ubuntu text-heading-colour text-lg font-semibold">
                         {faq.question}
                       </span>
                     </div>
                     <ChevronDown
                       size={20}
-                      className={`text-gray-600 transition-transform duration-300 ${
+                      className={`text-text-colour transition-transform duration-300 ${
                         isOpen ? "rotate-180" : ""
                       }`}
                     />
@@ -235,7 +246,7 @@ export default function SupportPage() {
                         transition={{ duration: 0.25, ease: "easeOut" }}
                         className="overflow-hidden"
                       >
-                        <p className="font-roboto-slab mt-3 leading-relaxed text-gray-700">
+                        <p className="font-roboto-slab text-text-colour-2 mt-3 leading-relaxed">
                           {faq.answer}
                         </p>
                       </motion.div>
@@ -254,7 +265,7 @@ export default function SupportPage() {
           variants={SLIDE_UP_VARIANT}
           className="mb-16"
         >
-          <h2 className="font-ubuntu mb-8 text-center text-3xl font-bold text-gray-900">
+          <h2 className="font-ubuntu text-heading-colour mb-8 text-center text-3xl font-bold">
             Helpful Resources
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -265,13 +276,15 @@ export default function SupportPage() {
                   key={index}
                   className="cursor-pointer rounded-xl bg-(--white) p-6 shadow-md transition-shadow hover:shadow-lg"
                 >
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-                    <Icon size={20} className="text-gray-600" />
+                  <div className="bg-gray-bg mb-4 flex h-10 w-10 items-center justify-center rounded-lg">
+                    <Icon size={20} className="text-text-colour" />
                   </div>
-                  <h3 className="font-ubuntu mb-2 text-lg font-semibold text-gray-900">
+                  <h3 className="font-ubuntu text-heading-colour mb-2 text-lg font-semibold">
                     {resource.title}
                   </h3>
-                  <p className="font-roboto-slab text-sm text-gray-600">{resource.description}</p>
+                  <p className="font-roboto-slab text-text-colour text-sm">
+                    {resource.description}
+                  </p>
                 </div>
               );
             })}
@@ -285,11 +298,14 @@ export default function SupportPage() {
           variants={FADE_IN_VARIANT}
           className="rounded-2xl bg-linear-to-r from-green-600 to-green-700 p-8 text-center shadow-xl lg:p-12"
         >
-          <h2 className="font-ubuntu mb-4 text-3xl font-bold text-white">Still Need Help?</h2>
-          <p className="font-roboto-slab mx-auto mb-6 max-w-2xl text-green-50">
-            Our support team is ready to assist you with any questions or concerns you may have.
+          <h2 className="font-ubuntu mb-4 text-3xl font-bold text-white">
+            Still Need Help?
+          </h2>
+          <p className="font-roboto-slab text-green-tint mx-auto mb-6 max-w-2xl">
+            Our support team is ready to assist you with any questions or
+            concerns you may have.
           </p>
-          <button className="font-roboto-slab rounded-lg bg-(--white) px-8 py-3 font-semibold text-green-600 transition-colors hover:bg-green-50">
+          <button className="font-roboto-slab text-theme-green-dark hover:bg-green-tint rounded-lg bg-(--white) px-8 py-3 font-semibold transition-colors">
             Contact Support
           </button>
         </motion.div>
@@ -304,14 +320,14 @@ export default function SupportPage() {
           <div className="flex items-center justify-center gap-6">
             <Link
               href="/privacy"
-              className="font-roboto-slab text-sm text-gray-600 transition-colors hover:text-gray-900"
+              className="font-roboto-slab text-text-colour hover:text-heading-colour text-sm transition-colors"
             >
               Privacy Policy
             </Link>
-            <span className="text-gray-400">•</span>
+            <span className="text-muted-text">•</span>
             <Link
               href="/terms"
-              className="font-roboto-slab text-sm text-gray-600 transition-colors hover:text-gray-900"
+              className="font-roboto-slab text-text-colour hover:text-heading-colour text-sm transition-colors"
             >
               Terms of Service
             </Link>

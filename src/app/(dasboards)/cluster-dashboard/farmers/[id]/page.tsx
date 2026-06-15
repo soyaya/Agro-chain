@@ -20,17 +20,23 @@ import {
   AlertCircle,
   XCircle,
 } from "lucide-react";
-import { clusterService, type BackendFarmerDetail } from "~/lib/services/cluster.service";
+import {
+  clusterService,
+  type BackendFarmerDetail,
+} from "~/lib/services/cluster.service";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
 type ListingStatus = "approved" | "pending" | "rejected";
 
-const STATUS_CONFIG: Record<ListingStatus, { icon: React.ReactNode; className: string; label: string }> = {
+const STATUS_CONFIG: Record<
+  ListingStatus,
+  { icon: React.ReactNode; className: string; label: string }
+> = {
   approved: {
     icon: <CheckCircle2 size={14} />,
-    className: "bg-green-50 text-green-700 border-green-200",
+    className: "bg-green-tint text-theme-green-dark border-gray-border",
     label: "Approved",
   },
   pending: {
@@ -49,7 +55,11 @@ function statusConfig(status: string) {
   return STATUS_CONFIG[status as ListingStatus] ?? STATUS_CONFIG.pending;
 }
 
-export default function FarmerProfilePage({ params }: { params: Promise<{ id: string }> }) {
+export default function FarmerProfilePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
 
@@ -67,16 +77,23 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
         if (mounted) setFarmer(res.data.farmer);
       } catch (err) {
         if (mounted)
-          setError(err instanceof Error ? err.message : "Failed to load farmer profile");
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Failed to load farmer profile",
+          );
       } finally {
         if (mounted) setLoading(false);
       }
     };
     void load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [id]);
 
-  if (loading) return <LoadingState message="Loading farmer profile..." size="lg" />;
+  if (loading)
+    return <LoadingState message="Loading farmer profile..." size="lg" />;
 
   if (error || !farmer) {
     return (
@@ -117,7 +134,9 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
           Back to Farmers
         </button>
         <div>
-          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Farmer Profile</h1>
+          <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+            Farmer Profile
+          </h1>
           <p className="font-roboto-slab text-text-colour">
             Full profile details for this cluster farmer
           </p>
@@ -135,12 +154,14 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
           variants={FADE_IN_VARIANT}
           className="border-input-border flex flex-col items-center gap-(--space-lg) rounded-2xl border bg-(--white) p-(--space-xl) text-center shadow-sm"
         >
-          <div className="font-ubuntu flex h-24 w-24 items-center justify-center rounded-full bg-green-100 text-3xl font-bold text-green-700">
+          <div className="font-ubuntu bg-green-tint text-theme-green-dark flex h-24 w-24 items-center justify-center rounded-full text-3xl font-bold">
             {initials}
           </div>
           <div>
-            <h2 className="font-ubuntu text-heading-colour text-2xl font-bold">{farmer.fullName}</h2>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-0.5 text-xs font-medium text-green-700">
+            <h2 className="font-ubuntu text-heading-colour text-2xl font-bold">
+              {farmer.fullName}
+            </h2>
+            <span className="border-gray-border bg-green-tint text-theme-green-dark inline-flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-medium">
               <Fish size={12} />
               Fish Farmer
             </span>
@@ -149,14 +170,34 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
           <div className="bg-gray-bg w-full rounded-2xl p-(--space-lg)">
             <div className="grid grid-cols-2 gap-(--gap-base)">
               {[
-                { label: "Total Listings", value: farmer.stats.totalListings, color: "text-heading-colour" },
-                { label: "Approved", value: farmer.stats.approvedListings, color: "text-green-600" },
-                { label: "Pending", value: farmer.stats.pendingListings, color: "text-yellow-600" },
-                { label: "Supply (kg)", value: farmer.stats.totalSupplyKg, color: "text-blue-600" },
+                {
+                  label: "Total Listings",
+                  value: farmer.stats.totalListings,
+                  color: "text-heading-colour",
+                },
+                {
+                  label: "Approved",
+                  value: farmer.stats.approvedListings,
+                  color: "text-theme-green-dark",
+                },
+                {
+                  label: "Pending",
+                  value: farmer.stats.pendingListings,
+                  color: "text-yellow-600",
+                },
+                {
+                  label: "Supply (kg)",
+                  value: farmer.stats.totalSupplyKg,
+                  color: "text-blue-600",
+                },
               ].map(({ label, value, color }) => (
                 <div key={label} className="text-center">
-                  <p className={`font-ubuntu text-2xl font-bold ${color}`}>{value}</p>
-                  <p className="font-roboto-slab text-text-colour text-xs">{label}</p>
+                  <p className={`font-ubuntu text-2xl font-bold ${color}`}>
+                    {value}
+                  </p>
+                  <p className="font-roboto-slab text-text-colour text-xs">
+                    {label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -164,10 +205,13 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
 
           <div className="w-full space-y-2 text-left">
             <div className="text-text-colour flex items-center gap-2 text-sm">
-              <Calendar size={15} className="shrink-0 text-gray-400" />
+              <Calendar size={15} className="text-muted-text shrink-0" />
               <span>
                 Member since{" "}
-                {memberSince.toLocaleDateString("en-NG", { month: "long", year: "numeric" })}
+                {memberSince.toLocaleDateString("en-NG", {
+                  month: "long",
+                  year: "numeric",
+                })}
               </span>
             </div>
           </div>
@@ -185,38 +229,68 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
             </h3>
             <div className="grid grid-cols-1 gap-(--space-lg) sm:grid-cols-2">
               {[
-                { icon: <User size={16} />, label: "Full Name", value: farmer.fullName },
-                { icon: <Phone size={16} />, label: "Phone", value: farmer.phoneNumber },
-                { icon: <Mail size={16} />, label: "Email", value: farmer.email ?? "—" },
-                { icon: <Building2 size={16} />, label: "Farm Name", value: farmer.farmName ?? "—" },
-                { icon: <MapPinned size={16} />, label: "State", value: farmer.state },
-                { icon: <MapPin size={16} />, label: "Local Government", value: farmer.localGovernment },
+                {
+                  icon: <User size={16} />,
+                  label: "Full Name",
+                  value: farmer.fullName,
+                },
+                {
+                  icon: <Phone size={16} />,
+                  label: "Phone",
+                  value: farmer.phoneNumber,
+                },
+                {
+                  icon: <Mail size={16} />,
+                  label: "Email",
+                  value: farmer.email ?? "—",
+                },
+                {
+                  icon: <Building2 size={16} />,
+                  label: "Farm Name",
+                  value: farmer.farmName ?? "—",
+                },
+                {
+                  icon: <MapPinned size={16} />,
+                  label: "State",
+                  value: farmer.state,
+                },
+                {
+                  icon: <MapPin size={16} />,
+                  label: "Local Government",
+                  value: farmer.localGovernment,
+                },
                 {
                   icon: <Package size={16} />,
                   label: "Farming Capacity",
-                  value: farmer.farmingCapacityKg != null
-                    ? `${farmer.farmingCapacityKg.toLocaleString()} kg`
-                    : "—",
+                  value:
+                    farmer.farmingCapacityKg != null
+                      ? `${farmer.farmingCapacityKg.toLocaleString()} kg`
+                      : "—",
                 },
                 {
                   icon: <TrendingUp size={16} />,
                   label: "Experience",
-                  value: farmer.yearsOfExperience != null
-                    ? `${farmer.yearsOfExperience} years`
-                    : "—",
+                  value:
+                    farmer.yearsOfExperience != null
+                      ? `${farmer.yearsOfExperience} years`
+                      : "—",
                 },
                 {
                   icon: <Clock size={16} />,
                   label: "Verification",
-                  value: farmer.verificationStatus.charAt(0).toUpperCase() + farmer.verificationStatus.slice(1),
+                  value:
+                    farmer.verificationStatus.charAt(0).toUpperCase() +
+                    farmer.verificationStatus.slice(1),
                 },
               ].map(({ icon, label, value }) => (
                 <div key={label}>
-                  <p className="font-roboto-slab mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                  <p className="font-roboto-slab text-muted-text mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase">
                     {icon}
                     {label}
                   </p>
-                  <p className="font-roboto-slab text-heading-colour text-sm">{value}</p>
+                  <p className="font-roboto-slab text-heading-colour text-sm">
+                    {value}
+                  </p>
                 </div>
               ))}
             </div>
@@ -238,14 +312,18 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                     >
                       <div className="flex flex-col gap-0.5">
                         <p className="font-roboto-slab text-heading-colour text-sm font-medium capitalize">
-                          {listing.fishType} — {listing.totalAvailableKg.toLocaleString()} kg
+                          {listing.fishType} —{" "}
+                          {listing.totalAvailableKg.toLocaleString()} kg
                         </p>
                         <p className="font-roboto-slab text-text-colour text-xs">
-                          {new Date(listing.createdAt).toLocaleDateString("en-NG", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                          {new Date(listing.createdAt).toLocaleDateString(
+                            "en-NG",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
                         </p>
                       </div>
                       <span
@@ -259,7 +337,9 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                 })}
               </div>
             ) : (
-              <p className="font-roboto-slab text-text-colour text-sm">No listings yet.</p>
+              <p className="font-roboto-slab text-text-colour text-sm">
+                No listings yet.
+              </p>
             )}
           </div>
         </motion.div>

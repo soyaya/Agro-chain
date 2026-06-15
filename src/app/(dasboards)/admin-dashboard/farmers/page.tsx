@@ -2,27 +2,36 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Search, X, CheckCircle, XCircle, Eye, ToggleLeft, ToggleRight } from "lucide-react";
+import {
+  Users,
+  Search,
+  X,
+  CheckCircle,
+  XCircle,
+  Eye,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import { adminService, type AdminUser } from "~/lib/services/admin.service";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
 // === Role badge
 
 const ROLE_STYLES: Record<string, string> = {
-  farmer: "bg-green-50 text-green-700 border-green-200",
+  farmer: "bg-green-tint text-theme-green-dark border-gray-border",
   cluster: "bg-blue-50 text-blue-700 border-blue-200",
   buyer: "bg-purple-50 text-purple-700 border-purple-200",
   admin: "bg-red-50 text-red-700 border-red-200",
-  pending: "bg-gray-50 text-gray-600 border-gray-200",
+  pending: "bg-gray-bg text-text-colour border-gray-border",
 };
 
 const VERIFICATION_STYLES: Record<string, string> = {
-  verified: "text-green-600",
+  verified: "text-theme-green-dark",
   pending: "text-yellow-600",
-  unverified: "text-gray-400",
+  unverified: "text-muted-text",
   rejected: "text-red-600",
 };
 
@@ -35,7 +44,12 @@ interface UserDetailProps {
   toggling: boolean;
 }
 
-function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDetailProps) {
+function UserDetailSlideOver({
+  user,
+  onClose,
+  onToggleActive,
+  toggling,
+}: UserDetailProps) {
   return (
     <AnimatePresence>
       {user && (
@@ -56,10 +70,12 @@ function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDe
           >
             {/* Header */}
             <div className="border-gray-border flex items-center justify-between border-b p-(--space-xl)">
-              <h2 className="font-ubuntu text-heading-colour text-xl font-bold">User Profile</h2>
+              <h2 className="font-ubuntu text-heading-colour text-xl font-bold">
+                User Profile
+              </h2>
               <button
                 onClick={onClose}
-                className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100"
+                className="text-muted-text hover:bg-gray-bg rounded-full p-1 transition"
               >
                 <X size={20} />
               </button>
@@ -73,9 +89,13 @@ function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDe
                   <h3 className="font-ubuntu text-heading-colour text-2xl font-bold">
                     {user.full_name}
                   </h3>
-                  <p className="font-roboto-slab text-text-colour text-sm">{user.phone_number}</p>
+                  <p className="font-roboto-slab text-text-colour text-sm">
+                    {user.phone_number}
+                  </p>
                   {user.email && (
-                    <p className="font-roboto-slab text-text-colour text-sm">{user.email}</p>
+                    <p className="font-roboto-slab text-text-colour text-sm">
+                      {user.email}
+                    </p>
                   )}
                 </div>
                 <span
@@ -105,7 +125,9 @@ function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDe
                   ["Status", user.is_active ? "Active" : "Inactive"],
                 ].map(([label, value]) => (
                   <div key={label}>
-                    <p className="font-roboto-slab text-xs text-gray-400">{label}</p>
+                    <p className="font-roboto-slab text-muted-text text-xs">
+                      {label}
+                    </p>
                     <p
                       className={`font-roboto-slab text-sm font-medium capitalize ${
                         label === "Verification"
@@ -126,10 +148,14 @@ function UserDetailSlideOver({ user, onClose, onToggleActive, toggling }: UserDe
                 className={`font-roboto-slab flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition disabled:opacity-50 ${
                   user.is_active
                     ? "border border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
-                    : "border border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+                    : "border-gray-border bg-green-tint text-theme-green-dark hover:bg-green-tint border"
                 }`}
               >
-                {user.is_active ? <ToggleLeft size={18} /> : <ToggleRight size={18} />}
+                {user.is_active ? (
+                  <ToggleLeft size={18} />
+                ) : (
+                  <ToggleRight size={18} />
+                )}
                 {toggling
                   ? "Updating..."
                   : user.is_active
@@ -167,7 +193,9 @@ export default function AdminFarmersPage() {
         if (mounted) setUsers(response.data.users ?? []);
       } catch (error) {
         if (mounted)
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load users");
+          setErrorMessage(
+            error instanceof Error ? error.message : "Failed to load users",
+          );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -183,13 +211,21 @@ export default function AdminFarmersPage() {
     try {
       await adminService.toggleUserActive(id);
       setUsers((prev) =>
-        prev.map((u) => (u.id === id ? { ...u, is_active: !currentlyActive } : u)),
+        prev.map((u) =>
+          u.id === id ? { ...u, is_active: !currentlyActive } : u,
+        ),
       );
       if (selectedUser?.id === id)
-        setSelectedUser((prev) => (prev ? { ...prev, is_active: !currentlyActive } : null));
-      toast.success(currentlyActive ? "Account deactivated." : "Account activated.");
+        setSelectedUser((prev) =>
+          prev ? { ...prev, is_active: !currentlyActive } : null,
+        );
+      toast.success(
+        currentlyActive ? "Account deactivated." : "Account activated.",
+      );
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update account");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update account",
+      );
     } finally {
       setToggling(false);
     }
@@ -240,11 +276,16 @@ export default function AdminFarmersPage() {
           <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
             User Management
           </h1>
-          <p className="font-roboto-slab text-text-colour">View and manage all platform users.</p>
+          <p className="font-roboto-slab text-text-colour">
+            View and manage all platform users.
+          </p>
         </div>
         {/* Search */}
         <div className="relative w-full max-w-xs">
-          <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+          <Search
+            size={16}
+            className="text-muted-text absolute top-1/2 left-3 -translate-y-1/2"
+          />
           <input
             type="text"
             placeholder="Search name, phone, email..."
@@ -268,7 +309,7 @@ export default function AdminFarmersPage() {
             onClick={() => setRoleFilter(role)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
               roleFilter === role
-                ? "border-theme-green-dark bg-green-50"
+                ? "border-theme-green-dark bg-green-tint"
                 : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
@@ -276,7 +317,11 @@ export default function AdminFarmersPage() {
               {counts[role]}
             </span>
             <span className="font-roboto-slab text-text-colour text-xs capitalize">
-              {role === "all" ? "All Users" : role === "cluster" ? "Cluster Farmers" : role + "s"}
+              {role === "all"
+                ? "All Users"
+                : role === "cluster"
+                  ? "Cluster Farmers"
+                  : role + "s"}
             </span>
           </button>
         ))}
@@ -325,7 +370,9 @@ export default function AdminFarmersPage() {
                         {user.full_name}
                       </p>
                       {user.email && (
-                        <p className="font-roboto-slab text-xs text-gray-400">{user.email}</p>
+                        <p className="font-roboto-slab text-muted-text text-xs">
+                          {user.email}
+                        </p>
                       )}
                     </td>
                     <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
@@ -350,13 +397,17 @@ export default function AdminFarmersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`font-roboto-slab flex w-fit items-center gap-1 text-xs font-medium ${user.is_active ? "text-green-600" : "text-gray-400"}`}
+                        className={`font-roboto-slab flex w-fit items-center gap-1 text-xs font-medium ${user.is_active ? "text-theme-green-dark" : "text-muted-text"}`}
                       >
-                        {user.is_active ? <CheckCircle size={13} /> : <XCircle size={13} />}
+                        {user.is_active ? (
+                          <CheckCircle size={13} />
+                        ) : (
+                          <XCircle size={13} />
+                        )}
                         {user.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="font-roboto-slab px-4 py-3 text-xs text-gray-400">
+                    <td className="font-roboto-slab text-muted-text px-4 py-3 text-xs">
                       {new Date(user.created_at).toLocaleDateString("en-NG", {
                         day: "numeric",
                         month: "short",

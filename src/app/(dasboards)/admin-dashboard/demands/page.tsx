@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Package, MapPin, Clock, UserCheck, X } from "lucide-react";
+import { FileText, UserCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   adminService,
@@ -10,19 +10,40 @@ import {
   type AdminDemandStatus,
   type AdminClusterFarmerOption,
 } from "~/lib/services/admin.service";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
 // === Status config
 
-const STATUS_CONFIG: Record<AdminDemandStatus, { label: string; className: string }> = {
-  pending: { label: "Pending", className: "bg-yellow-50 text-yellow-700 border-yellow-200" },
-  assigned: { label: "Assigned", className: "bg-blue-50 text-blue-700 border-blue-200" },
-  accepted: { label: "Accepted", className: "bg-green-50 text-green-700 border-green-200" },
-  declined: { label: "Declined", className: "bg-red-50 text-red-700 border-red-200" },
-  fulfilled: { label: "Fulfilled", className: "bg-gray-50 text-gray-700 border-gray-200" },
-  cancelled: { label: "Cancelled", className: "bg-gray-50 text-gray-500 border-gray-200" },
+const STATUS_CONFIG: Record<
+  AdminDemandStatus,
+  { label: string; className: string }
+> = {
+  pending: {
+    label: "Pending",
+    className: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  },
+  assigned: {
+    label: "Assigned",
+    className: "bg-blue-50 text-blue-700 border-blue-200",
+  },
+  accepted: {
+    label: "Accepted",
+    className: "bg-green-tint text-theme-green-dark border-gray-border",
+  },
+  declined: {
+    label: "Declined",
+    className: "bg-red-50 text-red-700 border-red-200",
+  },
+  fulfilled: {
+    label: "Fulfilled",
+    className: "bg-gray-bg text-text-colour-2 border-gray-border",
+  },
+  cancelled: {
+    label: "Cancelled",
+    className: "bg-gray-bg text-muted-text border-gray-border",
+  },
 };
 
 // === Assign Modal
@@ -36,7 +57,14 @@ interface AssignModalProps {
   loading: boolean;
 }
 
-function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: AssignModalProps) {
+function AssignModal({
+  isOpen,
+  demand,
+  farmers,
+  onClose,
+  onConfirm,
+  loading,
+}: AssignModalProps) {
   const [selectedFarmerId, setSelectedFarmerId] = useState("");
 
   const handleClose = () => {
@@ -46,7 +74,10 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
 
   // Filter farmers in same state if possible
   const relevantFarmers = demand
-    ? farmers.filter((f) => f.locationState.toLowerCase() === demand.locationState.toLowerCase())
+    ? farmers.filter(
+        (f) =>
+          f.locationState.toLowerCase() === demand.locationState.toLowerCase(),
+      )
     : farmers;
   const displayFarmers = relevantFarmers.length > 0 ? relevantFarmers : farmers;
 
@@ -79,13 +110,14 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
                       Assign Demand
                     </h3>
                     <p className="font-roboto-slab text-text-colour text-sm">
-                      {demand.fishType} · {demand.weightKg}kg · {demand.locationState}
+                      {demand.fishType} · {demand.weightKg}kg ·{" "}
+                      {demand.locationState}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={handleClose}
-                  className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100"
+                  className="text-muted-text hover:bg-gray-bg rounded-full p-1 transition"
                 >
                   <X size={20} />
                 </button>
@@ -104,7 +136,7 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
                       onClick={() => setSelectedFarmerId(farmer.id)}
                       className={`flex items-center justify-between rounded-2xl border p-(--space-md) text-left transition ${
                         selectedFarmerId === farmer.id
-                          ? "border-theme-green-dark bg-green-50"
+                          ? "border-theme-green-dark bg-green-tint"
                           : "border-gray-border hover:bg-pink-bg"
                       }`}
                     >
@@ -117,7 +149,7 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
                             {farmer.businessName}
                           </p>
                         )}
-                        <p className="font-roboto-slab text-xs text-gray-400">
+                        <p className="font-roboto-slab text-muted-text text-xs">
                           {farmer.locationLga}, {farmer.locationState}
                         </p>
                       </div>
@@ -131,7 +163,8 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
 
               {relevantFarmers.length === 0 && farmers.length > 0 && (
                 <p className="font-roboto-slab text-xs text-yellow-600">
-                  No cluster farmers in {demand.locationState} - showing all available farmers
+                  No cluster farmers in {demand.locationState} - showing all
+                  available farmers
                 </p>
               )}
 
@@ -145,7 +178,9 @@ function AssignModal({ isOpen, demand, farmers, onClose, onConfirm, loading }: A
                   Cancel
                 </button>
                 <button
-                  onClick={() => selectedFarmerId && onConfirm(selectedFarmerId)}
+                  onClick={() =>
+                    selectedFarmerId && onConfirm(selectedFarmerId)
+                  }
                   disabled={loading || !selectedFarmerId}
                   className="font-roboto-slab bg-theme-green-dark flex h-12 items-center justify-center rounded-full text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
                 >
@@ -168,7 +203,9 @@ export default function AdminDemandsPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<AdminDemandStatus | "all">("all");
+  const [filterStatus, setFilterStatus] = useState<AdminDemandStatus | "all">(
+    "all",
+  );
   const [assignModal, setAssignModal] = useState<AdminDemand | null>(null);
 
   useEffect(() => {
@@ -187,7 +224,9 @@ export default function AdminDemandsPage() {
         }
       } catch (error) {
         if (mounted)
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load demands");
+          setErrorMessage(
+            error instanceof Error ? error.message : "Failed to load demands",
+          );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -209,7 +248,9 @@ export default function AdminDemandsPage() {
             ? {
                 ...d,
                 status: "assigned" as AdminDemandStatus,
-                assignedClusterFarmerName: farmers.find((f) => f.id === farmerId)?.fullName,
+                assignedClusterFarmerName: farmers.find(
+                  (f) => f.id === farmerId,
+                )?.fullName,
               }
             : d,
         ),
@@ -217,14 +258,18 @@ export default function AdminDemandsPage() {
       toast.success("Demand assigned to cluster farmer.");
       setAssignModal(null);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to assign demand");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to assign demand",
+      );
     } finally {
       setActionLoading(false);
     }
   };
 
   const filtered =
-    filterStatus === "all" ? demands : demands.filter((d) => d.status === filterStatus);
+    filterStatus === "all"
+      ? demands
+      : demands.filter((d) => d.status === filterStatus);
 
   const counts = {
     all: demands.length,
@@ -273,24 +318,33 @@ export default function AdminDemandsPage() {
         animate="visible"
         className="grid grid-cols-3 gap-(--gap-base) sm:grid-cols-6"
       >
-        {(["all", "pending", "assigned", "accepted", "declined", "fulfilled"] as const).map(
-          (status) => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
-                filterStatus === status
-                  ? "border-theme-green-dark bg-green-50"
-                  : "border-gray-border hover:bg-pink-bg bg-(--white)"
-              }`}
-            >
-              <span className="font-ubuntu text-heading-colour text-xl font-bold">
-                {counts[status]}
-              </span>
-              <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
-            </button>
-          ),
-        )}
+        {(
+          [
+            "all",
+            "pending",
+            "assigned",
+            "accepted",
+            "declined",
+            "fulfilled",
+          ] as const
+        ).map((status) => (
+          <button
+            key={status}
+            onClick={() => setFilterStatus(status)}
+            className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
+              filterStatus === status
+                ? "border-theme-green-dark bg-green-tint"
+                : "border-gray-border hover:bg-pink-bg bg-(--white)"
+            }`}
+          >
+            <span className="font-ubuntu text-heading-colour text-xl font-bold">
+              {counts[status]}
+            </span>
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">
+              {status}
+            </span>
+          </button>
+        ))}
       </motion.div>
 
       {/* Table */}
@@ -338,7 +392,7 @@ export default function AdminDemandsPage() {
                           {demand.buyerName}
                         </p>
                         {demand.buyerPhone && (
-                          <p className="font-roboto-slab text-xs text-gray-400">
+                          <p className="font-roboto-slab text-muted-text text-xs">
                             {demand.buyerPhone}
                           </p>
                         )}
@@ -362,11 +416,14 @@ export default function AdminDemandsPage() {
                       <td className="font-roboto-slab text-text-colour px-4 py-3 text-sm">
                         {demand.assignedClusterFarmerName ?? "-"}
                       </td>
-                      <td className="font-roboto-slab px-4 py-3 text-xs text-gray-400">
-                        {new Date(demand.createdAt).toLocaleDateString("en-NG", {
-                          day: "numeric",
-                          month: "short",
-                        })}
+                      <td className="font-roboto-slab text-muted-text px-4 py-3 text-xs">
+                        {new Date(demand.createdAt).toLocaleDateString(
+                          "en-NG",
+                          {
+                            day: "numeric",
+                            month: "short",
+                          },
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         {demand.status === "pending" && (
@@ -391,7 +448,9 @@ export default function AdminDemandsPage() {
           icon={FileText}
           title="No demands found"
           description={
-            filterStatus === "all" ? "No buyer demands yet." : `No ${filterStatus} demands.`
+            filterStatus === "all"
+              ? "No buyer demands yet."
+              : `No ${filterStatus} demands.`
           }
           size="lg"
         />

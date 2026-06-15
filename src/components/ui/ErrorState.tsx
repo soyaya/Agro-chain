@@ -41,8 +41,10 @@ export function ErrorState({
         <AlertCircle size={iconSizes[size]} className="text-error-red" />
       </motion.div>
       <div className="max-w-md text-center">
-        <h3 className="font-ubuntu mb-2 text-lg font-semibold text-gray-900">Error</h3>
-        <p className="font-roboto-slab text-sm text-gray-600">{message}</p>
+        <h3 className="font-ubuntu text-heading-colour mb-2 text-lg font-semibold">
+          Error
+        </h3>
+        <p className="font-roboto-slab text-text-colour text-sm">{message}</p>
       </div>
       {onRetry && (
         <button

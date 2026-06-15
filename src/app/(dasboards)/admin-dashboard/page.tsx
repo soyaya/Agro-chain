@@ -38,19 +38,43 @@ export default function AdminDashboardPage() {
 
   const stats = useMemo(
     () => [
-      { label: "Total Users", value: metrics.totalUsers.toLocaleString(), icon: Users },
-      { label: "New Users Today", value: metrics.newUsersToday.toLocaleString(), icon: UserPlus },
-      { label: "Active Listings", value: metrics.activeListings.toLocaleString(), icon: Package },
-      { label: "Orders Today", value: metrics.ordersToday.toLocaleString(), icon: ShoppingCart },
+      {
+        label: "Total Users",
+        value: metrics.totalUsers.toLocaleString(),
+        icon: Users,
+      },
+      {
+        label: "New Users Today",
+        value: metrics.newUsersToday.toLocaleString(),
+        icon: UserPlus,
+      },
+      {
+        label: "Active Listings",
+        value: metrics.activeListings.toLocaleString(),
+        icon: Package,
+      },
+      {
+        label: "Orders Today",
+        value: metrics.ordersToday.toLocaleString(),
+        icon: ShoppingCart,
+      },
     ],
     [metrics],
   );
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      <motion.div variants={SLIDE_UP_VARIANT} initial="hidden" animate="visible">
-        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Admin Dashboard</h1>
-        <p className="font-roboto-slab text-text-colour">Platform overview and live metrics</p>
+      <motion.div
+        variants={SLIDE_UP_VARIANT}
+        initial="hidden"
+        animate="visible"
+      >
+        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+          Admin Dashboard
+        </h1>
+        <p className="font-roboto-slab text-text-colour">
+          Platform overview and live metrics
+        </p>
       </motion.div>
 
       <motion.div
@@ -68,12 +92,14 @@ export default function AdminDashboardPage() {
               className="border-gray-border rounded-2xl border bg-(--white) p-6 shadow-sm"
             >
               <div className="mb-4 flex items-center justify-between">
-                <Icon className="text-green-700" size={24} />
+                <Icon className="text-theme-green-dark" size={24} />
               </div>
               <p className="font-ubuntu text-heading-colour mb-1 text-3xl font-bold">
                 {loading ? "..." : stat.value}
               </p>
-              <p className="font-roboto-slab text-text-colour text-sm">{stat.label}</p>
+              <p className="font-roboto-slab text-text-colour text-sm">
+                {stat.label}
+              </p>
             </motion.div>
           );
         })}
@@ -103,7 +129,9 @@ export default function AdminDashboardPage() {
           animate="visible"
           className="border-gray-border rounded-2xl border bg-(--white) p-6 shadow-sm"
         >
-          <h2 className="font-ubuntu text-heading-colour mb-4 text-xl font-semibold">Next Steps</h2>
+          <h2 className="font-ubuntu text-heading-colour mb-4 text-xl font-semibold">
+            Next Steps
+          </h2>
           <div className="text-text-colour space-y-2 text-sm">
             <p>Review new cluster farmer applications.</p>
             <p>Monitor order volume and platform activity.</p>

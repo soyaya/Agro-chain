@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Trash2, Eye, EyeOff } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -24,7 +24,9 @@ import {
 const schema = z.object({
   fishType: z.string().min(1, "Fish type is required"),
   harvestDate: z.string().min(1, "Harvest date is required"),
-  totalAvailableKg: z.number().min(MIN_SUPPLY_KG, `Minimum supply is ${MIN_SUPPLY_KG}kg`),
+  totalAvailableKg: z
+    .number()
+    .min(MIN_SUPPLY_KG, `Minimum supply is ${MIN_SUPPLY_KG}kg`),
   location: z.string().min(3, "Location is required"),
   state: z.string().min(1, "State is required"),
   localGovernment: z.string().min(2, "Local government is required"),
@@ -40,14 +42,16 @@ export default function CreateClusterListingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [packaging, setPackaging] = useState<PackagingOption[]>([]);
   const [packagingError, setPackagingError] = useState("");
-  const [selectedDelivery, setSelectedDelivery] = useState<DeliveryOptionValue[]>([]);
+  const [selectedDelivery, setSelectedDelivery] = useState<
+    DeliveryOptionValue[]
+  >([]);
   const [deliveryError, setDeliveryError] = useState("");
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors, isValid },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -55,7 +59,10 @@ export default function CreateClusterListingPage() {
     defaultValues: { visibleOnMarketplace: true },
   });
 
-  const visibleOnMarketplace = watch("visibleOnMarketplace");
+  const visibleOnMarketplace = useWatch({
+    control,
+    name: "visibleOnMarketplace",
+  });
 
   const addPackaging = () => {
     setPackaging((prev) => [...prev, { weightKg: 1, quantity: 0 }]);
@@ -66,13 +73,21 @@ export default function CreateClusterListingPage() {
     setPackaging((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updatePackaging = (index: number, field: keyof PackagingOption, value: number) => {
-    setPackaging((prev) => prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
+  const updatePackaging = (
+    index: number,
+    field: keyof PackagingOption,
+    value: number,
+  ) => {
+    setPackaging((prev) =>
+      prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)),
+    );
   };
 
   const toggleDelivery = (option: DeliveryOptionValue) => {
     setSelectedDelivery((prev) =>
-      prev.includes(option) ? prev.filter((d) => d !== option) : [...prev, option],
+      prev.includes(option)
+        ? prev.filter((d) => d !== option)
+        : [...prev, option],
     );
     setDeliveryError("");
   };
@@ -98,7 +113,9 @@ export default function CreateClusterListingPage() {
       toast.success("Listing submitted for review!");
       router.push("/cluster-dashboard/listings");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to submit listing");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to submit listing",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +137,10 @@ export default function CreateClusterListingPage() {
           className="flex flex-col gap-(--section-gap)"
         >
           {/* Header */}
-          <motion.div variants={FADE_IN_VARIANT} className="flex flex-col gap-(--gap-base)">
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="flex flex-col gap-(--gap-base)"
+          >
             <button
               onClick={() => router.back()}
               className="text-text-colour hover:text-heading-colour flex w-fit items-center gap-2 transition"
@@ -143,7 +163,10 @@ export default function CreateClusterListingPage() {
             variants={SLIDE_UP_VARIANT}
             className="rounded-3xl bg-(--white) p-(--space-xl) shadow-sm lg:p-(--section-gap)"
           >
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-(--gap-lg)">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-(--gap-lg)"
+            >
               {/* Supply Details */}
               <div>
                 <h2 className="font-ubuntu text-heading-colour mb-(--space-lg) text-lg font-semibold">
@@ -153,7 +176,9 @@ export default function CreateClusterListingPage() {
                   <SelectInput
                     label="Fish Type"
                     value={watch("fishType") ?? ""}
-                    onValueChange={(v) => setValue("fishType", v, { shouldValidate: true })}
+                    onValueChange={(v) =>
+                      setValue("fishType", v, { shouldValidate: true })
+                    }
                     options={fishTypeOptions}
                     error={errors.fishType?.message}
                     required
@@ -195,7 +220,9 @@ export default function CreateClusterListingPage() {
                   <SelectInput
                     label="State"
                     value={watch("state") ?? ""}
-                    onValueChange={(v) => setValue("state", v, { shouldValidate: true })}
+                    onValueChange={(v) =>
+                      setValue("state", v, { shouldValidate: true })
+                    }
                     options={stateOptions}
                     error={errors.state?.message}
                     required
@@ -230,7 +257,8 @@ export default function CreateClusterListingPage() {
                 {packaging.length === 0 ? (
                   <div className="border-gray-border rounded-2xl border border-dashed p-(--space-xl) text-center">
                     <p className="font-roboto-slab text-text-colour text-sm">
-                      No packaging options added yet. Click &quot;Add Option&quot; to start.
+                      No packaging options added yet. Click &quot;Add
+                      Option&quot; to start.
                     </p>
                   </div>
                 ) : (
@@ -253,7 +281,11 @@ export default function CreateClusterListingPage() {
                               value={pkg.weightKg}
                               min={1}
                               onChange={(e) =>
-                                updatePackaging(i, "weightKg", Number(e.target.value))
+                                updatePackaging(
+                                  i,
+                                  "weightKg",
+                                  Number(e.target.value),
+                                )
                               }
                               className="font-roboto-slab border-input-border focus:ring-theme-green-dark w-full rounded-lg border px-(--space-md) py-(--space-sm) text-sm focus:ring-2 focus:outline-none"
                             />
@@ -267,7 +299,11 @@ export default function CreateClusterListingPage() {
                               value={pkg.quantity}
                               min={0}
                               onChange={(e) =>
-                                updatePackaging(i, "quantity", Number(e.target.value))
+                                updatePackaging(
+                                  i,
+                                  "quantity",
+                                  Number(e.target.value),
+                                )
                               }
                               className="font-roboto-slab border-input-border focus:ring-theme-green-dark w-full rounded-lg border px-(--space-md) py-(--space-sm) text-sm focus:ring-2 focus:outline-none"
                             />
@@ -286,7 +322,9 @@ export default function CreateClusterListingPage() {
                   </div>
                 )}
                 {packagingError && (
-                  <p className="font-roboto-slab mt-2 text-sm text-red-500">{packagingError}</p>
+                  <p className="font-roboto-slab mt-2 text-sm text-red-500">
+                    {packagingError}
+                  </p>
                 )}
               </div>
 
@@ -303,7 +341,7 @@ export default function CreateClusterListingPage() {
                       onClick={() => toggleDelivery(option)}
                       className={`font-roboto-slab rounded-xl border px-(--space-lg) py-(--space-sm) text-sm font-medium transition ${
                         selectedDelivery.includes(option)
-                          ? "border-theme-green-dark text-theme-green-dark bg-green-50"
+                          ? "border-theme-green-dark text-theme-green-dark bg-green-tint"
                           : "border-gray-border text-heading-colour hover:bg-pink-bg bg-(--white)"
                       }`}
                     >
@@ -312,7 +350,9 @@ export default function CreateClusterListingPage() {
                   ))}
                 </div>
                 {deliveryError && (
-                  <p className="font-roboto-slab mt-2 text-sm text-red-500">{deliveryError}</p>
+                  <p className="font-roboto-slab mt-2 text-sm text-red-500">
+                    {deliveryError}
+                  </p>
                 )}
               </div>
 
@@ -320,7 +360,9 @@ export default function CreateClusterListingPage() {
               <div className="border-gray-border flex items-start gap-(--space-md) rounded-2xl border p-(--space-lg)">
                 <button
                   type="button"
-                  onClick={() => setValue("visibleOnMarketplace", !visibleOnMarketplace)}
+                  onClick={() =>
+                    setValue("visibleOnMarketplace", !visibleOnMarketplace)
+                  }
                   className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition ${
                     visibleOnMarketplace
                       ? "border-theme-green-dark bg-theme-green-dark"
@@ -336,7 +378,11 @@ export default function CreateClusterListingPage() {
                       stroke="currentColor"
                       strokeWidth={3}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   )}
                 </button>
@@ -345,15 +391,15 @@ export default function CreateClusterListingPage() {
                     {visibleOnMarketplace ? (
                       <Eye size={16} className="text-theme-green-dark" />
                     ) : (
-                      <EyeOff size={16} className="text-gray-400" />
+                      <EyeOff size={16} className="text-muted-text" />
                     )}
                     <span className="font-roboto-slab text-heading-colour text-sm font-medium">
                       Visible on marketplace
                     </span>
                   </div>
                   <p className="font-roboto-slab text-text-colour mt-1 text-xs">
-                    When enabled, this listing will be publicly visible to buyers on the marketplace
-                    after approval.
+                    When enabled, this listing will be publicly visible to
+                    buyers on the marketplace after approval.
                   </p>
                 </div>
               </div>
@@ -362,8 +408,8 @@ export default function CreateClusterListingPage() {
               <div className="rounded-2xl bg-blue-50 p-(--space-lg)">
                 <p className="font-roboto-slab text-sm text-blue-800">
                   <span className="font-medium">Pricing note: </span>
-                  Price per unit is set platform-wide by the admin based on fish type and weight.
-                  You do not need to enter a price.
+                  Price per unit is set platform-wide by the admin based on fish
+                  type and weight. You do not need to enter a price.
                 </p>
               </div>
 

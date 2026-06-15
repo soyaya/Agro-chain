@@ -5,11 +5,19 @@ import { motion } from "framer-motion";
 import { Settings, User, Shield, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import { authService, type BackendUser } from "~/lib/services/auth.service";
-import { adminService, type FishPriceConfig } from "~/lib/services/admin.service";
+import {
+  adminService,
+  type FishPriceConfig,
+} from "~/lib/services/admin.service";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { LoadingState } from "~/components/ui/LoadingState";
-import { FADE_IN_VARIANT, FISH_TYPES, FISH_TYPE_LABELS, type FishType } from "~/types/constants";
+import {
+  FADE_IN_VARIANT,
+  FISH_TYPES,
+  FISH_TYPE_LABELS,
+  type FishType,
+} from "~/types/constants";
 
 // === Fish price form
 
@@ -62,18 +70,23 @@ function FishPricingSection() {
       setLastUpdatedBy(res.data.settings.updatedBy);
       toast.success("Fish prices updated successfully.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update prices.");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update prices.",
+      );
     } finally {
       setSaving(false);
     }
   };
 
-  const isDirty = draft && prices && JSON.stringify(draft) !== JSON.stringify(prices);
+  const isDirty =
+    draft && prices && JSON.stringify(draft) !== JSON.stringify(prices);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <p className="font-roboto-slab text-text-colour text-sm">Loading prices...</p>
+        <p className="font-roboto-slab text-text-colour text-sm">
+          Loading prices...
+        </p>
       </div>
     );
   }
@@ -85,14 +98,18 @@ function FishPricingSection() {
           <div key={fishType} className="flex flex-col gap-1.5">
             <label className="font-roboto-slab text-heading-colour text-sm font-medium">
               {FISH_TYPE_LABELS[fishType as FishType]}
-              <span className="text-text-colour ml-1 text-xs font-normal">(₦ per kg)</span>
+              <span className="text-text-colour ml-1 text-xs font-normal">
+                (₦ per kg)
+              </span>
             </label>
             <input
               type="number"
               min={1}
               step={50}
               value={draft?.[fishType as FishType] ?? ""}
-              onChange={(e) => handleChange(fishType as FishType, e.target.value)}
+              onChange={(e) =>
+                handleChange(fishType as FishType, e.target.value)
+              }
               className="font-roboto-slab text-heading-colour border-input-border focus:ring-theme-green-dark h-10 w-full rounded-lg border px-3 text-sm focus:ring-2 focus:outline-none"
             />
           </div>
@@ -100,7 +117,7 @@ function FishPricingSection() {
       </div>
 
       {lastUpdated && (
-        <p className="font-roboto-slab text-xs text-gray-400">
+        <p className="font-roboto-slab text-muted-text text-xs">
           Last updated: {new Date(lastUpdated).toLocaleString("en-NG")}
           {lastUpdatedBy ? ` · by admin ${lastUpdatedBy.slice(0, 8)}...` : ""}
         </p>
@@ -156,7 +173,9 @@ export default function AdminSettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">Settings</h1>
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
+          Settings
+        </h1>
         <p className="font-roboto-slab text-text-colour">
           Manage your admin account and platform configuration.
         </p>
@@ -170,14 +189,16 @@ export default function AdminSettingsPage() {
         className="border-gray-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+          <div className="bg-green-tint flex h-10 w-10 items-center justify-center rounded-full">
             <DollarSign size={20} className="text-theme-green-dark" />
           </div>
           <div>
-            <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">Fish Pricing</h2>
+            <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">
+              Fish Pricing
+            </h2>
             <p className="font-roboto-slab text-text-colour text-xs">
-              Set the platform-wide price per kg for each fish type. All listings and orders use
-              these values automatically.
+              Set the platform-wide price per kg for each fish type. All
+              listings and orders use these values automatically.
             </p>
           </div>
         </div>
@@ -192,19 +213,37 @@ export default function AdminSettingsPage() {
         className="border-gray-border rounded-2xl border bg-(--white) p-(--space-xl) shadow-sm"
       >
         <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+          <div className="bg-green-tint flex h-10 w-10 items-center justify-center rounded-full">
             <User size={20} className="text-theme-green-dark" />
           </div>
-          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">Admin Profile</h2>
+          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">
+            Admin Profile
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <DynamicInput label="Full Name" value={user?.full_name ?? ""} disabled />
-          <DynamicInput label="Email" fieldType="email" value={user?.email ?? ""} disabled />
-          <DynamicInput label="Phone" fieldType="tel" value={user?.phone_number ?? ""} disabled />
+          <DynamicInput
+            label="Full Name"
+            value={user?.full_name ?? ""}
+            disabled
+          />
+          <DynamicInput
+            label="Email"
+            fieldType="email"
+            value={user?.email ?? ""}
+            disabled
+          />
+          <DynamicInput
+            label="Phone"
+            fieldType="tel"
+            value={user?.phone_number ?? ""}
+            disabled
+          />
           <div className="flex flex-col gap-1.5">
-            <label className="font-roboto-slab text-heading-colour text-sm font-medium">Role</label>
-            <div className="border-input-border flex h-10 items-center rounded-lg border bg-gray-50 px-3">
+            <label className="font-roboto-slab text-heading-colour text-sm font-medium">
+              Role
+            </label>
+            <div className="border-input-border bg-gray-bg flex h-10 items-center rounded-lg border px-3">
               <span className="font-roboto-slab text-text-colour text-sm capitalize">
                 {user?.role ?? "admin"}
               </span>
@@ -212,9 +251,9 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        <p className="font-roboto-slab mt-4 text-xs text-gray-400">
-          Admin profile updates are managed directly in the database. Contact a super admin to make
-          changes.
+        <p className="font-roboto-slab text-muted-text mt-4 text-xs">
+          Admin profile updates are managed directly in the database. Contact a
+          super admin to make changes.
         </p>
       </motion.div>
 
@@ -243,8 +282,13 @@ export default function AdminSettingsPage() {
             ["Cluster Re-application Window", "6 months"],
             ["Listing Expiry", "30 days"],
           ].map(([label, value]) => (
-            <div key={label} className="border-gray-border rounded-xl border p-4">
-              <p className="font-roboto-slab text-xs text-gray-400">{label}</p>
+            <div
+              key={label}
+              className="border-gray-border rounded-xl border p-4"
+            >
+              <p className="font-roboto-slab text-muted-text text-xs">
+                {label}
+              </p>
               <p className="font-roboto-slab text-heading-colour mt-1 text-sm font-medium">
                 {value}
               </p>
@@ -252,9 +296,9 @@ export default function AdminSettingsPage() {
           ))}
         </div>
 
-        <p className="font-roboto-slab mt-4 text-xs text-gray-400">
-          These values are currently hardcoded in the backend. A configuration API endpoint is
-          needed to make them editable here.
+        <p className="font-roboto-slab text-muted-text mt-4 text-xs">
+          These values are currently hardcoded in the backend. A configuration
+          API endpoint is needed to make them editable here.
         </p>
       </motion.div>
 
@@ -269,7 +313,9 @@ export default function AdminSettingsPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
             <Shield size={20} className="text-red-600" />
           </div>
-          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">Security</h2>
+          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">
+            Security
+          </h2>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -278,7 +324,7 @@ export default function AdminSettingsPage() {
               <p className="font-roboto-slab text-heading-colour text-sm font-medium">
                 Active Sessions
               </p>
-              <p className="font-roboto-slab text-xs text-gray-400">
+              <p className="font-roboto-slab text-muted-text text-xs">
                 Manage all active login sessions for your account
               </p>
             </div>

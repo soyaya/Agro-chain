@@ -4,7 +4,10 @@ import Image from "next/image";
 import { motion, type TargetAndTransition } from "framer-motion";
 import { Linkedin } from "lucide-react";
 import Link from "next/link";
-import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import {
+  SLOW_STAGGER_CONTAINER_VARIANT,
+  SLIDE_UP_VARIANT,
+} from "~/types/constants";
 import type { TeamMember } from "~/types/types";
 
 const CARD_HOVER: TargetAndTransition = {
@@ -14,7 +17,10 @@ const CARD_HOVER: TargetAndTransition = {
   transition: { duration: 0.25, ease: "easeOut" },
 };
 
-const CARD_TAP: TargetAndTransition = { scale: 0.97, transition: { duration: 0.1 } };
+const CARD_TAP: TargetAndTransition = {
+  scale: 0.97,
+  transition: { duration: 0.1 },
+};
 
 export default function AboutTeamSection() {
   const team: TeamMember[] = [
@@ -79,15 +85,19 @@ export default function AboutTeamSection() {
                     sizes="96px"
                   />
                 ) : (
-                  <div className="text-theme-green-dark flex h-full w-full items-center justify-center bg-green-50 text-3xl font-bold">
+                  <div className="text-theme-green-dark bg-green-tint flex h-full w-full items-center justify-center text-3xl font-bold">
                     {name.charAt(0)}
                   </div>
                 )}
               </div>
 
               <div className="flex flex-col gap-0.5">
-                <p className="font-ubuntu text-heading-colour font-bold">{name}</p>
-                <p className="font-roboto-slab text-theme-green-dark text-sm font-medium">{role}</p>
+                <p className="font-ubuntu text-heading-colour font-bold">
+                  {name}
+                </p>
+                <p className="font-roboto-slab text-theme-green-dark text-sm font-medium">
+                  {role}
+                </p>
               </div>
 
               <p className="font-roboto-slab text-text-colour text-xs">{bio}</p>
@@ -100,7 +110,9 @@ export default function AboutTeamSection() {
                 aria-label={`${name} on LinkedIn`}
               >
                 <Linkedin className="h-3.5 w-3.5" />
-                <span className="font-ubuntu text-xs font-medium">LinkedIn</span>
+                <span className="font-ubuntu text-xs font-medium">
+                  LinkedIn
+                </span>
               </Link>
             </motion.div>
           ))}

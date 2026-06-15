@@ -4,7 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { CheckCircle2, ChevronDown } from "lucide-react";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import {
+  FADE_IN_VARIANT,
+  STAGGER_CONTAINER_VARIANT,
+  SLIDE_UP_VARIANT,
+} from "~/types/constants";
 
 const subjects = [
   "General Inquiry",
@@ -37,7 +41,10 @@ export default function ContactFormSection() {
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     }
@@ -45,7 +52,9 @@ export default function ContactFormSection() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
@@ -82,7 +91,12 @@ export default function ContactFormSection() {
                 <motion.div
                   initial={{ scale: 0.4, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20,
+                    delay: 0.1,
+                  }}
                 >
                   <CheckCircle2 className="text-theme-green-dark h-16 w-16" />
                 </motion.div>
@@ -90,7 +104,7 @@ export default function ContactFormSection() {
                   Message sent!
                 </h2>
                 <p className="font-roboto-slab text-text-colour">
-                  We'll get back to you within 24 hours on business days.
+                  We&apos;ll get back to you within 24 hours on business days.
                 </p>
                 <button
                   onClick={() => setSent(false)}
@@ -114,7 +128,10 @@ export default function ContactFormSection() {
                 </motion.h2>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                  <motion.div variants={SLIDE_UP_VARIANT} className="flex flex-col gap-1.5">
+                  <motion.div
+                    variants={SLIDE_UP_VARIANT}
+                    className="flex flex-col gap-1.5"
+                  >
                     <label
                       className="font-ubuntu text-heading-colour text-sm font-medium"
                       htmlFor="fullName"
@@ -133,7 +150,10 @@ export default function ContactFormSection() {
                     />
                   </motion.div>
 
-                  <motion.div variants={SLIDE_UP_VARIANT} className="flex flex-col gap-1.5">
+                  <motion.div
+                    variants={SLIDE_UP_VARIANT}
+                    className="flex flex-col gap-1.5"
+                  >
                     <label
                       className="font-ubuntu text-heading-colour text-sm font-medium"
                       htmlFor="email"
@@ -164,7 +184,9 @@ export default function ContactFormSection() {
                         type="button"
                         onClick={() => setDropdownOpen((prev) => !prev)}
                         className={`font-roboto-slab flex w-full cursor-default items-center justify-between rounded-2xl border bg-white px-4 py-3 text-sm transition-all duration-300 ease-in-out hover:cursor-pointer focus:outline-none ${
-                          dropdownOpen ? "border-theme-green-dark" : "border-input-border"
+                          dropdownOpen
+                            ? "border-theme-green-dark"
+                            : "border-input-border"
                         } ${form.subject ? "text-heading-colour" : "text-text-input"}`}
                       >
                         <span>{form.subject || "Select a subject"}</span>
@@ -182,7 +204,10 @@ export default function ContactFormSection() {
                             initial={{ opacity: 0, y: -6, scaleY: 0.95 }}
                             animate={{ opacity: 1, y: 0, scaleY: 1 }}
                             exit={{ opacity: 0, y: -6, scaleY: 0.95 }}
-                            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{
+                              duration: 0.18,
+                              ease: [0.16, 1, 0.3, 1],
+                            }}
                             style={{ transformOrigin: "top" }}
                             className="border-input-border absolute top-[calc(100%+6px)] right-0 left-0 z-20 overflow-hidden rounded-2xl border bg-white shadow-lg"
                           >
@@ -191,7 +216,7 @@ export default function ContactFormSection() {
                                 key={s}
                                 type="button"
                                 onClick={() => handleSubjectSelect(s)}
-                                className={`font-roboto-slab w-full cursor-default px-4 py-3 text-left text-sm transition-all duration-300 ease-in-out hover:cursor-pointer hover:bg-gray-50 ${
+                                className={`font-roboto-slab hover:bg-gray-bg w-full cursor-default px-4 py-3 text-left text-sm transition-all duration-300 ease-in-out hover:cursor-pointer ${
                                   form.subject === s
                                     ? "text-theme-green-dark font-medium"
                                     : "text-heading-colour"
@@ -206,7 +231,10 @@ export default function ContactFormSection() {
                     </div>
                   </motion.div>
 
-                  <motion.div variants={SLIDE_UP_VARIANT} className="flex flex-col gap-1.5">
+                  <motion.div
+                    variants={SLIDE_UP_VARIANT}
+                    className="flex flex-col gap-1.5"
+                  >
                     <label
                       className="font-ubuntu text-heading-colour text-sm font-medium"
                       htmlFor="message"

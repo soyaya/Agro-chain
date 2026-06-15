@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Package, Eye } from "lucide-react";
-import { toast } from "sonner";
+import { Package } from "lucide-react";
 import { adminService, type AdminOrder } from "~/lib/services/admin.service";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, STATUS_COLORS } from "~/types/constants";
+import { FADE_IN_VARIANT, STATUS_COLORS } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
@@ -16,7 +15,9 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [filterType, setFilterType] = useState<"all" | "direct" | "demand">("all");
+  const [filterType, setFilterType] = useState<"all" | "direct" | "demand">(
+    "all",
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -28,7 +29,9 @@ export default function AdminOrdersPage() {
         if (mounted) setOrders(response.data.orders ?? []);
       } catch (error) {
         if (mounted)
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load orders");
+          setErrorMessage(
+            error instanceof Error ? error.message : "Failed to load orders",
+          );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -48,7 +51,8 @@ export default function AdminOrdersPage() {
   const statusCounts: Record<string, number> = {
     all: orders.length,
     draft: orders.filter((o) => o.status === "draft").length,
-    payment_pending: orders.filter((o) => o.status === "payment_pending").length,
+    payment_pending: orders.filter((o) => o.status === "payment_pending")
+      .length,
     paid: orders.filter((o) => o.status === "paid").length,
     confirmed: orders.filter((o) => o.status === "confirmed").length,
     processing: orders.filter((o) => o.status === "processing").length,
@@ -102,11 +106,15 @@ export default function AdminOrdersPage() {
             onClick={() => setFilterType(type)}
             className={`font-roboto-slab rounded-full border px-4 py-1.5 text-sm font-medium capitalize transition ${
               filterType === type
-                ? "border-theme-green-dark text-theme-green-dark bg-green-50"
+                ? "border-theme-green-dark text-theme-green-dark bg-green-tint"
                 : "border-gray-border text-text-colour hover:bg-pink-bg bg-(--white)"
             }`}
           >
-            {type === "all" ? "All Types" : type === "direct" ? "Marketplace" : "Demand-Based"}
+            {type === "all"
+              ? "All Types"
+              : type === "direct"
+                ? "Marketplace"
+                : "Demand-Based"}
           </button>
         ))}
       </motion.div>
@@ -137,7 +145,7 @@ export default function AdminOrdersPage() {
             onClick={() => setFilterStatus(status)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-sm) transition-all duration-200 ${
               filterStatus === status
-                ? "border-theme-green-dark bg-green-50"
+                ? "border-theme-green-dark bg-green-tint"
                 : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
@@ -186,7 +194,7 @@ export default function AdminOrdersPage() {
                 {filtered.map((order) => {
                   const statusColor =
                     STATUS_COLORS[order.status as keyof typeof STATUS_COLORS] ??
-                    "bg-gray-100 text-gray-800";
+                    "bg-gray-bg text-text-colour-2";
                   return (
                     <motion.tr
                       key={order.id}
@@ -215,7 +223,9 @@ export default function AdminOrdersPage() {
                       <td className="px-4 py-3">
                         <span
                           className={`font-roboto-slab text-xs font-medium capitalize ${
-                            order.paymentStatus === "paid" ? "text-green-600" : "text-yellow-600"
+                            order.paymentStatus === "paid"
+                              ? "text-theme-green-dark"
+                              : "text-yellow-600"
                           }`}
                         >
                           {order.paymentStatus}
@@ -229,10 +239,12 @@ export default function AdminOrdersPage() {
                               : "border-blue-200 bg-blue-50 text-blue-700"
                           }`}
                         >
-                          {order.orderType === "demand" ? "Demand" : "Marketplace"}
+                          {order.orderType === "demand"
+                            ? "Demand"
+                            : "Marketplace"}
                         </span>
                       </td>
-                      <td className="font-roboto-slab px-4 py-3 text-xs text-gray-400">
+                      <td className="font-roboto-slab text-muted-text px-4 py-3 text-xs">
                         {new Date(order.createdAt).toLocaleDateString("en-NG", {
                           day: "numeric",
                           month: "short",

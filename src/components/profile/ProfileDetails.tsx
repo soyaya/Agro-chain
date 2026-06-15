@@ -17,13 +17,18 @@ interface DetailItemProps {
 
 function DetailItem({ icon: Icon, label, value }: DetailItemProps) {
   return (
-    <motion.div variants={FADE_IN_VARIANT} className="flex items-start gap-(--gap-base)">
+    <motion.div
+      variants={FADE_IN_VARIANT}
+      className="flex items-start gap-(--gap-base)"
+    >
       <div className="bg-gray-bg flex h-10 w-10 items-center justify-center rounded-full">
         <Icon size={20} className="text-text-colour" />
       </div>
       <div className="flex flex-col">
         <span className="text-text-colour text-sm">{label}</span>
-        <span className="font-roboto-slab text-heading-colour text-base">{value}</span>
+        <span className="font-roboto-slab text-heading-colour text-base">
+          {value}
+        </span>
       </div>
     </motion.div>
   );
@@ -54,9 +59,21 @@ export function ProfileDetails({ profile }: ProfileDetailsProps) {
       />
       <DetailItem icon={Briefcase} label="Farm Name" value={profile.farmName} />
       <DetailItem icon={Fish} label="Fish Type" value={profile.fishType} />
-      <DetailItem icon={Calendar} label="Experience" value={`${profile.yearsOfExperience} years`} />
-      <DetailItem icon={Briefcase} label="Capacity" value={`${profile.farmingCapacityKg} kg`} />
-      <DetailItem icon={MapPin} label="Farm Address" value={profile.farmAddress} />
+      <DetailItem
+        icon={Calendar}
+        label="Experience"
+        value={`${profile.yearsOfExperience} years`}
+      />
+      <DetailItem
+        icon={Briefcase}
+        label="Capacity"
+        value={`${profile.farmingCapacityKg} kg`}
+      />
+      <DetailItem
+        icon={MapPin}
+        label="Farm Address"
+        value={profile.farmAddress}
+      />
     </motion.div>
   );
 }

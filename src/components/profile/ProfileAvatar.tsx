@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Camera, User } from "lucide-react";
 import { cn } from "~/lib/utils";
+import Image from "next/image";
 
 interface ProfileAvatarProps {
   imageUrl?: string;
@@ -23,6 +24,12 @@ const iconSizes = {
   sm: 24,
   md: 32,
   lg: 40,
+};
+
+const containerSizePx = {
+  sm: "64px",
+  md: "96px",
+  lg: "128px",
 };
 
 export function ProfileAvatar({
@@ -61,11 +68,19 @@ export function ProfileAvatar({
         transition={{ duration: 0.2 }}
       >
         {imageUrl ? (
-          <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+          <Image
+            src={imageUrl}
+            alt={name}
+            fill
+            sizes={containerSizePx[size]}
+            className="object-cover"
+          />
         ) : (
           <div className="bg-gray-bg flex h-full w-full items-center justify-center">
             {initials ? (
-              <span className="font-ubuntu text-heading-colour text-lg font-bold">{initials}</span>
+              <span className="font-ubuntu text-heading-colour text-lg font-bold">
+                {initials}
+              </span>
             ) : (
               <User size={iconSizes[size]} className="text-text-colour" />
             )}

@@ -16,7 +16,10 @@ import {
   Package,
   Truck,
 } from "lucide-react";
-import { adminService, type AdminClusterApplication } from "~/lib/services/admin.service";
+import {
+  adminService,
+  type AdminClusterApplication,
+} from "~/lib/services/admin.service";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 
 const DOC_LABELS: { key: keyof AdminClusterApplication; label: string }[] = [
@@ -85,9 +88,14 @@ function ApplicationDrawer({
             <h2 className="font-ubuntu text-heading-colour text-xl font-bold">
               {application.full_name}
             </h2>
-            <p className="font-roboto-slab text-text-colour text-sm">Cluster Farmer Application</p>
+            <p className="font-roboto-slab text-text-colour text-sm">
+              Cluster Farmer Application
+            </p>
           </div>
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-gray-100">
+          <button
+            onClick={onClose}
+            className="hover:bg-gray-bg rounded-full p-2"
+          >
             <X size={20} className="text-text-colour" />
           </button>
         </div>
@@ -99,7 +107,7 @@ function ApplicationDrawer({
             <h3 className="font-ubuntu text-text-colour text-sm font-semibold tracking-wide uppercase">
               Personal Information
             </h3>
-            <div className="border-input-border grid grid-cols-2 gap-4 rounded-xl border bg-gray-50 p-4">
+            <div className="border-input-border bg-gray-bg grid grid-cols-2 gap-4 rounded-xl border p-4">
               <div className="col-span-2 flex items-center gap-2">
                 <User size={14} className="text-text-colour" />
                 <DetailRow label="Full Name" value={application.full_name} />
@@ -119,11 +127,15 @@ function ApplicationDrawer({
                   value={`${application.location_lga}, ${application.location_state}`}
                 />
               </div>
-              {application.location_address && application.location_address !== "N/A" && (
-                <div className="col-span-2">
-                  <DetailRow label="Address" value={application.location_address} />
-                </div>
-              )}
+              {application.location_address &&
+                application.location_address !== "N/A" && (
+                  <div className="col-span-2">
+                    <DetailRow
+                      label="Address"
+                      value={application.location_address}
+                    />
+                  </div>
+                )}
             </div>
           </section>
 
@@ -132,18 +144,25 @@ function ApplicationDrawer({
             <h3 className="font-ubuntu text-text-colour text-sm font-semibold tracking-wide uppercase">
               Farming Details
             </h3>
-            <div className="border-input-border grid grid-cols-2 gap-4 rounded-xl border bg-gray-50 p-4">
-              <DetailRow label="Fish Type" value={application.fish_type_preference} />
+            <div className="border-input-border bg-gray-bg grid grid-cols-2 gap-4 rounded-xl border p-4">
+              <DetailRow
+                label="Fish Type"
+                value={application.fish_type_preference}
+              />
               <DetailRow
                 label="Farming Capacity"
                 value={
-                  application.farming_capacity_kg ? `${application.farming_capacity_kg} kg` : null
+                  application.farming_capacity_kg
+                    ? `${application.farming_capacity_kg} kg`
+                    : null
                 }
               />
               <DetailRow
                 label="Years of Experience"
                 value={
-                  application.years_of_experience ? `${application.years_of_experience} yrs` : null
+                  application.years_of_experience
+                    ? `${application.years_of_experience} yrs`
+                    : null
                 }
               />
             </div>
@@ -154,15 +173,21 @@ function ApplicationDrawer({
             <h3 className="font-ubuntu text-text-colour text-sm font-semibold tracking-wide uppercase">
               Business Details
             </h3>
-            <div className="border-input-border grid grid-cols-2 gap-4 rounded-xl border bg-gray-50 p-4">
+            <div className="border-input-border bg-gray-bg grid grid-cols-2 gap-4 rounded-xl border p-4">
               <div className="col-span-2 flex items-center gap-2">
                 <Briefcase size={14} className="text-text-colour" />
-                <DetailRow label="Business Name" value={application.business_name} />
+                <DetailRow
+                  label="Business Name"
+                  value={application.business_name}
+                />
               </div>
               <DetailRow label="CAC Number" value={application.cac_number} />
               <div className="col-span-2 flex items-center gap-2">
                 <MapPin size={14} className="text-text-colour" />
-                <DetailRow label="Warehouse Location" value={application.warehouse_location} />
+                <DetailRow
+                  label="Warehouse Location"
+                  value={application.warehouse_location}
+                />
               </div>
               <div className="flex items-center gap-2">
                 <Package size={14} className="text-text-colour" />
@@ -177,7 +202,10 @@ function ApplicationDrawer({
               </div>
               <div className="flex items-center gap-2">
                 <Truck size={14} className="text-text-colour" />
-                <DetailRow label="Has Logistics" value={application.logistics_available} />
+                <DetailRow
+                  label="Has Logistics"
+                  value={application.logistics_available}
+                />
               </div>
             </div>
           </section>
@@ -193,11 +221,18 @@ function ApplicationDrawer({
                 return (
                   <div
                     key={key}
-                    className="border-input-border flex items-center justify-between rounded-xl border bg-gray-50 px-4 py-3"
+                    className="border-input-border bg-gray-bg flex items-center justify-between rounded-xl border px-4 py-3"
                   >
                     <div className="flex items-center gap-2">
-                      <FileText size={16} className={url ? "text-green-600" : "text-gray-400"} />
-                      <span className="font-roboto-slab text-heading-colour text-sm">{label}</span>
+                      <FileText
+                        size={16}
+                        className={
+                          url ? "text-theme-green-dark" : "text-muted-text"
+                        }
+                      />
+                      <span className="font-roboto-slab text-heading-colour text-sm">
+                        {label}
+                      </span>
                     </div>
                     {url ? (
                       <a
@@ -209,7 +244,9 @@ function ApplicationDrawer({
                         View
                       </a>
                     ) : (
-                      <span className="font-roboto-slab text-xs text-gray-400">Not uploaded</span>
+                      <span className="font-roboto-slab text-muted-text text-xs">
+                        Not uploaded
+                      </span>
                     )}
                   </div>
                 );
@@ -252,9 +289,13 @@ function ApplicationDrawer({
 }
 
 export default function AdminApplicationsPage() {
-  const [applications, setApplications] = useState<AdminClusterApplication[]>([]);
+  const [applications, setApplications] = useState<AdminClusterApplication[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<AdminClusterApplication | null>(null);
+  const [selected, setSelected] = useState<AdminClusterApplication | null>(
+    null,
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -264,7 +305,11 @@ export default function AdminApplicationsPage() {
         const response = await adminService.getClusterApplications();
         if (mounted) setApplications(response.data.applications);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to load applications");
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to load applications",
+        );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -283,7 +328,9 @@ export default function AdminApplicationsPage() {
         await adminService.rejectClusterApplication(id);
       }
       setApplications((prev) => prev.filter((a) => a.id !== id));
-      toast.success(action === "approve" ? "Application approved" : "Application rejected");
+      toast.success(
+        action === "approve" ? "Application approved" : "Application rejected",
+      );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Action failed");
     }
@@ -292,7 +339,9 @@ export default function AdminApplicationsPage() {
   return (
     <div className="flex flex-col gap-(--section-gap)">
       <div>
-        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">Cluster Applications</h1>
+        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+          Cluster Applications
+        </h1>
         <p className="font-roboto-slab text-text-colour">
           Review and decide on new cluster farmer applications.
         </p>
@@ -319,7 +368,9 @@ export default function AdminApplicationsPage() {
               .slice(0, 2)
               .map((w) => w[0]?.toUpperCase() ?? "")
               .join("");
-            const appliedDate = new Date(application.created_at).toLocaleDateString("en-NG", {
+            const appliedDate = new Date(
+              application.created_at,
+            ).toLocaleDateString("en-NG", {
               day: "numeric",
               month: "short",
               year: "numeric",
@@ -333,7 +384,7 @@ export default function AdminApplicationsPage() {
               >
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-50 text-sm font-semibold text-green-800">
+                  <div className="bg-green-tint text-theme-green-dark flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                     {initials}
                   </div>
 
@@ -345,7 +396,8 @@ export default function AdminApplicationsPage() {
                           {application.full_name}
                         </h2>
                         <p className="font-roboto-slab text-text-colour text-sm">
-                          {application.phone_number} · {application.location_lga},{" "}
+                          {application.phone_number} ·{" "}
+                          {application.location_lga},{" "}
                           {application.location_state}
                         </p>
                       </div>
@@ -373,7 +425,7 @@ export default function AdminApplicationsPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="mt-4 flex items-center justify-end gap-2 border-t border-gray-100 pt-3">
+                <div className="border-gray-border mt-4 flex items-center justify-end gap-2 border-t pt-3">
                   <span className="font-roboto-slab text-text-colour mr-auto text-xs">
                     Click card to view full details
                   </span>

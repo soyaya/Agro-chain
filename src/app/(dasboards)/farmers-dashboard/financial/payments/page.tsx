@@ -18,7 +18,7 @@ export default function FarmerPaymentHistoryPage() {
   /* === Original content (preserved, not deleted)
 
   const STATUS_CONFIG = {
-    completed:  { label: "Completed",  color: "text-green-700",  bg: "bg-green-100",  icon: CheckCircle },
+    completed:  { label: "Completed",  color: "text-theme-green-dark",  bg: "bg-green-tint",  icon: CheckCircle },
     pending:    { label: "Pending",    color: "text-yellow-700", bg: "bg-yellow-100", icon: Clock },
     processing: { label: "Processing", color: "text-blue-700",   bg: "bg-blue-100",   icon: Clock },
     failed:     { label: "Failed",     color: "text-red-700",    bg: "bg-red-100",    icon: AlertCircle },
@@ -58,7 +58,7 @@ export default function FarmerPaymentHistoryPage() {
   const onTimeRate = payouts.length > 0 ? Math.round((completedCount / payouts.length) * 100) : 0;
 
   const stats = [
-    { label: "Total Earned", value: `₦${totalEarnings.toLocaleString()}`, icon: DollarSign, color: "text-green-600", bg: "bg-green-50" },
+    { label: "Total Earned", value: `₦${totalEarnings.toLocaleString()}`, icon: DollarSign, color: "text-theme-green-dark", bg: "bg-green-tint" },
     { label: "Pending", value: `₦${pendingAmount.toLocaleString()}`, icon: Clock, color: "text-yellow-600", bg: "bg-yellow-50" },
     { label: "Total Payouts", value: payouts.length.toString(), icon: Receipt, color: "text-blue-600", bg: "bg-blue-50" },
     { label: "Completion Rate", value: `${onTimeRate}%`, icon: TrendingUp, color: "text-purple-600", bg: "bg-purple-50" },
@@ -121,7 +121,7 @@ export default function FarmerPaymentHistoryPage() {
               return (
                 <div
                   key={p.id}
-                  className="flex items-center justify-between rounded-xl border border-input-border p-(--space-lg) transition-all duration-200 hover:border-gray-300 hover:shadow-sm"
+                  className="flex items-center justify-between rounded-xl border border-input-border p-(--space-lg) transition-all duration-200 hover:border-gray-border hover:shadow-sm"
                 >
                   <div className="flex items-center gap-(--space-lg)">
                     <div className={`rounded-xl p-(--space-md) ${cfg.bg}`}>
@@ -131,7 +131,7 @@ export default function FarmerPaymentHistoryPage() {
                       <p className="font-ubuntu text-base font-semibold text-heading-colour">
                         Payout {p.orderNumber ? `· ${p.orderNumber}` : `#${p.id.slice(0, 8)}`}
                       </p>
-                      <p className="font-roboto-slab text-sm text-gray-500">
+                      <p className="font-roboto-slab text-sm text-muted-text">
                         {new Date(p.createdAt).toLocaleDateString()}
                         {p.paidAt ? ` · Paid ${new Date(p.paidAt).toLocaleDateString()}` : ""}
                       </p>

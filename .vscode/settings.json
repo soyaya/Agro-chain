@@ -127,6 +127,7 @@
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
+   "git.ignoreLimitWarning": true,
 
   // === cSpell — project-specific words to suppress false squiggles
   "cSpell.words": [

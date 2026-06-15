@@ -38,23 +38,23 @@ export default function SectionFAQ({
 
   return (
     <section
-      className="relative h-full w-full border-b border-gray-border"
+      className="border-gray-border relative h-full w-full border-b"
       aria-label="FAQ Section"
     >
-      <div className="flex h-full flex-col gap-10 px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg lg:grid lg:grid-cols-2 lg:gap-15">
+      <div className="px-section-px sm:px-section-px-sm lg:px-section-px-lg py-section-py sm:py-section-py-sm lg:py-section-py-lg flex h-full flex-col gap-10 lg:grid lg:grid-cols-2 lg:gap-15">
         {/* Left column */}
         <div className="flex h-full flex-col justify-between gap-6 lg:gap-8">
-          <h2 className="font-ubuntu text-2xl font-semibold text-heading-colour sm:text-3xl lg:text-4xl">
+          <h2 className="font-ubuntu text-heading-colour text-2xl font-semibold sm:text-3xl lg:text-4xl">
             {heading}
           </h2>
 
           <div className="flex flex-col gap-4">
-            <p className="font-roboto-slab text-base text-text-colour sm:text-lg">
+            <p className="font-roboto-slab text-text-colour text-base sm:text-lg">
               {subtext}
             </p>
             <Link
               href={ctaHref}
-              className="inline-flex w-fit items-center rounded-2xl bg-theme-green-dark px-5 py-2.5 font-ubuntu text-sm font-medium text-white transition hover:bg-theme-green-light"
+              className="bg-theme-green-dark font-ubuntu hover:bg-theme-green-light inline-flex w-fit items-center rounded-2xl px-5 py-2.5 text-sm font-medium text-white transition"
             >
               {ctaLabel}
             </Link>
@@ -75,7 +75,7 @@ export default function SectionFAQ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.25 }}
-                  className={`flex flex-col border-b border-gray-border p-4 transition-all duration-300 ease-in-out ${
+                  className={`border-gray-border flex flex-col border-b p-4 transition-all duration-300 ease-in-out ${
                     isOpen ? "bg-gray-bg" : "bg-transparent"
                   }`}
                 >
@@ -85,7 +85,7 @@ export default function SectionFAQ({
                     }
                     className="flex w-full cursor-pointer items-center justify-between gap-4 text-left"
                   >
-                    <div className="flex items-center gap-4 font-ubuntu text-lg font-medium text-heading-colour sm:text-xl">
+                    <div className="font-ubuntu text-heading-colour flex items-center gap-4 text-lg font-medium sm:text-xl">
                       <span>{String(index + 1)}.</span>
                       <span>{faq.question}</span>
                     </div>
@@ -103,7 +103,7 @@ export default function SectionFAQ({
                         : "grid-rows-[0fr] opacity-0"
                     }`}
                   >
-                    <div className="overflow-hidden font-roboto-slab text-base text-text-colour-2">
+                    <div className="font-roboto-slab text-text-colour-2 overflow-hidden text-base">
                       {faq.answer}
                     </div>
                   </div>
@@ -115,7 +115,7 @@ export default function SectionFAQ({
           {faqs.length > 5 && (
             <button
               onClick={() => setShowAll((prev) => !prev)}
-              className="mt-4 self-start font-ubuntu text-sm font-medium text-theme-green-dark underline decoration-transparent underline-offset-4 transition hover:decoration-current"
+              className="font-ubuntu text-theme-green-dark mt-4 self-start text-sm font-medium underline decoration-transparent underline-offset-4 transition hover:decoration-current"
             >
               {showAll ? "Show Less" : "Show All"}
             </button>

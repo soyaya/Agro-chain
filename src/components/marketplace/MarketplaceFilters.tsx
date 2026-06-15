@@ -19,7 +19,11 @@ interface MarketplaceFiltersProps {
   onReset: () => void;
 }
 
-export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFiltersProps) {
+export function MarketplaceFilters({
+  filters,
+  onChange,
+  onReset,
+}: MarketplaceFiltersProps) {
   const categoryOptions = [
     { label: "All Categories", value: "" },
     { label: "Live Catfish", value: "live" },
@@ -37,12 +41,20 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
   }));
 
   const fishTypeOptions = [
-    { label: filters.category === "processed" ? "All Processed Types" : filters.category === "live" ? "All Live Types" : "All Fish Types", value: "" },
+    {
+      label:
+        filters.category === "processed"
+          ? "All Processed Types"
+          : filters.category === "live"
+            ? "All Live Types"
+            : "All Fish Types",
+      value: "",
+    },
     ...(filters.category === "processed"
       ? processedFishTypeOptions
       : filters.category === "live"
-      ? liveFishTypeOptions
-      : [...liveFishTypeOptions, ...processedFishTypeOptions]),
+        ? liveFishTypeOptions
+        : [...liveFishTypeOptions, ...processedFishTypeOptions]),
   ];
 
   const stateOptions = [
@@ -84,7 +96,9 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <SlidersHorizontal size={20} className="text-text-colour" />
-          <h3 className="font-roboto-slab text-heading-colour text-lg font-medium">Filters</h3>
+          <h3 className="font-roboto-slab text-heading-colour text-lg font-medium">
+            Filters
+          </h3>
         </div>
         {hasActiveFilters && (
           <button
@@ -148,13 +162,17 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
             type="number"
             placeholder="Min"
             value={filters.minPrice || ""}
-            onChange={(e) => handleFilterChange("minPrice", Number(e.target.value))}
+            onChange={(e) =>
+              handleFilterChange("minPrice", Number(e.target.value))
+            }
           />
           <DynamicInput
             type="number"
             placeholder="Max"
             value={filters.maxPrice || ""}
-            onChange={(e) => handleFilterChange("maxPrice", Number(e.target.value))}
+            onChange={(e) =>
+              handleFilterChange("maxPrice", Number(e.target.value))
+            }
           />
         </div>
       </div>
@@ -165,7 +183,9 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
         type="number"
         placeholder="e.g. 1000"
         value={filters.minQuantity || ""}
-        onChange={(e) => handleFilterChange("minQuantity", Number(e.target.value))}
+        onChange={(e) =>
+          handleFilterChange("minQuantity", Number(e.target.value))
+        }
       />
 
       {/* Sort By */}

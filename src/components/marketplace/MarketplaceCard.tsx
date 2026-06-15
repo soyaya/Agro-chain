@@ -1,7 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MapPin, Package, Phone, Truck, ShoppingCart, Heart } from "lucide-react";
+import {
+  MapPin,
+  Package,
+  Phone,
+  Truck,
+  ShoppingCart,
+  Heart,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { MarketplaceListing } from "~/types";
 import { SCALE_IN_VARIANT } from "~/types/constants";
@@ -43,12 +50,15 @@ export function MarketplaceCard({
     });
   };
 
-  const packagePrices = (listing.packaging?.map((p) => p.pricePerUnit ?? 0) ?? []).filter(
-    (p) => p > 0,
-  );
+  const packagePrices = (
+    listing.packaging?.map((p) => p.pricePerUnit ?? 0) ?? []
+  ).filter((p) => p > 0);
   const lowestPrice =
-    packagePrices.length > 0 ? Math.min(...packagePrices) : (listing.pricePerKg ?? 0);
-  const highestPrice = packagePrices.length > 0 ? Math.max(...packagePrices) : lowestPrice;
+    packagePrices.length > 0
+      ? Math.min(...packagePrices)
+      : (listing.pricePerKg ?? 0);
+  const highestPrice =
+    packagePrices.length > 0 ? Math.max(...packagePrices) : lowestPrice;
   const displayPricePerKg = listing.pricePerKg ?? lowestPrice;
 
   return (
@@ -67,8 +77,12 @@ export function MarketplaceCard({
       {/* Header */}
       <div className="relative flex items-start justify-between">
         <div className="flex flex-col gap-1 pr-8">
-          <h3 className="font-ubuntu text-heading-colour text-xl font-bold">{listing.fishType}</h3>
-          <p className="text-text-colour text-sm font-medium">{listing.businessName}</p>
+          <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
+            {listing.fishType}
+          </h3>
+          <p className="text-text-colour text-sm font-medium">
+            {listing.businessName}
+          </p>
         </div>
         <div className="flex flex-col items-end gap-1">
           <button
@@ -83,7 +97,9 @@ export function MarketplaceCard({
               size={20}
               className={cn(
                 "transition-colors",
-                isLiked ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500",
+                isLiked
+                  ? "fill-red-500 text-red-500"
+                  : "text-muted-text hover:text-red-500",
               )}
             />
           </button>
@@ -120,14 +136,18 @@ export function MarketplaceCard({
 
       {/* Packaging Options */}
       <div className="bg-gray-bg flex flex-col gap-(--space-md) rounded-2xl p-(--space-md)">
-        <p className="text-heading-colour text-sm font-medium">Available Packages:</p>
+        <p className="text-heading-colour text-sm font-medium">
+          Available Packages:
+        </p>
         <div className="flex flex-wrap gap-2">
           {listing.packaging.map((pkg, index) => (
             <div
               key={index}
               className="flex items-center gap-1 rounded-full bg-(--white) px-(--space-md) py-1 text-sm"
             >
-              <span className="text-heading-colour font-medium">{pkg.weightKg}kg</span>
+              <span className="text-heading-colour font-medium">
+                {pkg.weightKg}kg
+              </span>
               <span className="text-text-colour">×{pkg.quantity}</span>
             </div>
           ))}
@@ -143,7 +163,9 @@ export function MarketplaceCard({
       )}
 
       {/* Harvest Date */}
-      <div className="text-text-colour text-sm">Harvested: {formatDate(listing.harvestDate)}</div>
+      <div className="text-text-colour text-sm">
+        Harvested: {formatDate(listing.harvestDate)}
+      </div>
 
       {/* Actions */}
       <div className="grid grid-cols-2 gap-(--gap-base)">
@@ -159,7 +181,9 @@ export function MarketplaceCard({
         </button>
         <button
           onClick={handleAddToCart}
-          aria-label={user ? `Add ${listing.fishType} to cart` : "Log in to buy"}
+          aria-label={
+            user ? `Add ${listing.fishType} to cart` : "Log in to buy"
+          }
           className="bg-theme-green-dark flex h-10 items-center justify-center gap-2 rounded-full text-sm font-medium text-white transition hover:opacity-90"
         >
           <ShoppingCart size={16} aria-hidden="true" />

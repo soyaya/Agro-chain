@@ -28,7 +28,7 @@ async function getIPBasedLocation(): Promise<GeolocationResult> {
 
   if (!apiKey) {
     console.error(
-      "IPSTACK_API_KEY not configured. Add NEXT_PUBLIC_IPSTACK_API_KEY to your .env.local file"
+      "IPSTACK_API_KEY not configured. Add NEXT_PUBLIC_IPSTACK_API_KEY to your .env.local file",
     );
     throw new Error("Location service not configured. Please contact support.");
   }
@@ -169,9 +169,12 @@ function getBrowserGeolocation(): Promise<GeolocationPosition> {
 //   }
 // }
 
-async function reverseGeocode(latitude: number, longitude: number): Promise<string> {
+async function reverseGeocode(
+  latitude: number,
+  longitude: number,
+): Promise<string> {
   const res = await fetch(
-    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
   );
 
   if (!res.ok) {

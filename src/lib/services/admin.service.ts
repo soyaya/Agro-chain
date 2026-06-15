@@ -1,5 +1,4 @@
 import { apiFetch } from "~/lib/api";
-import type { FishType } from "~/types/constants";
 
 // === Platform Settings types
 
@@ -57,7 +56,12 @@ export interface AdminActivityResponse {
   status: string;
   data: {
     recentActivities: {
-      newRegistrations: Array<{ id: string; full_name: string; role: string; created_at: string }>;
+      newRegistrations: Array<{
+        id: string;
+        full_name: string;
+        role: string;
+        created_at: string;
+      }>;
       newOrders: Array<{
         id: string;
         status: string;
@@ -102,7 +106,13 @@ export interface AdminClusterApplicationsResponse {
 
 // === Demand types
 
-export type AdminDemandStatus = "pending" | "assigned" | "accepted" | "declined" | "fulfilled" | "cancelled";
+export type AdminDemandStatus =
+  | "pending"
+  | "assigned"
+  | "accepted"
+  | "declined"
+  | "fulfilled"
+  | "cancelled";
 
 export interface AdminDemand {
   id: string;
@@ -206,26 +216,38 @@ export const adminService = {
   },
 
   getClusterApplications() {
-    return apiFetch<AdminClusterApplicationsResponse>("/admin/cluster-applications");
+    return apiFetch<AdminClusterApplicationsResponse>(
+      "/admin/cluster-applications",
+    );
   },
 
   approveClusterApplication(id: string) {
-    return apiFetch(`/admin/cluster-applications/${id}/approve`, { method: "PUT" });
+    return apiFetch(`/admin/cluster-applications/${id}/approve`, {
+      method: "PUT",
+    });
   },
 
   rejectClusterApplication(id: string) {
-    return apiFetch(`/admin/cluster-applications/${id}/reject`, { method: "PUT" });
+    return apiFetch(`/admin/cluster-applications/${id}/reject`, {
+      method: "PUT",
+    });
   },
 
   // === Demands
 
   getDemands(params?: { status?: string; state?: string }) {
-    const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : "";
-    return apiFetch<{ status: string; data: { demands: AdminDemand[] } }>(`/admin/demands${query}`);
+    const query = params
+      ? `?${new URLSearchParams(params as Record<string, string>).toString()}`
+      : "";
+    return apiFetch<{ status: string; data: { demands: AdminDemand[] } }>(
+      `/admin/demands${query}`,
+    );
   },
 
   getDemand(id: string) {
-    return apiFetch<{ status: string; data: { demand: AdminDemand } }>(`/admin/demands/${id}`);
+    return apiFetch<{ status: string; data: { demand: AdminDemand } }>(
+      `/admin/demands/${id}`,
+    );
   },
 
   assignDemand(id: string, clusterFarmerId: string) {
@@ -236,29 +258,49 @@ export const adminService = {
   },
 
   getClusterFarmers() {
-    return apiFetch<{ status: string; data: { farmers: AdminClusterFarmerOption[] } }>("/admin/farmers?role=cluster");
+    return apiFetch<{
+      status: string;
+      data: { farmers: AdminClusterFarmerOption[] };
+    }>("/admin/farmers?role=cluster");
   },
 
   // === Orders
 
   getOrders(params?: { status?: string; paymentStatus?: string }) {
-    const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : "";
-    return apiFetch<{ status: string; data: { orders: AdminOrder[] } }>(`/admin/orders${query}`);
+    const query = params
+      ? `?${new URLSearchParams(params as Record<string, string>).toString()}`
+      : "";
+    return apiFetch<{ status: string; data: { orders: AdminOrder[] } }>(
+      `/admin/orders${query}`,
+    );
   },
 
   getOrder(id: string) {
-    return apiFetch<{ status: string; data: { order: AdminOrder } }>(`/admin/orders/${id}`);
+    return apiFetch<{ status: string; data: { order: AdminOrder } }>(
+      `/admin/orders/${id}`,
+    );
   },
 
   // === Farmers / Users
 
-  getFarmers(params?: { role?: string; state?: string; verificationStatus?: string }) {
-    const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : "";
-    return apiFetch<{ status: string; data: { users: AdminUser[]; total: number } }>(`/admin/farmers${query}`);
+  getFarmers(params?: {
+    role?: string;
+    state?: string;
+    verificationStatus?: string;
+  }) {
+    const query = params
+      ? `?${new URLSearchParams(params as Record<string, string>).toString()}`
+      : "";
+    return apiFetch<{
+      status: string;
+      data: { users: AdminUser[]; total: number };
+    }>(`/admin/farmers${query}`);
   },
 
   getFarmer(id: string) {
-    return apiFetch<{ status: string; data: { user: AdminUser } }>(`/admin/farmers/${id}`);
+    return apiFetch<{ status: string; data: { user: AdminUser } }>(
+      `/admin/farmers/${id}`,
+    );
   },
 
   toggleUserActive(id: string) {
@@ -268,8 +310,13 @@ export const adminService = {
   // === Listings
 
   getListings(params?: { status?: string; fishType?: string; state?: string }) {
-    const query = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : "";
-    return apiFetch<{ status: string; data: { listings: AdminListing[]; total: number } }>(`/admin/listings${query}`);
+    const query = params
+      ? `?${new URLSearchParams(params as Record<string, string>).toString()}`
+      : "";
+    return apiFetch<{
+      status: string;
+      data: { listings: AdminListing[]; total: number };
+    }>(`/admin/listings${query}`);
   },
 
   approveListing(id: string) {

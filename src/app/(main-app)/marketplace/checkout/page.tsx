@@ -17,11 +17,15 @@ export default function CheckoutPage() {
   const [addressError, setAddressError] = useState<string | null>(null);
 
   const derivedDeliveryType = useMemo(
-    () => (cart.items.some((item) => item.deliveryType === "delivery") ? "delivery" : "pickup"),
+    () =>
+      cart.items.some((item) => item.deliveryType === "delivery")
+        ? "delivery"
+        : "pickup",
     [cart.items],
   );
 
-  const deliveryFee = derivedDeliveryType === "delivery" ? BASE_DELIVERY_FEE_NAIRA : 0;
+  const deliveryFee =
+    derivedDeliveryType === "delivery" ? BASE_DELIVERY_FEE_NAIRA : 0;
   const totalAmount = cart.subtotal + deliveryFee;
 
   const handlePlaceOrder = async () => {
@@ -49,10 +53,13 @@ export default function CheckoutPage() {
         method: "POST",
         body: JSON.stringify({
           deliveryType: derivedDeliveryType,
-          deliveryAddress: derivedDeliveryType === "delivery" ? deliveryAddress : undefined,
+          deliveryAddress:
+            derivedDeliveryType === "delivery" ? deliveryAddress : undefined,
           deliveryFee,
           cartItems: cart.items.map((item) => ({
-            cartItemId: item.cartItemId ?? `${item.listingId}-${item.weightKg}-${item.variant}`,
+            cartItemId:
+              item.cartItemId ??
+              `${item.listingId}-${item.weightKg}-${item.variant}`,
             quantity: item.quantity,
           })),
           totalAmount,
@@ -63,7 +70,8 @@ export default function CheckoutPage() {
       cart.clearCart();
       router.push("/buyers-dashboard/orders");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to place order";
+      const message =
+        error instanceof Error ? error.message : "Failed to place order";
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -80,7 +88,9 @@ export default function CheckoutPage() {
         >
           <div className="lg:col-span-2">
             <div className="rounded-3xl bg-(--white) p-(--space-xl) shadow-sm">
-              <h1 className="font-ubuntu text-heading-colour text-2xl font-bold">Checkout</h1>
+              <h1 className="font-ubuntu text-heading-colour text-2xl font-bold">
+                Checkout
+              </h1>
               <p className="text-text-colour mt-1 text-sm">
                 Review your cart and confirm delivery options.
               </p>
@@ -101,17 +111,20 @@ export default function CheckoutPage() {
                           <p className="font-roboto-slab text-heading-colour font-semibold">
                             {item.fishType} • {item.variant}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            {item.processed ? "Processed" : "Unprocessed"} • {item.weightKg}kg pack
+                          <p className="text-muted-text text-xs">
+                            {item.processed ? "Processed" : "Unprocessed"} •{" "}
+                            {item.weightKg}kg pack
                           </p>
                         </div>
                         <p className="text-heading-colour text-sm font-semibold">
                           ₦{item.totalPrice.toLocaleString()}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="text-muted-text flex items-center justify-between text-xs">
                         <span>Qty: {item.quantity}</span>
-                        <span>₦{item.pricePerUnit.toLocaleString()} per pack</span>
+                        <span>
+                          ₦{item.pricePerUnit.toLocaleString()} per pack
+                        </span>
                       </div>
                     </div>
                   ))
@@ -138,10 +151,12 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => cart.updateDeliveryType(index, "pickup")}
+                          onClick={() =>
+                            cart.updateDeliveryType(index, "pickup")
+                          }
                           className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition ${
                             item.deliveryType === "pickup"
-                              ? "border-theme-green-dark text-theme-green-dark bg-green-50"
+                              ? "border-theme-green-dark text-theme-green-dark bg-green-tint"
                               : "border-gray-border text-text-colour hover:bg-gray-bg"
                           }`}
                         >
@@ -149,10 +164,12 @@ export default function CheckoutPage() {
                           Pickup
                         </button>
                         <button
-                          onClick={() => cart.updateDeliveryType(index, "delivery")}
+                          onClick={() =>
+                            cart.updateDeliveryType(index, "delivery")
+                          }
                           className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition ${
                             item.deliveryType === "delivery"
-                              ? "border-theme-green-dark text-theme-green-dark bg-green-50"
+                              ? "border-theme-green-dark text-theme-green-dark bg-green-tint"
                               : "border-gray-border text-text-colour hover:bg-gray-bg"
                           }`}
                         >
@@ -182,7 +199,11 @@ export default function CheckoutPage() {
                       }`}
                       placeholder="Enter delivery address"
                     />
-                    {addressError && <p className="mt-2 text-xs text-red-500">{addressError}</p>}
+                    {addressError && (
+                      <p className="mt-2 text-xs text-red-500">
+                        {addressError}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -191,7 +212,9 @@ export default function CheckoutPage() {
 
           <div className="lg:col-span-1">
             <div className="sticky top-4 rounded-3xl bg-(--white) p-(--space-xl) shadow-sm">
-              <h2 className="font-ubuntu text-heading-colour text-lg font-bold">Order Summary</h2>
+              <h2 className="font-ubuntu text-heading-colour text-lg font-bold">
+                Order Summary
+              </h2>
               <div className="text-text-colour mt-4 flex flex-col gap-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span>Subtotal</span>
@@ -206,7 +229,9 @@ export default function CheckoutPage() {
                   </span>
                 </div>
                 <div className="border-gray-border flex items-center justify-between border-t pt-3">
-                  <span className="font-ubuntu text-heading-colour text-base font-bold">Total</span>
+                  <span className="font-ubuntu text-heading-colour text-base font-bold">
+                    Total
+                  </span>
                   <span className="font-ubuntu text-theme-green-dark text-base font-bold">
                     ₦{totalAmount.toLocaleString()}
                   </span>

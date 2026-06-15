@@ -1,12 +1,40 @@
-
-import type { NavLink, Object, FAQ, ImpactStat, TestimonialItem, FeatureCard, FishCategoryGroup, HowItWorksCard } from "~/types/types";
+import type {
+  NavLink,
+  Object,
+  FAQ,
+  ImpactStat,
+  TestimonialItem,
+  FeatureCard,
+  FishCategoryGroup,
+  HowItWorksCard,
+} from "~/types/types";
 import {
-  HomeIcon, ShoppingCart, HelpCircle, Users, Phone,
-  Shield, Tag, Truck, Lock, FileText, Users2, Fish,
-  LayoutDashboard, User, Package,
-  Users as UsersIcon, Settings,
-  CheckSquare, Clock, BarChart3, CreditCard,
-  DollarSign, Receipt, Wallet, TrendingUp,
+  HomeIcon,
+  ShoppingCart,
+  HelpCircle,
+  Users,
+  Phone,
+  Shield,
+  Tag,
+  Truck,
+  Lock,
+  FileText,
+  Users2,
+  Fish,
+  LayoutDashboard,
+  User,
+  Package,
+  Users as UsersIcon,
+  Settings,
+  CheckSquare,
+  Clock,
+  BarChart3,
+  CreditCard,
+  DollarSign,
+  Receipt,
+  Wallet,
+  TrendingUp,
+  MapPin,
 } from "lucide-react";
 
 // === Footer
@@ -15,6 +43,7 @@ export const navLinks: NavLink[] = [
   { label: "Marketplace", href: "/marketplace" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "Contact", href: "/contact" },
+  { label: "About", href: "/about" },
 ];
 
 export const sideNavLinks: NavLink[] = [
@@ -23,6 +52,7 @@ export const sideNavLinks: NavLink[] = [
   { label: "How It Works", href: "/how-it-works", icon: HelpCircle },
   { label: "About", href: "/about", icon: Users },
   { label: "Contact", href: "/contact", icon: Phone },
+  { label: "About Us", href: "/about", icon: MapPin },
 ];
 
 export const supportLinks: NavLink[] = [
@@ -38,9 +68,7 @@ export const footer2Links: NavLink[] = [
   { label: "Site Map", href: "/" },
 ];
 
-// ============================================
-// HOMEPAGE DATA
-// ============================================
+// === Homepage Data
 
 export const impactStats: ImpactStat[] = [
   { value: "500+", label: "Registered Farmers" },
@@ -54,11 +82,7 @@ export const howItWorksCards: HowItWorksCard[] = [
     number: 1,
     icon: Fish,
     title: "Farmer",
-    steps: [
-      "Register → List supply",
-      "Cluster approval",
-      "Earn",
-    ],
+    steps: ["Register → List supply", "Cluster approval", "Earn"],
   },
   {
     number: 2,
@@ -125,7 +149,8 @@ export const fishCategoryGroups: FishCategoryGroup[] = [
   {
     key: "live",
     name: "Live Catfish",
-    description: "Fresh, live catfish sourced direct from verified cluster farms — sold by growth stage.",
+    description:
+      "Fresh, live catfish sourced direct from verified cluster farms — sold by growth stage.",
     subTypes: [
       { label: "Fingerlings", value: "fingerlings" },
       { label: "Juveniles", value: "juveniles" },
@@ -140,7 +165,8 @@ export const fishCategoryGroups: FishCategoryGroup[] = [
   {
     key: "processed",
     name: "Processed Catfish",
-    description: "Catfish prepared your way — dried, grilled, peppersoup, and more. Ready to cook.",
+    description:
+      "Catfish prepared your way — dried, grilled, peppersoup, and more. Ready to cook.",
     subTypes: [
       { label: "Dried", value: "dried" },
       { label: "Grilled", value: "grilled" },
@@ -155,7 +181,8 @@ export const fishCategoryGroups: FishCategoryGroup[] = [
   {
     key: "special_demand",
     name: "Special Demand",
-    description: "Can't find exactly what you need? Submit a custom demand and admin will assign the right cluster farmer to fulfill it.",
+    description:
+      "Can't find exactly what you need? Submit a custom demand and admin will assign the right cluster farmer to fulfill it.",
     subTypes: [],
     categoryParam: "demand",
     isSpecialDemand: true,
@@ -185,9 +212,7 @@ export const testimonials: TestimonialItem[] = [
   },
 ];
 
-// ============================================
-// FAQ ARRAYS
-// ============================================
+// === FAQ Arrays
 
 export const homeFaqs: FAQ[] = [
   {
@@ -220,7 +245,8 @@ export const homeFaqs: FAQ[] = [
 export const farmerFaqs: FAQ[] = [
   {
     question: "How long does cluster approval take?",
-    answer: "Cluster farmers are expected to review listings within 24–48 hours of submission.",
+    answer:
+      "Cluster farmers are expected to review listings within 24–48 hours of submission.",
   },
   {
     question: "What happens if my listing is rejected?",
@@ -265,7 +291,8 @@ export const buyerFaqs: FAQ[] = [
   },
   {
     question: "What payment methods are accepted?",
-    answer: "Paystack (card or bank transfer). Funds are held in escrow until you confirm delivery.",
+    answer:
+      "Paystack (card or bank transfer). Funds are held in escrow until you confirm delivery.",
   },
   {
     question: "What if my order doesn't arrive?",
@@ -324,9 +351,10 @@ export const contactFaqs: FAQ[] = [
       "Register at /register?role=farmer. After registration you'll be assigned to a cluster farmer in your area. They will guide you through your first listing.",
   },
   {
-    question: "I want to partner with Agro-chain as an organisation or logistics provider.",
+    question:
+      "I want to partner with Agro-chain as an organisation or logistics provider.",
     answer:
-      "Send a partnership inquiry through the contact form selecting \"Partnership\" as the subject. Our team will review and respond within 2–3 business days.",
+      'Send a partnership inquiry through the contact form selecting "Partnership" as the subject. Our team will review and respond within 2–3 business days.',
   },
   {
     question: "Is there a phone number I can call?",
@@ -342,39 +370,54 @@ export const supportFaqs: FAQ[] = [
 ];
 
 import {
-  FacebookIcon, XIcon,
-  Instagram, Linkedin,
-  MessageCircleCodeIcon, Mail,
-} from 'lucide-react';
+  FacebookIcon,
+  XIcon,
+  Instagram,
+  Linkedin,
+  MessageCircleCodeIcon,
+  Mail,
+} from "lucide-react";
 
 export const socialLinks: NavLink[] = [
   {
-    label: "Facebook", href: "https://facebook.com/yourpage",
-    icon: FacebookIcon, color: "hover:text-[#1877F2]"
+    label: "Facebook",
+    href: "https://facebook.com/yourpage",
+    icon: FacebookIcon,
+    color: "hover:text-[#1877F2]",
   }, // Facebook Blue
   {
-    label: "X", href: "https://x.com/Debridgers",
-    icon: XIcon, color: "hover:text-black"
+    label: "X",
+    href: "https://x.com/Debridgers",
+    icon: XIcon,
+    color: "hover:text-black",
   }, // X Black
   {
-    label: "Instagram", href: "https://instagram.com/yourhandle",
-    icon: Instagram, color: "hover:text-[#E4405F]"
+    label: "Instagram",
+    href: "https://instagram.com/yourhandle",
+    icon: Instagram,
+    color: "hover:text-[#E4405F]",
   }, // Instagram Pink
   // {
   //   label: "WhatsApp", href: "https://wa.me/2347012288798",
   //   icon: Instagram, color: "hover:text-[#25D366]"
   // }, // Whatsapp Green
   {
-    label: "WhatsApp", href: "https://wa.me/2347012288798?text=Hello%20from%20your%20website!",
-    icon: MessageCircleCodeIcon, color: "hover:text-[#25D366]"
+    label: "WhatsApp",
+    href: "https://wa.me/2347012288798?text=Hello%20from%20your%20website!",
+    icon: MessageCircleCodeIcon,
+    color: "hover:text-[#25D366]",
   }, // Whatsapp Green
   {
-    label: "LinkedIn", href: "https://www.linkedin.com/company/debridger/",
-    icon: Linkedin, color: "hover:text-[#0A66C2]"
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/company/debridger/",
+    icon: Linkedin,
+    color: "hover:text-[#0A66C2]",
   }, // LinkedIn Blue
   {
-    label: "Gmail", href: "mailto:Debridger@yahoo.com",
-    icon: Mail, color: "hover:text-[#EA4335]"
+    label: "Gmail",
+    href: "mailto:Debridger@yahoo.com",
+    icon: Mail,
+    color: "hover:text-[#EA4335]",
   }, // Gmail Red
 ];
 
@@ -401,15 +444,12 @@ export const kadunaLga: Object[] = [
   { label: "Sanga", value: "sanga" },
   { label: "Soba", value: "soba" },
   { label: "Zangon Kataf", value: "zangon-kataf" },
-  { label: "Zaria", value: "zaria" }
+  { label: "Zaria", value: "zaria" },
 ];
 
+// === Dashboard Navigation
 
-// ============================================
-// DASHBOARD NAVIGATION
-// ============================================
-
-import type { DashboardConfig, EnhancedDashboardConfig } from '~/types/index';
+import type { DashboardConfig, EnhancedDashboardConfig } from "~/types/index";
 
 export const farmerDashboardConfig: EnhancedDashboardConfig = {
   title: "Farmer Dashboard",
@@ -417,8 +457,16 @@ export const farmerDashboardConfig: EnhancedDashboardConfig = {
   navLinks: [
     { label: "Dashboard", href: "/farmers-dashboard", icon: LayoutDashboard },
     { label: "Profile", href: "/farmers-dashboard/profile", icon: User },
-    { label: "My Listings", href: "/farmers-dashboard/listings", icon: FileText },
-    { label: "Create Listing", href: "/farmers-dashboard/listings/create", icon: Package },
+    {
+      label: "My Listings",
+      href: "/farmers-dashboard/listings",
+      icon: FileText,
+    },
+    {
+      label: "Create Listing",
+      href: "/farmers-dashboard/listings/create",
+      icon: Package,
+    },
   ],
   financialServices: {
     enabled: true,
@@ -441,9 +489,17 @@ export const clusterFarmerDashboardConfig: EnhancedDashboardConfig = {
   navLinks: [
     { label: "Dashboard", href: "/cluster-dashboard", icon: LayoutDashboard },
     { label: "Profile", href: "/cluster-dashboard/profile", icon: User },
-    { label: "Pending Approvals", href: "/cluster-dashboard/pending-approvals", icon: Clock },
+    {
+      label: "Pending Approvals",
+      href: "/cluster-dashboard/pending-approvals",
+      icon: Clock,
+    },
     { label: "Orders", href: "/cluster-dashboard/orders", icon: Package },
-    { label: "My Listings", href: "/cluster-dashboard/listings", icon: FileText },
+    {
+      label: "My Listings",
+      href: "/cluster-dashboard/listings",
+      icon: FileText,
+    },
     { label: "Farmers", href: "/cluster-dashboard/farmers", icon: UsersIcon },
   ],
   financialServices: {
@@ -470,7 +526,11 @@ export const buyerDashboardConfig: DashboardConfig = {
     { label: "Marketplace", href: "/marketplace", icon: ShoppingCart },
     { label: "My Orders", href: "/buyers-dashboard/orders", icon: Package },
     { label: "My Demands", href: "/buyers-dashboard/demands", icon: FileText },
-    { label: "Saved Listings", href: "/buyers-dashboard/saved", icon: CheckSquare },
+    {
+      label: "Saved Listings",
+      href: "/buyers-dashboard/saved",
+      icon: CheckSquare,
+    },
   ],
 };
 
@@ -481,7 +541,11 @@ export const adminDashboardConfig: DashboardConfig = {
     { label: "Dashboard", href: "/admin-dashboard", icon: LayoutDashboard },
     { label: "Analytics", href: "/admin-dashboard/analytics", icon: BarChart3 },
     { label: "Farmers", href: "/admin-dashboard/farmers", icon: UsersIcon },
-    { label: "Cluster Applications", href: "/admin-dashboard/applications", icon: CheckSquare },
+    {
+      label: "Cluster Applications",
+      href: "/admin-dashboard/applications",
+      icon: CheckSquare,
+    },
     { label: "Listings", href: "/admin-dashboard/listings", icon: FileText },
     { label: "Demands", href: "/admin-dashboard/demands", icon: Receipt },
     { label: "Orders", href: "/admin-dashboard/orders", icon: Package },
@@ -489,9 +553,7 @@ export const adminDashboardConfig: DashboardConfig = {
   ],
 };
 
-// ============================================
-// ENHANCED FARMER DASHBOARD CONFIGURATIONS
-// ============================================
+// === Enhanced Farmer Dashboard Configurations
 
 export const enhancedFarmerDashboardConfig: EnhancedDashboardConfig = {
   title: "Farmer Dashboard",
@@ -499,20 +561,48 @@ export const enhancedFarmerDashboardConfig: EnhancedDashboardConfig = {
   navLinks: [
     { label: "Dashboard", href: "/farmers-dashboard", icon: LayoutDashboard },
     { label: "Profile", href: "/farmers-dashboard/profile", icon: User },
-    { label: "My Listings", href: "/farmers-dashboard/listings", icon: FileText },
-    { label: "Create Listing", href: "/farmers-dashboard/listings/create", icon: Package },
-    { label: "My Orders", href: "/farmers-dashboard/orders", icon: ShoppingCart },
+    {
+      label: "My Listings",
+      href: "/farmers-dashboard/listings",
+      icon: FileText,
+    },
+    {
+      label: "Create Listing",
+      href: "/farmers-dashboard/listings/create",
+      icon: Package,
+    },
+    {
+      label: "My Orders",
+      href: "/farmers-dashboard/orders",
+      icon: ShoppingCart,
+    },
     // Financial Services Navigation
     {
       label: "Financial Services",
       href: "/farmers-dashboard/financial",
       icon: CreditCard,
       submenu: [
-        { label: "Loan Applications", href: "/farmers-dashboard/financial/loans", icon: DollarSign },
-        { label: "Credit Purchases", href: "/farmers-dashboard/financial/credit", icon: ShoppingCart },
-        { label: "Payment History", href: "/farmers-dashboard/financial/payments", icon: Receipt },
-        { label: "Financial Profile", href: "/farmers-dashboard/financial/profile", icon: TrendingUp },
-      ]
+        {
+          label: "Loan Applications",
+          href: "/farmers-dashboard/financial/loans",
+          icon: DollarSign,
+        },
+        {
+          label: "Credit Purchases",
+          href: "/farmers-dashboard/financial/credit",
+          icon: ShoppingCart,
+        },
+        {
+          label: "Payment History",
+          href: "/farmers-dashboard/financial/payments",
+          icon: Receipt,
+        },
+        {
+          label: "Financial Profile",
+          href: "/farmers-dashboard/financial/profile",
+          icon: TrendingUp,
+        },
+      ],
     },
   ],
   financialServices: {
@@ -536,10 +626,18 @@ export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
   navLinks: [
     { label: "Dashboard", href: "/cluster-dashboard", icon: LayoutDashboard },
     { label: "Profile", href: "/cluster-dashboard/profile", icon: User },
-    { label: "Pending Approvals", href: "/cluster-dashboard/pending-approvals", icon: Clock },
+    {
+      label: "Pending Approvals",
+      href: "/cluster-dashboard/pending-approvals",
+      icon: Clock,
+    },
     { label: "Demands", href: "/cluster-dashboard/demands", icon: Receipt },
     { label: "Orders", href: "/cluster-dashboard/orders", icon: Package },
-    { label: "My Listings", href: "/cluster-dashboard/listings", icon: FileText },
+    {
+      label: "My Listings",
+      href: "/cluster-dashboard/listings",
+      icon: FileText,
+    },
     { label: "Farmers", href: "/cluster-dashboard/farmers", icon: UsersIcon },
     // Financial Services Navigation
     {
@@ -547,12 +645,32 @@ export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
       href: "/cluster-dashboard/financial",
       icon: CreditCard,
       submenu: [
-        { label: "Loan Applications", href: "/cluster-dashboard/financial/loans", icon: DollarSign },
-        { label: "Credit Purchases", href: "/cluster-dashboard/financial/credit", icon: ShoppingCart },
-        { label: "Payment History", href: "/cluster-dashboard/financial/payments", icon: Receipt },
-        { label: "Financial Profile", href: "/cluster-dashboard/financial/profile", icon: TrendingUp },
-        { label: "Farmer Finances", href: "/cluster-dashboard/financial/farmers", icon: Wallet },
-      ]
+        {
+          label: "Loan Applications",
+          href: "/cluster-dashboard/financial/loans",
+          icon: DollarSign,
+        },
+        {
+          label: "Credit Purchases",
+          href: "/cluster-dashboard/financial/credit",
+          icon: ShoppingCart,
+        },
+        {
+          label: "Payment History",
+          href: "/cluster-dashboard/financial/payments",
+          icon: Receipt,
+        },
+        {
+          label: "Financial Profile",
+          href: "/cluster-dashboard/financial/profile",
+          icon: TrendingUp,
+        },
+        {
+          label: "Farmer Finances",
+          href: "/cluster-dashboard/financial/farmers",
+          icon: Wallet,
+        },
+      ],
     },
   ],
   financialServices: {

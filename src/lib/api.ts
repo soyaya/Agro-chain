@@ -1,8 +1,11 @@
 export const BASE_BACKEND_URL =
-  process.env.BASE_BACKEND_URL?.trim() ?? process.env.NEXT_PUBLIC_BASE_BACKEND_URL?.trim() ?? "";
+  process.env.BASE_BACKEND_URL?.trim() ??
+  process.env.NEXT_PUBLIC_BASE_BACKEND_URL?.trim() ??
+  "";
 
 const normalizeBase = (base: string) => base.replace(/\/+$/, "");
-const normalizePath = (path: string) => (path.startsWith("/") ? path : `/${path}`);
+const normalizePath = (path: string) =>
+  path.startsWith("/") ? path : `/${path}`;
 
 export const buildApiUrl = (path: string) => {
   const base = normalizeBase(BASE_BACKEND_URL).replace(/\/api$/, "");
@@ -21,7 +24,10 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+export async function apiFetch<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
   const url = buildApiUrl(path);
   const headers = new Headers(options.headers);
 
@@ -36,7 +42,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
       headers,
       credentials: "include",
     });
-  } catch (networkError) {
+  } catch {
     // Network failure (backend down, no connection, CORS preflight blocked, etc.)
     throw new ApiError(
       "Unable to reach the server. Please check your connection or try again later.",
@@ -46,12 +52,17 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
 
   const contentType = response.headers.get("content-type") ?? "";
   const isJson = contentType.includes("application/json");
-  const data = isJson ? await response.json().catch(() => null) : await response.text();
+  const data = isJson
+    ? await response.json().catch(() => null)
+    : await response.text();
 
   if (!response.ok) {
     const message =
-      (data && typeof data === "object" && ("message" in data || "error" in data)
-        ? (data as Record<string, string>).message || (data as Record<string, string>).error
+      (data &&
+      typeof data === "object" &&
+      ("message" in data || "error" in data)
+        ? (data as Record<string, string>).message ||
+          (data as Record<string, string>).error
         : null) ??
       (typeof data === "string" && data.length > 0 ? data : null) ??
       response.statusText;

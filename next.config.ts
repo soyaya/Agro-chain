@@ -32,15 +32,24 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
         ],
       },
       {
         // Never cache the service worker itself
         source: "/sw.js",
         headers: [
-          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
-          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+          {
+            key: "Content-Type",
+            value: "application/javascript; charset=utf-8",
+          },
         ],
       },
     ];
@@ -48,9 +57,9 @@ const nextConfig: NextConfig = {
 };
 
 const withSerwist = withSerwistInit({
-  swSrc: 'src/app/sw.ts',           // your custom service worker
-  swDest: 'public/sw.js',
-  disable: process.env.NODE_ENV === 'development',
+  swSrc: "src/app/sw.ts", // your custom service worker
+  swDest: "public/sw.js",
+  disable: process.env.NODE_ENV === "development",
   register: true,
   // skipWaiting: true,
   //clientsClaim: true,

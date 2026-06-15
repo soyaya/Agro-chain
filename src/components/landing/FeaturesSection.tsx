@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { motion, type TargetAndTransition } from "framer-motion";
 import { ArrowRightIcon } from "lucide-react";
-import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import {
+  SLOW_STAGGER_CONTAINER_VARIANT,
+  SLIDE_UP_VARIANT,
+} from "~/types/constants";
 import { featureCards } from "~/models/models";
 
 const CARD_HOVER: TargetAndTransition = {
@@ -13,7 +16,10 @@ const CARD_HOVER: TargetAndTransition = {
   transition: { duration: 0.25, ease: "easeOut" },
 };
 
-const CARD_TAP: TargetAndTransition = { scale: 0.98, transition: { duration: 0.1 } };
+const CARD_TAP: TargetAndTransition = {
+  scale: 0.98,
+  transition: { duration: 0.1 },
+};
 
 export default function FeaturesSection() {
   return (
@@ -28,7 +34,8 @@ export default function FeaturesSection() {
             Built for every role in the supply chain.
           </h2>
           <p className="font-roboto-slab text-text-colour max-w-xl text-lg">
-            From farm to table, every step of the process is verified, transparent, and secure.
+            From farm to table, every step of the process is verified,
+            transparent, and secure.
           </p>
         </div>
 
@@ -48,11 +55,15 @@ export default function FeaturesSection() {
               whileTap={CARD_TAP}
               className="border-gray-border flex flex-col gap-4 rounded-2xl border bg-white p-6 shadow-sm"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50">
+              <div className="bg-green-tint flex h-12 w-12 items-center justify-center rounded-xl">
                 <Icon className="text-theme-green-dark h-6 w-6" />
               </div>
-              <h3 className="font-ubuntu text-heading-colour text-lg font-semibold">{title}</h3>
-              <p className="font-roboto-slab text-text-colour text-sm">{description}</p>
+              <h3 className="font-ubuntu text-heading-colour text-lg font-semibold">
+                {title}
+              </h3>
+              <p className="font-roboto-slab text-text-colour text-sm">
+                {description}
+              </p>
             </motion.div>
           ))}
         </motion.div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,7 +32,10 @@ const farmerProfileSchema = z
     fishType: z.string().min(1, "Fish type is required"),
     farmingCapacityKg: z
       .number()
-      .min(MIN_FARMING_CAPACITY_KG, `Minimum capacity is ${MIN_FARMING_CAPACITY_KG}kg`),
+      .min(
+        MIN_FARMING_CAPACITY_KG,
+        `Minimum capacity is ${MIN_FARMING_CAPACITY_KG}kg`,
+      ),
     yearsOfExperience: z
       .number()
       .min(MIN_YEARS_EXPERIENCE, "Experience cannot be negative")
@@ -61,7 +64,8 @@ const farmerProfileSchema = z
       return true;
     },
     {
-      message: "All cluster farmer fields are required when applying to be a cluster farmer",
+      message:
+        "All cluster farmer fields are required when applying to be a cluster farmer",
       path: ["businessName"],
     },
   );
@@ -80,14 +84,16 @@ export function FarmerProfileForm({
   isLoading = false,
 }: FarmerProfileFormProps) {
   const [profileImage, setProfileImage] = useState<File | undefined>();
-  const [imagePreview, setImagePreview] = useState<string | undefined>(initialData?.profileImage);
+  const [imagePreview, setImagePreview] = useState<string | undefined>(
+    initialData?.profileImage,
+  );
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isValid },
     setValue,
-    watch,
   } = useForm<FarmerProfileFormValues>({
     resolver: zodResolver(farmerProfileSchema),
     mode: "onChange",
@@ -110,9 +116,10 @@ export function FarmerProfileForm({
         },
   });
 
-  const selectedState = watch("state");
-  const selectedFishType = watch("fishType");
-  const isClusterFarmer = watch("isClusterFarmer");
+  const selectedState = useWatch({ control, name: "state" });
+  const selectedFishType = useWatch({ control, name: "fishType" });
+  const isClusterFarmer = useWatch({ control, name: "isClusterFarmer" });
+  const fullName = useWatch({ control, name: "fullName" });
 
   const handleImageChange = (file: File) => {
     setProfileImage(file);
@@ -131,7 +138,8 @@ export function FarmerProfileForm({
       });
       toast.success("Profile saved successfully!");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to save profile";
+      const message =
+        error instanceof Error ? error.message : "Failed to save profile";
       toast.error(message);
     }
   };
@@ -166,7 +174,7 @@ export function FarmerProfileForm({
       <motion.div variants={FADE_IN_VARIANT} className="flex justify-center">
         <ProfileAvatar
           imageUrl={imagePreview}
-          name={watch("fullName") || "User"}
+          name={fullName || "User"}
           size="lg"
           editable
           onImageChange={handleImageChange}
@@ -218,7 +226,9 @@ export function FarmerProfileForm({
         <SelectInput
           label="State"
           value={selectedState}
-          onValueChange={(value) => setValue("state", value, { shouldValidate: true })}
+          onValueChange={(value) =>
+            setValue("state", value, { shouldValidate: true })
+          }
           options={stateOptions}
           error={errors.state?.message}
           required
@@ -241,7 +251,9 @@ export function FarmerProfileForm({
         <SelectInput
           label="Fish Type"
           value={selectedFishType}
-          onValueChange={(value) => setValue("fishType", value, { shouldValidate: true })}
+          onValueChange={(value) =>
+            setValue("fishType", value, { shouldValidate: true })
+          }
           options={fishTypeOptions}
           error={errors.fishType?.message}
           required
@@ -267,14 +279,14 @@ export function FarmerProfileForm({
       {/* Cluster Farmer Section */}
       <motion.div
         variants={FADE_IN_VARIANT}
-        className="border-input-border rounded-xl border bg-gray-50 p-(--space-lg)"
+        className="border-input-border bg-gray-bg rounded-xl border p-(--space-lg)"
       >
         <div className="flex items-start gap-(--space-md)">
           <input
             type="checkbox"
             id="isClusterFarmer"
             {...register("isClusterFarmer")}
-            className="text-theme-green-dark focus:ring-theme-green-dark mt-1 h-5 w-5 rounded border-gray-300 transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2"
+            className="text-theme-green-dark focus:ring-theme-green-dark border-gray-border mt-1 h-5 w-5 rounded transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2"
           />
           <div className="flex-1">
             <label
@@ -283,9 +295,9 @@ export function FarmerProfileForm({
             >
               I&apos;m interested in becoming a Cluster Farmer
             </label>
-            <p className="font-roboto-slab mt-1 text-sm text-gray-600">
-              Cluster farmers can aggregate produce from multiple farmers and manage distribution to
-              buyers
+            <p className="font-roboto-slab text-text-colour mt-1 text-sm">
+              Cluster farmers can aggregate produce from multiple farmers and
+              manage distribution to buyers
             </p>
           </div>
         </div>
@@ -346,7 +358,7 @@ export function FarmerProfileForm({
                       type="checkbox"
                       id="logisticsAvailable"
                       {...register("logisticsAvailable")}
-                      className="text-theme-green-dark focus:ring-theme-green-dark mt-1 h-5 w-5 rounded border-gray-300 transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2"
+                      className="text-theme-green-dark focus:ring-theme-green-dark border-gray-border mt-1 h-5 w-5 rounded transition-all duration-300 ease-in-out hover:cursor-pointer focus:ring-2"
                     />
                     <label
                       htmlFor="logisticsAvailable"
@@ -363,8 +375,15 @@ export function FarmerProfileForm({
       </motion.div>
 
       {/* Submit Button */}
-      <motion.div variants={FADE_IN_VARIANT} className="mt-(--submit-button-mt)">
-        <SubmitPrimaryButton loading={isLoading} disabled={!isValid || isLoading} type="submit">
+      <motion.div
+        variants={FADE_IN_VARIANT}
+        className="mt-(--submit-button-mt)"
+      >
+        <SubmitPrimaryButton
+          loading={isLoading}
+          disabled={!isValid || isLoading}
+          type="submit"
+        >
           {initialData ? "Update Profile" : "Create Profile"}
         </SubmitPrimaryButton>
       </motion.div>

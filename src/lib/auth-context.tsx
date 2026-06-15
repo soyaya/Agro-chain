@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
 import type { AuthUser, DashboardType } from "~/types/index";
 import { authService, type BackendUser } from "~/lib/services/auth.service";
 import { ApiError } from "~/lib/api";
@@ -21,10 +28,17 @@ function readCurrentUserCookie(): AuthUser | null {
     const match = document.cookie.match(/(?:^|; )current_user=([^;]*)/);
     if (!match) return null;
     const parsed = JSON.parse(decodeURIComponent(match[1]!)) as {
-      id?: string; role?: string; fullName?: string; isClusterFarmer?: boolean;
+      id?: string;
+      role?: string;
+      fullName?: string;
+      isClusterFarmer?: boolean;
     };
     if (!parsed.role) return null;
-    const mappedRole = (parsed.role === "cluster" || parsed.role === "pending" ? "farmer" : parsed.role) as AuthUser["role"];
+    const mappedRole = (
+      parsed.role === "cluster" || parsed.role === "pending"
+        ? "farmer"
+        : parsed.role
+    ) as AuthUser["role"];
     return {
       id: parsed.id ?? "",
       fullName: parsed.fullName ?? "",
@@ -42,13 +56,12 @@ function readCurrentUserCookie(): AuthUser | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  // Seed from cookie immediately so the header never flashes "User"
+  const [user, setUser] = useState<AuthUser | null>(readCurrentUserCookie);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Seed from cookie immediately so the header never flashes "User"
     const cookieUser = readCurrentUserCookie();
-    if (cookieUser) setUser(cookieUser);
 
     const fetchUser = async () => {
       try {
@@ -61,7 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // status 0 = network error / backend not running (expected in dev)
         // anything else is unexpected - log it
         const isExpected =
-          error instanceof ApiError && (error.status === 401 || error.status === 0);
+          error instanceof ApiError &&
+          (error.status === 401 || error.status === 0);
         if (!isExpected) {
           console.error("Failed to fetch user session:", error);
         }
@@ -75,9 +89,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void fetchUser();
   }, []);
 
-  const updateUser = (updatedUser: AuthUser) => {
+  const updateUser = useCallback((updatedUser: AuthUser) => {
     setUser(updatedUser);
-  };
+  }, []);
 
   const logout = async () => {
     try {

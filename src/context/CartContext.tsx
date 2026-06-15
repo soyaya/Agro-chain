@@ -1,9 +1,20 @@
 "use client";
 
-import { createContext, useContext, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { toast } from "sonner";
 import type { MarketplaceListing, PackagingOption } from "~/types";
-import { FALLBACK_PRICES_PER_KG, type FishType, type FishVariant } from "~/types/constants";
+import {
+  FALLBACK_PRICES_PER_KG,
+  type FishType,
+  type FishVariant,
+} from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { usePlatformSettings } from "~/context/PlatformSettingsContext";
 
@@ -33,7 +44,10 @@ interface CartContextValue {
     options: { variant: FishVariant; processed: boolean },
   ) => void;
   updateQuantity: (index: number, quantity: number) => void;
-  updateDeliveryType: (index: number, deliveryType: "pickup" | "delivery") => void;
+  updateDeliveryType: (
+    index: number,
+    deliveryType: "pickup" | "delivery",
+  ) => void;
   clearCart: () => void;
   setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
 }
@@ -41,7 +55,8 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null);
 
 const CART_STORAGE_KEY = "agro_chain_cart";
-const createLocalId = () => `cart-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+const createLocalId = () =>
+  `cart-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 const getInitialCart = (): CartItem[] => {
   if (typeof window === "undefined") return [];
@@ -55,21 +70,20 @@ const getInitialCart = (): CartItem[] => {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { pricePerKg } = usePlatformSettings();
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(getInitialCart);
   const [synced, setSynced] = useState(false);
 
   const computePricePerUnit = useCallback(
     (pkg: PackagingOption, fishType: string): number => {
       if (pkg.pricePerUnit != null) return Number(pkg.pricePerUnit);
-      const rate = pricePerKg[fishType as FishType] ?? FALLBACK_PRICES_PER_KG.table_size;
+      const rate =
+        pricePerKg[fishType as FishType] ?? FALLBACK_PRICES_PER_KG.table_size;
       return Number(pkg.weightKg) * rate;
     },
     [pricePerKg],
   );
 
   useEffect(() => {
-    setItems(getInitialCart());
-
     const syncWithBackend = async () => {
       try {
         const response = await apiFetch<{
@@ -125,7 +139,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items, synced]);
 
-  const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
+  const totalItems = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity, 0),
+    [items],
+  );
 
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + Number(item.totalPrice), 0),
@@ -180,25 +197,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       void (async () => {
         try {
-          const response = await apiFetch<{ status: string; data: { cartItemId: string } }>(
-            "/marketplace/cart",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                listingId: listing.id,
-                variant: options.variant,
-                processed: options.processed,
-                weightKg: pkg.weightKg,
-                quantity: 1,
-                pricePerUnit,
-              }),
-            },
-          );
+          const response = await apiFetch<{
+            status: string;
+            data: { cartItemId: string };
+          }>("/marketplace/cart", {
+            method: "POST",
+            body: JSON.stringify({
+              listingId: listing.id,
+              variant: options.variant,
+              processed: options.processed,
+              weightKg: pkg.weightKg,
+              quantity: 1,
+              pricePerUnit,
+            }),
+          });
           const serverId = response.data?.cartItemId;
           if (serverId) {
             setItems((prev) =>
               prev.map((item) =>
-                item.cartItemId === localId ? { ...item, cartItemId: serverId } : item,
+                item.cartItemId === localId
+                  ? { ...item, cartItemId: serverId }
+                  : item,
               ),
             );
           }
@@ -216,7 +235,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     (index: number, deliveryType: "pickup" | "delivery") => {
       setItems((prev) => {
         if (index < 0 || index >= prev.length) return prev;
-        return prev.map((item, idx) => (idx === index ? { ...item, deliveryType } : item));
+        return prev.map((item, idx) =>
+          idx === index ? { ...item, deliveryType } : item,
+        );
       });
     },
     [],
@@ -228,7 +249,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (quantity <= 0) {
         const item = prev[index];
         if (item?.cartItemId) {
-          void apiFetch(`/marketplace/cart/${item.cartItemId}`, { method: "DELETE" });
+          void apiFetch(`/marketplace/cart/${item.cartItemId}`, {
+            method: "DELETE",
+          });
         }
         return prev.filter((_, idx) => idx !== index);
       }
@@ -241,7 +264,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       return prev.map((item, idx) =>
         idx === index
-          ? { ...item, quantity, totalPrice: quantity * Number(item.pricePerUnit) }
+          ? {
+              ...item,
+              quantity,
+              totalPrice: quantity * Number(item.pricePerUnit),
+            }
           : item,
       );
     });
@@ -272,6 +299,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCartContext(): CartContextValue {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCartContext must be used inside <CartProvider>");
+  if (!ctx)
+    throw new Error("useCartContext must be used inside <CartProvider>");
   return ctx;
 }

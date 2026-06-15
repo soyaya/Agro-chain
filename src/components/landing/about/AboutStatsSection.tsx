@@ -1,7 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { STAGGER_CONTAINER_VARIANT, STAT_ITEM_VARIANT } from "~/types/constants";
+import {
+  STAGGER_CONTAINER_VARIANT,
+  STAT_ITEM_VARIANT,
+} from "~/types/constants";
 import type { ImpactStat } from "~/types/types";
 
 const aboutStats: ImpactStat[] = [
@@ -34,7 +37,9 @@ export default function AboutStatsSection() {
               >
                 {value}
               </span>
-              <span className="font-roboto-slab text-sm text-white/60">{label}</span>
+              <span className="font-roboto-slab text-sm text-white/60">
+                {label}
+              </span>
             </motion.div>
           ))}
         </motion.div>

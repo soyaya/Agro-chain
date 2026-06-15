@@ -14,10 +14,10 @@ function PaymentVerifyContent() {
   const reference = searchParams.get("reference");
 
   const [status, setStatus] = useState<VerifyStatus>(() =>
-    reference ? "loading" : "failed"
+    reference ? "loading" : "failed",
   );
   const [message, setMessage] = useState(() =>
-    reference ? "" : "No payment reference found."
+    reference ? "" : "No payment reference found.",
   );
   useEffect(() => {
     if (!reference) return;
@@ -28,7 +28,9 @@ function PaymentVerifyContent() {
           status: string;
           message: string;
           data: { orderId: string; orderStatus: string; paymentStatus: string };
-        }>(`/buyers/payments/verify?reference=${encodeURIComponent(reference)}`);
+        }>(
+          `/buyers/payments/verify?reference=${encodeURIComponent(reference)}`,
+        );
 
         setStatus("success");
         setMessage(response.message);
@@ -38,7 +40,11 @@ function PaymentVerifyContent() {
         }, 2500);
       } catch (error) {
         setStatus("failed");
-        setMessage(error instanceof Error ? error.message : "Payment verification failed.");
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "Payment verification failed.",
+        );
       }
     };
 
@@ -58,23 +64,31 @@ function PaymentVerifyContent() {
             <p className="font-ubuntu text-heading-colour text-xl font-bold">
               Verifying payment...
             </p>
-            <p className="text-text-colour text-sm">Please wait while we confirm your payment.</p>
+            <p className="text-text-colour text-sm">
+              Please wait while we confirm your payment.
+            </p>
           </>
         )}
 
         {status === "success" && (
           <>
             <CheckCircle size={64} className="text-theme-green-dark" />
-            <p className="font-ubuntu text-heading-colour text-xl font-bold">Payment Confirmed!</p>
+            <p className="font-ubuntu text-heading-colour text-xl font-bold">
+              Payment Confirmed!
+            </p>
             <p className="text-text-colour text-sm">{message}</p>
-            <p className="text-text-colour text-xs">Redirecting to your order...</p>
+            <p className="text-text-colour text-xs">
+              Redirecting to your order...
+            </p>
           </>
         )}
 
         {status === "failed" && (
           <>
             <XCircle size={64} className="text-error-red" />
-            <p className="font-ubuntu text-heading-colour text-xl font-bold">Payment Failed</p>
+            <p className="font-ubuntu text-heading-colour text-xl font-bold">
+              Payment Failed
+            </p>
             <p className="text-text-colour text-sm">{message}</p>
             <button
               onClick={() => router.push("/buyers-dashboard/orders")}

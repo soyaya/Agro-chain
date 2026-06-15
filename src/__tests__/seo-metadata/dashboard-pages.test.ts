@@ -121,36 +121,66 @@ describe("Dashboard page metadata - Property 3: correctness", () => {
           const name = pageNames[index];
 
           // robots.index === false
-          const robots = meta.robots as { index: boolean; follow: boolean } | undefined;
+          const robots = meta.robots as
+            | { index: boolean; follow: boolean }
+            | undefined;
           expect(robots, `${name}: robots should be defined`).toBeDefined();
-          expect(robots!.index, `${name}: robots.index should be false`).toBe(false);
-          expect(robots!.follow, `${name}: robots.follow should be false`).toBe(false);
+          expect(robots!.index, `${name}: robots.index should be false`).toBe(
+            false,
+          );
+          expect(robots!.follow, `${name}: robots.follow should be false`).toBe(
+            false,
+          );
 
           // Non-empty title (string or title.default)
           const title = meta.title;
           expect(title, `${name}: title should be defined`).toBeDefined();
           if (typeof title === "string") {
-            expect(title.length, `${name}: title string should not be empty`).toBeGreaterThan(0);
+            expect(
+              title.length,
+              `${name}: title string should not be empty`,
+            ).toBeGreaterThan(0);
           } else {
             const titleObj = title as { default?: string; template?: string };
-            expect(titleObj.default, `${name}: title.default should be defined`).toBeDefined();
-            expect((titleObj.default as string).length, `${name}: title.default should not be empty`).toBeGreaterThan(0);
+            expect(
+              titleObj.default,
+              `${name}: title.default should be defined`,
+            ).toBeDefined();
+            expect(
+              (titleObj.default as string).length,
+              `${name}: title.default should not be empty`,
+            ).toBeGreaterThan(0);
           }
 
           // Non-empty description
           const description = meta.description;
-          expect(description, `${name}: description should be defined`).toBeDefined();
-          expect(typeof description, `${name}: description should be a string`).toBe("string");
-          expect((description as string).length, `${name}: description should not be empty`).toBeGreaterThan(0);
+          expect(
+            description,
+            `${name}: description should be defined`,
+          ).toBeDefined();
+          expect(
+            typeof description,
+            `${name}: description should be a string`,
+          ).toBe("string");
+          expect(
+            (description as string).length,
+            `${name}: description should not be empty`,
+          ).toBeGreaterThan(0);
 
           // openGraph must be absent
-          expect(meta.openGraph, `${name}: openGraph should be absent on dashboard pages`).toBeUndefined();
+          expect(
+            meta.openGraph,
+            `${name}: openGraph should be absent on dashboard pages`,
+          ).toBeUndefined();
 
           // twitter must be absent
-          expect(meta.twitter, `${name}: twitter should be absent on dashboard pages`).toBeUndefined();
-        }
+          expect(
+            meta.twitter,
+            `${name}: twitter should be absent on dashboard pages`,
+          ).toBeUndefined();
+        },
       ),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 });

@@ -14,7 +14,12 @@ interface PackagingSelectorProps {
   error?: string;
 }
 
-export function PackagingSelector({ totalKg, packaging, onChange, error }: PackagingSelectorProps) {
+export function PackagingSelector({
+  totalKg,
+  packaging,
+  onChange,
+  error,
+}: PackagingSelectorProps) {
   const [selectedWeight, setSelectedWeight] = useState<number>(1);
 
   const addPackaging = () => {
@@ -39,7 +44,10 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
     onChange(packaging.filter((_, i) => i !== index));
   };
 
-  const totalPackaged = packaging.reduce((sum, p) => sum + p.weightKg * p.quantity, 0);
+  const totalPackaged = packaging.reduce(
+    (sum, p) => sum + p.weightKg * p.quantity,
+    0,
+  );
 
   return (
     <div
@@ -124,7 +132,9 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
             {/* Summary */}
             <div className="bg-gray-bg rounded-2xl p-(--space-lg)">
               <div className="flex justify-between">
-                <span className="font-roboto-slab text-text-colour text-sm">Total Packaged:</span>
+                <span className="font-roboto-slab text-text-colour text-sm">
+                  Total Packaged:
+                </span>
                 <span className="font-roboto-slab text-heading-colour text-sm font-medium">
                   {totalPackaged}kg / {totalKg}kg
                 </span>

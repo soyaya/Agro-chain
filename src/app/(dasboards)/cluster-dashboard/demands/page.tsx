@@ -24,13 +24,34 @@ import { EmptyState } from "~/components/ui/EmptyState";
 
 // === Status config
 
-const STATUS_CONFIG: Record<DemandStatus, { label: string; className: string }> = {
-  pending: { label: "Pending", className: "bg-yellow-50 text-yellow-700 border-yellow-200" },
-  assigned: { label: "Assigned", className: "bg-blue-50 text-blue-700 border-blue-200" },
-  accepted: { label: "Accepted", className: "bg-green-50 text-green-700 border-green-200" },
-  declined: { label: "Declined", className: "bg-red-50 text-red-700 border-red-200" },
-  fulfilled: { label: "Fulfilled", className: "bg-gray-50 text-gray-700 border-gray-200" },
-  cancelled: { label: "Cancelled", className: "bg-gray-50 text-gray-500 border-gray-200" },
+const STATUS_CONFIG: Record<
+  DemandStatus,
+  { label: string; className: string }
+> = {
+  pending: {
+    label: "Pending",
+    className: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  },
+  assigned: {
+    label: "Assigned",
+    className: "bg-blue-50 text-blue-700 border-blue-200",
+  },
+  accepted: {
+    label: "Accepted",
+    className: "bg-green-tint text-theme-green-dark border-gray-border",
+  },
+  declined: {
+    label: "Declined",
+    className: "bg-red-50 text-red-700 border-red-200",
+  },
+  fulfilled: {
+    label: "Fulfilled",
+    className: "bg-gray-bg text-text-colour-2 border-gray-border",
+  },
+  cancelled: {
+    label: "Cancelled",
+    className: "bg-gray-bg text-muted-text border-gray-border",
+  },
 };
 
 // === Decline Modal
@@ -42,7 +63,12 @@ interface DeclineModalProps {
   loading: boolean;
 }
 
-function DeclineModal({ isOpen, onClose, onConfirm, loading }: DeclineModalProps) {
+function DeclineModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  loading,
+}: DeclineModalProps) {
   const [reason, setReason] = useState("");
 
   const handleClose = () => {
@@ -132,7 +158,9 @@ export default function ClusterDemandsPage() {
         if (mounted) setDemands(response.data.demands ?? []);
       } catch (error) {
         if (mounted)
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load demands");
+          setErrorMessage(
+            error instanceof Error ? error.message : "Failed to load demands",
+          );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -148,11 +176,15 @@ export default function ClusterDemandsPage() {
     try {
       await clusterService.acceptDemand(id);
       setDemands((prev) =>
-        prev.map((d) => (d.id === id ? { ...d, status: "accepted" as DemandStatus } : d)),
+        prev.map((d) =>
+          d.id === id ? { ...d, status: "accepted" as DemandStatus } : d,
+        ),
       );
       toast.success("Demand accepted - it will appear in your Orders.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to accept demand");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to accept demand",
+      );
     } finally {
       setActionLoading(false);
     }
@@ -169,13 +201,19 @@ export default function ClusterDemandsPage() {
     try {
       await clusterService.declineDemand(selectedId, reason || undefined);
       setDemands((prev) =>
-        prev.map((d) => (d.id === selectedId ? { ...d, status: "declined" as DemandStatus } : d)),
+        prev.map((d) =>
+          d.id === selectedId
+            ? { ...d, status: "declined" as DemandStatus }
+            : d,
+        ),
       );
       toast.success("Demand declined.");
       setDeclineModalOpen(false);
       setSelectedId(null);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to decline demand");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to decline demand",
+      );
     } finally {
       setActionLoading(false);
     }
@@ -186,18 +224,24 @@ export default function ClusterDemandsPage() {
     try {
       await clusterService.fulfillDemand(id);
       setDemands((prev) =>
-        prev.map((d) => (d.id === id ? { ...d, status: "fulfilled" as DemandStatus } : d)),
+        prev.map((d) =>
+          d.id === id ? { ...d, status: "fulfilled" as DemandStatus } : d,
+        ),
       );
       toast.success("Demand marked as fulfilled.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to mark as fulfilled");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to mark as fulfilled",
+      );
     } finally {
       setActionLoading(false);
     }
   };
 
   const filtered =
-    filterStatus === "all" ? demands : demands.filter((d) => d.status === filterStatus);
+    filterStatus === "all"
+      ? demands
+      : demands.filter((d) => d.status === filterStatus);
   const assignedCount = demands.filter((d) => d.status === "assigned").length;
 
   const counts = {
@@ -231,10 +275,12 @@ export default function ClusterDemandsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">Demands</h1>
+        <h1 className="font-ubuntu text-heading-colour mb-2 text-3xl font-bold">
+          Demands
+        </h1>
         <p className="font-roboto-slab text-text-colour">
-          Custom buyer requests assigned to you by admin. Accept to fulfill or decline if
-          unavailable.
+          Custom buyer requests assigned to you by admin. Accept to fulfill or
+          decline if unavailable.
         </p>
       </motion.div>
 
@@ -249,7 +295,8 @@ export default function ClusterDemandsPage() {
           <AlertCircle size={22} className="shrink-0 text-blue-600" />
           <p className="font-roboto-slab text-sm text-blue-800">
             <span className="font-semibold">{assignedCount}</span> new demand
-            {assignedCount !== 1 ? "s" : ""} assigned to you - review and accept or decline
+            {assignedCount !== 1 ? "s" : ""} assigned to you - review and accept
+            or decline
           </p>
         </motion.div>
       )}
@@ -261,20 +308,24 @@ export default function ClusterDemandsPage() {
         animate="visible"
         className="grid grid-cols-3 gap-(--gap-base) sm:grid-cols-5"
       >
-        {(["all", "assigned", "accepted", "declined", "fulfilled"] as const).map((status) => (
+        {(
+          ["all", "assigned", "accepted", "declined", "fulfilled"] as const
+        ).map((status) => (
           <button
             key={status}
             onClick={() => setFilterStatus(status)}
             className={`flex flex-col gap-1 rounded-2xl border p-(--space-md) transition-all duration-200 ${
               filterStatus === status
-                ? "border-theme-green-dark bg-green-50"
+                ? "border-theme-green-dark bg-green-tint"
                 : "border-gray-border hover:bg-pink-bg bg-(--white)"
             }`}
           >
             <span className="font-ubuntu text-heading-colour text-xl font-bold">
               {counts[status]}
             </span>
-            <span className="font-roboto-slab text-text-colour text-xs capitalize">{status}</span>
+            <span className="font-roboto-slab text-text-colour text-xs capitalize">
+              {status}
+            </span>
           </button>
         ))}
       </motion.div>
@@ -312,24 +363,25 @@ export default function ClusterDemandsPage() {
                   </span>
                 </div>
 
-                <div className="h-px w-full bg-gray-100" />
+                <div className="bg-gray-bg h-px w-full" />
 
                 {/* Details */}
                 <div className="flex flex-col gap-2.5">
                   <div className="font-roboto-slab text-text-colour flex items-center gap-2 text-sm">
-                    <Package size={15} className="shrink-0 text-gray-400" />
+                    <Package size={15} className="text-muted-text shrink-0" />
                     <span>
-                      {demand.weightKg} kg · {demand.fishVariant.replace("_", " ")}
+                      {demand.weightKg} kg ·{" "}
+                      {demand.fishVariant.replace("_", " ")}
                     </span>
                   </div>
                   <div className="font-roboto-slab text-text-colour flex items-center gap-2 text-sm">
-                    <MapPin size={15} className="shrink-0 text-gray-400" />
+                    <MapPin size={15} className="text-muted-text shrink-0" />
                     <span>
                       {demand.locationLga}, {demand.locationState}
                     </span>
                   </div>
                   <div className="font-roboto-slab text-text-colour flex items-center gap-2 text-sm">
-                    <Clock size={15} className="shrink-0 text-gray-400" />
+                    <Clock size={15} className="text-muted-text shrink-0" />
                     <span>
                       {new Date(demand.createdAt).toLocaleDateString("en-NG", {
                         day: "numeric",

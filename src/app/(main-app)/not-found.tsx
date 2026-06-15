@@ -15,14 +15,14 @@ export default function NotFound() {
       <motion.h1
         variants={SLIDE_UP_VARIANT}
         transition={{ duration: 0.5 }}
-        className="font-ubuntu text-5xl font-bold text-heading-colour"
+        className="font-ubuntu text-heading-colour text-5xl font-bold"
       >
         404
       </motion.h1>
       <motion.p
         variants={SLIDE_UP_VARIANT}
         transition={{ duration: 0.5 }}
-        className="font-roboto-slab text-lg text-text-colour"
+        className="font-roboto-slab text-text-colour text-lg"
       >
         This page doesn&apos;t exist. Back to safety?
       </motion.p>
@@ -33,13 +33,13 @@ export default function NotFound() {
       >
         <Link
           href="/"
-          className="font-ubuntu text-sm font-medium text-theme-green-dark underline underline-offset-4"
+          className="font-ubuntu text-theme-green-dark text-sm font-medium underline underline-offset-4"
         >
           Go Home
         </Link>
         <Link
           href="/marketplace"
-          className="font-ubuntu text-sm font-medium text-theme-green-dark underline underline-offset-4"
+          className="font-ubuntu text-theme-green-dark text-sm font-medium underline underline-offset-4"
         >
           Browse Marketplace
         </Link>

@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { SLOW_STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import {
+  SLOW_STAGGER_CONTAINER_VARIANT,
+  SLIDE_UP_VARIANT,
+} from "~/types/constants";
 import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import type { MarketplaceListing } from "~/types/index";
 

@@ -75,7 +75,10 @@ export const authService = {
   /** Logout from the current device. */
   logout() {
     // Calls the Next.js proxy which clears httpOnly cookies server-side
-    return fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    return fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
   },
 
   /** Logout from all devices. */

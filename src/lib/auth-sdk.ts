@@ -12,7 +12,10 @@ function getSecret() {
 }
 
 function toBase64Url(input: string) {
-  return btoa(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return btoa(input)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 }
 
 function fromBase64Url(input: string) {
@@ -30,7 +33,11 @@ async function sign(value: string) {
     false,
     ["sign"],
   );
-  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(value));
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    encoder.encode(value),
+  );
   const signatureText = Array.from(new Uint8Array(signature))
     .map((b) => String.fromCharCode(b))
     .join("");

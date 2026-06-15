@@ -11,11 +11,16 @@ import { toast } from "sonner";
 
 function getDashboardPath(): string {
   try {
-    const raw = typeof window !== "undefined" ? localStorage.getItem("auth_user") : null;
+    const raw =
+      typeof window !== "undefined" ? localStorage.getItem("auth_user") : null;
     if (!raw) return "/farmers-dashboard";
-    const user = JSON.parse(raw) as { role?: string; is_cluster_farmer?: boolean };
+    const user = JSON.parse(raw) as {
+      role?: string;
+      is_cluster_farmer?: boolean;
+    };
     if (user.role === "admin") return "/admin-dashboard";
-    if (user.is_cluster_farmer || user.role === "cluster") return "/cluster-dashboard";
+    if (user.is_cluster_farmer || user.role === "cluster")
+      return "/cluster-dashboard";
     if (user.role === "buyer") return "/buyers-dashboard";
     return "/farmers-dashboard";
   } catch {
@@ -58,7 +63,9 @@ export default function VerifyIdentity() {
       setTimeout(() => router.push(getDashboardPath()), 2400);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Verification failed. Please try again.";
+        error instanceof Error
+          ? error.message
+          : "Verification failed. Please try again.";
       setErrorMessage(message);
       setVerifyState("form");
       toast.error(message);
@@ -89,11 +96,11 @@ export default function VerifyIdentity() {
           transition={{ duration: 0.3 }}
           className="space-y-6 py-20 text-center"
         >
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-theme-green-dark" />
-          <h2 className="font-ubuntu text-xl font-semibold text-heading-colour">
+          <Loader2 className="text-theme-green-dark mx-auto h-12 w-12 animate-spin" />
+          <h2 className="font-ubuntu text-heading-colour text-xl font-semibold">
             We&apos;re verifying your identity
           </h2>
-          <p className="font-roboto-slab text-sm text-text-colour">
+          <p className="font-roboto-slab text-text-colour text-sm">
             This usually takes a few seconds...
           </p>
         </motion.div>
@@ -112,13 +119,24 @@ export default function VerifyIdentity() {
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
+            transition={{
+              type: "spring",
+              stiffness: 260,
+              damping: 20,
+              delay: 0.1,
+            }}
           >
-            <CheckCircle2 className="mx-auto h-16 w-16 text-theme-green-dark" />
+            <CheckCircle2 className="text-theme-green-dark mx-auto h-16 w-16" />
           </motion.div>
-          <h2 className="font-ubuntu text-2xl font-bold text-heading-colour">Great job!</h2>
-          <p className="font-roboto-slab text-text-colour">{doneMessage} Let&apos;s head to your dashboard!</p>
-          <p className="font-roboto-slab text-sm text-text-colour">Redirecting in a few seconds...</p>
+          <h2 className="font-ubuntu text-heading-colour text-2xl font-bold">
+            Great job!
+          </h2>
+          <p className="font-roboto-slab text-text-colour">
+            {doneMessage} Let&apos;s head to your dashboard!
+          </p>
+          <p className="font-roboto-slab text-text-colour text-sm">
+            Redirecting in a few seconds...
+          </p>
         </motion.div>
       )}
 
@@ -146,21 +164,26 @@ export default function VerifyIdentity() {
                   type="checkbox"
                   checked={creditConsent}
                   onChange={(e) => setCreditConsent(e.target.checked)}
-                  className="mt-1 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-2 focus:ring-green-500"
+                  className="border-gray-border text-theme-green-dark focus:ring-theme-green-light mt-1 h-5 w-5 rounded focus:ring-2"
                 />
-                <span className="font-roboto-slab text-sm leading-relaxed text-text-colour">
-                  I consent to a credit check being performed using my BVN data to assess my
-                  creditworthiness on the Agro-chain platform.
+                <span className="font-roboto-slab text-text-colour text-sm leading-relaxed">
+                  I consent to a credit check being performed using my BVN data
+                  to assess my creditworthiness on the Agro-chain platform.
                 </span>
               </label>
             </div>
 
             {errorMessage && (
-              <p className="text-center text-sm text-error-red">{errorMessage}</p>
+              <p className="text-error-red text-center text-sm">
+                {errorMessage}
+              </p>
             )}
 
             <div className="mt-(--submit-button-mt) grid grid-cols-2 gap-4">
-              <SubmitSecondaryButton onClick={handleSkip} className="h-14 rounded-full">
+              <SubmitSecondaryButton
+                onClick={handleSkip}
+                className="h-14 rounded-full"
+              >
                 Skip for now
               </SubmitSecondaryButton>
               <SubmitPrimaryButton

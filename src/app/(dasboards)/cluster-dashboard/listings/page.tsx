@@ -34,7 +34,7 @@ const STATUS_CONFIG = {
   approved: {
     label: "Approved",
     icon: CheckCircle,
-    className: "bg-green-50 text-green-700 border-green-200",
+    className: "bg-green-tint text-theme-green-dark border-gray-border",
   },
   pending: {
     label: "Pending",
@@ -67,7 +67,9 @@ export default function ClusterMyListingsPage() {
           setSummary(res.data.summary ?? null);
         }
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to load listings");
+        toast.error(
+          error instanceof Error ? error.message : "Failed to load listings",
+        );
       } finally {
         if (mounted) setLoading(false);
       }
@@ -78,12 +80,19 @@ export default function ClusterMyListingsPage() {
     };
   }, []);
 
-  if (loading) return <LoadingState message="Loading your listings..." size="lg" />;
+  if (loading)
+    return <LoadingState message="Loading your listings..." size="lg" />;
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
-      <motion.div variants={SLIDE_UP_VARIANT} initial="hidden" animate="visible">
-        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">My Listings</h1>
+      <motion.div
+        variants={SLIDE_UP_VARIANT}
+        initial="hidden"
+        animate="visible"
+      >
+        <h1 className="font-ubuntu text-heading-colour text-3xl font-bold">
+          My Listings
+        </h1>
         <p className="font-roboto-slab text-text-colour">
           Fish listings you created on the platform.
         </p>
@@ -107,8 +116,12 @@ export default function ClusterMyListingsPage() {
               key={s.label}
               className="border-gray-border rounded-2xl border bg-(--white) p-4 shadow-sm"
             >
-              <p className="font-ubuntu text-heading-colour text-2xl font-bold">{s.value}</p>
-              <p className="font-roboto-slab text-text-colour text-xs">{s.label}</p>
+              <p className="font-ubuntu text-heading-colour text-2xl font-bold">
+                {s.value}
+              </p>
+              <p className="font-roboto-slab text-text-colour text-xs">
+                {s.label}
+              </p>
             </div>
           ))}
         </motion.div>
@@ -121,8 +134,10 @@ export default function ClusterMyListingsPage() {
           animate="visible"
           className="border-gray-border flex flex-col items-center gap-3 rounded-2xl border bg-(--white) p-12 text-center shadow-sm"
         >
-          <Package size={40} className="text-gray-300" />
-          <p className="font-ubuntu text-heading-colour font-semibold">No listings yet</p>
+          <Package size={40} className="text-muted-text" />
+          <p className="font-ubuntu text-heading-colour font-semibold">
+            No listings yet
+          </p>
           <p className="font-roboto-slab text-text-colour text-sm">
             Create your first listing to appear on the marketplace.
           </p>
@@ -163,26 +178,29 @@ export default function ClusterMyListingsPage() {
 
                 <div className="text-text-colour flex flex-col gap-1.5 text-sm">
                   <div className="font-roboto-slab flex items-center gap-2">
-                    <Package size={14} className="shrink-0 text-gray-400" />
+                    <Package size={14} className="text-muted-text shrink-0" />
                     <span>
                       {listing.totalFishAvailable.toLocaleString()} fish ·{" "}
                       {listing.totalAvailableKg.toLocaleString()} kg total
                     </span>
                   </div>
                   <div className="font-roboto-slab flex items-center gap-2">
-                    <Calendar size={14} className="shrink-0 text-gray-400" />
+                    <Calendar size={14} className="text-muted-text shrink-0" />
                     <span>
                       Harvest:{" "}
-                      {new Date(listing.harvestDate).toLocaleDateString("en-NG", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {new Date(listing.harvestDate).toLocaleDateString(
+                        "en-NG",
+                        {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )}
                     </span>
                   </div>
                 </div>
 
-                <p className="font-roboto-slab mt-auto text-xs text-gray-400">
+                <p className="font-roboto-slab text-muted-text mt-auto text-xs">
                   Listed{" "}
                   {new Date(listing.createdAt).toLocaleDateString("en-NG", {
                     day: "numeric",

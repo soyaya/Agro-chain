@@ -64,10 +64,10 @@ export default function LoanApplicationsPage() {
 
   const getStatusConfig = (status: LoanApplicationStatus) => {
     const configs = {
-      draft: { label: "Draft", color: "text-gray-600", bgColor: "bg-gray-100", icon: FileText },
+      draft: { label: "Draft", color: "text-text-colour", bgColor: "bg-gray-bg", icon: FileText },
       submitted: { label: "Submitted", color: "text-blue-600", bgColor: "bg-blue-100", icon: FileText },
       under_review: { label: "Under Review", color: "text-yellow-600", bgColor: "bg-yellow-100", icon: Clock },
-      approved: { label: "Approved", color: "text-green-600", bgColor: "bg-green-100", icon: CheckCircle },
+      approved: { label: "Approved", color: "text-theme-green-dark", bgColor: "bg-green-tint", icon: CheckCircle },
       rejected: { label: "Rejected", color: "text-red-600", bgColor: "bg-red-100", icon: XCircle },
       disbursed: { label: "Disbursed", color: "text-purple-600", bgColor: "bg-purple-100", icon: DollarSign },
     };
@@ -104,8 +104,8 @@ export default function LoanApplicationsPage() {
       label: "Approved",
       value: loanApplications.filter(l => l.status === "approved").length.toString(),
       icon: CheckCircle,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      color: "text-theme-green-dark",
+      bgColor: "bg-green-tint",
     },
     {
       label: "Total Approved Amount",
@@ -180,8 +180,8 @@ export default function LoanApplicationsPage() {
         </h2>
         {loanApplications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-(--space-2xl) text-center">
-            <FileText size={48} className="text-gray-300 mb-(--space-md)" />
-            <p className="font-roboto-slab text-gray-500 mb-(--space-lg)">
+            <FileText size={48} className="text-muted-text mb-(--space-md)" />
+            <p className="font-roboto-slab text-muted-text mb-(--space-lg)">
               You haven&apos;t submitted any loan applications yet
             </p>
             <Link
@@ -199,7 +199,7 @@ export default function LoanApplicationsPage() {
               return (
                 <div
                   key={application.id}
-                  className="rounded-xl border border-input-border p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-105"
+                  className="rounded-xl border border-input-border p-(--space-lg) cursor-default ease-in-out transition-all duration-300 hover:shadow-md hover:border-gray-border hover:scale-105"
                 >
                   <div className="flex flex-col gap-(--space-md) sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex-1">
@@ -214,27 +214,27 @@ export default function LoanApplicationsPage() {
                       </div>
                       <div className="grid grid-cols-1 gap-(--space-sm) sm:grid-cols-2 mb-(--space-md)">
                         <div>
-                          <p className="font-roboto-slab text-xs text-gray-500">Loan Type</p>
+                          <p className="font-roboto-slab text-xs text-muted-text">Loan Type</p>
                           <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                             {getLoanTypeLabel(application.loanType)}
                           </p>
                         </div>
                         <div>
-                          <p className="font-roboto-slab text-xs text-gray-500">Requested Amount</p>
+                          <p className="font-roboto-slab text-xs text-muted-text">Requested Amount</p>
                           <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                             ₦{application.requestedAmount.toLocaleString()}
                           </p>
                         </div>
                         <div>
-                          <p className="font-roboto-slab text-xs text-gray-500">Submitted</p>
+                          <p className="font-roboto-slab text-xs text-muted-text">Submitted</p>
                           <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                             {application.submittedAt.toLocaleDateString()}
                           </p>
                         </div>
                         {application.approvedAmount && (
                           <div>
-                            <p className="font-roboto-slab text-xs text-gray-500">Approved Amount</p>
-                            <p className="font-roboto-slab text-sm font-medium text-green-600">
+                            <p className="font-roboto-slab text-xs text-muted-text">Approved Amount</p>
+                            <p className="font-roboto-slab text-sm font-medium text-theme-green-dark">
                               ₦{application.approvedAmount.toLocaleString()}
                             </p>
                           </div>
@@ -244,24 +244,24 @@ export default function LoanApplicationsPage() {
                         <span className="font-medium">Purpose:</span> {application.purpose}
                       </p>
                       {application.repaymentTerms && (
-                        <div className="mt-(--space-md) rounded-lg bg-green-50 p-(--space-md)">
-                          <p className="font-roboto-slab text-xs text-green-800 mb-2">Repayment Terms</p>
+                        <div className="mt-(--space-md) rounded-lg bg-green-tint p-(--space-md)">
+                          <p className="font-roboto-slab text-xs text-theme-green-dark mb-2">Repayment Terms</p>
                           <div className="grid grid-cols-2 gap-(--space-sm) sm:grid-cols-3">
                             <div>
-                              <p className="font-roboto-slab text-xs text-green-600">Duration</p>
-                              <p className="font-roboto-slab text-sm font-medium text-green-900">
+                              <p className="font-roboto-slab text-xs text-theme-green-dark">Duration</p>
+                              <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                                 {application.repaymentTerms.durationMonths} months
                               </p>
                             </div>
                             <div>
-                              <p className="font-roboto-slab text-xs text-green-600">Monthly Payment</p>
-                              <p className="font-roboto-slab text-sm font-medium text-green-900">
+                              <p className="font-roboto-slab text-xs text-theme-green-dark">Monthly Payment</p>
+                              <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                                 ₦{application.repaymentTerms.monthlyPayment.toLocaleString()}
                               </p>
                             </div>
                             <div>
-                              <p className="font-roboto-slab text-xs text-green-600">Interest Rate</p>
-                              <p className="font-roboto-slab text-sm font-medium text-green-900">
+                              <p className="font-roboto-slab text-xs text-theme-green-dark">Interest Rate</p>
+                              <p className="font-roboto-slab text-sm font-medium text-heading-colour">
                                 {application.interestRate}%
                               </p>
                             </div>

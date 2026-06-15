@@ -4,18 +4,18 @@ Next.js 16 frontend for the AgroChain fish supply chain platform. Provides role-
 
 ## Tech Stack
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| Next.js | 16 (App Router) | Framework, routing, API proxy |
-| React | 19 | UI |
-| TypeScript | 5 | Type safety |
-| Tailwind CSS | v4 | Styling |
-| shadcn/ui + Radix UI | — | Component primitives |
-| React Hook Form + Zod | — | Form validation |
-| Framer Motion | — | Animations |
-| Sonner | — | Toast notifications |
-| Vitest | — | Unit tests |
-| Cloudinary | — | File/document uploads (unsigned preset) |
+| Library               | Version         | Purpose                                 |
+| --------------------- | --------------- | --------------------------------------- |
+| Next.js               | 16 (App Router) | Framework, routing, API proxy           |
+| React                 | 19              | UI                                      |
+| TypeScript            | 5               | Type safety                             |
+| Tailwind CSS          | v4              | Styling                                 |
+| shadcn/ui + Radix UI  | —               | Component primitives                    |
+| React Hook Form + Zod | —               | Form validation                         |
+| Framer Motion         | —               | Animations                              |
+| Sonner                | —               | Toast notifications                     |
+| Vitest                | —               | Unit tests                              |
+| Cloudinary            | —               | File/document uploads (unsigned preset) |
 
 ---
 
@@ -56,6 +56,7 @@ NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your_unsigned_preset_here
 The default backend port is `5000`. Adjust if your backend runs elsewhere.
 
 **Cloudinary setup (one time):**
+
 1. Create a free account at [cloudinary.com](https://cloudinary.com)
 2. Dashboard → Settings → Upload → Upload Presets → Add preset
 3. Set Signing Mode to **Unsigned**, copy the preset name
@@ -71,25 +72,25 @@ Runs on `http://localhost:3000`.
 
 ### Scripts
 
-| Script | Description |
-|--------|-------------|
-| `pnpm dev` | Start dev server on port 3000 |
-| `pnpm build` | Production build |
-| `pnpm start` | Start production server (after build) |
-| `pnpm lint` | Run ESLint |
-| `pnpm format` | Format with Prettier |
-| `pnpm test` | Run Vitest unit tests |
+| Script        | Description                           |
+| ------------- | ------------------------------------- |
+| `pnpm dev`    | Start dev server on port 3000         |
+| `pnpm build`  | Production build                      |
+| `pnpm start`  | Start production server (after build) |
+| `pnpm lint`   | Run ESLint                            |
+| `pnpm format` | Format with Prettier                  |
+| `pnpm test`   | Run Vitest unit tests                 |
 
 ---
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `BASE_BACKEND_URL` | Yes | Backend origin for server-side API proxy routes — never exposed to the browser |
-| `NEXT_PUBLIC_BASE_BACKEND_URL` | Yes | Backend origin for browser-side `apiFetch` calls |
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name for file uploads |
-| `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | Yes | Cloudinary unsigned upload preset |
+| Variable                               | Required | Description                                                                    |
+| -------------------------------------- | -------- | ------------------------------------------------------------------------------ |
+| `BASE_BACKEND_URL`                     | Yes      | Backend origin for server-side API proxy routes — never exposed to the browser |
+| `NEXT_PUBLIC_BASE_BACKEND_URL`         | Yes      | Backend origin for browser-side `apiFetch` calls                               |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`    | Yes      | Cloudinary cloud name for file uploads                                         |
+| `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | Yes      | Cloudinary unsigned upload preset                                              |
 
 ---
 
@@ -98,6 +99,7 @@ Runs on `http://localhost:3000`.
 Auth is OTP-based. Tokens never touch browser JavaScript — they live in httpOnly cookies set by Next.js API proxy routes.
 
 **Registration flow:**
+
 1. User selects role (`farmer` or `buyer`) → `POST /api/auth/role`
 2. User registers with name, phone, email, location, password → `POST /api/auth/register`
 3. Backend sends a 6-digit OTP to the email
@@ -105,17 +107,20 @@ Auth is OTP-based. Tokens never touch browser JavaScript — they live in httpOn
 5. Backend activates the account, proxy sets `auth_token` and `current_user` httpOnly cookies
 
 **Login flow:**
+
 1. User submits email + password → `POST /api/auth/login`
 2. Backend sends OTP to email
 3. User verifies OTP → `POST /api/auth/login/otp`
 4. Proxy sets httpOnly cookies
 
 **Session:**
+
 - All `apiFetch` calls send `credentials: "include"` — the `auth_token` cookie is attached automatically
 - Next.js middleware reads the `current_user` cookie to protect dashboard routes and redirect by role
 - Logout → `POST /api/auth/logout` clears both cookies server-side
 
 **Forgot password:**
+
 - `POST /api/auth/forgot-password` → OTP to email → `POST /api/auth/forgot-password/otp` (carries new password + OTP) → all sessions invalidated
 
 ---
@@ -239,14 +244,15 @@ src/
 
 ## User Roles & Dashboards
 
-| Role | Cookie value | Dashboard | Capabilities |
-|------|-------------|-----------|--------------|
-| `farmer` | `role: "farmer"` | `/farmers-dashboard` | Create supply listings, view orders from buyers, apply to become a cluster farmer |
-| `cluster` | `role: "cluster"` | `/cluster-dashboard` | Approve farmer listings, manage orders, accept/fulfill buyer demands |
-| `buyer` | `role: "buyer"` | `/buyers-dashboard` | Browse marketplace, place orders, submit custom demands, save listings |
-| `admin` | `role: "admin"` | `/admin-dashboard` | Full platform oversight — users, listings, demands, orders, pricing config |
+| Role      | Cookie value      | Dashboard            | Capabilities                                                                      |
+| --------- | ----------------- | -------------------- | --------------------------------------------------------------------------------- |
+| `farmer`  | `role: "farmer"`  | `/farmers-dashboard` | Create supply listings, view orders from buyers, apply to become a cluster farmer |
+| `cluster` | `role: "cluster"` | `/cluster-dashboard` | Approve farmer listings, manage orders, accept/fulfill buyer demands              |
+| `buyer`   | `role: "buyer"`   | `/buyers-dashboard`  | Browse marketplace, place orders, submit custom demands, save listings            |
+| `admin`   | `role: "admin"`   | `/admin-dashboard`   | Full platform oversight — users, listings, demands, orders, pricing config        |
 
 Middleware reads the `current_user` cookie and:
+
 - Redirects unauthenticated requests to `/login` for any `/[role]-dashboard/*` route
 - Redirects authenticated users away from `/login` and `/register` to their dashboard
 - `cluster` role users are routed to `/cluster-dashboard`, not `/farmers-dashboard`
@@ -270,6 +276,7 @@ Fish prices are set platform-wide by an admin — farmers never enter a price wh
 **`src/lib/api.ts` — `apiFetch`**
 
 All backend calls go through `apiFetch`. It:
+
 - Builds the full URL from `NEXT_PUBLIC_BASE_BACKEND_URL`
 - Sends `credentials: "include"` so the `auth_token` cookie is attached
 - Throws `ApiError(statusCode, message)` on non-2xx responses
@@ -280,15 +287,15 @@ Auth calls go through Next.js API proxy routes at `/api/auth/*` to keep tokens s
 
 Each service wraps `apiFetch` with typed payloads and response interfaces:
 
-| File | Backend prefix | Used by |
-|------|---------------|---------|
-| `auth.service.ts` | `/auth` | All roles |
-| `farmer.service.ts` | `/farmers` | Farmer dashboard, cluster create listing |
-| `cluster.service.ts` | `/cluster` | Cluster dashboard |
-| `buyer.service.ts` | `/buyers`, `/payments` | Buyer dashboard, marketplace |
-| `marketplace.service.ts` | `/marketplace` | Marketplace pages, cart |
-| `admin.service.ts` | `/admin` | Admin dashboard |
-| `notification.service.ts` | `/notifications` | Notifications bell + panel |
+| File                      | Backend prefix         | Used by                                  |
+| ------------------------- | ---------------------- | ---------------------------------------- |
+| `auth.service.ts`         | `/auth`                | All roles                                |
+| `farmer.service.ts`       | `/farmers`             | Farmer dashboard, cluster create listing |
+| `cluster.service.ts`      | `/cluster`             | Cluster dashboard                        |
+| `buyer.service.ts`        | `/buyers`, `/payments` | Buyer dashboard, marketplace             |
+| `marketplace.service.ts`  | `/marketplace`         | Marketplace pages, cart                  |
+| `admin.service.ts`        | `/admin`               | Admin dashboard                          |
+| `notification.service.ts` | `/notifications`       | Notifications bell + panel               |
 
 ---
 
@@ -366,12 +373,12 @@ Buyers can create custom supply requests when a specific fish type or quantity i
 
 Implementation details and backend requirements are in `docs/`:
 
-| File | Contents |
-|------|----------|
-| `docs/TASKS.md` | Complete frontend wiring status, all backend outstanding work with implementation code, full endpoint reference |
-| `docs/endpoints/1-AUTH.md` | Auth flow endpoint specs |
-| `docs/endpoints/2_FARMERS.md` | Farmer endpoint specs |
-| `docs/endpoints/3_CLUSTER.md` | Cluster endpoint specs |
-| `docs/endpoints/4_BUYERS.md` | Buyer endpoint specs |
-| `docs/endpoints/5_MARKETPLACE.md` | Marketplace + cart + checkout specs |
-| `docs/endpoints/6_ADMIN.md` | Admin settings + management specs |
+| File                              | Contents                                                                                                        |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `docs/TASKS.md`                   | Complete frontend wiring status, all backend outstanding work with implementation code, full endpoint reference |
+| `docs/endpoints/1-AUTH.md`        | Auth flow endpoint specs                                                                                        |
+| `docs/endpoints/2_FARMERS.md`     | Farmer endpoint specs                                                                                           |
+| `docs/endpoints/3_CLUSTER.md`     | Cluster endpoint specs                                                                                          |
+| `docs/endpoints/4_BUYERS.md`      | Buyer endpoint specs                                                                                            |
+| `docs/endpoints/5_MARKETPLACE.md` | Marketplace + cart + checkout specs                                                                             |
+| `docs/endpoints/6_ADMIN.md`       | Admin settings + management specs                                                                               |

@@ -43,7 +43,10 @@ function extractImageUrls(meta: AnyMetadata, sourceName: string): ImageEntry[] {
 const allImageEntries: ImageEntry[] = [
   ...extractImageUrls(rootMetadata as AnyMetadata, "root layout"),
   ...extractImageUrls(marketplaceMetadata as AnyMetadata, "marketplace layout"),
-  ...extractImageUrls(marketplaceIdMetadata as AnyMetadata, "marketplace/[id] layout"),
+  ...extractImageUrls(
+    marketplaceIdMetadata as AnyMetadata,
+    "marketplace/[id] layout",
+  ),
 ];
 
 describe("Image paths - Property 4: OG and Twitter image paths are relative", () => {
@@ -60,16 +63,16 @@ describe("Image paths - Property 4: OG and Twitter image paths are relative", ()
 
           expect(
             entry.url.startsWith("/"),
-            `${label}: image url "${entry.url}" should start with "/"`
+            `${label}: image url "${entry.url}" should start with "/"`,
           ).toBe(true);
 
           expect(
             entry.url.startsWith("http"),
-            `${label}: image url "${entry.url}" should not start with "http"`
+            `${label}: image url "${entry.url}" should not start with "http"`,
           ).toBe(false);
-        }
+        },
       ),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 });

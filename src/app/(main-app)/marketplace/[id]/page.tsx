@@ -36,9 +36,14 @@ type MarketplaceDetailResponse =
   | MarketplaceListing
   | { listing?: MarketplaceListing; data?: MarketplaceListing };
 
-function extractListing(response: MarketplaceDetailResponse): MarketplaceListing | null {
+function extractListing(
+  response: MarketplaceDetailResponse,
+): MarketplaceListing | null {
   if ("id" in response) return response as MarketplaceListing;
-  const r = response as { listing?: MarketplaceListing; data?: MarketplaceListing };
+  const r = response as {
+    listing?: MarketplaceListing;
+    data?: MarketplaceListing;
+  };
   return r.listing ?? r.data ?? null;
 }
 
@@ -64,12 +69,19 @@ export default function ListingDetailPage() {
       setLoading(true);
       setErrorMessage(null);
       try {
-        const response = await apiFetch<MarketplaceDetailResponse>(`/marketplace/${listingId}`);
+        const response = await apiFetch<MarketplaceDetailResponse>(
+          `/marketplace/${listingId}`,
+        );
         const payload = extractListing(response);
 
         if (payload && mounted) {
-          const fishPricePerKg = pricePerKg[payload.fishType as FishType] ?? pricePerKg.table_size;
-          setIsProcessed(PROCESSED_FISH_TYPES.includes(payload.fishType as ProcessedFishType));
+          const fishPricePerKg =
+            pricePerKg[payload.fishType as FishType] ?? pricePerKg.table_size;
+          setIsProcessed(
+            PROCESSED_FISH_TYPES.includes(
+              payload.fishType as ProcessedFishType,
+            ),
+          );
           setListing({
             ...payload,
             totalAvailableKg: Number(payload.totalAvailableKg),
@@ -77,13 +89,16 @@ export default function ListingDetailPage() {
             packaging: payload.packaging?.map((pkg) => ({
               ...pkg,
               weightKg: Number(pkg.weightKg),
-              pricePerUnit: Number(pkg.pricePerUnit) || Number(pkg.weightKg) * fishPricePerKg,
+              pricePerUnit:
+                Number(pkg.pricePerUnit) ||
+                Number(pkg.weightKg) * fishPricePerKg,
             })),
           });
           setSelectedDelivery(payload.deliveryOptions?.[0] ?? "");
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to load listing";
+        const message =
+          error instanceof Error ? error.message : "Failed to load listing";
         if (mounted) {
           setErrorMessage(message);
         }
@@ -101,11 +116,14 @@ export default function ListingDetailPage() {
     return () => {
       mounted = false;
     };
-  }, [listingId]);
+  }, [listingId, pricePerKg]);
 
   const addToCart = (pkg: PackagingOption) => {
     if (!listing) return;
-    cart.addToCart(listing, pkg, { variant: listing.fishType as FishType, processed: isProcessed });
+    cart.addToCart(listing, pkg, {
+      variant: listing.fishType as FishType,
+      processed: isProcessed,
+    });
   };
 
   const handleSave = async () => {
@@ -133,7 +151,10 @@ export default function ListingDetailPage() {
   };
 
   const totalAmount = cart.subtotal;
-  const totalWeight = cart.items.reduce((sum, item) => sum + item.weightKg * item.quantity, 0);
+  const totalWeight = cart.items.reduce(
+    (sum, item) => sum + item.weightKg * item.quantity,
+    0,
+  );
 
   const handleCheckout = () => {
     if (cart.items.length === 0) {
@@ -234,7 +255,9 @@ export default function ListingDetailPage() {
                   <div className="flex items-center gap-(--gap-base)">
                     <Package size={20} className="text-text-colour" />
                     <div className="flex flex-col">
-                      <span className="text-text-colour text-sm">Available</span>
+                      <span className="text-text-colour text-sm">
+                        Available
+                      </span>
                       <span className="font-roboto-slab text-heading-colour font-medium">
                         {listing.totalAvailableKg}kg
                       </span>
@@ -244,7 +267,9 @@ export default function ListingDetailPage() {
                   <div className="flex items-center gap-(--gap-base)">
                     <Calendar size={20} className="text-text-colour" />
                     <div className="flex flex-col">
-                      <span className="text-text-colour text-sm">Harvest Date</span>
+                      <span className="text-text-colour text-sm">
+                        Harvest Date
+                      </span>
                       <span className="font-roboto-slab text-heading-colour font-medium">
                         {formatDate(listing.harvestDate)}
                       </span>
@@ -281,12 +306,13 @@ export default function ListingDetailPage() {
                     <div className="border-gray-border flex items-center gap-2 rounded-2xl border p-(--space-md)">
                       <span className="text-text-colour text-sm">Type</span>
                       <span className="bg-theme-green-dark/10 text-theme-green-dark font-ubuntu rounded-full px-3 py-1 text-sm font-semibold capitalize">
-                        {FISH_TYPE_LABELS[listing.fishType as FishType] ?? listing.fishType.replace("_", " ")}
+                        {FISH_TYPE_LABELS[listing.fishType as FishType] ??
+                          listing.fishType.replace("_", " ")}
                       </span>
                     </div>
                     <div className="border-gray-border flex items-center gap-2 rounded-2xl border p-(--space-md)">
                       <span className="text-text-colour text-sm">Category</span>
-                      <span className="font-ubuntu rounded-full bg-green-50 px-3 py-1 text-sm font-semibold text-green-700">
+                      <span className="font-ubuntu bg-green-tint text-theme-green-dark rounded-full px-3 py-1 text-sm font-semibold">
                         {isProcessed ? "Processed" : "Live"}
                       </span>
                     </div>
@@ -299,7 +325,8 @@ export default function ListingDetailPage() {
                           item.listingId === listing.id &&
                           item.weightKg === pkg.weightKg,
                       );
-                      const cartItem = cartItemIndex >= 0 ? cart.items[cartItemIndex] : null;
+                      const cartItem =
+                        cartItemIndex >= 0 ? cart.items[cartItemIndex] : null;
 
                       return (
                         <div
@@ -314,13 +341,18 @@ export default function ListingDetailPage() {
                               ₦{(pkg.pricePerUnit ?? 0).toLocaleString()}
                             </span>
                           </div>
-                          <p className="text-text-colour text-sm">{pkg.quantity} units available</p>
+                          <p className="text-text-colour text-sm">
+                            {pkg.quantity} units available
+                          </p>
 
                           {cartItem ? (
                             <div className="border-gray-border flex items-center justify-between rounded-full border p-1">
                               <button
                                 onClick={() =>
-                                  cart.updateQuantity(cartItemIndex, cartItem.quantity - 1)
+                                  cart.updateQuantity(
+                                    cartItemIndex,
+                                    cartItem.quantity - 1,
+                                  )
                                 }
                                 className="bg-gray-bg hover:bg-border-gray flex h-8 w-8 items-center justify-center rounded-full transition"
                               >
@@ -331,7 +363,10 @@ export default function ListingDetailPage() {
                               </span>
                               <button
                                 onClick={() =>
-                                  cart.updateQuantity(cartItemIndex, cartItem.quantity + 1)
+                                  cart.updateQuantity(
+                                    cartItemIndex,
+                                    cartItem.quantity + 1,
+                                  )
                                 }
                                 className="bg-gray-bg hover:bg-border-gray flex h-8 w-8 items-center justify-center rounded-full transition"
                               >
@@ -374,7 +409,9 @@ export default function ListingDetailPage() {
                         />
                         <div className="flex items-center gap-2">
                           <Truck size={18} className="text-text-colour" />
-                          <span className="font-roboto-slab text-text-colour">{option}</span>
+                          <span className="font-roboto-slab text-text-colour">
+                            {option}
+                          </span>
                         </div>
                       </label>
                     ))}
@@ -389,18 +426,26 @@ export default function ListingDetailPage() {
                 variants={SLIDE_UP_VARIANT}
                 className="sticky top-4 flex flex-col gap-(--gap-base) rounded-3xl bg-(--white) p-(--space-xl) shadow-sm"
               >
-                <h3 className="font-ubuntu text-heading-colour text-xl font-bold">Order Summary</h3>
+                <h3 className="font-ubuntu text-heading-colour text-xl font-bold">
+                  Order Summary
+                </h3>
 
                 {cart.items.length > 0 ? (
                   <>
                     <div className="flex flex-col gap-(--space-md)">
                       {cart.items.map((item, index) => (
-                        <div key={index} className="flex justify-between text-sm">
+                        <div
+                          key={index}
+                          className="flex justify-between text-sm"
+                        >
                           <span className="text-text-colour">
                             {item.weightKg}kg × {item.quantity} ({item.variant})
                           </span>
                           <span className="text-heading-colour font-medium">
-                            ₦{(item.pricePerUnit * item.quantity).toLocaleString()}
+                            ₦
+                            {(
+                              item.pricePerUnit * item.quantity
+                            ).toLocaleString()}
                           </span>
                         </div>
                       ))}
@@ -409,7 +454,9 @@ export default function ListingDetailPage() {
                     <div className="border-gray-border border-t pt-(--space-md)">
                       <div className="flex justify-between text-sm">
                         <span className="text-text-colour">Total Weight:</span>
-                        <span className="text-heading-colour font-medium">{totalWeight}kg</span>
+                        <span className="text-heading-colour font-medium">
+                          {totalWeight}kg
+                        </span>
                       </div>
                     </div>
 

@@ -58,7 +58,7 @@ export interface AddToCartPayload {
   processed?: boolean;
   weightKg: number;
   quantity: number;
-  pricePerUnit: number;   // Price snapshot - read from listing.packaging[n].pricePerUnit, not user input
+  pricePerUnit: number; // Price snapshot - read from listing.packaging[n].pricePerUnit, not user input
 }
 
 export interface CheckoutPayload {
@@ -72,25 +72,38 @@ export interface CheckoutPayload {
 export interface CheckoutResponse {
   status: string;
   message: string;
-  data: { order: { id: string; order_number: string; status: string; grand_total: number } };
+  data: {
+    order: {
+      id: string;
+      order_number: string;
+      status: string;
+      grand_total: number;
+    };
+  };
 }
 
 // === Marketplace Service
 
 export const marketplaceService = {
   /** Get all approved marketplace listings with optional filters. */
-  getListings(filters?: MarketplaceFiltersQuery): Promise<MarketplaceListingsResponse> {
+  getListings(
+    filters?: MarketplaceFiltersQuery,
+  ): Promise<MarketplaceListingsResponse> {
     const params = new URLSearchParams();
     if (filters?.fishType) params.set("fishType", filters.fishType);
     if (filters?.state) params.set("state", filters.state);
     if (filters?.lga) params.set("lga", filters.lga);
-    if (filters?.minPrice != null) params.set("minPrice", String(filters.minPrice));
-    if (filters?.maxPrice != null) params.set("maxPrice", String(filters.maxPrice));
+    if (filters?.minPrice != null)
+      params.set("minPrice", String(filters.minPrice));
+    if (filters?.maxPrice != null)
+      params.set("maxPrice", String(filters.maxPrice));
     if (filters?.page != null) params.set("page", String(filters.page));
     if (filters?.limit != null) params.set("limit", String(filters.limit));
 
     const query = params.toString();
-    return apiFetch<MarketplaceListingsResponse>(query ? `/marketplace?${query}` : "/marketplace");
+    return apiFetch<MarketplaceListingsResponse>(
+      query ? `/marketplace?${query}` : "/marketplace",
+    );
   },
 
   /** Get a single listing by ID. */
@@ -104,7 +117,9 @@ export const marketplaceService = {
   },
 
   /** Add an item to the server-side cart. */
-  addToCart(payload: AddToCartPayload): Promise<{ status: string; data: { cartItemId: string } }> {
+  addToCart(
+    payload: AddToCartPayload,
+  ): Promise<{ status: string; data: { cartItemId: string } }> {
     return apiFetch("/marketplace/cart", {
       method: "POST",
       body: JSON.stringify(payload),

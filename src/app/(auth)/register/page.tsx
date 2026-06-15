@@ -29,7 +29,10 @@ const registerSchema = z
     phone: z
       .string()
       .min(10, "Phone number is too short")
-      .regex(/^(0|\+234)[789][01]\d{8}$/, "Invalid Nigerian phone number (+234 or 0 prefix)"),
+      .regex(
+        /^(0|\+234)[789][01]\d{8}$/,
+        "Invalid Nigerian phone number (+234 or 0 prefix)",
+      ),
     email: z.string().email("Invalid email address"),
     state: z.string().min(1, "State is required"),
     localGovernment: z.string().min(2, "Local government is required"),
@@ -116,7 +119,9 @@ function RegisterFormContent() {
     } catch (error) {
       setStatusModal({ open: false, variant: "loading" });
       const message =
-        error instanceof Error ? error.message : "Registration failed. Please try again.";
+        error instanceof Error
+          ? error.message
+          : "Registration failed. Please try again.";
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -146,7 +151,10 @@ function RegisterFormContent() {
       const response = await fetch("/api/auth/register/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emailAddress: getValues("email"), registerOtp: Number(otp) }),
+        body: JSON.stringify({
+          emailAddress: getValues("email"),
+          registerOtp: Number(otp),
+        }),
         credentials: "include",
       });
 
@@ -177,7 +185,9 @@ function RegisterFormContent() {
       }, 1800);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "OTP verification failed. Please try again.";
+        error instanceof Error
+          ? error.message
+          : "OTP verification failed. Please try again.";
       setOtpError(message);
       setStatusModal({ open: false, variant: "loading" });
       toast.error(message);
@@ -219,7 +229,9 @@ function RegisterFormContent() {
       );
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Failed to resend OTP. Please try again.";
+        error instanceof Error
+          ? error.message
+          : "Failed to resend OTP. Please try again.";
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -234,9 +246,11 @@ function RegisterFormContent() {
             Create Account
           </h2>
           {role && (
-            <p className="font-roboto-slab text-sm text-text-colour">
+            <p className="font-roboto-slab text-text-colour text-sm">
               Joining as a{" "}
-              <span className="font-semibold capitalize text-theme-green-dark">{role}</span>
+              <span className="text-theme-green-dark font-semibold capitalize">
+                {role}
+              </span>
             </p>
           )}
         </div>
@@ -244,7 +258,7 @@ function RegisterFormContent() {
         {/* Inline role selector - shown only when no ?role= param */}
         {!urlRole && step === 1 && (
           <div className="default-page-max-width flex flex-col gap-2">
-            <label className="font-roboto-slab text-sm font-medium text-heading-colour">
+            <label className="font-roboto-slab text-heading-colour text-sm font-medium">
               I am a…
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -253,12 +267,14 @@ function RegisterFormContent() {
                 onClick={() => setSelectedRole("farmer")}
                 className={`rounded-2xl border p-4 text-left transition ${
                   selectedRole === "farmer"
-                    ? "border-theme-green-dark bg-green-50"
+                    ? "border-theme-green-dark bg-green-tint"
                     : "border-input-border hover:bg-gray-bg"
                 }`}
               >
-                <p className="font-ubuntu font-semibold text-heading-colour">Farmer</p>
-                <p className="font-roboto-slab text-xs text-text-colour">
+                <p className="font-ubuntu text-heading-colour font-semibold">
+                  Farmer
+                </p>
+                <p className="font-roboto-slab text-text-colour text-xs">
                   I grow and sell catfish
                 </p>
               </button>
@@ -267,12 +283,14 @@ function RegisterFormContent() {
                 onClick={() => setSelectedRole("buyer")}
                 className={`rounded-2xl border p-4 text-left transition ${
                   selectedRole === "buyer"
-                    ? "border-theme-green-dark bg-green-50"
+                    ? "border-theme-green-dark bg-green-tint"
                     : "border-input-border hover:bg-gray-bg"
                 }`}
               >
-                <p className="font-ubuntu font-semibold text-heading-colour">Buyer</p>
-                <p className="font-roboto-slab text-xs text-text-colour">
+                <p className="font-ubuntu text-heading-colour font-semibold">
+                  Buyer
+                </p>
+                <p className="font-roboto-slab text-text-colour text-xs">
                   I buy catfish in bulk
                 </p>
               </button>
@@ -281,167 +299,171 @@ function RegisterFormContent() {
         )}
 
         <AnimatePresence mode="wait">
-        {step === 1 ? (
-          <motion.form
-            key="step-1"
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            onSubmit={handleSubmit(onSubmit)}
-            className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
-          >
-            <div className="flex w-full flex-col gap-(--gap-base)">
-              <DynamicInput
-                label="Full Name"
-                error={errors.fullName?.message}
-                {...register("fullName")}
-                required
-              />
+          {step === 1 ? (
+            <motion.form
+              key="step-1"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              onSubmit={handleSubmit(onSubmit)}
+              className="default-page-max-width flex w-full flex-col gap-(--gap-lg)"
+            >
+              <div className="flex w-full flex-col gap-(--gap-base)">
+                <DynamicInput
+                  label="Full Name"
+                  error={errors.fullName?.message}
+                  {...register("fullName")}
+                  required
+                />
 
-              <DynamicInput
-                fieldType="tel"
-                label="Phone Number"
-                error={errors.phone?.message}
-                {...register("phone")}
-                placeholder="08012345678 or +2348012345678"
-                required
-              />
+                <DynamicInput
+                  fieldType="tel"
+                  label="Phone Number"
+                  error={errors.phone?.message}
+                  {...register("phone")}
+                  placeholder="08012345678 or +2348012345678"
+                  required
+                />
 
-              <DynamicInput
-                fieldType="email"
-                label="Email Address"
-                error={errors.email?.message}
-                {...register("email")}
-                required
-              />
+                <DynamicInput
+                  fieldType="email"
+                  label="Email Address"
+                  error={errors.email?.message}
+                  {...register("email")}
+                  required
+                />
 
-              <DynamicInput
-                fieldType="password"
-                label="Password"
-                error={errors.password?.message}
-                {...register("password")}
-                required
-              />
+                <DynamicInput
+                  fieldType="password"
+                  label="Password"
+                  error={errors.password?.message}
+                  {...register("password")}
+                  required
+                />
 
-              <DynamicInput
-                fieldType="password"
-                label="Confirm Password"
-                error={errors.confirmPassword?.message}
-                {...register("confirmPassword")}
-                required
-              />
+                <DynamicInput
+                  fieldType="password"
+                  label="Confirm Password"
+                  error={errors.confirmPassword?.message}
+                  {...register("confirmPassword")}
+                  required
+                />
 
-              <SelectInput
-                label="State"
-                value={selectedState}
-                onValueChange={handleStateChange}
-                options={NIGERIAN_STATES.map((s) => ({ label: s, value: s }))}
-                error={errors.state?.message}
-                required
-              />
+                <SelectInput
+                  label="State"
+                  value={selectedState}
+                  onValueChange={handleStateChange}
+                  options={NIGERIAN_STATES.map((s) => ({ label: s, value: s }))}
+                  error={errors.state?.message}
+                  required
+                />
 
-              <DynamicInput
-                label="Local Government"
-                error={errors.localGovernment?.message}
-                {...register("localGovernment")}
-                placeholder="Enter your local government area"
-                required
-              />
-            </div>
+                <DynamicInput
+                  label="Local Government"
+                  error={errors.localGovernment?.message}
+                  {...register("localGovernment")}
+                  placeholder="Enter your local government area"
+                  required
+                />
+              </div>
 
-            <div className="mx-auto mt-(--submit-button-mt) flex w-full max-w-sm flex-col gap-(--gap-base)">
-              {isFormComplete && role ? (
-                <SubmitPrimaryButton loading={submitting} type="submit">
-                  Create Account
-                </SubmitPrimaryButton>
-              ) : (
-                <SubmitSecondaryButton disabled type="button">
-                  Create Account
-                </SubmitSecondaryButton>
-              )}
-              <p className="text-text-colour text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
-                >
-                  Log in
-                </Link>
-              </p>
-            </div>
-          </motion.form>
-        ) : (
-          <motion.div
-            key="step-2"
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="default-page-max-width flex flex-col gap-(--section-gap)"
-          >
-            <p className="font-roboto-slab text-text-colour text-center lg:text-lg">
-              Enter the OTP sent to your email
-            </p>
-            <div className="flex flex-col items-center gap-6">
-              <InputOTP
-                maxLength={6}
-                value={otp}
-                onChange={setOtp}
-                containerClassName={cn("gap-3", otpError && "animate-shake")}
-              >
-                <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
-                  <InputOTPSlot index={0} aria-invalid={!!otpError} />
-                  <InputOTPSlot index={1} aria-invalid={!!otpError} />
-                  <InputOTPSlot index={2} aria-invalid={!!otpError} />
-                </InputOTPGroup>
-                <InputOTPSeparator />
-                <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
-                  <InputOTPSlot index={3} aria-invalid={!!otpError} />
-                  <InputOTPSlot index={4} aria-invalid={!!otpError} />
-                  <InputOTPSlot index={5} aria-invalid={!!otpError} />
-                </InputOTPGroup>
-              </InputOTP>
-
-              {otpError && (
-                <p className="text-destructive text-center text-sm font-medium">{otpError}</p>
-              )}
-
-              <div className="mt-8 flex w-full flex-col gap-(--gap-base)">
-                <SubmitPrimaryButton
-                  onClick={handleVerifyOtp}
-                  disabled={otp.length < 6 || submitting}
-                  loading={submitting}
-                >
-                  Verify OTP
-                </SubmitPrimaryButton>
-
+              <div className="mx-auto mt-(--submit-button-mt) flex w-full max-w-sm flex-col gap-(--gap-base)">
+                {isFormComplete && role ? (
+                  <SubmitPrimaryButton loading={submitting} type="submit">
+                    Create Account
+                  </SubmitPrimaryButton>
+                ) : (
+                  <SubmitSecondaryButton disabled type="button">
+                    Create Account
+                  </SubmitSecondaryButton>
+                )}
                 <p className="text-text-colour text-center text-sm">
-                  Didn&apos;t receive a code?{" "}
-                  <button
-                    type="button"
-                    className="cursor-pointer font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
-                    onClick={handleResendOtp}
-                    disabled={submitting || cooldownSeconds > 0 || resendLocked}
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
                   >
-                    {resendLocked
-                      ? "Retry after 24 hours"
-                      : cooldownSeconds > 0
-                        ? `Resend in ${cooldownSeconds}s`
-                        : "Resend OTP"}
-                  </button>
-                </p>
-                <p className="text-text-colour text-center text-xs">
-                  {resendLocked
-                    ? "You’ve reached the resend limit. Try again after 24 hours."
-                    : `${Math.max(0, 2 - resendAttempts)} resend${
-                        2 - resendAttempts === 1 ? "" : "s"
-                      } left`}
+                    Log in
+                  </Link>
                 </p>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.form>
+          ) : (
+            <motion.div
+              key="step-2"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="default-page-max-width flex flex-col gap-(--section-gap)"
+            >
+              <p className="font-roboto-slab text-text-colour text-center lg:text-lg">
+                Enter the OTP sent to your email
+              </p>
+              <div className="flex flex-col items-center gap-6">
+                <InputOTP
+                  maxLength={6}
+                  value={otp}
+                  onChange={setOtp}
+                  containerClassName={cn("gap-3", otpError && "animate-shake")}
+                >
+                  <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
+                    <InputOTPSlot index={0} aria-invalid={!!otpError} />
+                    <InputOTPSlot index={1} aria-invalid={!!otpError} />
+                    <InputOTPSlot index={2} aria-invalid={!!otpError} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup className="py-(--space-lg) *:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-12 *:data-[slot=input-otp-slot]:text-xl">
+                    <InputOTPSlot index={3} aria-invalid={!!otpError} />
+                    <InputOTPSlot index={4} aria-invalid={!!otpError} />
+                    <InputOTPSlot index={5} aria-invalid={!!otpError} />
+                  </InputOTPGroup>
+                </InputOTP>
+
+                {otpError && (
+                  <p className="text-destructive text-center text-sm font-medium">
+                    {otpError}
+                  </p>
+                )}
+
+                <div className="mt-8 flex w-full flex-col gap-(--gap-base)">
+                  <SubmitPrimaryButton
+                    onClick={handleVerifyOtp}
+                    disabled={otp.length < 6 || submitting}
+                    loading={submitting}
+                  >
+                    Verify OTP
+                  </SubmitPrimaryButton>
+
+                  <p className="text-text-colour text-center text-sm">
+                    Didn&apos;t receive a code?{" "}
+                    <button
+                      type="button"
+                      className="cursor-pointer font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
+                      onClick={handleResendOtp}
+                      disabled={
+                        submitting || cooldownSeconds > 0 || resendLocked
+                      }
+                    >
+                      {resendLocked
+                        ? "Retry after 24 hours"
+                        : cooldownSeconds > 0
+                          ? `Resend in ${cooldownSeconds}s`
+                          : "Resend OTP"}
+                    </button>
+                  </p>
+                  <p className="text-text-colour text-center text-xs">
+                    {resendLocked
+                      ? "You’ve reached the resend limit. Try again after 24 hours."
+                      : `${Math.max(0, 2 - resendAttempts)} resend${
+                          2 - resendAttempts === 1 ? "" : "s"
+                        } left`}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
@@ -456,7 +478,9 @@ function RegisterFormContent() {
             : "Account Verified! Redirecting to your dashboard..."
         }
         description={
-          statusModal.variant === "success" ? "We're preparing your dashboard now." : undefined
+          statusModal.variant === "success"
+            ? "We're preparing your dashboard now."
+            : undefined
         }
       />
     </>
@@ -467,7 +491,9 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-full min-h-full w-full items-center justify-center">Loading...</div>
+        <div className="flex h-full min-h-full w-full items-center justify-center">
+          Loading...
+        </div>
       }
     >
       <RegisterFormContent />

@@ -64,7 +64,8 @@ export const defaultMetadata: Metadata = {
     site: "@AgroChain",
     creator: "@AgroChain",
     title: "AgroChain | Digital Fish Supply Marketplace",
-    description: "Connect with verified fish farmers and buyers. Secure payments, reliable logistics.",
+    description:
+      "Connect with verified fish farmers and buyers. Secure payments, reliable logistics.",
     images: {
       url: "/twitter-image.png",
       alt: "AgroChain Twitter Card",
@@ -78,7 +79,8 @@ export const farmerDashboardMetadata: Metadata = {
     "Manage your farm profile, create supply listings, and track approvals on AgroChain marketplace.",
   openGraph: {
     title: "Farmer Dashboard | AgroChain",
-    description: "Manage your farm and supply listings on AgroChain marketplace.",
+    description:
+      "Manage your farm and supply listings on AgroChain marketplace.",
   },
 };
 
@@ -88,7 +90,8 @@ export const clusterDashboardMetadata: Metadata = {
     "Manage farmers, approve listings, and publish to marketplace as a cluster farmer on AgroChain.",
   openGraph: {
     title: "Cluster Farmer Dashboard | AgroChain",
-    description: "Aggregate supply and manage farmers on AgroChain marketplace.",
+    description:
+      "Aggregate supply and manage farmers on AgroChain marketplace.",
   },
 };
 
@@ -126,7 +129,8 @@ export const marketplaceMetadata: Metadata = {
   ],
   openGraph: {
     title: "Fish Marketplace | AgroChain",
-    description: "Browse and purchase fresh fish from verified cluster farmers.",
+    description:
+      "Browse and purchase fresh fish from verified cluster farmers.",
   },
 };
 
@@ -159,7 +163,8 @@ export const profileMetadata: Metadata = {
 
 export const listingsMetadata: Metadata = {
   title: "My Listings",
-  description: "View and manage your fish supply listings on AgroChain marketplace.",
+  description:
+    "View and manage your fish supply listings on AgroChain marketplace.",
   openGraph: {
     title: "My Listings | AgroChain",
     description: "Manage your supply listings on AgroChain.",
@@ -177,7 +182,8 @@ export const createListingMetadata: Metadata = {
 
 export const ordersMetadata: Metadata = {
   title: "My Orders",
-  description: "Track your fish orders and delivery status on AgroChain marketplace.",
+  description:
+    "Track your fish orders and delivery status on AgroChain marketplace.",
   openGraph: {
     title: "My Orders | AgroChain",
     description: "Track your orders on AgroChain marketplace.",
@@ -186,7 +192,8 @@ export const ordersMetadata: Metadata = {
 
 export const pendingApprovalsMetadata: Metadata = {
   title: "Pending Approvals",
-  description: "Review and approve farmer supply listings as a cluster farmer on AgroChain.",
+  description:
+    "Review and approve farmer supply listings as a cluster farmer on AgroChain.",
   openGraph: {
     title: "Pending Approvals | AgroChain",
     description: "Review farmer listings on AgroChain marketplace.",

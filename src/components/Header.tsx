@@ -54,7 +54,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="border-border/40 font-inter sticky top-0 left-0 z-50 w-full border-b bg-linear-to-b from-navbar-bg to-navbar-bg/10 backdrop-blur-sm supports-backdrop-filter:bg-navbar-bg/60">
+      <header className="border-border/40 font-inter from-navbar-bg to-navbar-bg/10 supports-backdrop-filter:bg-navbar-bg/60 sticky top-0 left-0 z-50 w-full border-b bg-linear-to-b backdrop-blur-sm">
         <div className="px-section-px sm:px-section-px-sm lg:px-section-px-lg mx-auto flex h-(--navbar-h) w-full items-center justify-between gap-2">
           {/* Left: Menu + Logo */}
           <div className="flex items-center gap-4">
@@ -64,7 +64,7 @@ export default function Header() {
           </div>
 
           {/* Center: Desktop Nav */}
-          <nav className="hidden items-center gap-2 lg:flex px-4 py-2">
+          <nav className="hidden items-center gap-2 px-4 py-2 lg:flex">
             <ul className="flex items-center gap-2 rounded-full">
               {navLinks.map(({ label, href, icon: Icon }) => {
                 const isActive = pathname == href;
@@ -74,8 +74,8 @@ export default function Header() {
                       href={href}
                       className={`font-inter flex items-center gap-2 px-4 py-2 transition-all duration-300 ease-in-out hover:opacity-90 ${
                         isActive
-                          ? "bg-transparent text-white font-semibold"
-                          : "text-white/80 font-medium hover:text-white"
+                          ? "bg-transparent font-semibold text-white"
+                          : "font-medium text-white/80 hover:text-white"
                       }`}
                     >
                       {Icon && <Icon className="h-4 w-4" />}
@@ -101,7 +101,11 @@ export default function Header() {
 
           {/* Desktop Authentication Links */}
           <div className="relative hidden items-center gap-2 lg:flex">
-            <SecondaryLink href="/login" label="Log In" className="border-white text-white" />
+            <SecondaryLink
+              href="/login"
+              label="Log In"
+              className="border-white text-white"
+            />
 
             <PrimaryLink href="/register" label="Get Started" />
           </div>
@@ -153,7 +157,7 @@ export default function Header() {
 
                       <span className="relative">
                         <BellIcon className="text-text-colour h-6 w-6 text-lg" />
-                        <span className="absolute -top-2 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#EF4444] p-1 text-sm text-white shadow-md">
+                        <span className="bg-danger absolute -top-2 right-0 flex h-4 w-4 items-center justify-center rounded-full p-1 text-sm text-white shadow-md">
                           2
                         </span>
                       </span>
@@ -182,14 +186,14 @@ export default function Header() {
                               href={href}
                               className={`${
                                 isActive
-                                  ? "group text-heading-colour bg-[#E8EEE9]"
-                                  : "text-text-colour hover:bg-[#E8EEE9]"
+                                  ? "group text-heading-colour bg-nav-active"
+                                  : "text-text-colour hover:bg-nav-active"
                               } border-gray-border flex items-center gap-4 border-b p-4 text-xl`}
                               onClick={() => setIsSidebarOpen(false)}
                             >
                               {Icon && (
                                 <Icon
-                                  className={`h-5 w-5 text-debridger-green-dark transition-all duration-300 ease-in-out ${isActive ? "fill-current" : "group-hover:fill-current"}`}
+                                  className={`text-debridger-green-dark h-5 w-5 transition-all duration-300 ease-in-out ${isActive ? "fill-current" : "group-hover:fill-current"}`}
                                 />
                               )}
                               <span>{label}</span>
