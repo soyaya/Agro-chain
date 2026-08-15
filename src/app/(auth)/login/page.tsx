@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,8 +25,6 @@ const emailSchema = z.object({
 type EmailForm = z.infer<typeof emailSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
-
   const [step, setStep] = useState<1 | 2>(1);
   const [emailAddress, setEmailAddress] = useState("");
   const [loginOtp, setLoginOtp] = useState("");
@@ -119,7 +116,9 @@ export default function LoginPage() {
       setStatusModal({ open: true, variant: "success" });
       toast.success("Login successful!");
 
-      setTimeout(() => router.push(dashboardPath), 800);
+      // Use window.location to force a full navigation so the browser commits
+      // the httpOnly cookies set by the proxy before the middleware reads them.
+      setTimeout(() => { window.location.href = dashboardPath; }, 800);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Invalid or expired code";
       setError(msg);
@@ -128,7 +127,7 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  }, [loading, success, loginOtp, emailAddress, router]);
+  }, [loading, success, loginOtp, emailAddress]);
 
   // Auto-submit when 6 digits entered
   useEffect(() => {

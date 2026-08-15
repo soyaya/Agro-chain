@@ -1,6 +1,6 @@
 
-import { NavLink, Object } from "~/types/types";
-import { HomeIcon, Briefcase, ToolCase, Users, Phone } from "lucide-react";
+import type { NavLink, SelectOption } from "~/types/index";
+import { HomeIcon, Briefcase, Users, Phone } from "lucide-react";
 
 export const navLinks: NavLink[] = [
   { label: "Home", href: "/", },
@@ -11,11 +11,10 @@ export const navLinks: NavLink[] = [
 ];
 
 export const sideNavLinks: NavLink[] = [
-  { label: "Home", href: "/", icon: HomeIcon, },
-  { label: "Products", href: "/products", icon: Briefcase, },
-  { label: "How it works", href: "/how-it-works", icon: ToolCase, },
-  { label: "About Us", href: "/about", icon: Users, },
-  { label: "Contact", href: "/contact", icon: Phone, },
+  { label: "Home", href: "/", icon: HomeIcon },
+  { label: "Products", href: "/products", icon: Briefcase },
+  { label: "About Us", href: "/about", icon: Users },
+  { label: "Contact", href: "/contact", icon: Phone },
 ];
 
 import {
@@ -37,8 +36,8 @@ export const socialLinks: NavLink[] = [
     label: "Instagram", href: "https://instagram.com/yourhandle",
     icon: Instagram, color: "hover:text-[#E4405F]"
   }, // Instagram Pink
-  // { 
-  //   label: "WhatsApp", href: "https://wa.me/2347012288798", 
+  // {
+  //   label: "WhatsApp", href: "https://wa.me/2347012288798",
   //   icon: Instagram, color: "hover:text-[#25D366]"
   // }, // Whatsapp Green
   {
@@ -55,7 +54,7 @@ export const socialLinks: NavLink[] = [
   }, // Gmail Red
 ];
 
-export const kadunaLga: Object[] = [
+export const kadunaLga: SelectOption[] = [
   { label: "Birnin Gwari", value: "birnin-gwari" },
   { label: "Chikun", value: "chikun" },
   { label: "Giwa", value: "giwa" },

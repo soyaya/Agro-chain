@@ -5,14 +5,17 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "node",
+    // jsdom covers both component and node-style tests
+    environment: "jsdom",
     globals: true,
+    setupFiles: ["src/__tests__/setup.ts"],
   },
   resolve: {
     alias: {
       "~": path.resolve(__dirname, "./src"),
-      // next/font/google is not available in the vitest node environment
       "next/font/google": path.resolve(__dirname, "./src/__tests__/__mocks__/next-font.ts"),
+      "next/server": path.resolve(__dirname, "./src/__tests__/__mocks__/next-server.ts"),
+      "next/navigation": path.resolve(__dirname, "./src/__tests__/__mocks__/next-navigation.ts"),
     },
   },
 });

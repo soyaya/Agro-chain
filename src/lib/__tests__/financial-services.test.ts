@@ -1,13 +1,14 @@
-import { 
-  hasFinancialServices, 
-  isFinancialFeatureEnabled, 
+import { describe, it, expect } from 'vitest';
+import {
+  hasFinancialServices,
+  isFinancialFeatureEnabled,
   getFinancialNavigationItems,
-  shouldShowFinancialServices 
+  shouldShowFinancialServices
 } from '../financial-services';
-import { 
-  farmerDashboardConfig, 
+import {
+  farmerDashboardConfig,
   enhancedFarmerDashboardConfig,
-  buyerDashboardConfig 
+  buyerDashboardConfig
 } from '../../models/models';
 
 describe('Financial Services Utilities', () => {
@@ -48,7 +49,7 @@ describe('Financial Services Utilities', () => {
     it('should return financial navigation items for enhanced config', () => {
       const items = getFinancialNavigationItems(enhancedFarmerDashboardConfig);
       expect(items.length).toBeGreaterThan(0);
-      
+
       // Should return the submenu items from Financial Services
       expect(items.some(item => item.label === 'Loan Applications')).toBe(true);
       expect(items.some(item => item.label === 'Credit Purchases')).toBe(true);

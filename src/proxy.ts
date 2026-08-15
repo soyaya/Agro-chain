@@ -17,7 +17,7 @@ function getDashboardFromCookie(request: NextRequest): string {
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const hasSession = Boolean(request.cookies.get("current_user")?.value);
   const pathname = request.nextUrl.pathname;
 
@@ -33,7 +33,7 @@ export function middleware(request: NextRequest) {
 
   if (
     hasSession &&
-    (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname === "/")
+    (pathname.startsWith("/login") || pathname.startsWith("/register"))
   ) {
     return NextResponse.redirect(new URL(getDashboardFromCookie(request), request.url));
   }
@@ -49,6 +49,5 @@ export const config = {
     "/admin-dashboard/:path*",
     "/login",
     "/register",
-    "/",
   ],
 };

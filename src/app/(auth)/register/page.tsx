@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -42,7 +42,6 @@ type RegisterForm = z.infer<typeof registerSchema>;
 type Role = "farmer" | "buyer";
 
 function RegisterFormContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const role = (searchParams.get("role")?.toLowerCase() || "") as Role;
 
@@ -174,8 +173,10 @@ function RegisterFormContent() {
               ? "/buyers-dashboard"
               : "/login";
 
+      // Use window.location to force a full navigation so the browser commits
+      // the httpOnly cookies set by the proxy before the middleware reads them.
       setTimeout(() => {
-        router.push(dashboardRoute);
+        window.location.href = dashboardRoute;
       }, 1800);
     } catch (error) {
       const message =

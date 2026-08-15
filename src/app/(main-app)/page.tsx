@@ -47,6 +47,11 @@ const metadata = {
 export default function Home() {
   const router = useRouter();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const steps = [
     {
@@ -160,6 +165,7 @@ export default function Home() {
         {/* Step Content */}
         <div className="flex flex-1 items-center justify-center" role="region" aria-label="Onboarding content">
           <div className="relative flex w-full max-w-md flex-col items-center justify-center">
+            {mounted ? (
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentStep}
@@ -192,6 +198,14 @@ export default function Home() {
                 </p>
               </motion.div>
             </AnimatePresence>
+            ) : (
+              <div className="flex w-full flex-col gap-6">
+                <h1 className="text-3xl font-semibold focus:outline-none sm:text-4xl">
+                  {steps[0].heading}
+                </h1>
+                <p className="text-lg text-zinc-600">{steps[0].description}</p>
+              </div>
+            )}
           </div>
         </div>
 
