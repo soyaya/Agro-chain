@@ -51,7 +51,13 @@ export default function VerifyIdentity() {
       }
 
       setSuccess(true);
-      toast.success("Verification submitted! Redirecting...");
+      if (data?.data?.wallet) {
+        toast.success("Verification complete — your wallet is ready!");
+      } else if (data?.data?.walletError) {
+        toast.success("Verification submitted — wallet setup will finish shortly.");
+      } else {
+        toast.success("Verification submitted! Redirecting...");
+      }
       setTimeout(() => router.push(getDashboardPath()), 2400);
     } catch (error) {
       const message =

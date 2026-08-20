@@ -153,6 +153,7 @@ export const buyerDashboardConfig: DashboardConfig = {
     { label: "My Orders", href: "/buyers-dashboard/orders", icon: Package },
     { label: "My Demands", href: "/buyers-dashboard/demands", icon: FileText },
     { label: "Saved Listings", href: "/buyers-dashboard/saved", icon: CheckSquare },
+    { label: "Wallet", href: "/buyers-dashboard/wallet", icon: Wallet },
   ],
 };
 

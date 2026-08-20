@@ -6,10 +6,10 @@
 // import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 // import type { PaymentHistoryRecord, PaymentStatus } from "~/types/index";
 
-import { ComingSoon } from "~/components/shared/ComingSoon";
+import { WalletPanel } from "~/components/wallet/WalletPanel";
 
 export default function PaymentHistoryPage() {
-  return <ComingSoon />;
+  return <WalletPanel />;
 
   /* === Original content (preserved, not deleted)
   // Mock data - replace with actual data fetching
