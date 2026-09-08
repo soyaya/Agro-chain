@@ -143,11 +143,18 @@ describe("enhancedFarmerDashboardConfig", () => {
 describe("enhancedClusterFarmerDashboardConfig", () => {
   assertDashboardShape(enhancedClusterFarmerDashboardConfig, "enhancedClusterFarmerDashboardConfig");
 
-  it("financial submenu includes Farmer Finances", () => {
+  it("has financialServices disabled (loans/credit have no backend yet)", () => {
+    expect(enhancedClusterFarmerDashboardConfig.financialServices?.enabled).toBe(false);
+  });
+
+  it("links to a real Wallet page instead of the disabled Financial Services submenu", () => {
+    const wallet = enhancedClusterFarmerDashboardConfig.navLinks.find(
+      (l) => (l as { href: string }).href === "/cluster-dashboard/wallet",
+    );
+    expect(wallet).toBeDefined();
     const financial = enhancedClusterFarmerDashboardConfig.navLinks.find(
       (l) => (l as { href: string }).href === "/cluster-dashboard/financial",
-    ) as { submenu?: Array<{ label: string }> } | undefined;
-    const farmerFinances = financial?.submenu?.find((s) => s.label === "Farmer Finances");
-    expect(farmerFinances).toBeDefined();
+    );
+    expect(financial).toBeUndefined();
   });
 });

@@ -918,8 +918,8 @@ export const kadunaLga: SelectOption[] = NIGERIA_LGA_BY_STATE["Kaduna"];
 import {
   LayoutDashboard, User, FileText, Package,
   ShoppingCart, Users as UsersIcon,
-  CheckSquare, Clock, CreditCard,
-  DollarSign, Receipt, Wallet, TrendingUp, Truck
+  CheckSquare, Clock,
+  Receipt, Wallet, Truck
 } from 'lucide-react';
 import type { DashboardConfig, EnhancedDashboardConfig } from '~/types/index';
 
@@ -935,16 +935,16 @@ export const farmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "Wallet", href: "/farmers-dashboard/wallet", icon: Wallet },
   ],
   financialServices: {
-    enabled: true,
+    enabled: false,
     loanServices: {
-      applicationEnabled: true,
-      trackingEnabled: true,
-      historyEnabled: true,
+      applicationEnabled: false,
+      trackingEnabled: false,
+      historyEnabled: false,
     },
     creditServices: {
-      purchaseEnabled: true,
-      catalogEnabled: true,
-      paymentTrackingEnabled: true,
+      purchaseEnabled: false,
+      catalogEnabled: false,
+      paymentTrackingEnabled: false,
     },
   },
 };
@@ -1041,31 +1041,23 @@ export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "My Listings", href: "/cluster-dashboard/listings", icon: FileText },
     { label: "Farmers", href: "/cluster-dashboard/farmers", icon: UsersIcon },
     { label: "Riders", href: "/cluster-dashboard/riders", icon: Truck },
-    // Financial Services Navigation
-    {
-      label: "Financial Services",
-      href: "/cluster-dashboard/financial",
-      icon: CreditCard,
-      submenu: [
-        { label: "Loan Applications", href: "/cluster-dashboard/financial/loans", icon: DollarSign },
-        { label: "Credit Purchases", href: "/cluster-dashboard/financial/credit", icon: ShoppingCart },
-        { label: "Payment History", href: "/cluster-dashboard/financial/payments", icon: Receipt },
-        { label: "Financial Profile", href: "/cluster-dashboard/financial/profile", icon: TrendingUp },
-        { label: "Farmer Finances", href: "/cluster-dashboard/financial/farmers", icon: Wallet },
-      ]
-    },
+    { label: "Wallet", href: "/cluster-dashboard/wallet", icon: Wallet },
   ],
+  // Loans/credit have no backend behind them yet — every screen under
+  // Financial Services was a static "Coming Soon" except Payment History,
+  // which just duplicated this Wallet link. Disabled (matching the farmer
+  // dashboard) rather than leaving a nav item that dead-ends for real users.
   financialServices: {
-    enabled: true,
+    enabled: false,
     loanServices: {
-      applicationEnabled: true,
-      trackingEnabled: true,
-      historyEnabled: true,
+      applicationEnabled: false,
+      trackingEnabled: false,
+      historyEnabled: false,
     },
     creditServices: {
-      purchaseEnabled: true,
-      catalogEnabled: true,
-      paymentTrackingEnabled: true,
+      purchaseEnabled: false,
+      catalogEnabled: false,
+      paymentTrackingEnabled: false,
     },
   },
 };
