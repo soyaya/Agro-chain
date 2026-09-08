@@ -228,7 +228,17 @@ export const farmerService = {
   getPayouts() {
     return apiFetch<{
       status: string;
-      data: { payouts: unknown[]; totalEarnings: number; pendingPayouts: number };
+      data: {
+        payouts: Array<{
+          payoutId: string;
+          orderId: string | null;
+          demandId: string | null;
+          amount: number;
+          scheduledFor: string;
+          status: "pending" | "processing" | "paid" | "failed";
+          createdAt: string;
+        }>;
+      };
     }>("/farmers/payouts");
   },
 };

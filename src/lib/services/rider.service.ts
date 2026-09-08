@@ -25,10 +25,32 @@ export interface RiderDemand {
   createdAt: string;
 }
 
+export interface UpdateRiderProfilePayload {
+  fullName?: string;
+  locationState?: string;
+  locationLga?: string;
+  locationAddress?: string;
+}
+
 export const riderService = {
   /** Get orders assigned to this rider. */
   getOrders() {
     return apiFetch<{ status: string; data: { orders: RiderOrder[] } }>("/riders/orders");
+  },
+
+  /** Update the rider's own profile. Rider has no role-specific profile
+   * endpoint like the other roles — this is the same generic one the app's
+   * legacy profile route exposes, just wrapped in a typed service call. */
+  updateProfile(data: UpdateRiderProfilePayload) {
+    return apiFetch("/users/profile", {
+      method: "PUT",
+      body: JSON.stringify({
+        full_name: data.fullName,
+        location_state: data.locationState,
+        location_lga: data.locationLga,
+        location_address: data.locationAddress,
+      }),
+    });
   },
 
   /** Send a phone-verification OTP to the buyer before starting delivery. */

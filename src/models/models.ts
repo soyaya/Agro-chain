@@ -919,7 +919,7 @@ import {
   LayoutDashboard, User, FileText, Package,
   ShoppingCart, Users as UsersIcon,
   CheckSquare, Clock,
-  Receipt, Wallet, Truck
+  Receipt, Wallet, Truck, Banknote
 } from 'lucide-react';
 import type { DashboardConfig, EnhancedDashboardConfig } from '~/types/index';
 
@@ -932,6 +932,7 @@ export const farmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "My Listings", href: "/farmers-dashboard/listings", icon: FileText },
     { label: "Create Listing", href: "/farmers-dashboard/listings/create", icon: Package },
     { label: "My Orders", href: "/farmers-dashboard/orders", icon: Truck },
+    { label: "Payouts", href: "/farmers-dashboard/payouts", icon: Banknote },
     { label: "Wallet", href: "/farmers-dashboard/wallet", icon: Wallet },
   ],
   financialServices: {
@@ -1012,6 +1013,7 @@ export const enhancedFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "My Listings", href: "/farmers-dashboard/listings", icon: FileText },
     { label: "Create Listing", href: "/farmers-dashboard/listings/create", icon: Package },
     { label: "My Orders", href: "/farmers-dashboard/orders", icon: Truck },
+    { label: "Payouts", href: "/farmers-dashboard/payouts", icon: Banknote },
     { label: "Wallet", href: "/farmers-dashboard/wallet", icon: Wallet },
   ],
   financialServices: {
@@ -1041,6 +1043,7 @@ export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "My Listings", href: "/cluster-dashboard/listings", icon: FileText },
     { label: "Farmers", href: "/cluster-dashboard/farmers", icon: UsersIcon },
     { label: "Riders", href: "/cluster-dashboard/riders", icon: Truck },
+    { label: "Payouts", href: "/cluster-dashboard/payouts", icon: Banknote },
     { label: "Wallet", href: "/cluster-dashboard/wallet", icon: Wallet },
   ],
   // Loans/credit have no backend behind them yet — every screen under

@@ -17,6 +17,8 @@ import { FADE_IN_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
+import { LocationPicker } from "~/components/shared/LocationPicker";
+import { platformService } from "~/lib/services/platform.service";
 
 // === Options
 
@@ -59,8 +61,8 @@ export default function CreateDemandPage() {
   const [seedlingSize, setSeedlingSize] = useState<SeedlingSize | "">("");
   const [quantityPieces, setQuantityPieces] = useState("");
   const [fulfillmentMethod, setFulfillmentMethod] = useState<"pickup" | "delivery">("pickup");
-  const [locationState, setLocationState] = useState("Kaduna");
-  const [locationLga, setLocationLga] = useState("");
+  const [location, setLocation] = useState({ state: "", lga: "", ward: "" });
+  const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [notes, setNotes] = useState("");
 
@@ -74,6 +76,13 @@ export default function CreateDemandPage() {
       }
     };
     void load();
+  }, []);
+
+  useEffect(() => {
+    platformService
+      .getActiveStates()
+      .then((res) => setActiveStates(res.data.activeStates))
+      .catch(() => {});
   }, []);
 
   const isSeedling = fishVariant === "seedlings";
@@ -98,7 +107,8 @@ export default function CreateDemandPage() {
     !!fishVariant &&
     (isSeedling ? !!seedlingSize && Number(quantityPieces) > 0 : !!weightBracket && Number(quantityKg) > 0) &&
     pricePerUnit !== null &&
-    !!locationLga &&
+    !!location.state &&
+    !!location.lga &&
     !!deliveryAddress;
 
   const handleSubmit = async () => {
@@ -112,8 +122,8 @@ export default function CreateDemandPage() {
         seedlingSize: isSeedling ? (seedlingSize as SeedlingSize) : undefined,
         quantityPieces: isSeedling ? Number(quantityPieces) : undefined,
         fulfillmentMethod,
-        locationState,
-        locationLga,
+        locationState: location.state,
+        locationLga: location.lga,
         deliveryAddress,
         notes: notes || undefined,
       });
@@ -296,22 +306,13 @@ export default function CreateDemandPage() {
           </div>
 
           {/* Location */}
-          <div className="grid grid-cols-1 gap-(--gap-base) sm:grid-cols-2">
-            <DynamicInput
-              label="State"
-              placeholder="e.g. Kaduna"
-              value={locationState}
-              onChange={(e) => setLocationState(e.target.value)}
-              required
-            />
-            <DynamicInput
-              label="LGA"
-              placeholder="e.g. Kaduna South"
-              value={locationLga}
-              onChange={(e) => setLocationLga(e.target.value)}
-              required
-            />
-          </div>
+          <LocationPicker
+            value={location}
+            onChange={setLocation}
+            activeStates={activeStates}
+            includeWard={false}
+            required
+          />
 
           {/* Delivery Address */}
           <DynamicInput

@@ -11,9 +11,11 @@ import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { buyerService } from "~/lib/services/buyer.service";
+import { useCart } from "~/components/marketplace/useCart";
 
 export default function SavedListingsPage() {
   const router = useRouter();
+  const cart = useCart();
   const [savedListings, setSavedListings] = useState<MarketplaceListing[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,8 +51,13 @@ export default function SavedListingsPage() {
   };
 
   const handleAddToCart = (listing: MarketplaceListing) => {
+    const defaultPkg = listing.packaging?.[0];
+    if (!defaultPkg) {
+      toast.error("No packages available for this listing");
+      return;
+    }
+    cart.addToCart(listing, defaultPkg, { variant: "Table Size", processed: false });
     toast.success(`${listing.fishType} added to cart!`);
-    // TODO: Implement cart functionality
   };
 
   if (loading) {

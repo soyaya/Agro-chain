@@ -10,8 +10,6 @@ import {
   Mail,
   Phone,
   HelpCircle,
-  Book,
-  Users,
   ChevronDown,
 } from "lucide-react";
 import { FADE_IN_VARIANT, SLIDE_UP_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
@@ -88,23 +86,9 @@ export default function SupportPage() {
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
-  const resources = [
-    {
-      icon: Book,
-      title: "User Guide",
-      description: "Comprehensive guide to using AgroChain",
-    },
-    {
-      icon: HelpCircle,
-      title: "FAQs",
-      description: "Answers to commonly asked questions",
-    },
-    {
-      icon: Users,
-      title: "Community Forum",
-      description: "Connect with other users and share experiences",
-    },
-  ];
+  const scrollToId = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
@@ -145,6 +129,7 @@ export default function SupportPage() {
 
         {/* Support Options */}
         <motion.div
+          id="support-options"
           initial="hidden"
           animate="visible"
           variants={STAGGER_CONTAINER_VARIANT}
@@ -247,37 +232,6 @@ export default function SupportPage() {
           </div>
         </motion.div>
 
-        {/* Resources */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={SLIDE_UP_VARIANT}
-          className="mb-16"
-        >
-          <h2 className="font-ubuntu mb-8 text-center text-3xl font-bold text-gray-900">
-            Helpful Resources
-          </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {resources.map((resource, index) => {
-              const Icon = resource.icon;
-              return (
-                <div
-                  key={index}
-                  className="cursor-pointer rounded-xl bg-(--white) p-6 shadow-md transition-shadow hover:shadow-lg"
-                >
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-                    <Icon size={20} className="text-gray-600" />
-                  </div>
-                  <h3 className="font-ubuntu mb-2 text-lg font-semibold text-gray-900">
-                    {resource.title}
-                  </h3>
-                  <p className="font-roboto-slab text-sm text-gray-600">{resource.description}</p>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
-
         {/* Contact Form CTA */}
         <motion.div
           initial="hidden"
@@ -289,7 +243,10 @@ export default function SupportPage() {
           <p className="font-roboto-slab mx-auto mb-6 max-w-2xl text-green-50">
             Our support team is ready to assist you with any questions or concerns you may have.
           </p>
-          <button className="font-roboto-slab rounded-lg bg-(--white) px-8 py-3 font-semibold text-green-600 transition-colors hover:bg-green-50">
+          <button
+            onClick={() => scrollToId("support-options")}
+            className="font-roboto-slab rounded-lg bg-(--white) px-8 py-3 font-semibold text-green-600 transition-colors hover:bg-green-50"
+          >
             Contact Support
           </button>
         </motion.div>

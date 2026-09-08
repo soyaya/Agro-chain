@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Clock } from "lucide-react";
 import { toast } from "sonner";
 import { authService } from "~/lib/services/auth.service";
-import { apiFetch } from "~/lib/api";
+import { riderService } from "~/lib/services/rider.service";
 
 type RiderForm = {
   fullName: string;
@@ -62,14 +62,11 @@ export default function RiderProfilePage() {
   const save = async () => {
     setSaving(true);
     try {
-      await apiFetch("/users/profile", {
-        method: "PUT",
-        body: JSON.stringify({
-          full_name: form.fullName,
-          location_state: form.locationState,
-          location_lga: form.locationLga,
-          location_address: form.locationAddress,
-        }),
+      await riderService.updateProfile({
+        fullName: form.fullName,
+        locationState: form.locationState,
+        locationLga: form.locationLga,
+        locationAddress: form.locationAddress,
       });
       setEditing(false);
       toast.success("Profile updated successfully");

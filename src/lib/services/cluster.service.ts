@@ -193,9 +193,15 @@ export const clusterService = {
     return apiFetch<{
       status: string;
       data: {
-        payouts: unknown[];
-        totalClusterEarnings: number;
-        pendingPayouts: number;
+        payouts: Array<{
+          payoutId: string;
+          orderId: string | null;
+          demandId: string | null;
+          amount: number;
+          scheduledFor: string;
+          status: "pending" | "processing" | "paid" | "failed";
+          createdAt: string;
+        }>;
       };
     }>("/cluster/payouts");
   },
