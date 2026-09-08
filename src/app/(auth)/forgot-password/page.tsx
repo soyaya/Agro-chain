@@ -9,6 +9,7 @@ import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "~/components/ui/input-otp";
 import { cn } from "~/lib/utils";
+import { MAX_OTP_RESEND_ATTEMPTS } from "~/types/constants";
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -127,7 +128,7 @@ export default function ForgotPasswordPage() {
 
   const handleResendOtp = async () => {
     if (loading || resendLocked || cooldownSeconds > 0) return;
-    if (resendAttempts >= 2) {
+    if (resendAttempts >= MAX_OTP_RESEND_ATTEMPTS) {
       setResendLocked(true);
       return;
     }
@@ -143,10 +144,10 @@ export default function ForgotPasswordPage() {
         throw new Error(err.message || "Failed to resend OTP");
       }
       const nextAttempts = resendAttempts + 1;
-      const attemptsLeft = 2 - nextAttempts;
+      const attemptsLeft = MAX_OTP_RESEND_ATTEMPTS - nextAttempts;
       setResendAttempts(nextAttempts);
       setCooldownSeconds(60);
-      if (nextAttempts >= 2) {
+      if (nextAttempts >= MAX_OTP_RESEND_ATTEMPTS) {
         setResendLocked(true);
       }
       toast.success(
@@ -256,8 +257,8 @@ export default function ForgotPasswordPage() {
           <p className="text-center text-xs text-(--text-colour)">
             {resendLocked
               ? "You’ve reached the resend limit. Try again after 24 hours."
-              : `${Math.max(0, 2 - resendAttempts)} resend${
-                  2 - resendAttempts === 1 ? "" : "s"
+              : `${Math.max(0, MAX_OTP_RESEND_ATTEMPTS - resendAttempts)} resend${
+                  MAX_OTP_RESEND_ATTEMPTS - resendAttempts === 1 ? "" : "s"
                 } left`}
           </p>
         </form>

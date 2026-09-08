@@ -43,6 +43,36 @@ export interface FarmerListingRecord {
   createdAt: string;
 }
 
+export interface FarmerListingDetail {
+  id: string;
+  fishType: string;
+  harvestDate: string;
+  listedDate: string;
+  quantityAvailable: number;
+  quantitySold: number;
+  totalAvailableKg: number;
+  pricePerKg: number;
+  pricePerFish: number;
+  packagingWeightKg: number;
+  status: "approved" | "pending" | "rejected";
+  isApproved: boolean;
+  rejectionReason: string | null;
+  createdAt: string;
+}
+
+export interface FarmerListingOrder {
+  orderId: string;
+  orderNumber: string;
+  buyerName: string;
+  quantity: number;
+  weightKg: number | null;
+  grandTotal: number;
+  status: string;
+  fulfillmentStage: string;
+  fulfillmentMethod: "pickup" | "delivery";
+  createdAt: string;
+}
+
 export interface BackendActivity {
   id: string;
   description: string;
@@ -50,12 +80,43 @@ export interface BackendActivity {
   created_at: string;
 }
 
+export type ListingBracketVariant = "broodstock" | "table_size" | "dried";
+export type ListingWeightBracket =
+  | "weight_300_500"
+  | "weight_500_700"
+  | "weight_700_1000"
+  | "weight_1000_1200"
+  | "weight_1200_plus";
+export type ListingSeedlingSize = "juveniles" | "post" | "jumbo";
+export type ListingFishVariant = ListingBracketVariant | "seedlings";
+
 export interface CreateListingPayload {
-  fishType: string;
+  fishVariant: ListingFishVariant;
+  weightBracket?: ListingWeightBracket;
+  availableKg?: number;
+  seedlingSize?: ListingSeedlingSize;
+  availablePieces?: number;
   harvestDate: string;
   listedDate?: string;
-  totalFishAvailable: number;
-  packaging: { weightKg: number; pricePerUnit: number };
+  priceAgreementAccepted: boolean;
+}
+
+export interface ListingPriceCatalog {
+  bracketPrices: Array<{ variant: ListingBracketVariant; weightBracket: ListingWeightBracket; pricePerKg: number }>;
+  seedlingPrices: Array<{ seedlingSize: ListingSeedlingSize; pricePerPiece: number }>;
+}
+
+export interface FarmerOrder {
+  orderId: string;
+  listingId: string | null;
+  listingFishType: string | null;
+  buyerName: string;
+  quantity: number;
+  weightKg: number | null;
+  status: string;
+  fulfillmentStage: string;
+  fulfillmentMethod: "pickup" | "delivery";
+  createdAt: string;
 }
 
 export interface UpdateFarmerProfilePayload {
@@ -67,6 +128,7 @@ export interface UpdateFarmerProfilePayload {
   farmAddress?: string;
   localGovernment?: string;
   state?: string;
+  ward?: string;
   fishType?: string;
   farmingCapacityKg?: number;
   yearsOfExperience?: number;
@@ -78,10 +140,10 @@ export interface ClusterApplicationPayload {
   warehouseLocation?: string;
   distributionCapacity?: number;
   logisticsAvailable?: boolean;
-  // Document URLs — obtained after uploading files to Cloudinary
-  bvnVerification?: string;
+  // Document URLs — obtained after uploading files to Cloudinary. BVN is
+  // covered by the existing wallet/BVN verification flow and CAC by
+  // automatic verification, so neither needs a document upload here.
   proofOfAddress?: string;
-  cacRegistration?: string;
   businessLicense?: string;
   taxClearance?: string;
 }
@@ -101,6 +163,13 @@ export const farmerService = {
   getListings() {
     return apiFetch<{ status: string; data: { summary: FarmerListingSummary; listings: FarmerListingRecord[] } }>(
       "/farmers/listings/get",
+    );
+  },
+
+  /** Get a single listing plus the real orders placed against it. */
+  getListing(listingId: string) {
+    return apiFetch<{ status: string; data: { listing: FarmerListingDetail; orders: FarmerListingOrder[] } }>(
+      `/farmers/listings/${listingId}`,
     );
   },
 
@@ -127,9 +196,32 @@ export const farmerService = {
     });
   },
 
+  /**
+   * Verify a CAC number against AutoRamp instead of requiring a manually
+   * uploaded registration certificate. Experimental — AutoRamp's support for
+   * this isn't confirmed, so a failure here doesn't necessarily mean the
+   * number is invalid.
+   */
+  verifyCac(cacNumber: string) {
+    return apiFetch<{ status: string; data: { verified: boolean; autorampStatus: string } }>(
+      "/farmers/verify-cac",
+      { method: "POST", body: JSON.stringify({ cacNumber }) },
+    );
+  },
+
   /** Get all orders for the farmer's listings. */
   getOrders() {
-    return apiFetch<{ status: string; data: { orders: unknown[] } }>("/farmers/orders");
+    return apiFetch<{ status: string; data: { orders: FarmerOrder[] } }>("/farmers/orders");
+  },
+
+  /** Get the current admin-regulated price catalog. */
+  getListingPrices() {
+    return apiFetch<{ status: string; data: ListingPriceCatalog }>("/farmers/listing-prices");
+  },
+
+  /** Mark an order as physically dispatched to the cluster farmer's office. */
+  dispatchOrder(orderId: string) {
+    return apiFetch(`/farmers/orders/${orderId}/dispatch`, { method: "PATCH" });
   },
 
   /** Get payout history. */

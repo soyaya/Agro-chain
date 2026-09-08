@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ import {
   SLIDE_UP_VARIANT,
   BASE_PRICE_PER_KG_NAIRA,
   FISH_VARIANTS,
+  FISH_TYPE_CATEGORIES,
   type FishVariant,
 } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
@@ -29,12 +31,15 @@ import { useCart } from "~/components/marketplace/useCart";
 
 type MarketplaceDetailResponse =
   | MarketplaceListing
-  | { listing?: MarketplaceListing; data?: MarketplaceListing };
+  | { listing?: MarketplaceListing; data?: { listing?: MarketplaceListing } | MarketplaceListing };
 
 function extractListing(response: MarketplaceDetailResponse): MarketplaceListing | null {
-  if ("id" in response) return response as MarketplaceListing;
-  const r = response as { listing?: MarketplaceListing; data?: MarketplaceListing };
-  return r.listing ?? r.data ?? null;
+  if (response && typeof response === "object" && "id" in response) {
+    return response as MarketplaceListing;
+  }
+  const r = response as { listing?: MarketplaceListing; data?: { listing?: MarketplaceListing } | MarketplaceListing };
+  const data = r.data as { listing?: MarketplaceListing } | MarketplaceListing | undefined;
+  return r.listing ?? (data && "listing" in data ? data.listing : (data as MarketplaceListing)) ?? null;
 }
 
 export default function ListingDetailPage() {
@@ -98,6 +103,7 @@ export default function ListingDetailPage() {
 
   const totalAmount = cart.subtotal;
   const totalWeight = cart.items.reduce((sum, item) => sum + item.weightKg * item.quantity, 0);
+  const unit = listing?.unit === "piece" ? "piece" : "kg";
 
   const handleCheckout = () => {
     if (cart.items.length === 0) {
@@ -166,6 +172,28 @@ export default function ListingDetailPage() {
                 variants={SLIDE_UP_VARIANT}
                 className="flex flex-col gap-(--gap-lg) rounded-3xl bg-(--white) p-(--space-xl) shadow-sm"
               >
+                {/* Image */}
+                <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-(--gray-bg) sm:h-80">
+                  {(listing.imageUrl ??
+                    FISH_TYPE_CATEGORIES.find((c) => c.value === listing.fishType)?.imageUrl) ? (
+                    <Image
+                      src={
+                        listing.imageUrl ??
+                        FISH_TYPE_CATEGORIES.find((c) => c.value === listing.fishType)!.imageUrl
+                      }
+                      alt={`${listing.fishType} listing`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 66vw"
+                      className="object-cover"
+                      priority
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <Package size={56} className="text-(--text-colour) opacity-30" aria-hidden="true" />
+                    </div>
+                  )}
+                </div>
+
                 {/* Header */}
                 <div className="flex flex-col gap-(--gap-base)">
                   <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">
@@ -186,7 +214,7 @@ export default function ListingDetailPage() {
                     <div className="flex flex-col">
                       <span className="text-sm text-(--text-colour)">Available</span>
                       <span className="font-roboto-slab font-medium text-(--heading-colour)">
-                        {listing.totalAvailableKg}kg
+                        {listing.totalAvailableKg} {unit === "piece" ? "pieces" : "kg"}
                       </span>
                     </div>
                   </div>
@@ -279,7 +307,7 @@ export default function ListingDetailPage() {
                   </div>
 
                   <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
-                    {listing.packaging.map((pkg, index) => {
+                    {(listing.packaging ?? []).map((pkg, index) => {
                       const cartItemIndex = cart.items.findIndex(
                         (item) =>
                           item.weightKg === pkg.weightKg &&
@@ -295,7 +323,7 @@ export default function ListingDetailPage() {
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-ubuntu text-lg font-bold text-(--heading-colour)">
-                              {pkg.weightKg}kg Package
+                              {unit === "piece" ? "1 piece" : `${pkg.weightKg}kg`} Package
                             </span>
                             <span className="font-ubuntu text-lg font-bold text-(--theme-green-dark)">
                               ₦{pkg.pricePerUnit.toLocaleString()}
@@ -388,7 +416,7 @@ export default function ListingDetailPage() {
                       {cart.items.map((item, index) => (
                         <div key={index} className="flex justify-between text-sm">
                           <span className="text-(--text-colour)">
-                            {item.weightKg}kg × {item.quantity} ({item.variant})
+                            {item.weightKg}{unit === "piece" ? " piece" : "kg"} × {item.quantity} ({item.variant})
                           </span>
                           <span className="font-medium text-(--heading-colour)">
                             ₦{(item.pricePerUnit * item.quantity).toLocaleString()}
@@ -399,8 +427,12 @@ export default function ListingDetailPage() {
 
                     <div className="border-t border-(--border-gray) pt-(--space-md)">
                       <div className="flex justify-between text-sm">
-                        <span className="text-(--text-colour)">Total Weight:</span>
-                        <span className="font-medium text-(--heading-colour)">{totalWeight}kg</span>
+                        <span className="text-(--text-colour)">
+                          {unit === "piece" ? "Total Pieces:" : "Total Weight:"}
+                        </span>
+                        <span className="font-medium text-(--heading-colour)">
+                          {totalWeight}{unit === "piece" ? "" : "kg"}
+                        </span>
                       </div>
                     </div>
 

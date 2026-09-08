@@ -7,13 +7,15 @@ export interface BackendUser {
   full_name: string;
   email: string;
   phone_number: string;
-  role: "farmer" | "buyer" | "cluster" | "admin" | "pending";
+  role: "farmer" | "buyer" | "cluster" | "admin" | "pending" | "rider";
   verification_status: "unverified" | "pending" | "verified" | "rejected";
   profile_completed: boolean;
+  must_set_password: boolean;
   is_cluster_farmer: boolean;
   cluster_approved: boolean;
   location_state: string;
   location_lga: string;
+  location_ward?: string | null;
   location_address: string;
   profile_photo_url?: string;
   farm_name?: string;
@@ -23,7 +25,9 @@ export interface BackendUser {
   business_name?: string;
   company_name?: string;
   business_type?: string;
+  rider_approved?: boolean;
   cac_number?: string;
+  cac_verified?: boolean;
   warehouse_location?: string;
   distribution_capacity?: number;
   logistics_available?: boolean;
@@ -64,12 +68,17 @@ export const authService = {
     });
   },
 
-  /** Refresh the access token using a stored refresh token. */
-  refresh(refreshToken: string): Promise<RefreshResponse> {
-    return apiFetch<RefreshResponse>("/auth/refresh", {
+  /** Set a new password (first login for admin-invited accounts, e.g. riders). */
+  setPassword(newPassword: string) {
+    return apiFetch("/auth/set-password", {
       method: "POST",
-      body: JSON.stringify({ refresh_token: refreshToken }),
+      body: JSON.stringify({ newPassword }),
     });
+  },
+
+  /** Refresh the access token. The refresh token itself lives in an httpOnly cookie the browser sends automatically. */
+  refresh(): Promise<RefreshResponse> {
+    return apiFetch<RefreshResponse>("/auth/refresh", { method: "POST" });
   },
 
   /** Logout from the current device. */

@@ -1,88 +1,137 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { buyerService } from "~/lib/services/buyer.service";
+import {
+  buyerService,
+  type DemandBracketVariant,
+  type DemandFishVariant,
+  type DemandPriceCatalog,
+  type DemandWeightBracket,
+  type SeedlingSize,
+} from "~/lib/services/buyer.service";
 import { FADE_IN_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
 
-// === Schema
+// === Options
 
-const FISH_TYPES = [
-  { label: "Catfish", value: "catfish" },
-  { label: "Fingerlings", value: "fingerlings" },
-  { label: "Juveniles", value: "juveniles" },
-  { label: "Table Size", value: "table_size" },
-  { label: "Jumbo", value: "jumbo" },
-  { label: "Parent Stocks", value: "parent_stocks" },
-];
-
-const FISH_VARIANTS = [
-  { label: "Dried", value: "dried" },
-  { label: "Jumbo", value: "jumbo" },
-  { label: "Table Size", value: "table_size" },
+const FISH_VARIANTS: { label: string; value: DemandFishVariant }[] = [
   { label: "Broodstock", value: "broodstock" },
+  { label: "Table Size", value: "table_size" },
+  { label: "Dry Fish", value: "dried" },
+  { label: "Seedlings", value: "seedlings" },
 ];
 
-const createDemandSchema = z.object({
-  fishType: z.string().min(1, "Fish type is required"),
-  weightKg: z
-    .number({ error: "Weight must be a number" })
-    .positive("Weight must be greater than 0")
-    .max(10000, "Weight cannot exceed 10,000 kg"),
-  fishVariant: z.string().min(1, "Fish variant is required"),
-  locationState: z.string().min(1, "State is required"),
-  locationLga: z.string().min(1, "LGA is required"),
-  deliveryAddress: z.string().min(5, "Delivery address is required"),
-  notes: z.string().max(500, "Notes cannot exceed 500 characters").optional(),
-});
+const WEIGHT_BRACKETS: { label: string; value: DemandWeightBracket }[] = [
+  { label: "300g – 500g", value: "weight_300_500" },
+  { label: "500g – 700g", value: "weight_500_700" },
+  { label: "700g – 1kg", value: "weight_700_1000" },
+  { label: "1kg – 1.2kg", value: "weight_1000_1200" },
+  { label: "1.2kg and above", value: "weight_1200_plus" },
+];
 
-type CreateDemandForm = z.infer<typeof createDemandSchema>;
+const SEEDLING_SIZES: { label: string; value: SeedlingSize }[] = [
+  { label: "Juveniles (8–9cm)", value: "juveniles" },
+  { label: "Post (10–11cm)", value: "post" },
+  { label: "Jumbo (12–15cm)", value: "jumbo" },
+];
+
+const FULFILLMENT_OPTIONS = [
+  { label: "Pickup", value: "pickup" },
+  { label: "Delivery", value: "delivery" },
+];
 
 // === Page
 
 export default function CreateDemandPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [catalog, setCatalog] = useState<DemandPriceCatalog | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isValid },
-  } = useForm<CreateDemandForm>({
-    resolver: zodResolver(createDemandSchema),
-    mode: "onChange",
-    defaultValues: { fishType: "", fishVariant: "", locationState: "", locationLga: "" },
-  });
+  const [fishVariant, setFishVariant] = useState<DemandFishVariant | "">("");
+  const [weightBracket, setWeightBracket] = useState<DemandWeightBracket | "">("");
+  const [quantityKg, setQuantityKg] = useState("");
+  const [seedlingSize, setSeedlingSize] = useState<SeedlingSize | "">("");
+  const [quantityPieces, setQuantityPieces] = useState("");
+  const [fulfillmentMethod, setFulfillmentMethod] = useState<"pickup" | "delivery">("pickup");
+  const [locationState, setLocationState] = useState("Kaduna");
+  const [locationLga, setLocationLga] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [notes, setNotes] = useState("");
 
-  const fishType = watch("fishType");
-  const fishVariant = watch("fishVariant");
-  const locationState = watch("locationState");
-  const locationLga = watch("locationLga");
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await buyerService.getDemandPrices();
+        setCatalog(res.data);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to load prices");
+      }
+    };
+    void load();
+  }, []);
 
-  const onSubmit = async (data: CreateDemandForm) => {
+  const isSeedling = fishVariant === "seedlings";
+
+  const pricePerUnit = useMemo(() => {
+    if (!catalog) return null;
+    if (isSeedling) {
+      const match = catalog.seedlingPrices.find((p) => p.seedlingSize === seedlingSize);
+      return match?.pricePerPiece ?? null;
+    }
+    if (!fishVariant || !weightBracket) return null;
+    const match = catalog.bracketPrices.find(
+      (p) => p.variant === (fishVariant as DemandBracketVariant) && p.weightBracket === weightBracket,
+    );
+    return match?.pricePerKg ?? null;
+  }, [catalog, isSeedling, fishVariant, weightBracket, seedlingSize]);
+
+  const quantity = isSeedling ? Number(quantityPieces) : Number(quantityKg);
+  const total = pricePerUnit !== null && quantity > 0 ? pricePerUnit * quantity : null;
+
+  const canSubmit =
+    !!fishVariant &&
+    (isSeedling ? !!seedlingSize && Number(quantityPieces) > 0 : !!weightBracket && Number(quantityKg) > 0) &&
+    pricePerUnit !== null &&
+    !!locationLga &&
+    !!deliveryAddress;
+
+  const handleSubmit = async () => {
+    if (!canSubmit || !fishVariant) return;
     setSubmitting(true);
     try {
-      await buyerService.createDemand({
-        fishType: data.fishType,
-        weightKg: data.weightKg,
-        fishVariant: data.fishVariant,
-        locationState: data.locationState,
-        locationLga: data.locationLga,
-        deliveryAddress: data.deliveryAddress,
-        notes: data.notes,
+      const created = await buyerService.createDemand({
+        fishVariant,
+        weightBracket: isSeedling ? undefined : (weightBracket as DemandWeightBracket),
+        quantityKg: isSeedling ? undefined : Number(quantityKg),
+        seedlingSize: isSeedling ? (seedlingSize as SeedlingSize) : undefined,
+        quantityPieces: isSeedling ? Number(quantityPieces) : undefined,
+        fulfillmentMethod,
+        locationState,
+        locationLga,
+        deliveryAddress,
+        notes: notes || undefined,
       });
-      toast.success("Demand submitted! Admin will assign a cluster farmer shortly.");
+
+      const demandId = created.data.demand.id;
+      toast.success("Demand created. Paying escrow...");
+
+      try {
+        await buyerService.payDemandWithWallet(demandId);
+        toast.success("Payment successful. Your demand is now live.");
+      } catch (payError) {
+        toast.error(
+          payError instanceof Error
+            ? `Demand created, but payment failed: ${payError.message}`
+            : "Demand created, but payment failed. Pay from My Demands.",
+        );
+      }
+
       router.push("/buyers-dashboard/demands");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to submit demand");
@@ -110,8 +159,7 @@ export default function CreateDemandPage() {
         <div>
           <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">Create Demand</h1>
           <p className="font-roboto-slab mt-1 text-(--text-colour)">
-            Request any weight of fish — even less than 1kg. Admin will assign a cluster farmer to
-            fulfill it.
+            Request fish at admin-regulated prices. Pay the escrow to make your demand live.
           </p>
         </div>
       </motion.div>
@@ -123,55 +171,127 @@ export default function CreateDemandPage() {
         animate="visible"
         className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--space-xl) shadow-sm"
       >
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-(--gap-lg)">
-          {/* Fish Type + Variant */}
+        <div className="flex flex-col gap-(--gap-lg)">
+          {/* Fish Type (fixed for now) + Variant */}
           <div className="grid grid-cols-1 gap-(--gap-base) sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
-                Fish Type <span className="text-red-500">*</span>
+                Fish Type
               </label>
-              <SelectInput
-                label=""
-                value={fishType}
-                onValueChange={(v) => setValue("fishType", v, { shouldValidate: true })}
-                options={FISH_TYPES}
-                required
-              />
-              {errors.fishType && (
-                <p className="font-roboto-slab text-xs text-red-500">{errors.fishType.message}</p>
-              )}
+              <div className="font-roboto-slab flex h-11 items-center rounded-2xl border border-(--border-input) px-(--space-md) text-sm text-(--text-colour)">
+                Catfish
+              </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
               <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
-                Fish Variant <span className="text-red-500">*</span>
+                Fish Product <span className="text-red-500">*</span>
               </label>
               <SelectInput
                 label=""
                 value={fishVariant}
-                onValueChange={(v) => setValue("fishVariant", v, { shouldValidate: true })}
+                onValueChange={(v) => {
+                  setFishVariant(v as DemandFishVariant);
+                  setWeightBracket("");
+                  setSeedlingSize("");
+                  setQuantityKg("");
+                  setQuantityPieces("");
+                }}
                 options={FISH_VARIANTS}
                 required
               />
-              {errors.fishVariant && (
-                <p className="font-roboto-slab text-xs text-red-500">
-                  {errors.fishVariant.message}
-                </p>
-              )}
             </div>
           </div>
 
-          {/* Weight */}
+          {/* Conditional: seedling vs kg-priced */}
+          {fishVariant && (
+            <div className="grid grid-cols-1 gap-(--gap-base) sm:grid-cols-2">
+              {isSeedling ? (
+                <>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                      Seedling Size <span className="text-red-500">*</span>
+                    </label>
+                    <SelectInput
+                      label=""
+                      value={seedlingSize}
+                      onValueChange={(v) => setSeedlingSize(v as SeedlingSize)}
+                      options={SEEDLING_SIZES}
+                      required
+                    />
+                  </div>
+                  <DynamicInput
+                    label="Quantity (pieces)"
+                    placeholder="e.g. 100"
+                    value={quantityPieces}
+                    onChange={(e) => setQuantityPieces(e.target.value)}
+                    required
+                  />
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+                      Weight Range <span className="text-red-500">*</span>
+                    </label>
+                    <SelectInput
+                      label=""
+                      value={weightBracket}
+                      onValueChange={(v) => setWeightBracket(v as DemandWeightBracket)}
+                      options={WEIGHT_BRACKETS}
+                      required
+                    />
+                  </div>
+                  <DynamicInput
+                    label="Quantity (kg)"
+                    placeholder="e.g. 10"
+                    value={quantityKg}
+                    onChange={(e) => setQuantityKg(e.target.value)}
+                    required
+                  />
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Price summary */}
+          {fishVariant && (
+            <div className="rounded-2xl border border-(--border-gray) bg-(--gray-bg) p-(--space-md)">
+              {pricePerUnit === null ? (
+                <p className="font-roboto-slab text-sm text-(--text-colour)">
+                  Select a {isSeedling ? "seedling size" : "weight range"} to see the price.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-1">
+                  <p className="font-roboto-slab text-sm text-(--text-colour)">
+                    ₦{pricePerUnit.toLocaleString()} per {isSeedling ? "piece" : "kg"}
+                  </p>
+                  {total !== null && (
+                    <p className="font-ubuntu text-lg font-bold text-(--heading-colour)">
+                      Total: ₦{total.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Fulfillment */}
           <div className="flex flex-col gap-1.5">
-            <DynamicInput
-              label="Weight (kg)"
-              placeholder="e.g. 0.5 for half a kg, 2 for 2kg"
-              error={errors.weightKg?.message}
-              {...register("weightKg", { valueAsNumber: true })}
+            <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+              Fulfillment Method <span className="text-red-500">*</span>
+            </label>
+            <SelectInput
+              label=""
+              value={fulfillmentMethod}
+              onValueChange={(v) => setFulfillmentMethod(v as "pickup" | "delivery")}
+              options={FULFILLMENT_OPTIONS}
               required
             />
             <p className="font-roboto-slab text-xs text-gray-500">
-              You can request any amount — there is no minimum weight.
+              {fulfillmentMethod === "delivery"
+                ? "Your order will be delivered to the address below."
+                : "You'll pick up from the assigned cluster farmer's office."}
             </p>
           </div>
 
@@ -180,25 +300,25 @@ export default function CreateDemandPage() {
             <DynamicInput
               label="State"
               placeholder="e.g. Kaduna"
-              error={errors.locationState?.message}
-              {...register("locationState")}
+              value={locationState}
+              onChange={(e) => setLocationState(e.target.value)}
               required
             />
             <DynamicInput
               label="LGA"
               placeholder="e.g. Kaduna South"
-              error={errors.locationLga?.message}
-              {...register("locationLga")}
+              value={locationLga}
+              onChange={(e) => setLocationLga(e.target.value)}
               required
             />
           </div>
 
           {/* Delivery Address */}
           <DynamicInput
-            label="Delivery Address"
-            placeholder="Full delivery address"
-            error={errors.deliveryAddress?.message}
-            {...register("deliveryAddress")}
+            label={fulfillmentMethod === "delivery" ? "Delivery Address" : "Your Address"}
+            placeholder="Full address"
+            value={deliveryAddress}
+            onChange={(e) => setDeliveryAddress(e.target.value)}
             required
           />
 
@@ -208,21 +328,20 @@ export default function CreateDemandPage() {
               Additional Notes <span className="font-normal text-gray-400">(optional)</span>
             </label>
             <textarea
-              {...register("notes")}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               placeholder="Any specific requirements, preferred delivery time, etc."
               rows={3}
+              maxLength={500}
               className="font-roboto-slab w-full rounded-2xl border border-(--border-input) p-(--space-md) text-sm text-(--text-colour) transition outline-none focus:border-(--border-gray)"
             />
-            {errors.notes && (
-              <p className="font-roboto-slab text-xs text-red-500">{errors.notes.message}</p>
-            )}
           </div>
 
           {/* Submit */}
           <div className="mx-auto w-full max-w-sm">
-            {isValid ? (
-              <SubmitPrimaryButton loading={submitting} type="submit">
-                Submit Demand
+            {canSubmit ? (
+              <SubmitPrimaryButton loading={submitting} onClick={handleSubmit} type="button">
+                {total !== null ? `Pay ₦${total.toLocaleString()} & Submit` : "Submit Demand"}
               </SubmitPrimaryButton>
             ) : (
               <SubmitSecondaryButton disabled type="button">
@@ -230,7 +349,7 @@ export default function CreateDemandPage() {
               </SubmitSecondaryButton>
             )}
           </div>
-        </form>
+        </div>
       </motion.div>
     </div>
   );

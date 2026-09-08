@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
@@ -15,127 +15,18 @@ import {
   Building2,
   Calendar,
   CheckCircle2,
-  Clock,
 } from "lucide-react";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
-import type { FarmerProfile } from "~/types";
-
-type FarmerWithStats = FarmerProfile & {
-  totalListings: number;
-  approvedListings: number;
-  pendingListings: number;
-  lastActive: Date;
-  memberSince: Date;
-};
-
-const mockFarmers: FarmerWithStats[] = [
-  {
-    id: "farmer-1",
-    userId: "user-1",
-    fullName: "Adebayo Johnson",
-    farmName: "Sunrise Fisheries",
-    farmAddress: "12 Fishpond Road, Epe",
-    state: "Lagos",
-    localGovernment: "Epe",
-    phoneNumber: "08012345678",
-    email: "adebayo.johnson@example.com",
-    occupation: "Farmer",
-    fishType: "Catfish",
-    farmingCapacityKg: 5000,
-    yearsOfExperience: 7,
-    isClusterFarmer: false,
-    profileImage: undefined,
-    totalListings: 12,
-    approvedListings: 9,
-    pendingListings: 2,
-    lastActive: new Date("2026-03-10"),
-    memberSince: new Date("2024-06-01"),
-    createdAt: new Date("2024-06-01"),
-    updatedAt: new Date("2026-03-10"),
-  },
-  {
-    id: "farmer-2",
-    userId: "user-2",
-    fullName: "Chinedu Okafor",
-    farmName: "Eastern Waves Aquaculture",
-    farmAddress: "5 Riverside Close, Ijebu Ode",
-    state: "Ogun",
-    localGovernment: "Ijebu Ode",
-    phoneNumber: "09098765432",
-    email: "chinedu.okafor@example.com",
-    occupation: "Farmer",
-    fishType: "Tilapia",
-    farmingCapacityKg: 3500,
-    yearsOfExperience: 4,
-    isClusterFarmer: false,
-    profileImage: undefined,
-    totalListings: 6,
-    approvedListings: 5,
-    pendingListings: 1,
-    lastActive: new Date("2026-03-12"),
-    memberSince: new Date("2024-09-15"),
-    createdAt: new Date("2024-09-15"),
-    updatedAt: new Date("2026-03-12"),
-  },
-  {
-    id: "farmer-3",
-    userId: "user-3",
-    fullName: "Fatima Yusuf",
-    farmName: "Northern Flow Farms",
-    farmAddress: "Plot 8, Kaduna South Industrial Area",
-    state: "Kaduna",
-    localGovernment: "Kaduna South",
-    phoneNumber: "07011223344",
-    email: "fatima.yusuf@example.com",
-    occupation: "Farmer",
-    fishType: "Mackerel",
-    farmingCapacityKg: 8000,
-    yearsOfExperience: 11,
-    isClusterFarmer: false,
-    profileImage: undefined,
-    totalListings: 20,
-    approvedListings: 18,
-    pendingListings: 0,
-    lastActive: new Date("2026-03-13"),
-    memberSince: new Date("2023-11-20"),
-    createdAt: new Date("2023-11-20"),
-    updatedAt: new Date("2026-03-13"),
-  },
-  {
-    id: "farmer-4",
-    userId: "user-4",
-    fullName: "Emeka Nwosu",
-    farmName: "Delta Aqua Farms",
-    farmAddress: "22 Waterside Avenue, Asaba",
-    state: "Delta",
-    localGovernment: "Oshimili South",
-    phoneNumber: "08155667788",
-    email: "emeka.nwosu@example.com",
-    occupation: "Farmer",
-    fishType: "Catfish",
-    farmingCapacityKg: 6200,
-    yearsOfExperience: 9,
-    isClusterFarmer: false,
-    profileImage: undefined,
-    totalListings: 15,
-    approvedListings: 11,
-    pendingListings: 3,
-    lastActive: new Date("2026-03-08"),
-    memberSince: new Date("2024-02-10"),
-    createdAt: new Date("2024-02-10"),
-    updatedAt: new Date("2026-03-08"),
-  },
-];
-
+import { clusterService, type BackendClusterFarmer } from "~/lib/services/cluster.service";
 
 function FarmerDetailModal({
   farmer,
   onClose,
 }: {
-  farmer: FarmerWithStats;
+  farmer: BackendClusterFarmer;
   onClose: () => void;
 }) {
-  const initials = farmer.fullName
+  const initials = farmer.farmerName
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -172,7 +63,7 @@ function FarmerDetailModal({
             {initials}
           </div>
           <div>
-            <h2 className="font-ubuntu text-2xl font-bold text-(--heading-colour)">{farmer.fullName}</h2>
+            <h2 className="font-ubuntu text-2xl font-bold text-(--heading-colour)">{farmer.farmerName}</h2>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-0.5 text-xs font-medium text-green-700">
               <Fish size={12} />
               {farmer.fishType} Farmer
@@ -187,11 +78,11 @@ function FarmerDetailModal({
             <p className="font-roboto-slab text-xs text-(--text-colour)">Total Listings</p>
           </div>
           <div className="text-center">
-            <p className="font-ubuntu text-2xl font-bold text-green-600">{farmer.approvedListings}</p>
+            <p className="font-ubuntu text-2xl font-bold text-green-600">{farmer.totalApprovedListings}</p>
             <p className="font-roboto-slab text-xs text-(--text-colour)">Approved</p>
           </div>
           <div className="text-center">
-            <p className="font-ubuntu text-2xl font-bold text-yellow-600">{farmer.pendingListings}</p>
+            <p className="font-ubuntu text-2xl font-bold text-yellow-600">{farmer.totalPendingListings}</p>
             <p className="font-roboto-slab text-xs text-(--text-colour)">Pending</p>
           </div>
         </div>
@@ -199,21 +90,27 @@ function FarmerDetailModal({
         {/* Details */}
         <div className="flex flex-col gap-(--space-md)">
           {[
-            { icon: <Building2 size={16} />, label: "Farm Name", value: farmer.farmName },
-            { icon: <MapPin size={16} />, label: "Location", value: `${farmer.farmAddress}, ${farmer.localGovernment}, ${farmer.state}` },
+            { icon: <Building2 size={16} />, label: "Farm Name", value: farmer.farmName ?? "—" },
+            { icon: <MapPin size={16} />, label: "Location", value: farmer.location },
             { icon: <Phone size={16} />, label: "Phone", value: farmer.phoneNumber },
-            { icon: <Mail size={16} />, label: "Email", value: farmer.email },
-            { icon: <Package size={16} />, label: "Capacity", value: `${farmer.farmingCapacityKg.toLocaleString()} kg` },
-            { icon: <TrendingUp size={16} />, label: "Experience", value: `${farmer.yearsOfExperience} years` },
+            { icon: <Mail size={16} />, label: "Email", value: farmer.emailAddress },
+            {
+              icon: <Package size={16} />,
+              label: "Capacity",
+              value: farmer.capacity != null ? `${Number(farmer.capacity).toLocaleString()} kg` : "—",
+            },
+            {
+              icon: <TrendingUp size={16} />,
+              label: "Experience",
+              value: farmer.experience != null ? `${farmer.experience} years` : "—",
+            },
             {
               icon: <Calendar size={16} />,
               label: "Member Since",
-              value: farmer.memberSince.toLocaleDateString("en-NG", { month: "long", year: "numeric" }),
-            },
-            {
-              icon: <Clock size={16} />,
-              label: "Last Active",
-              value: farmer.lastActive.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" }),
+              value: new Date(farmer.memberSince).toLocaleDateString("en-NG", {
+                month: "long",
+                year: "numeric",
+              }),
             },
           ].map(({ icon, label, value }) => (
             <div key={label} className="flex items-start gap-(--space-md)">
@@ -232,18 +129,48 @@ function FarmerDetailModal({
 
 export default function ClusterFarmersPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFarmer, setSelectedFarmer] = useState<FarmerWithStats | null>(null);
+  const [selectedFarmer, setSelectedFarmer] = useState<BackendClusterFarmer | null>(null);
+  const [farmers, setFarmers] = useState<BackendClusterFarmer[]>([]);
+  const [summary, setSummary] = useState({
+    totalFarmers: 0,
+    totalFarmersCapacity: 0,
+    locationCovering: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const filtered = mockFarmers.filter(
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      setErrorMessage(null);
+      try {
+        const response = await clusterService.getFarmers();
+        if (mounted) {
+          setFarmers(response.data.farmers);
+          setSummary(response.data.summary);
+        }
+      } catch (error) {
+        if (mounted) {
+          setErrorMessage(error instanceof Error ? error.message : "Failed to load farmers");
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const filtered = farmers.filter(
     (f) =>
-      f.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      f.farmName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      f.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      f.fishType.toLowerCase().includes(searchTerm.toLowerCase())
+      f.farmerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (f.farmName ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.fishType.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-
-  const totalCapacity = mockFarmers.reduce((sum, f) => sum + f.farmingCapacityKg, 0);
-  const statesCovered = new Set(mockFarmers.map((f) => f.state)).size;
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
@@ -257,14 +184,14 @@ export default function ClusterFarmersPage() {
         <div>
           <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">My Farmers</h1>
           <p className="font-roboto-slab text-(--text-colour)">
-            View and manage the farmers registered under your cluster
+            View and manage the farmers registered in your region
           </p>
         </div>
         <div className="relative w-full max-w-sm">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by name, farm, state, or fish type..."
+            placeholder="Search by name, farm, location, or fish type..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="font-roboto-slab h-10 w-full rounded-xl border border-(--border-input) pl-10 pr-4 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
@@ -280,9 +207,9 @@ export default function ClusterFarmersPage() {
         className="grid grid-cols-1 gap-4 sm:grid-cols-3"
       >
         {[
-          { icon: <Users size={24} className="text-green-600" />, bg: "bg-green-50", value: mockFarmers.length, label: "Total Farmers" },
-          { icon: <Package size={24} className="text-blue-600" />, bg: "bg-blue-50", value: `${totalCapacity.toLocaleString()} kg`, label: "Total Capacity" },
-          { icon: <MapPin size={24} className="text-purple-600" />, bg: "bg-purple-50", value: statesCovered, label: "States Covered" },
+          { icon: <Users size={24} className="text-green-600" />, bg: "bg-green-50", value: summary.totalFarmers, label: "Total Farmers" },
+          { icon: <Package size={24} className="text-blue-600" />, bg: "bg-blue-50", value: `${Number(summary.totalFarmersCapacity).toLocaleString()} kg`, label: "Total Capacity" },
+          { icon: <MapPin size={24} className="text-purple-600" />, bg: "bg-purple-50", value: summary.locationCovering, label: "Locations Covered" },
         ].map(({ icon, bg, value, label }) => (
           <motion.div
             key={label}
@@ -297,7 +224,25 @@ export default function ClusterFarmersPage() {
       </motion.div>
 
       {/* Farmer Cards */}
-      {filtered.length > 0 ? (
+      {loading ? (
+        <motion.div
+          variants={FADE_IN_VARIANT}
+          initial="hidden"
+          animate="visible"
+          className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap) text-center"
+        >
+          <p className="text-(--text-colour)">Loading farmers...</p>
+        </motion.div>
+      ) : errorMessage ? (
+        <motion.div
+          variants={FADE_IN_VARIANT}
+          initial="hidden"
+          animate="visible"
+          className="rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap) text-center"
+        >
+          <p className="text-(--error-red)">{errorMessage}</p>
+        </motion.div>
+      ) : filtered.length > 0 ? (
         <motion.div
           variants={STAGGER_CONTAINER_VARIANT}
           initial="hidden"
@@ -305,7 +250,7 @@ export default function ClusterFarmersPage() {
           className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
         >
           {filtered.map((farmer) => {
-            const initials = farmer.fullName
+            const initials = farmer.farmerName
               .split(" ")
               .map((n) => n[0])
               .join("")
@@ -314,7 +259,7 @@ export default function ClusterFarmersPage() {
 
             return (
               <motion.div
-                key={farmer.id}
+                key={farmer.emailAddress}
                 variants={FADE_IN_VARIANT}
                 className="flex flex-col gap-4 rounded-3xl border border-(--border-gray) bg-(--white) p-6 shadow-sm transition hover:shadow-md"
               >
@@ -324,7 +269,7 @@ export default function ClusterFarmersPage() {
                     {initials}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-ubuntu truncate text-lg font-bold text-(--heading-colour)">{farmer.fullName}</h3>
+                    <h3 className="font-ubuntu truncate text-lg font-bold text-(--heading-colour)">{farmer.farmerName}</h3>
                     <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
                       <Fish size={11} />
                       {farmer.fishType}
@@ -338,11 +283,11 @@ export default function ClusterFarmersPage() {
                 <div className="flex flex-col gap-2.5">
                   <div className="flex items-center gap-2 text-sm text-(--text-colour)">
                     <Building2 size={15} className="shrink-0 text-gray-400" />
-                    <span className="truncate">{farmer.farmName}</span>
+                    <span className="truncate">{farmer.farmName ?? "—"}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-(--text-colour)">
                     <MapPin size={15} className="shrink-0 text-gray-400" />
-                    <span>{farmer.localGovernment}, {farmer.state}</span>
+                    <span>{farmer.location}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-(--text-colour)">
                     <Phone size={15} className="shrink-0 text-gray-400" />
@@ -350,7 +295,12 @@ export default function ClusterFarmersPage() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-(--text-colour)">
                     <Package size={15} className="shrink-0 text-gray-400" />
-                    <span>Capacity: <span className="font-medium text-(--heading-colour)">{farmer.farmingCapacityKg.toLocaleString()} kg</span></span>
+                    <span>
+                      Capacity:{" "}
+                      <span className="font-medium text-(--heading-colour)">
+                        {farmer.capacity != null ? `${Number(farmer.capacity).toLocaleString()} kg` : "—"}
+                      </span>
+                    </span>
                   </div>
                 </div>
 
@@ -361,11 +311,11 @@ export default function ClusterFarmersPage() {
                     <p className="font-roboto-slab text-xs text-(--text-colour)">Listings</p>
                   </div>
                   <div className="text-center">
-                    <p className="font-ubuntu text-lg font-bold text-green-600">{farmer.approvedListings}</p>
+                    <p className="font-ubuntu text-lg font-bold text-green-600">{farmer.totalApprovedListings}</p>
                     <p className="font-roboto-slab text-xs text-(--text-colour)">Approved</p>
                   </div>
                   <div className="text-center">
-                    <p className="font-ubuntu text-lg font-bold text-yellow-600">{farmer.pendingListings}</p>
+                    <p className="font-ubuntu text-lg font-bold text-yellow-600">{farmer.totalPendingListings}</p>
                     <p className="font-roboto-slab text-xs text-(--text-colour)">Pending</p>
                   </div>
                 </div>
@@ -391,7 +341,11 @@ export default function ClusterFarmersPage() {
           <Users size={48} className="text-gray-300" />
           <div>
             <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">No farmers found</h3>
-            <p className="font-roboto-slab mt-1 text-(--text-colour)">Try adjusting your search terms</p>
+            <p className="font-roboto-slab mt-1 text-(--text-colour)">
+              {farmers.length === 0
+                ? "No farmers have registered in your region yet"
+                : "Try adjusting your search terms"}
+            </p>
           </div>
         </motion.div>
       )}

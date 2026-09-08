@@ -140,6 +140,7 @@ export type SelectInputProps = {
   options: {
     value: string;
     label: string;
+    disabled?: boolean;
   }[];
 
   value?: string;
@@ -249,13 +250,16 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
                   <div
                     key={option.value}
                     onClick={() => {
+                      if (option.disabled) return;
                       onValueChange?.(option.value);
                       setIsOpen(false);
                     }}
-                    tabIndex={0}
+                    tabIndex={option.disabled ? -1 : 0}
                     role="option"
                     aria-selected={option.value === value}
+                    aria-disabled={option.disabled}
                     onKeyDown={(e) => {
+                      if (option.disabled) return;
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
                         onValueChange?.(option.value);
@@ -263,10 +267,11 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
                       }
                     }}
                     className={cn(
-                      "font-roboto-slab cursor-pointer px-(--space-md) py-(--space-md) text-base text-(--text-colour) transition-all duration-200 ease-in-out",
-                      "hover:bg-(--bg-pink) hover:shadow-sm",
-                      "focus:bg-(--bg-pink) focus:outline-none focus:ring-inset",
-                      option.value === value && "bg-(--bg-pink)",
+                      "font-roboto-slab px-(--space-md) py-(--space-md) text-base transition-all duration-200 ease-in-out",
+                      option.disabled
+                        ? "cursor-not-allowed text-gray-300"
+                        : "cursor-pointer text-(--text-colour) hover:bg-(--bg-pink) hover:shadow-sm focus:bg-(--bg-pink) focus:outline-none focus:ring-inset",
+                      option.value === value && !option.disabled && "bg-(--bg-pink)",
                     )}
                   >
                     {option.label}

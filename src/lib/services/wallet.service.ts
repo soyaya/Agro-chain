@@ -31,8 +31,13 @@ export interface WalletTransactionRecord {
 export interface NameEnquiryResult {
   accountName: string;
   accountNumber: string;
-  responseCode: string;
-  responseMessage: string;
+  bankCode: string;
+  bankName: string;
+}
+
+export interface Bank {
+  bankCode: string;
+  bankName: string;
 }
 
 export interface TransferPayload {
@@ -46,9 +51,14 @@ export interface TransferPayload {
 // === Wallet Service
 
 export const walletService = {
-  /** Get live wallet balance (provisions the PulseMFB sub-account if BVN has been submitted). */
+  /** Get live wallet balance. Requires BVN + OTP verification to be completed first. */
   getWallet() {
     return apiFetch<{ status: string; data: WalletBalance }>("/wallet");
+  },
+
+  /** Get the list of banks supported for transfers/name-enquiry. */
+  getBanks() {
+    return apiFetch<{ status: string; data: { banks: Bank[] } }>("/wallet/banks");
   },
 
   /** Get the wallet's transfer history. */

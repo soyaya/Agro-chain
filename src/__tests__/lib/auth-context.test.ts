@@ -9,6 +9,7 @@ function getDashboardType(user: AuthUser | null): DashboardType {
   if (!user) return "farmer";
   if (user.role === "admin") return "admin";
   if (user.role === "buyer") return "buyer";
+  if (user.role === "rider") return "rider";
   if (user.isClusterFarmer) return "cluster-farmer";
   return "farmer";
 }
@@ -21,6 +22,9 @@ const baseUser: AuthUser = {
   role: "farmer",
   isClusterFarmer: false,
   profileComplete: true,
+  mustSetPassword: false,
+  locationState: "Kaduna",
+  locationLga: "Kaduna North",
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -74,6 +78,9 @@ function mapBackendUser(user: BackendUser): AuthUser {
     role: mappedRole,
     isClusterFarmer: user.is_cluster_farmer || user.role === "cluster",
     profileComplete: user.profile_completed,
+    mustSetPassword: user.must_set_password,
+    locationState: user.location_state,
+    locationLga: user.location_lga,
     createdAt: new Date(user.created_at),
     updatedAt: new Date(user.updated_at),
   };
@@ -87,6 +94,7 @@ const baseBackend: BackendUser = {
   role: "farmer",
   is_cluster_farmer: false,
   profile_completed: true,
+  must_set_password: false,
   verification_status: "verified",
   cluster_approved: false,
   location_state: "Kaduna",

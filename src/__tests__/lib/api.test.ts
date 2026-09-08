@@ -153,15 +153,37 @@ describe("apiFetch", () => {
   });
 
   it("throws ApiError with HTTP status on non-2xx response (JSON message)", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      makeJsonResponse({ message: "Unauthorized" }, 401),
-    );
+    // A 401 on a non-/auth/ path now triggers one silent /auth/refresh retry
+    // attempt (see api.ts) — mock that second call failing too, so the
+    // original 401 propagates as before.
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(makeJsonResponse({ message: "Unauthorized" }, 401))
+      .mockResolvedValueOnce(makeJsonResponse({}, 401));
 
     await expect(apiFetch("/me")).rejects.toMatchObject({
       name: "ApiError",
       status: 401,
       message: "Unauthorized",
     });
+  });
+
+  it("retries once and succeeds when /auth/refresh silently renews the session", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(makeJsonResponse({ message: "Invalid or expired session." }, 401))
+      .mockResolvedValueOnce(makeJsonResponse({ data: { access_token: "new" } }, 200))
+      .mockResolvedValueOnce(makeJsonResponse({ data: { id: "1" } }, 200));
+
+    const result = await apiFetch<{ data: { id: string } }>("/me");
+    expect(result).toEqual({ data: { id: "1" } });
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(3);
+    expect(vi.mocked(fetch).mock.calls[1][0]).toContain("/auth/refresh");
+  });
+
+  it("does not attempt a refresh retry for /auth/ routes themselves", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(makeJsonResponse({ message: "Invalid password" }, 401));
+
+    await expect(apiFetch("/auth/login")).rejects.toMatchObject({ status: 401 });
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
   });
 
   it("throws ApiError using error field when message is absent", async () => {

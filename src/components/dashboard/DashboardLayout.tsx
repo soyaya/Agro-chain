@@ -19,9 +19,23 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => void logout();
+
+  const displayName = user?.fullName?.trim() || "";
+  const initials =
+    displayName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]!.toUpperCase())
+      .join("") || "?";
+  const roleLabel = user?.isClusterFarmer
+    ? "Cluster Farmer"
+    : user?.role
+      ? user.role[0]!.toUpperCase() + user.role.slice(1)
+      : "";
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-linear-to-br from-gray-50 via-white to-gray-100">
@@ -237,16 +251,17 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                     {/* User Avatar */}
                     <div className="relative">
                       <div className="font-ubuntu flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-linear-to-br from-green-600 to-green-800 text-sm font-semibold text-white">
-                        {/* Placeholder - will show initials or uploaded image */}
-                        <span>JD</span>
+                        <span>{initials}</span>
                       </div>
                       <div className="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
                     </div>
 
                     {/* User Name - Hidden on mobile */}
                     <div className="hidden lg:block">
-                      <p className="font-roboto-slab text-sm font-medium text-gray-900">John Doe</p>
-                      <p className="font-roboto-slab text-xs text-gray-600">Farmer</p>
+                      <p className="font-roboto-slab text-sm font-medium text-gray-900">
+                        {displayName || " "}
+                      </p>
+                      <p className="font-roboto-slab text-xs text-gray-600">{roleLabel}</p>
                     </div>
                   </div>
                 </div>

@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { authService } from "~/lib/services/auth.service";
 import { buyerService } from "~/lib/services/buyer.service";
+import { platformService } from "~/lib/services/platform.service";
+import { LocationPicker, type LocationValue } from "~/components/shared/LocationPicker";
 
 type BuyerForm = {
   fullName: string;
@@ -14,6 +16,7 @@ type BuyerForm = {
   deliveryAddress: string;
   state: string;
   localGovernment: string;
+  ward: string;
   businessType: string;
 };
 
@@ -26,11 +29,26 @@ export default function BuyerProfilePage() {
     deliveryAddress: "",
     state: "",
     localGovernment: "",
+    ward: "",
     businessType: "",
   });
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    platformService
+      .getActiveStates()
+      .then((res) => {
+        if (mounted) setActiveStates(res.data.activeStates);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -42,12 +60,13 @@ export default function BuyerProfilePage() {
         if (!mounted) return;
         setForm({
           fullName: user.full_name ?? "",
-          companyName: user.business_name ?? "",
+          companyName: user.company_name ?? "",
           phoneNumber: user.phone_number ?? "",
           email: user.email ?? "",
           deliveryAddress: user.location_address ?? "",
           state: user.location_state ?? "",
           localGovernment: user.location_lga ?? "",
+          ward: user.location_ward ?? "",
           businessType: user.business_type ?? "",
         });
       } catch (error) {
@@ -67,12 +86,14 @@ export default function BuyerProfilePage() {
     try {
       await buyerService.updateProfile({
         fullName: form.fullName,
-        businessName: form.companyName,
+        companyName: form.companyName,
         phoneNumber: form.phoneNumber,
         email: form.email,
-        businessAddress: form.deliveryAddress,
+        deliveryAddress: form.deliveryAddress,
         state: form.state,
         localGovernment: form.localGovernment,
+        ward: form.ward,
+        businessType: form.businessType,
       });
       setEditing(false);
       toast.success("Profile updated successfully");
@@ -112,8 +133,6 @@ export default function BuyerProfilePage() {
             ["Phone Number", "phoneNumber"],
             ["Email", "email"],
             ["Delivery Address", "deliveryAddress"],
-            ["State", "state"],
-            ["Local Government", "localGovernment"],
             ["Business Type", "businessType"],
           ] as const
         ).map(([label, key]) => (
@@ -127,6 +146,53 @@ export default function BuyerProfilePage() {
             />
           </label>
         ))}
+
+        {editing ? (
+          <div className="md:col-span-2">
+            <LocationPicker
+              value={{ state: form.state, lga: form.localGovernment, ward: form.ward }}
+              onChange={(next: LocationValue) =>
+                setForm((prev) => ({
+                  ...prev,
+                  state: next.state,
+                  localGovernment: next.lga,
+                  ward: next.ward,
+                }))
+              }
+              activeStates={activeStates}
+            />
+          </div>
+        ) : (
+          <>
+            <label className="text-sm text-(--text-colour)">
+              <span className="mb-1 block font-medium text-(--heading-colour)">State</span>
+              <input
+                value={form.state}
+                disabled
+                className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
+                readOnly
+              />
+            </label>
+            <label className="text-sm text-(--text-colour)">
+              <span className="mb-1 block font-medium text-(--heading-colour)">Local Government</span>
+              <input
+                value={form.localGovernment}
+                disabled
+                className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
+                readOnly
+              />
+            </label>
+            <label className="text-sm text-(--text-colour)">
+              <span className="mb-1 block font-medium text-(--heading-colour)">Ward / Community</span>
+              <input
+                value={form.ward}
+                disabled
+                className="w-full rounded-lg border border-(--border-input) px-3 py-2 disabled:bg-gray-50"
+                readOnly
+              />
+            </label>
+          </>
+        )}
       </div>
     </div>
   );

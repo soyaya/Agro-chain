@@ -25,7 +25,7 @@ const serwist = new Serwist({
         url.pathname.startsWith('/farmers-dashboard') ||
         url.pathname.startsWith('/buyers-dashboard') ||
         url.pathname.startsWith('/cluster-dashboard') ||
-        url.pathname.startsWith('/admin-dashboard'),
+        url.pathname.startsWith('/rider-dashboard'),
       handler: new NetworkOnly(),
     },
 

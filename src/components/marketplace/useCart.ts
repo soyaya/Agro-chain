@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { toast } from "sonner";
 import type { MarketplaceListing, PackagingOption } from "~/types";
 import { BASE_PRICE_PER_KG_NAIRA } from "~/types/constants";
@@ -13,7 +14,6 @@ export interface CartItem {
   fishType: string;
   variant: FishVariant;
   processed: boolean;
-  deliveryType: "pickup" | "delivery";
   weightKg: number;
   quantity: number;
   pricePerUnit: number;
@@ -35,15 +35,21 @@ const getInitialCart = (): CartItem[] => {
   }
 };
 
-const computePricePerUnit = (pkg: PackagingOption) => pkg.pricePerUnit ?? pkg.weightKg * BASE_PRICE_PER_KG_NAIRA;
+// pkg.pricePerUnit is typed as `number` but the API actually serializes it as
+// a string (Prisma Decimal) — `??` alone doesn't coerce a present string, so
+// downstream arithmetic (cart subtotal, totals) silently does string
+// concatenation instead of addition unless every value is coerced here.
+const computePricePerUnit = (pkg: PackagingOption) =>
+  pkg.pricePerUnit != null ? Number(pkg.pricePerUnit) : pkg.weightKg * BASE_PRICE_PER_KG_NAIRA;
 
-export function useCart() {
+function useCartState() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [synced, setSynced] = useState(false);
 
   // Hydrate from localStorage first, then sync with backend cart if logged in
   useEffect(() => {
-    setItems(getInitialCart());
+    const localItems = getInitialCart();
+    setItems(localItems);
 
     const syncWithBackend = async () => {
       try {
@@ -73,7 +79,6 @@ export function useCart() {
             fishType: item.fishType,
             variant: item.variant as FishVariant,
             processed: item.processed,
-            deliveryType: "pickup" as const,
             weightKg: Number(item.weightKg),
             quantity: item.quantity,
             pricePerUnit: Number(item.pricePerUnit),
@@ -82,6 +87,36 @@ export function useCart() {
             clusterFarmerName: "",
           }));
           setItems(mapped);
+        } else if (localItems.length > 0) {
+          // GET succeeding means this is now an authenticated session, but the
+          // backend cart is empty — this is a guest cart built up before login
+          // (every addToCart POST silently 401'd while anonymous). Flush it to
+          // the backend now so checkout can actually find these items.
+          const flushed = await Promise.all(
+            localItems.map(async (item) => {
+              try {
+                const flushResponse = await apiFetch<{ data: { cartItemId: string } }>(
+                  "/marketplace/cart",
+                  {
+                    method: "POST",
+                    body: JSON.stringify({
+                      listingId: item.listingId,
+                      variant: item.variant,
+                      processed: item.processed,
+                      weightKg: item.weightKg,
+                      quantity: item.quantity,
+                      pricePerUnit: item.pricePerUnit,
+                    }),
+                  },
+                );
+                const serverId = flushResponse.data?.cartItemId;
+                return serverId ? { ...item, cartItemId: serverId } : item;
+              } catch {
+                return item;
+              }
+            }),
+          );
+          setItems(flushed);
         }
       } catch {
         // Not logged in or backend unreachable — keep local cart
@@ -105,8 +140,13 @@ export function useCart() {
     [items],
   );
 
+  // Number(...) here, not just at the point items are added — a cart item
+  // already sitting in localStorage from before computePricePerUnit was
+  // fixed (or a network hiccup during the server sync's own coercion) would
+  // otherwise keep a stale string totalPrice forever and silently break this
+  // sum into string concatenation again.
   const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.totalPrice, 0),
+    () => items.reduce((sum, item) => sum + Number(item.totalPrice), 0),
     [items],
   );
 
@@ -147,7 +187,6 @@ export function useCart() {
             fishType: listing.fishType,
             variant: options.variant,
             processed: options.processed,
-            deliveryType: "pickup",
             weightKg: pkg.weightKg,
             quantity: 1,
             pricePerUnit,
@@ -182,20 +221,14 @@ export function useCart() {
             );
           }
         } catch {
-          // keep local cart in place even if backend sync fails
+          // keep local cart in place even if backend sync fails (e.g. still anonymous —
+          // syncWithBackend's guest-cart flush picks this up once they log in)
         }
       })();
       toast.success("Added to cart");
     },
     [],
   );
-
-  const updateDeliveryType = useCallback((index: number, deliveryType: "pickup" | "delivery") => {
-    setItems((prev) => {
-      if (index < 0 || index >= prev.length) return prev;
-      return prev.map((item, idx) => (idx === index ? { ...item, deliveryType } : item));
-    });
-  }, []);
 
   const updateQuantity = useCallback((index: number, quantity: number) => {
     setItems((prev) => {
@@ -233,8 +266,24 @@ export function useCart() {
     synced,
     addToCart,
     updateQuantity,
-    updateDeliveryType,
     clearCart,
     setItems,
   };
+}
+
+type CartContextValue = ReturnType<typeof useCartState>;
+
+const CartContext = createContext<CartContextValue | null>(null);
+
+export function CartProvider({ children }: { children: ReactNode }) {
+  const cart = useCartState();
+  return createElement(CartContext.Provider, { value: cart }, children);
+}
+
+export function useCart(): CartContextValue {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
 }

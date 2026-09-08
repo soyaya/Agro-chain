@@ -5,8 +5,11 @@ import { motion } from "framer-motion";
 import { Users, FileText, Clock, CheckCircle } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { clusterService, type ClusterListingSummary } from "~/lib/services/cluster.service";
+import { useAuth } from "~/lib/auth-context";
 
 export default function ClusterDashboardPage() {
+  const { user } = useAuth();
+  const firstName = user?.fullName?.trim().split(/\s+/)[0] || "Cluster Farmer";
   const [summary, setSummary] = useState<ClusterListingSummary>({
     farmersUnderMe: 0,
     pendingApproval: 0,
@@ -85,7 +88,7 @@ export default function ClusterDashboardPage() {
         transition={{ duration: 0.4 }}
       >
         <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
-          Welcome back, Cluster Farmer! 👋
+          Welcome back, {firstName}! 👋
         </h1>
         <p className="font-roboto-slab text-(--text-colour)">
           Manage your farmers and marketplace listings

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +10,7 @@ import { motion } from "framer-motion";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
+import { VerifyAccountModal } from "~/components/shared/VerifyAccountModal";
 import {
   InputOTP,
   InputOTPGroup,
@@ -16,7 +18,8 @@ import {
   InputOTPSlot,
 } from "~/components/ui/input-otp";
 import Link from "next/link";
-import { cn } from "~/lib/utils";
+import { cn, getSafeReturnTo } from "~/lib/utils";
+import { MAX_OTP_RESEND_ATTEMPTS } from "~/types/constants";
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -24,8 +27,14 @@ const emailSchema = z.object({
 });
 type EmailForm = z.infer<typeof emailSchema>;
 
-export default function LoginPage() {
+function LoginPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const prefilledEmail = searchParams.get("email") || "";
+  const safeReturnTo = getSafeReturnTo(searchParams.get("returnTo"));
+
   const [step, setStep] = useState<1 | 2>(1);
+  const [unverifiedModal, setUnverifiedModal] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
   const [loginOtp, setLoginOtp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,7 +57,7 @@ export default function LoginPage() {
   } = useForm<EmailForm>({
     resolver: zodResolver(emailSchema),
     mode: "onChange",
-    defaultValues: { email: "" },
+    defaultValues: { email: prefilledEmail },
   });
 
   // Step 1: send OTP
@@ -72,7 +81,13 @@ export default function LoginPage() {
       setResendLocked(false);
       setCooldownSeconds(60);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send OTP. Please try again.");
+      const message = err instanceof Error ? err.message : "Failed to send OTP. Please try again.";
+      if (/not yet verified/i.test(message)) {
+        setEmailAddress(data.email);
+        setUnverifiedModal(true);
+      } else {
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -95,7 +110,7 @@ export default function LoginPage() {
 
       const json = (await response.json()) as {
         message?: string;
-        data?: { user?: { role?: string; is_cluster_farmer?: boolean } };
+        data?: { user?: { role?: string; is_cluster_farmer?: boolean; must_set_password?: boolean } };
       };
 
       if (!response.ok) {
@@ -108,9 +123,18 @@ export default function LoginPage() {
       const isCluster = user?.is_cluster_farmer === true || role === "cluster";
 
       let dashboardPath = "/buyers-dashboard";
-      if (role === "admin") dashboardPath = "/admin-dashboard";
-      else if (isCluster) dashboardPath = "/cluster-dashboard";
+      if (isCluster) dashboardPath = "/cluster-dashboard";
       else if (role === "farmer") dashboardPath = "/farmers-dashboard";
+      else if (role === "rider") dashboardPath = "/rider-dashboard";
+
+      // Admin-invited accounts (riders) must replace their temporary
+      // password before reaching any dashboard.
+      if (user?.must_set_password) dashboardPath = "/set-password";
+
+      // A returnTo present means login was reached via the checkout auth gate —
+      // resume that purchase instead of jumping to the dashboard. A voluntary
+      // direct login (no returnTo) always keeps the normal dashboard redirect.
+      const destination = user?.must_set_password ? dashboardPath : safeReturnTo || dashboardPath;
 
       setSuccess(true);
       setStatusModal({ open: true, variant: "success" });
@@ -118,12 +142,17 @@ export default function LoginPage() {
 
       // Use window.location to force a full navigation so the browser commits
       // the httpOnly cookies set by the proxy before the middleware reads them.
-      setTimeout(() => { window.location.href = dashboardPath; }, 800);
+      setTimeout(() => { window.location.href = destination; }, 800);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Invalid or expired code";
       setError(msg);
       setStatusModal({ open: false, variant: "loading" });
       toast.error(msg);
+      // Clear the code so the auto-submit effect below doesn't immediately
+      // re-fire with the same now-known-bad value the instant `loading` flips
+      // back to false — without this, a wrong/expired code gets silently
+      // resubmitted in a tight loop instead of waiting for fresh input.
+      setLoginOtp("");
     } finally {
       setLoading(false);
     }
@@ -147,7 +176,7 @@ export default function LoginPage() {
 
   const handleResendOtp = async () => {
     if (loading || resendLocked || cooldownSeconds > 0) return;
-    if (resendAttempts >= 2) {
+    if (resendAttempts >= MAX_OTP_RESEND_ATTEMPTS) {
       setResendLocked(true);
       return;
     }
@@ -165,9 +194,9 @@ export default function LoginPage() {
       const nextAttempts = resendAttempts + 1;
       setResendAttempts(nextAttempts);
       setCooldownSeconds(60);
-      if (nextAttempts >= 2) setResendLocked(true);
+      if (nextAttempts >= MAX_OTP_RESEND_ATTEMPTS) setResendLocked(true);
       toast.success(
-        `OTP resent. ${Math.max(0, 2 - nextAttempts)} resend${2 - nextAttempts === 1 ? "" : "s"} left.`,
+        `OTP resent. ${Math.max(0, MAX_OTP_RESEND_ATTEMPTS - nextAttempts)} resend${MAX_OTP_RESEND_ATTEMPTS - nextAttempts === 1 ? "" : "s"} left.`,
       );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to resend OTP");
@@ -235,7 +264,11 @@ export default function LoginPage() {
                 <p className="text-center text-sm text-(--text-colour)">
                   Don&apos;t have an account?{" "}
                   <Link
-                    href="/register"
+                    href={
+                      safeReturnTo
+                        ? `/authentication?returnTo=${encodeURIComponent(safeReturnTo)}`
+                        : "/authentication"
+                    }
                     className="font-medium text-(--black) decoration-2 underline-offset-4 hover:underline"
                   >
                     Register
@@ -305,7 +338,7 @@ export default function LoginPage() {
                   <p className="text-center text-xs text-(--text-colour)">
                     {resendLocked
                       ? "You've reached the resend limit. Try again after 24 hours."
-                      : `${Math.max(0, 2 - resendAttempts)} resend${2 - resendAttempts === 1 ? "" : "s"} left`}
+                      : `${Math.max(0, MAX_OTP_RESEND_ATTEMPTS - resendAttempts)} resend${MAX_OTP_RESEND_ATTEMPTS - resendAttempts === 1 ? "" : "s"} left`}
                   </p>
                 </div>
               </div>
@@ -324,6 +357,31 @@ export default function LoginPage() {
           statusModal.variant === "success" ? "Redirecting you to your dashboard." : undefined
         }
       />
+
+      <VerifyAccountModal
+        open={unverifiedModal}
+        email={emailAddress}
+        onVerify={() =>
+          router.push(
+            `/register?verify=${encodeURIComponent(emailAddress)}${
+              safeReturnTo ? `&returnTo=${encodeURIComponent(safeReturnTo)}` : ""
+            }`,
+          )
+        }
+        onDismiss={() => setUnverifiedModal(false)}
+      />
     </>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-full min-h-full w-full items-center justify-center">Loading...</div>
+      }
+    >
+      <LoginPageContent />
+    </Suspense>
   );
 }

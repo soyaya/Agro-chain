@@ -9,6 +9,14 @@ import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, STATUS_COLORS } from "~/typ
 import { EmptyState } from "~/components/ui/EmptyState";
 import { LoadingState } from "~/components/ui/LoadingState";
 
+// Guards against a missing/undefined status crashing the whole list — a
+// stale session refetch (401) or an order row missing this field shouldn't
+// take the page down.
+function capitalize(value: string | null | undefined): string {
+  if (!value) return "Unknown";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 export default function BuyerOrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<BackendOrder[]>([]);
@@ -166,7 +174,7 @@ export default function BuyerOrdersPage() {
 
                     <div className="flex items-center gap-3">
                       <span className={`rounded-full px-4 py-2 text-sm font-medium ${statusColor}`}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        {capitalize(order.status)}
                       </span>
                     </div>
                   </div>
@@ -192,8 +200,7 @@ export default function BuyerOrdersPage() {
                           order.payment_status === "paid" ? "text-green-600" : "text-yellow-600"
                         }`}
                       >
-                        {order.payment_status.charAt(0).toUpperCase() +
-                          order.payment_status.slice(1)}
+                        {capitalize(order.payment_status)}
                       </p>
                     </div>
                   </div>

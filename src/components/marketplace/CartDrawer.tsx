@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { CartItem } from "./useCart";
+import { isSeedlingFishType } from "~/types/constants";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -66,8 +67,8 @@ export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity 
                             {item.fishType} • {item.variant}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {item.processed ? "Processed" : "Unprocessed"} • {item.weightKg}kg pack •{" "}
-                            {item.deliveryType === "delivery" ? "Delivery" : "Pickup"}
+                            {item.processed ? "Processed" : "Unprocessed"} •{" "}
+                            {isSeedlingFishType(item.fishType) ? `${item.weightKg} piece` : `${item.weightKg}kg`} pack
                           </p>
                           <p className="mt-1 text-xs text-gray-500">
                             {item.clusterFarmerName}

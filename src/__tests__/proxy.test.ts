@@ -27,8 +27,6 @@ describe("proxy — unauthenticated requests", () => {
     "/buyers-dashboard/orders",
     "/cluster-dashboard",
     "/cluster-dashboard/farmers",
-    "/admin-dashboard",
-    "/admin-dashboard/applications",
   ];
 
   dashboardPaths.forEach((path) => {
@@ -64,17 +62,22 @@ describe("proxy — authenticated users hitting auth pages", () => {
     expect(res?.headers.get("location")).toContain("/farmers-dashboard");
   });
 
-  it("redirects /register → /buyers-dashboard for a buyer", () => {
+  it("does NOT redirect /register away even with a session cookie present", () => {
+    // Deliberate: the `current_user` cookie only proves a session existed, not
+    // that it's still valid server-side (e.g. account deleted, session revoked
+    // elsewhere). Bouncing /register away on a stale cookie would trap the user
+    // with no way to re-register until the cookie self-clears client-side —
+    // see auth-context.tsx. /login staying gated is an acceptable tradeoff
+    // since a wrongly-bounced dashboard self-corrects back to /login anyway.
     const req = makeRequest("/register", encodeUser({ role: "buyer" }));
     const res = proxy(req);
-    expect(res?.status).toBe(307);
-    expect(res?.headers.get("location")).toContain("/buyers-dashboard");
+    expect(res?.status).not.toBe(307);
   });
 
-  it("redirects /login → /admin-dashboard for an admin", () => {
+  it("redirects /login → /buyers-dashboard for an admin (no dashboard in this app)", () => {
     const req = makeRequest("/login", encodeUser({ role: "admin" }));
     const res = proxy(req);
-    expect(res?.headers.get("location")).toContain("/admin-dashboard");
+    expect(res?.headers.get("location")).toContain("/buyers-dashboard");
   });
 
   it("redirects /login → /cluster-dashboard for a cluster farmer (isClusterFarmer=true)", () => {
@@ -108,6 +111,37 @@ describe("proxy — authenticated users accessing their dashboards", () => {
       "/buyers-dashboard/orders",
       encodeUser({ role: "buyer" }),
     );
+    const res = proxy(req);
+    expect(res?.status).not.toBe(307);
+  });
+});
+
+// ─── checkout auth gate (public marketplace, purchase-gated auth) ────────────
+
+describe("proxy — checkout auth gate", () => {
+  it("redirects /marketplace/checkout → /login with a returnTo param when no session", () => {
+    const req = makeRequest("/marketplace/checkout");
+    const res = proxy(req);
+    expect(res?.status).toBe(307);
+    const location = res?.headers.get("location") ?? "";
+    expect(location).toContain("/login");
+    expect(location).toContain(`returnTo=${encodeURIComponent("/marketplace/checkout")}`);
+  });
+
+  it("lets an authenticated user through to /marketplace/checkout", () => {
+    const req = makeRequest("/marketplace/checkout", encodeUser({ role: "buyer" }));
+    const res = proxy(req);
+    expect(res?.status).not.toBe(307);
+  });
+
+  it("does not gate plain /marketplace browsing for anonymous visitors", () => {
+    const req = makeRequest("/marketplace");
+    const res = proxy(req);
+    expect(res?.status).not.toBe(307);
+  });
+
+  it("does not gate /marketplace listing detail pages for anonymous visitors", () => {
+    const req = makeRequest("/marketplace/some-listing-id");
     const res = proxy(req);
     expect(res?.status).not.toBe(307);
   });

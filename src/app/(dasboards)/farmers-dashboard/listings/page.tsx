@@ -6,7 +6,7 @@ import { Plus, Filter } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ListingCard } from "~/components/listings/ListingCard";
 import type { FarmerSupplyListing, ListingStatus } from "~/types";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, isSeedlingFishType } from "~/types/constants";
 import { farmerService } from "~/lib/services/farmer.service";
 
 export default function FarmerListingsPage() {
@@ -32,6 +32,7 @@ export default function FarmerListingsPage() {
             farmerId: "self",
             farmerName: "My Listing",
             fishType: item.fishType,
+            unit: isSeedlingFishType(item.fishType) ? "piece" : "kg",
             harvestDate: new Date(item.harvestDate),
             totalAvailableKg: item.totalAvailableKg,
             packaging: [

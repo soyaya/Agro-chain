@@ -4,18 +4,73 @@
 // ============================================
 // FISH TYPES
 // ============================================
+// Catfish growth-stage / product categories a farmer can list. `value` must
+// match the backend's FishType Prisma enum exactly.
 
-export const FISH_TYPES = ["Catfish"] as const;
+export interface FishTypeCategory {
+  value: "post" | "juveniles" | "jumbo" | "table_size" | "broodstock" | "dried";
+  label: string;
+  imageUrl: string;
+}
 
-export type FishType = typeof FISH_TYPES[number];
+// post/juveniles/jumbo are all fingerling-stage seedling sizes, so they
+// share the same representative seedlings photo — table_size/broodstock/
+// dried are each their own distinct mature/processed category.
+const SEEDLINGS_IMAGE_URL = "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005/Seedlings.webp";
+
+export const FISH_TYPE_CATEGORIES: FishTypeCategory[] = [
+  {
+    value: "post",
+    label: "Post Fingerlings",
+    imageUrl: SEEDLINGS_IMAGE_URL,
+  },
+  {
+    value: "juveniles",
+    label: "Juveniles",
+    imageUrl: SEEDLINGS_IMAGE_URL,
+  },
+  {
+    value: "jumbo",
+    label: "Jumbo",
+    imageUrl: SEEDLINGS_IMAGE_URL,
+  },
+  {
+    value: "table_size",
+    label: "Table Size",
+    imageUrl: "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005/Table_size.jpg",
+  },
+  {
+    value: "broodstock",
+    label: "Broodstock",
+    imageUrl: "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005/Broodstock.jpg",
+  },
+  {
+    value: "dried",
+    label: "Dried Catfish",
+    imageUrl: "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005/Dry_Fish.jpg",
+  },
+];
+
+export const FISH_TYPE_OPTIONS = FISH_TYPE_CATEGORIES.map(({ value, label }) => ({
+  value,
+  label,
+}));
+
+export const FISH_TYPES = FISH_TYPE_CATEGORIES.map((c) => c.label);
+
+export type FishType = FishTypeCategory["value"];
 
 export const FISH_VARIANTS = ["Dried", "Jumbo", "Table Size", "Broodstock"] as const;
 
 export type FishVariant = typeof FISH_VARIANTS[number];
 
-export const BASE_PRICE_PER_KG_NAIRA = 3500;
+// Seedling listings (fish_type = "juveniles" | "post" | "jumbo") are sold and
+// priced per piece, not per kg — used wherever a listing/cart item's unit
+// needs deriving client-side from just its fishType string.
+const SEEDLING_FISH_TYPES = ["juveniles", "post", "jumbo"];
+export const isSeedlingFishType = (fishType: string) => SEEDLING_FISH_TYPES.includes(fishType);
 
-export const BASE_DELIVERY_FEE_NAIRA = 1500;
+export const BASE_PRICE_PER_KG_NAIRA = 3500;
 
 // ============================================
 // NIGERIAN STATES
@@ -107,10 +162,13 @@ export type PackagingWeight = typeof STANDARD_PACKAGING_WEIGHTS[number];
 // MINIMUM REQUIREMENTS
 // ============================================
 
-export const MIN_SUPPLY_KG = 1000;
+export const MIN_SUPPLY_KG = 1;
 export const MIN_FARMING_CAPACITY_KG = 500;
 export const MIN_YEARS_EXPERIENCE = 0;
 export const MAX_YEARS_EXPERIENCE = 50;
+
+// Must match MAX_RESEND_ATTEMPTS in Agro-chain2/src/controllers/auth.controller.ts
+export const MAX_OTP_RESEND_ATTEMPTS = 3;
 
 // ============================================
 // VALIDATION PATTERNS

@@ -5,20 +5,27 @@ import { motion } from "framer-motion";
 import { ShoppingCart, Package, Clock, CheckCircle } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { buyerService, type BackendOrder } from "~/lib/services/buyer.service";
+import { useAuth } from "~/lib/auth-context";
 
 export default function BuyersDashboardPage() {
+  const { user } = useAuth();
+  const firstName = user?.fullName?.trim().split(/\s+/)[0] || "Buyer";
   const [orders, setOrders] = useState<BackendOrder[]>([]);
+  const [savedCount, setSavedCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
     const load = async () => {
       setLoading(true);
-      try {
-        const response = await buyerService.getOrders();
-        if (mounted) setOrders(response.data.orders ?? []);
-      } finally {
-        if (mounted) setLoading(false);
+      const [ordersRes, savedRes] = await Promise.allSettled([
+        buyerService.getOrders(),
+        buyerService.getSavedListings(),
+      ]);
+      if (mounted) {
+        if (ordersRes.status === "fulfilled") setOrders(ordersRes.value.data.orders ?? []);
+        if (savedRes.status === "fulfilled") setSavedCount(savedRes.value.data.listings?.length ?? 0);
+        setLoading(false);
       }
     };
     void load();
@@ -51,12 +58,12 @@ export default function BuyersDashboardPage() {
     },
     {
       label: "Saved Listings",
-      value: "-",
+      value: savedCount.toLocaleString(),
       icon: Package,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
     },
-  ], [orders]);
+  ], [orders, savedCount]);
 
   return (
     <div className="flex flex-col gap-(--section-gap)">
@@ -67,7 +74,7 @@ export default function BuyersDashboardPage() {
         transition={{ duration: 0.4 }}
       >
         <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
-          Welcome back, Buyer! 👋
+          Welcome back, {firstName}! 👋
         </h1>
         <p className="font-roboto-slab text-(--text-colour)">
           Here&apos;s an overview of your orders and activities

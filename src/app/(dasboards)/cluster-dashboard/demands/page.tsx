@@ -11,12 +11,14 @@ import {
   Package,
   MapPin,
   AlertCircle,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   clusterService,
   type BackendDemand,
   type DemandStatus,
+  type ApprovedRider,
 } from "~/lib/services/cluster.service";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
@@ -31,6 +33,16 @@ const STATUS_CONFIG: Record<DemandStatus, { label: string; className: string }> 
   declined: { label: "Declined", className: "bg-red-50 text-red-700 border-red-200" },
   fulfilled: { label: "Fulfilled", className: "bg-gray-50 text-gray-700 border-gray-200" },
   cancelled: { label: "Cancelled", className: "bg-gray-50 text-gray-500 border-gray-200" },
+};
+
+const FULFILLMENT_STAGE_LABELS: Record<string, string> = {
+  awaiting_farmer_dispatch: "Awaiting acceptance",
+  at_cluster_office: "Sourced — at your office",
+  ready_for_pickup: "Ready for buyer pickup",
+  escalated_to_rider: "Escalated to rider",
+  out_for_delivery: "Out for delivery",
+  delivered_awaiting_confirmation: "Delivered — awaiting buyer confirmation",
+  completed: "Completed",
 };
 
 // === Decline Modal
@@ -111,50 +123,137 @@ function DeclineModal({ isOpen, onClose, onConfirm, loading }: DeclineModalProps
   );
 }
 
+// === Escalate Modal
+
+interface EscalateModalProps {
+  isOpen: boolean;
+  riders: ApprovedRider[];
+  onClose: () => void;
+  onConfirm: (riderId: string) => void;
+  loading: boolean;
+}
+
+function EscalateModal({ isOpen, riders, onClose, onConfirm, loading }: EscalateModalProps) {
+  const [selectedRiderId, setSelectedRiderId] = useState("");
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 z-50 bg-black/50"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="fixed top-1/2 left-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-(--white) p-(--space-xl) shadow-lg"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">Escalate to Rider</h3>
+              <button onClick={onClose} className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="mt-4 flex max-h-64 flex-col gap-2 overflow-y-auto">
+              {riders.length === 0 ? (
+                <p className="font-roboto-slab py-4 text-center text-sm text-(--text-colour)">
+                  No approved riders in your region yet.
+                </p>
+              ) : (
+                riders.map((rider) => (
+                  <button
+                    key={rider.id}
+                    onClick={() => setSelectedRiderId(rider.id)}
+                    className={`flex items-center justify-between rounded-2xl border p-(--space-md) text-left transition ${
+                      selectedRiderId === rider.id
+                        ? "border-(--theme-green-dark) bg-green-50"
+                        : "border-(--border-gray) hover:bg-(--bg-pink)"
+                    }`}
+                  >
+                    <div>
+                      <p className="font-roboto-slab text-sm font-semibold text-(--heading-colour)">
+                        {rider.full_name}
+                      </p>
+                      <p className="font-roboto-slab text-xs text-gray-400">{rider.phone_number}</p>
+                    </div>
+                    {selectedRiderId === rider.id && <div className="h-4 w-4 rounded-full bg-(--theme-green-dark)" />}
+                  </button>
+                ))
+              )}
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-(--gap-base)">
+              <button
+                onClick={onClose}
+                className="font-roboto-slab flex h-12 items-center justify-center rounded-full border border-(--border-gray) text-sm font-medium text-(--text-colour) transition hover:bg-(--bg-pink)"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => selectedRiderId && onConfirm(selectedRiderId)}
+                disabled={loading || !selectedRiderId}
+                className="font-roboto-slab flex h-12 items-center justify-center rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+              >
+                {loading ? "Escalating..." : "Escalate"}
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // === Page
 
 export default function ClusterDemandsPage() {
   const [demands, setDemands] = useState<BackendDemand[]>([]);
+  const [riders, setRiders] = useState<ApprovedRider[]>([]);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [declineModalOpen, setDeclineModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [escalateDemandId, setEscalateDemandId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<DemandStatus | "all">("all");
 
+  const load = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const [demandsRes, ridersRes] = await Promise.all([
+        clusterService.getDemands(),
+        clusterService.getApprovedRiders(),
+      ]);
+      setDemands(demandsRes.data.demands ?? []);
+      setRiders(ridersRes.data.riders ?? []);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Failed to load demands");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      setLoading(true);
-      setErrorMessage(null);
-      try {
-        const response = await clusterService.getDemands();
-        if (mounted) setDemands(response.data.demands ?? []);
-      } catch (error) {
-        if (mounted)
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load demands");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
     void load();
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   const handleAccept = async (id: string) => {
-    setActionLoading(true);
+    setActionLoading(id);
     try {
       await clusterService.acceptDemand(id);
-      setDemands((prev) =>
-        prev.map((d) => (d.id === id ? { ...d, status: "accepted" as DemandStatus } : d)),
-      );
-      toast.success("Demand accepted — it will appear in your Orders.");
+      toast.success("Demand accepted — source it and mark it ready or escalate to a rider.");
+      await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to accept demand");
     } finally {
-      setActionLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -165,34 +264,45 @@ export default function ClusterDemandsPage() {
 
   const handleDeclineConfirm = async (reason: string) => {
     if (!selectedId) return;
-    setActionLoading(true);
+    setActionLoading(selectedId);
     try {
       await clusterService.declineDemand(selectedId, reason || undefined);
-      setDemands((prev) =>
-        prev.map((d) => (d.id === selectedId ? { ...d, status: "declined" as DemandStatus } : d)),
-      );
       toast.success("Demand declined.");
       setDeclineModalOpen(false);
       setSelectedId(null);
+      await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to decline demand");
     } finally {
-      setActionLoading(false);
+      setActionLoading(null);
     }
   };
 
-  const handleFulfill = async (id: string) => {
-    setActionLoading(true);
+  const handleReadyForPickup = async (id: string) => {
+    setActionLoading(id);
     try {
-      await clusterService.fulfillDemand(id);
-      setDemands((prev) =>
-        prev.map((d) => (d.id === id ? { ...d, status: "fulfilled" as DemandStatus } : d)),
-      );
-      toast.success("Demand marked as fulfilled.");
+      await clusterService.markDemandReadyForPickup(id);
+      toast.success("Marked ready for pickup.");
+      await load();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to mark as fulfilled");
+      toast.error(error instanceof Error ? error.message : "Failed to update demand");
     } finally {
-      setActionLoading(false);
+      setActionLoading(null);
+    }
+  };
+
+  const handleEscalate = async (riderId: string) => {
+    if (!escalateDemandId) return;
+    setActionLoading(escalateDemandId);
+    try {
+      await clusterService.escalateDemandToRider(escalateDemandId, riderId);
+      toast.success("Escalated to rider for delivery.");
+      setEscalateDemandId(null);
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to escalate to rider");
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -233,8 +343,8 @@ export default function ClusterDemandsPage() {
       >
         <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">Demands</h1>
         <p className="font-roboto-slab text-(--text-colour)">
-          Custom buyer requests assigned to you by admin. Accept to fulfill or decline if
-          unavailable.
+          Custom buyer requests assigned to you by admin. Accept to source it yourself, then hand
+          it off for pickup or delivery — the buyer confirms when it arrives.
         </p>
       </motion.div>
 
@@ -301,7 +411,7 @@ export default function ClusterDemandsPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-ubuntu text-lg font-bold text-(--heading-colour) capitalize">
-                      {demand.fishType}
+                      {demand.fishVariant.replace("_", " ")}
                     </h3>
                     <p className="font-roboto-slab text-sm text-(--text-colour)">
                       from {demand.buyerName}
@@ -321,7 +431,8 @@ export default function ClusterDemandsPage() {
                   <div className="font-roboto-slab flex items-center gap-2 text-sm text-(--text-colour)">
                     <Package size={15} className="shrink-0 text-gray-400" />
                     <span>
-                      {demand.weightKg} kg · {demand.fishVariant.replace("_", " ")}
+                      {demand.quantityPieces ? `${demand.quantityPieces} pcs` : `${demand.weightKg} kg`} · ₦
+                      {demand.grandTotal.toLocaleString()}
                     </span>
                   </div>
                   <div className="font-roboto-slab flex items-center gap-2 text-sm text-(--text-colour)">
@@ -347,12 +458,12 @@ export default function ClusterDemandsPage() {
                   )}
                 </div>
 
-                {/* Actions */}
+                {/* Assign-stage actions */}
                 {demand.status === "assigned" && (
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <button
                       onClick={() => handleAccept(demand.id)}
-                      disabled={actionLoading}
+                      disabled={actionLoading === demand.id}
                       className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
                     >
                       <CheckCircle size={16} />
@@ -360,7 +471,7 @@ export default function ClusterDemandsPage() {
                     </button>
                     <button
                       onClick={() => handleDeclineClick(demand.id)}
-                      disabled={actionLoading}
+                      disabled={actionLoading === demand.id}
                       className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:opacity-50"
                     >
                       <XCircle size={16} />
@@ -369,15 +480,33 @@ export default function ClusterDemandsPage() {
                   </div>
                 )}
 
+                {/* Physical fulfillment, once accepted */}
                 {demand.status === "accepted" && (
-                  <button
-                    onClick={() => handleFulfill(demand.id)}
-                    disabled={actionLoading}
-                    className="font-roboto-slab flex w-full items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-                  >
-                    <Truck size={16} />
-                    Mark as Fulfilled
-                  </button>
+                  <div className="rounded-xl border border-(--border-gray) bg-(--gray-bg) p-3">
+                    <p className="font-roboto-slab mb-2 text-xs font-medium text-(--text-colour)">
+                      {FULFILLMENT_STAGE_LABELS[demand.fulfillmentStage] ?? demand.fulfillmentStage}
+                    </p>
+                    {demand.fulfillmentStage === "at_cluster_office" && demand.fulfillmentMethod === "pickup" && (
+                      <button
+                        onClick={() => handleReadyForPickup(demand.id)}
+                        disabled={actionLoading === demand.id}
+                        className="font-roboto-slab flex w-full items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                      >
+                        <CheckCircle size={16} />
+                        Mark Ready for Pickup
+                      </button>
+                    )}
+                    {demand.fulfillmentStage === "at_cluster_office" && demand.fulfillmentMethod === "delivery" && (
+                      <button
+                        onClick={() => setEscalateDemandId(demand.id)}
+                        disabled={actionLoading === demand.id}
+                        className="font-roboto-slab flex w-full items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                      >
+                        <Truck size={16} />
+                        Escalate to Rider
+                      </button>
+                    )}
+                  </div>
                 )}
               </motion.div>
             );
@@ -403,7 +532,15 @@ export default function ClusterDemandsPage() {
           setSelectedId(null);
         }}
         onConfirm={handleDeclineConfirm}
-        loading={actionLoading}
+        loading={!!actionLoading}
+      />
+
+      <EscalateModal
+        isOpen={!!escalateDemandId}
+        riders={riders}
+        onClose={() => setEscalateDemandId(null)}
+        onConfirm={handleEscalate}
+        loading={!!actionLoading}
       />
     </div>
   );

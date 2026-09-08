@@ -44,6 +44,13 @@ const nextInternals: Record<string, string> = {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
+    ],
+  },
+
   webpack(config) {
     config.resolve = config.resolve ?? {};
     config.resolve.alias = {

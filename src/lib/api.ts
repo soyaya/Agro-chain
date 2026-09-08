@@ -19,6 +19,39 @@ export class ApiError extends Error {
   }
 }
 
+// The access token JWT is short-lived (hours), but its cookie and the paired
+// refresh-token cookie live for days — without this, any request made after
+// the JWT itself expires surfaces as a hard "Invalid or expired session"
+// even though the user never logged out. On a 401, silently try /auth/refresh
+// once (which rotates both cookies) and retry the original request before
+// giving up. Concurrent 401s share one in-flight refresh instead of each
+// racing their own.
+let refreshPromise: Promise<boolean> | null = null;
+
+async function attemptRefresh(): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = fetch(buildApiUrl("/auth/refresh"), {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((res) => res.ok)
+      .catch(() => false)
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
+async function doFetch(url: string, options: RequestInit, headers: Headers): Promise<Response> {
+  try {
+    return await fetch(url, { ...options, headers, credentials: "include" });
+  } catch (networkError) {
+    // Network failure (backend down, no connection, CORS preflight blocked, etc.)
+    throw new ApiError("Unable to reach the server. Please check your connection or try again later.", 0);
+  }
+}
+
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = buildApiUrl(path);
   const headers = new Headers(options.headers);
@@ -27,19 +60,14 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     headers.set("Content-Type", "application/json");
   }
 
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: "include",
-    });
-  } catch (networkError) {
-    // Network failure (backend down, no connection, CORS preflight blocked, etc.)
-    throw new ApiError(
-      "Unable to reach the server. Please check your connection or try again later.",
-      0,
-    );
+  let response = await doFetch(url, options, headers);
+
+  const isAuthRoute = path.startsWith("/auth/");
+  if (response.status === 401 && !isAuthRoute) {
+    const refreshed = await attemptRefresh();
+    if (refreshed) {
+      response = await doFetch(url, options, headers);
+    }
   }
 
   const contentType = response.headers.get("content-type") ?? "";

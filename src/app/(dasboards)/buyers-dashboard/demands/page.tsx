@@ -53,26 +53,23 @@ export default function BuyerDemandsPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<DemandStatus | "all">("all");
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const [paying, setPaying] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const response = await buyerService.getDemands();
+      setDemands(response.data.demands ?? []);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Failed to load demands");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      setLoading(true);
-      setErrorMessage(null);
-      try {
-        const response = await buyerService.getDemands();
-        if (mounted) setDemands(response.data.demands ?? []);
-      } catch (error) {
-        if (mounted)
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load demands");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
     void load();
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   const handleCancel = async (id: string) => {
@@ -85,6 +82,19 @@ export default function BuyerDemandsPage() {
       toast.error(error instanceof Error ? error.message : "Failed to cancel demand");
     } finally {
       setCancelling(null);
+    }
+  };
+
+  const handlePay = async (id: string) => {
+    setPaying(id);
+    try {
+      await buyerService.payDemandWithWallet(id);
+      toast.success("Payment successful. Your demand is now live.");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Payment failed");
+    } finally {
+      setPaying(null);
     }
   };
 
@@ -215,9 +225,11 @@ export default function BuyerDemandsPage() {
                         </p>
                       </div>
                       <div>
-                        <p className="font-roboto-slab text-xs text-gray-500">Weight</p>
+                        <p className="font-roboto-slab text-xs text-gray-500">
+                          {demand.seedlingSize ? "Quantity" : "Weight"}
+                        </p>
                         <p className="font-ubuntu font-semibold text-(--heading-colour)">
-                          {demand.weightKg} kg
+                          {demand.seedlingSize ? `${demand.quantityPieces} pcs` : `${demand.weightKg} kg`}
                         </p>
                       </div>
                       <div>
@@ -232,6 +244,22 @@ export default function BuyerDemandsPage() {
                           {demand.locationLga}, {demand.locationState}
                         </p>
                       </div>
+                      <div>
+                        <p className="font-roboto-slab text-xs text-gray-500">Total</p>
+                        <p className="font-ubuntu font-semibold text-(--heading-colour)">
+                          ₦{demand.grandTotal.toLocaleString()}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-roboto-slab text-xs text-gray-500">Payment</p>
+                        <p
+                          className={`font-ubuntu font-semibold capitalize ${
+                            demand.paymentStatus === "paid" ? "text-green-600" : "text-yellow-600"
+                          }`}
+                        >
+                          {demand.paymentStatus}
+                        </p>
+                      </div>
                     </div>
 
                     {demand.notes && (
@@ -241,17 +269,33 @@ export default function BuyerDemandsPage() {
                     )}
                   </div>
 
-                  {/* Cancel button — only for pending demands */}
-                  {demand.status === "pending" && (
+                  <div className="flex shrink-0 flex-col gap-2 self-start">
                     <button
-                      onClick={() => handleCancel(demand.id)}
-                      disabled={cancelling === demand.id}
-                      className="font-roboto-slab flex shrink-0 items-center gap-2 self-start rounded-xl border border-red-200 bg-red-50 px-(--space-lg) py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                      onClick={() => router.push(`/buyers-dashboard/demands/${demand.id}`)}
+                      className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl border border-(--border-gray) px-(--space-lg) py-2 text-sm font-medium text-(--heading-colour) transition hover:bg-(--bg-pink)"
                     >
-                      <X size={15} />
-                      {cancelling === demand.id ? "Cancelling..." : "Cancel"}
+                      View Details
                     </button>
-                  )}
+                    {demand.status === "pending" && demand.paymentStatus !== "paid" && (
+                      <button
+                        onClick={() => void handlePay(demand.id)}
+                        disabled={paying === demand.id}
+                        className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) px-(--space-lg) py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+                      >
+                        {paying === demand.id ? "Paying..." : `Pay ₦${demand.grandTotal.toLocaleString()}`}
+                      </button>
+                    )}
+                    {demand.status === "pending" && (
+                      <button
+                        onClick={() => handleCancel(demand.id)}
+                        disabled={cancelling === demand.id}
+                        className="font-roboto-slab flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-(--space-lg) py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                      >
+                        <X size={15} />
+                        {cancelling === demand.id ? "Cancelling..." : "Cancel"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             );

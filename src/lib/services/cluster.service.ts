@@ -14,7 +14,16 @@ export interface BackendClusterOrder {
   quantity: number;
   deliveryOption: string;
   status: string;
+  fulfillmentStage: string;
+  fulfillmentMethod: "pickup" | "delivery";
+  assignedRiderId: string | null;
   createdAt: string;
+}
+
+export interface ApprovedRider {
+  id: string;
+  full_name: string;
+  phone_number: string;
 }
 
 export interface BackendClusterFarmer {
@@ -63,8 +72,19 @@ export interface UpdateClusterProfilePayload {
   fullName?: string;
   phoneNumber?: string;
   email?: string;
-  clusterName?: string;
-  location?: string;
+  businessName?: string;
+  state?: string;
+  localGovernment?: string;
+  ward?: string;
+}
+
+export interface PendingRider {
+  id: string;
+  full_name: string;
+  phone_number: string;
+  email: string | null;
+  location_lga: string;
+  created_at: string;
 }
 
 export type DemandStatus = "pending" | "assigned" | "accepted" | "declined" | "fulfilled" | "cancelled";
@@ -74,8 +94,13 @@ export interface BackendDemand {
   buyerName: string;
   buyerPhone?: string;
   fishType: string;
-  weightKg: number;
+  weightKg?: number;
+  quantityPieces?: number;
   fishVariant: string;
+  grandTotal: number;
+  fulfillmentStage: string;
+  fulfillmentMethod: "pickup" | "delivery";
+  assignedRiderId?: string;
   locationState: string;
   locationLga: string;
   deliveryAddress: string;
@@ -195,8 +220,56 @@ export const clusterService = {
     });
   },
 
-  /** Mark a demand as fulfilled. */
-  fulfillDemand(demandId: string) {
-    return apiFetch(`/cluster/demands/${demandId}/fulfill`, { method: "PATCH" });
+  /** Mark an accepted, pickup-method demand as ready for pickup. */
+  markDemandReadyForPickup(demandId: string) {
+    return apiFetch(`/cluster/demands/${demandId}/ready-for-pickup`, { method: "PATCH" });
+  },
+
+  /** Escalate an accepted, delivery-method demand to a rider. */
+  escalateDemandToRider(demandId: string, riderId: string) {
+    return apiFetch(`/cluster/demands/${demandId}/escalate`, {
+      method: "PATCH",
+      body: JSON.stringify({ riderId }),
+    });
+  },
+
+  // === Riders
+
+  /** Get riders awaiting approval in this cluster farmer's region. */
+  getPendingRiders() {
+    return apiFetch<{ status: string; data: { riders: PendingRider[] } }>("/cluster/riders/pending");
+  },
+
+  /** Get approved riders in this cluster farmer's region (for escalating a delivery). */
+  getApprovedRiders() {
+    return apiFetch<{ status: string; data: { riders: ApprovedRider[] } }>("/cluster/riders/approved");
+  },
+
+  /** Approve or reject a rider in-region. */
+  reviewRider(riderId: string, status: "approved" | "rejected") {
+    return apiFetch(`/cluster/riders/${riderId}/review`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  // === Order Fulfillment
+
+  /** Confirm physical receipt of a farmer's dispatched product. */
+  receiveOrder(orderId: string) {
+    return apiFetch(`/cluster/orders/${orderId}/receive`, { method: "PATCH" });
+  },
+
+  /** Mark a pickup order ready for the buyer to collect. */
+  markReadyForPickup(orderId: string) {
+    return apiFetch(`/cluster/orders/${orderId}/ready-for-pickup`, { method: "PATCH" });
+  },
+
+  /** Escalate a delivery order to an approved in-region rider. */
+  escalateToRider(orderId: string, riderId: string) {
+    return apiFetch(`/cluster/orders/${orderId}/escalate`, {
+      method: "PATCH",
+      body: JSON.stringify({ riderId }),
+    });
   },
 };

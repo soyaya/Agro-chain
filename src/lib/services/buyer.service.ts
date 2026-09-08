@@ -1,14 +1,37 @@
 import { apiFetch } from "~/lib/api";
+import type { MarketplaceListing } from "~/types";
 
 // === Types
 
 export type DemandStatus = "pending" | "assigned" | "accepted" | "declined" | "fulfilled" | "cancelled";
 
+export type DemandBracketVariant = "broodstock" | "table_size" | "dried";
+export type DemandWeightBracket =
+  | "weight_300_500"
+  | "weight_500_700"
+  | "weight_700_1000"
+  | "weight_1000_1200"
+  | "weight_1200_plus";
+export type SeedlingSize = "juveniles" | "post" | "jumbo";
+export type DemandFishVariant = DemandBracketVariant | "seedlings";
+
 export interface BackendDemand {
   id: string;
   fishType: string;
-  weightKg: number;
+  weightKg?: number;
+  weightBracket?: DemandWeightBracket;
+  quantityPieces?: number;
+  seedlingSize?: SeedlingSize;
   fishVariant: string;
+  pricePerUnit: number;
+  totalAmount: number;
+  deliveryFee: number;
+  grandTotal: number;
+  fulfillmentMethod: "pickup" | "delivery";
+  fulfillmentStage: string;
+  assignedRiderId?: string;
+  paymentStatus: "pending" | "paid" | "refunded" | "failed";
+  paidAt?: string;
   locationState: string;
   locationLga: string;
   deliveryAddress: string;
@@ -21,13 +44,21 @@ export interface BackendDemand {
 }
 
 export interface CreateDemandPayload {
-  fishType: string;
-  weightKg: number;
-  fishVariant: string;
+  fishVariant: DemandFishVariant;
+  weightBracket?: DemandWeightBracket;
+  quantityKg?: number;
+  seedlingSize?: SeedlingSize;
+  quantityPieces?: number;
+  fulfillmentMethod: "pickup" | "delivery";
   locationState: string;
   locationLga: string;
   deliveryAddress: string;
   notes?: string;
+}
+
+export interface DemandPriceCatalog {
+  bracketPrices: Array<{ variant: DemandBracketVariant; weightBracket: DemandWeightBracket; pricePerKg: number }>;
+  seedlingPrices: Array<{ seedlingSize: SeedlingSize; pricePerPiece: number }>;
 }
 
 export interface BackendOrder {
@@ -43,25 +74,41 @@ export interface BackendOrder {
 
 export interface BuyerOrderDetail {
   id: string;
-  order_number: string;
-  delivery_type: string;
-  delivery_address: string;
-  status: string;
-  payment_status: string;
-  total_amount: number;
-  delivery_fee: number;
-  grand_total: number;
-  created_at: string;
-  items?: Array<{
-    listingId: string;
-    quantity: number;
-    weightKg: number;
+  orderNumber: string;
+  buyerId: string;
+  clusterFarmerId: string | null;
+  clusterFarmerName: string;
+  clusterFarmerContact: string | null;
+  warehouseLocation: string | null;
+  listingFishType: string | null;
+  items: Array<{
+    fishType?: string;
+    unit?: "kg" | "piece";
     variant?: string;
     processed?: boolean;
+    weightKg: number;
+    quantity: number;
     pricePerUnit: number;
+    totalPrice: number;
   }>;
-  clusterFarmer?: { full_name: string; phone_number: string };
-  listing?: { fish_type: string; packaging_weight_kg: number };
+  quantity: number;
+  weightKg: number | null;
+  totalAmount: number;
+  deliveryFee: number;
+  grandTotal: number;
+  deliveryType: string | null;
+  deliveryAddress: string;
+  fulfillmentMethod: "pickup" | "delivery";
+  fulfillmentStage: string;
+  assignedRiderId: string | null;
+  status: string;
+  paymentStatus: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  deliveredAt?: string;
+  confirmedAt?: string;
+  completedAt?: string;
 }
 
 export interface BuyerOrderTrackingEvent {
@@ -75,10 +122,12 @@ export interface UpdateBuyerProfilePayload {
   phoneNumber?: string;
   email?: string;
   profileImage?: string;
-  businessName?: string;
-  businessAddress?: string;
+  companyName?: string;
+  deliveryAddress?: string;
   localGovernment?: string;
   state?: string;
+  ward?: string;
+  businessType?: string;
 }
 
 // === Buyer Service
@@ -120,20 +169,46 @@ export const buyerService = {
     }>(`/buyers/orders/${orderId}/tracking`);
   },
 
-  /** Confirm delivery of an order. */
-  confirmDelivery(orderId: string) {
-    return apiFetch(`/buyers/orders/${orderId}/confirm-delivery`, { method: "PATCH" });
-  },
-
-  /** Initiate payment for an order. */
-  initiatePayment(orderId: string, amount: number) {
-    return apiFetch(`/buyers/orders/${orderId}/pay`, {
-      method: "POST",
-      body: JSON.stringify({ amount }),
+  /** Confirm delivery/pickup of an order, starting the payout countdown. */
+  confirmDelivery(orderId: string, payoutDelay?: string) {
+    return apiFetch(`/buyers/orders/${orderId}/confirm-delivery`, {
+      method: "PATCH",
+      body: JSON.stringify({ payoutDelay }),
     });
   },
 
+  /** Pay an order's balance via wallet debit (AutoRamp) — the only payment path this app uses. */
+  payOrderWithWallet(orderId: string) {
+    return apiFetch<{
+      status: string;
+      message: string;
+      data: { paymentReference: string; status: "completed" | "processing" };
+    }>(`/buyers/orders/${orderId}/pay-with-wallet`, { method: "POST" });
+  },
+
+  // === Saved Listings
+
+  /** Get the buyer's saved (bookmarked) listings, fully formatted for the marketplace UI. */
+  getSavedListings() {
+    return apiFetch<{ status: string; data: { listings: MarketplaceListing[] } }>("/marketplace/saved");
+  },
+
+  /** Save a listing for later. */
+  saveListing(listingId: string) {
+    return apiFetch(`/marketplace/saved/${listingId}`, { method: "POST" });
+  },
+
+  /** Remove a listing from saved. */
+  unsaveListing(listingId: string) {
+    return apiFetch(`/marketplace/saved/${listingId}`, { method: "DELETE" });
+  },
+
   // === Demands
+
+  /** Get the current admin-regulated demand price catalog. */
+  getDemandPrices() {
+    return apiFetch<{ status: string; data: DemandPriceCatalog }>("/buyers/demand-prices");
+  },
 
   /** Get all demands created by this buyer. */
   getDemands() {
@@ -142,14 +217,42 @@ export const buyerService = {
 
   /** Create a new demand. */
   createDemand(data: CreateDemandPayload) {
-    return apiFetch("/buyers/demands", {
+    return apiFetch<{ status: string; data: { demand: BackendDemand } }>("/buyers/demands", {
       method: "POST",
       body: JSON.stringify(data),
     });
   },
 
+  /** Pay a demand's escrow via wallet debit. */
+  payDemandWithWallet(demandId: string) {
+    return apiFetch<{ status: string; data: { demand: BackendDemand } }>(
+      `/buyers/demands/${demandId}/pay-with-wallet`,
+      { method: "POST" },
+    );
+  },
+
+  /** Get a single demand's details. */
+  getDemand(demandId: string) {
+    return apiFetch<{ status: string; data: { demand: BackendDemand } }>(`/buyers/demands/${demandId}`);
+  },
+
   /** Cancel a pending demand. */
   cancelDemand(demandId: string) {
     return apiFetch(`/buyers/demands/${demandId}`, { method: "DELETE" });
+  },
+
+  /** Get the tracking history for a demand. */
+  getDemandTracking(demandId: string) {
+    return apiFetch<{ status: string; data: { tracking: BuyerOrderTrackingEvent[] } }>(
+      `/buyers/demands/${demandId}/tracking`,
+    );
+  },
+
+  /** Confirm final receipt (pickup or delivery) of a demand. */
+  confirmDemandReceipt(demandId: string) {
+    return apiFetch<{ status: string; data: { demand: BackendDemand } }>(
+      `/buyers/demands/${demandId}/confirm-receipt`,
+      { method: "PATCH" },
+    );
   },
 };

@@ -8,7 +8,7 @@ import type { WalletBalance } from "~/lib/services/wallet.service";
 
 /** Self-contained wallet panel: balance, transfer form, transaction history. No props needed. */
 export function WalletPanel() {
-  const [walletReady, setWalletReady] = useState(false);
+  const [wallet, setWallet] = useState<WalletBalance | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   return (
@@ -20,11 +20,11 @@ export function WalletPanel() {
         </p>
       </div>
 
-      <WalletBalanceCard onWalletLoaded={(wallet: WalletBalance) => setWalletReady(!!wallet.accountNumber)} />
+      <WalletBalanceCard onWalletLoaded={setWallet} />
 
-      {walletReady && (
+      {wallet?.accountNumber && (
         <div className="grid grid-cols-1 gap-(--gap-lg) lg:grid-cols-2">
-          <TransferForm onSuccess={() => setRefreshKey((k) => k + 1)} />
+          <TransferForm wallet={wallet} onSuccess={() => setRefreshKey((k) => k + 1)} />
           <TransactionHistoryList refreshKey={refreshKey} />
         </div>
       )}

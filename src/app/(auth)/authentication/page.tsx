@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
 import { SelectInput } from "~/components/dynamic-input";
 import { motion, AnimatePresence } from "framer-motion";
+import { getSafeReturnTo } from "~/lib/utils";
 
 type Role = "farmer" | "buyer" | "";
 const roles = [
@@ -13,13 +14,18 @@ const roles = [
   { value: "farmer", label: "Farmer" },
 ];
 
-export default function AuthWelcome() {
+function AuthWelcomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const safeReturnTo = getSafeReturnTo(searchParams.get("returnTo"));
   const [role, setRole] = useState<Role>("");
 
   const isValid = role !== "";
 
-  const handleRoleSubmit = async (target: "login" | "register") => {
+  // Registration needs the chosen role (sets the pending_role cookie before
+  // POST /auth/register). Login determines role from the account itself once
+  // authenticated, so it needs no role selection at all.
+  const handleRegisterSubmit = async () => {
     if (!role) return;
     try {
       await fetch("/api/auth/role", {
@@ -30,9 +36,14 @@ export default function AuthWelcome() {
     } catch (error) {
       // non-blocking
     } finally {
-      router.push(`/${target}?role=${role}`);
+      const registerUrl = safeReturnTo
+        ? `/register?role=${role}&returnTo=${encodeURIComponent(safeReturnTo)}`
+        : `/register?role=${role}`;
+      router.push(registerUrl);
     }
   };
+
+  const loginUrl = safeReturnTo ? `/login?returnTo=${encodeURIComponent(safeReturnTo)}` : "/login";
 
   return (
     <AnimatePresence mode="wait">
@@ -74,47 +85,55 @@ export default function AuthWelcome() {
             </p>
           </motion.div>
 
-          {/* Select Role */}
-          <motion.div
-            className="flex flex-col gap-(--gap-md)"
-            variants={{
-              hidden: { opacity: 0, y: 30 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <SelectInput
-              label="Select your role"
-              value={role}
-              onValueChange={(value) => setRole(value as Role)}
-              options={roles}
-              required
-            />
-          </motion.div>
         </motion.div>
 
-        {/* Button Section */}
+        {/* Already have an account — plain login, no role needed */}
         <motion.div
-          className="mx-auto mt-(--space-3xl) flex w-full default-page-max-width flex-col gap-(--gap-base)"
+          className="mx-auto mt-(--space-3xl) flex w-full default-page-max-width flex-col gap-(--gap-md)"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+          transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
         >
-          <SubmitSecondaryButton
-            disabled={!isValid}
-            onClick={() => handleRoleSubmit("login")}
-          >
+          <p className="font-roboto-slab text-center text-sm text-(--text-colour)">
+            Already have an account?
+          </p>
+          <SubmitSecondaryButton onClick={() => router.push(loginUrl)}>
             Log In
           </SubmitSecondaryButton>
+        </motion.div>
 
-          <SubmitPrimaryButton
-            disabled={!isValid}
-            onClick={() => handleRoleSubmit("register")}
-          >
+        {/* New here — role is only ever picked at registration */}
+        <motion.div
+          className="mx-auto mt-(--space-xl) flex w-full default-page-max-width flex-col gap-(--gap-base)"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.6, ease: "easeOut" }}
+        >
+          <p className="font-roboto-slab text-center text-sm text-(--text-colour)">New here?</p>
+          <SelectInput
+            label="Select your role"
+            value={role}
+            onValueChange={(value) => setRole(value as Role)}
+            options={roles}
+            required
+          />
+          <SubmitPrimaryButton disabled={!isValid} onClick={handleRegisterSubmit}>
             Register
           </SubmitPrimaryButton>
         </motion.div>
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+export default function AuthWelcome() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-full min-h-full w-full items-center justify-center">Loading...</div>
+      }
+    >
+      <AuthWelcomeContent />
+    </Suspense>
   );
 }

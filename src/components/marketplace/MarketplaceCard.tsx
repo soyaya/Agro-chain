@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { MapPin, Package, Phone, Truck, ShoppingCart, Heart } from "lucide-react";
+import { MapPin, Package, Phone, Truck, ShoppingCart, Heart, Fish } from "lucide-react";
 import type { MarketplaceListing } from "~/types";
-import { SCALE_IN_VARIANT } from "~/types/constants";
+import { SCALE_IN_VARIANT, FISH_TYPE_CATEGORIES } from "~/types/constants";
 import { cn } from "~/lib/utils";
 
 interface MarketplaceCardProps {
@@ -23,10 +24,15 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
     });
   };
 
-  const packagePrices = listing.packaging?.map((p) => p.pricePerUnit) ?? [];
-  const lowestPrice = packagePrices.length > 0 ? Math.min(...packagePrices) : listing.pricePerKg ?? 0;
+  const packagePrices = listing.packaging?.map((p) => Number(p.pricePerUnit)) ?? [];
+  const lowestPrice = packagePrices.length > 0 ? Math.min(...packagePrices) : Number(listing.pricePerKg ?? 0);
   const highestPrice = packagePrices.length > 0 ? Math.max(...packagePrices) : lowestPrice;
-  const displayPricePerKg = listing.pricePerKg ?? lowestPrice;
+  const displayPricePerKg = listing.pricePerKg !== undefined ? Number(listing.pricePerKg) : lowestPrice;
+  const unit = listing.unit === "piece" ? "piece" : "kg";
+  // No per-listing photo upload flow exists yet — fall back to a static
+  // representative image for the listing's fish type category.
+  const displayImage =
+    listing.imageUrl ?? FISH_TYPE_CATEGORIES.find((c) => c.value === listing.fishType)?.imageUrl;
 
   return (
     <motion.div
@@ -41,6 +47,23 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
         onClick && "cursor-pointer hover:shadow-md",
       )}
     >
+      {/* Image */}
+      <div className="relative h-40 w-full overflow-hidden rounded-2xl bg-(--gray-bg)">
+        {displayImage ? (
+          <Image
+            src={displayImage}
+            alt={`${listing.fishType} listing`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <Fish size={40} className="text-(--text-colour) opacity-30" aria-hidden="true" />
+          </div>
+        )}
+      </div>
+
       {/* Header */}
       <div className="flex items-start justify-between relative">
         <div className="flex flex-col gap-1 pr-8">
@@ -61,7 +84,7 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
             <Heart size={20} className={cn("transition-colors", isLiked ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500")} />
           </button>
           <span className="font-ubuntu text-lg font-bold text-(--theme-green-dark) mt-6">
-            ₦{displayPricePerKg.toLocaleString()}/kg
+            ₦{displayPricePerKg.toLocaleString()}/{unit}
           </span>
           {lowestPrice !== highestPrice && (
             <span className="text-xs text-(--text-colour)">
@@ -75,7 +98,9 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
       <div className="flex flex-col gap-(--space-md)">
         <div className="flex items-center gap-2 text-sm text-(--text-colour)">
           <Package size={16} />
-          <span>{listing.totalAvailableKg}kg available</span>
+          <span>
+            {listing.totalAvailableKg} {unit === "piece" ? "pieces" : "kg"} available
+          </span>
         </div>
 
         <div className="flex items-center gap-2 text-sm text-(--text-colour)">
@@ -100,7 +125,9 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
               key={index}
               className="flex items-center gap-1 rounded-full bg-(--white) px-(--space-md) py-1 text-sm"
             >
-              <span className="font-medium text-(--heading-colour)">{pkg.weightKg}kg</span>
+              <span className="font-medium text-(--heading-colour)">
+                {unit === "piece" ? "1 piece" : `${pkg.weightKg}kg`}
+              </span>
               <span className="text-(--text-colour)">×{pkg.quantity}</span>
             </div>
           ))}

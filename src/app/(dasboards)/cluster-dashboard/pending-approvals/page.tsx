@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ListingCard } from "~/components/listings/ListingCard";
 import type { FarmerSupplyListing } from "~/types";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, isSeedlingFishType } from "~/types/constants";
 import { clusterService } from "~/lib/services/cluster.service";
 
 type PendingListingsResponse =
@@ -116,6 +116,7 @@ export default function PendingApprovalsPage() {
               farmerId: "",
               farmerName: item.farmerName,
               fishType: item.fishType,
+              unit: isSeedlingFishType(item.fishType) ? "piece" : "kg",
               harvestDate: new Date(item.harvestDate),
               totalAvailableKg: item.totalFishAvailable,
               packaging: [

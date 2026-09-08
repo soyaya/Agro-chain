@@ -5,13 +5,18 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { authService } from "~/lib/services/auth.service";
 import { clusterService } from "~/lib/services/cluster.service";
+import { platformService } from "~/lib/services/platform.service";
+import { DynamicInput } from "~/components/dynamic-input";
+import { LocationPicker, type LocationValue } from "~/components/shared/LocationPicker";
 
 type ClusterForm = {
   fullName: string;
   phoneNumber: string;
   email: string;
   clusterName: string;
-  location: string;
+  state: string;
+  localGovernment: string;
+  ward: string;
 };
 
 export default function ClusterProfilePage() {
@@ -20,11 +25,27 @@ export default function ClusterProfilePage() {
     phoneNumber: "",
     email: "",
     clusterName: "",
-    location: "",
+    state: "",
+    localGovernment: "",
+    ward: "",
   });
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    platformService
+      .getActiveStates()
+      .then((res) => {
+        if (mounted) setActiveStates(res.data.activeStates);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -39,7 +60,9 @@ export default function ClusterProfilePage() {
           phoneNumber: user.phone_number ?? "",
           email: user.email ?? "",
           clusterName: user.business_name ?? user.farm_name ?? "",
-          location: [user.location_address, user.location_lga, user.location_state].filter(Boolean).join(", "),
+          state: user.location_state ?? "",
+          localGovernment: user.location_lga ?? "",
+          ward: user.location_ward ?? "",
         });
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to load profile");
@@ -60,8 +83,10 @@ export default function ClusterProfilePage() {
         fullName: form.fullName,
         phoneNumber: form.phoneNumber,
         email: form.email,
-        clusterName: form.clusterName,
-        location: form.location,
+        businessName: form.clusterName,
+        state: form.state,
+        localGovernment: form.localGovernment,
+        ward: form.ward,
       });
       setEditing(false);
       toast.success("Profile updated successfully");
@@ -100,7 +125,6 @@ export default function ClusterProfilePage() {
             ["Phone Number", "phoneNumber"],
             ["Email", "email"],
             ["Cluster Name", "clusterName"],
-            ["Location", "location"],
           ] as const
         ).map(([label, key]) => (
           <label key={key} className="text-sm text-(--text-colour)">
@@ -113,6 +137,33 @@ export default function ClusterProfilePage() {
             />
           </label>
         ))}
+
+        {editing ? (
+          <div className="md:col-span-2">
+            <p className="font-roboto-slab mb-2 text-xs text-(--text-colour)">
+              Your ward determines which farmers' listings you're the first to see and approve — set
+              it precisely.
+            </p>
+            <LocationPicker
+              value={{ state: form.state, lga: form.localGovernment, ward: form.ward }}
+              onChange={(next: LocationValue) =>
+                setForm((prev) => ({
+                  ...prev,
+                  state: next.state,
+                  localGovernment: next.lga,
+                  ward: next.ward,
+                }))
+              }
+              activeStates={activeStates}
+            />
+          </div>
+        ) : (
+          <>
+            <DynamicInput label="State" value={form.state} disabled />
+            <DynamicInput label="Local Government" value={form.localGovernment} disabled />
+            <DynamicInput label="Ward / Community" value={form.ward} disabled />
+          </>
+        )}
       </div>
     </div>
   );

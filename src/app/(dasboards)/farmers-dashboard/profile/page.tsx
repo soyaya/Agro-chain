@@ -6,13 +6,15 @@ import { toast } from "sonner";
 import { CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { farmerService } from "~/lib/services/farmer.service";
 import { authService, type BackendUser } from "~/lib/services/auth.service";
+import { platformService } from "~/lib/services/platform.service";
 import { uploadFile } from "~/lib/upload";
 import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
 import { FileUploadField } from "~/components/profile/FileUploadField";
+import { LocationPicker, type LocationValue } from "~/components/shared/LocationPicker";
 import { LoadingState } from "~/components/ui/LoadingState";
-import { FADE_IN_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, FISH_TYPE_OPTIONS } from "~/types/constants";
 
 // === Types
 
@@ -24,6 +26,7 @@ type ProfileForm = {
   farmAddress: string;
   state: string;
   localGovernment: string;
+  ward: string;
   fishType: string;
   farmingCapacityKg: number;
   yearsOfExperience: number;
@@ -38,35 +41,24 @@ type ClusterForm = {
 };
 
 type DocFiles = {
-  bvnVerification: File | null;
   proofOfAddress: File | null;
-  cacRegistration: File | null;
   businessLicense: File | null;
   taxClearance: File | null;
 };
 
 type DocUrls = {
-  bvnVerification: string;
   proofOfAddress: string;
-  cacRegistration: string;
   businessLicense: string;
   taxClearance: string;
 };
 
-const FISH_TYPE_OPTIONS = [
-  { label: "Catfish", value: "catfish" },
-  { label: "Fingerlings", value: "fingerlings" },
-  { label: "Juveniles", value: "juveniles" },
-  { label: "Table Size", value: "table_size" },
-  { label: "Jumbo", value: "jumbo" },
-  { label: "Parent Stocks", value: "parent_stocks" },
-];
-
+// BVN verification document and CAC registration upload were dropped —
+// BVN is already confirmed through the existing wallet/BVN verification
+// flow, and the CAC number is verified automatically instead of requiring
+// a manual certificate upload.
 const DOC_FIELDS: { key: keyof DocFiles; label: string }[] = [
-  { key: "bvnVerification", label: "BVN Verification Document" },
   { key: "proofOfAddress", label: "Proof of Address" },
-  { key: "cacRegistration", label: "CAC Registration Certificate" },
-  { key: "businessLicense", label: "Business License" },
+  { key: "businessLicense", label: "CAC Certificate" },
   { key: "taxClearance", label: "Tax Clearance Certificate" },
 ];
 
@@ -79,6 +71,9 @@ export default function FarmerProfilePage() {
   const [savingProfile, setSavingProfile] = useState(false);
   const [applyingCluster, setApplyingCluster] = useState(false);
   const [wantsCluster, setWantsCluster] = useState(false);
+  const [cacVerifying, setCacVerifying] = useState(false);
+  const [cacVerified, setCacVerified] = useState(false);
+  const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
 
   // Open/close state for each FileUploadField accordion
   const [openDoc, setOpenDoc] = useState<keyof DocFiles | null>(null);
@@ -91,6 +86,7 @@ export default function FarmerProfilePage() {
     farmAddress: "",
     state: "",
     localGovernment: "",
+    ward: "",
     fishType: "",
     farmingCapacityKg: 0,
     yearsOfExperience: 0,
@@ -106,15 +102,26 @@ export default function FarmerProfilePage() {
 
   // Files held in state — not uploaded yet
   const [docFiles, setDocFiles] = useState<DocFiles>({
-    bvnVerification: null,
     proofOfAddress: null,
-    cacRegistration: null,
     businessLicense: null,
     taxClearance: null,
   });
 
   // Already-uploaded URLs from a previous application
   const [existingDocUrls, setExistingDocUrls] = useState<Partial<DocUrls>>({});
+
+  useEffect(() => {
+    let mounted = true;
+    platformService
+      .getActiveStates()
+      .then((res) => {
+        if (mounted) setActiveStates(res.data.activeStates);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Load user
   useEffect(() => {
@@ -134,6 +141,7 @@ export default function FarmerProfilePage() {
           farmAddress: u.location_address ?? "",
           state: u.location_state ?? "",
           localGovernment: u.location_lga ?? "",
+          ward: u.location_ward ?? "",
           fishType: u.fish_type_preference ?? "",
           farmingCapacityKg: Number(u.farming_capacity_kg ?? 0),
           yearsOfExperience: Number(u.years_of_experience ?? 0),
@@ -145,10 +153,9 @@ export default function FarmerProfilePage() {
           distributionCapacity: Number(u.distribution_capacity ?? 0),
           logisticsAvailable: Boolean(u.logistics_available),
         });
+        setCacVerified(Boolean(u.cac_verified));
         setExistingDocUrls({
-          bvnVerification: u.bvn_doc_url ?? undefined,
           proofOfAddress: u.proof_of_address_url ?? undefined,
-          cacRegistration: u.cac_registration_url ?? undefined,
           businessLicense: u.business_license_url ?? undefined,
           taxClearance: u.tax_clearance_url ?? undefined,
         });
@@ -178,6 +185,7 @@ export default function FarmerProfilePage() {
         farmAddress: form.farmAddress,
         state: form.state,
         localGovernment: form.localGovernment,
+        ward: form.ward,
         fishType: form.fishType,
         farmingCapacityKg: form.farmingCapacityKg,
         yearsOfExperience: form.yearsOfExperience,
@@ -188,6 +196,29 @@ export default function FarmerProfilePage() {
       toast.error(error instanceof Error ? error.message : "Failed to update profile");
     } finally {
       setSavingProfile(false);
+    }
+  };
+
+  // === Verify CAC number (replaces the manual certificate upload)
+  const verifyCacNumber = async () => {
+    if (clusterForm.cacNumber.trim().length < 3) {
+      toast.error("Enter a CAC number first.");
+      return;
+    }
+    setCacVerifying(true);
+    try {
+      const res = await farmerService.verifyCac(clusterForm.cacNumber.trim());
+      setCacVerified(res.data.verified);
+      if (res.data.verified) {
+        toast.success("CAC number verified.");
+      } else {
+        toast.error(`CAC verification did not pass (status: ${res.data.autorampStatus}).`);
+      }
+    } catch (error) {
+      setCacVerified(false);
+      toast.error(error instanceof Error ? error.message : "CAC verification failed.");
+    } finally {
+      setCacVerifying(false);
     }
   };
 
@@ -203,10 +234,8 @@ export default function FarmerProfilePage() {
         return existingDocUrls[key as keyof DocUrls];
       };
 
-      const [bvnUrl, poaUrl, cacUrl, licUrl, taxUrl] = await Promise.all([
-        uploadDoc("bvnVerification"),
+      const [poaUrl, licUrl, taxUrl] = await Promise.all([
         uploadDoc("proofOfAddress"),
-        uploadDoc("cacRegistration"),
         uploadDoc("businessLicense"),
         uploadDoc("taxClearance"),
       ]);
@@ -217,9 +246,7 @@ export default function FarmerProfilePage() {
         warehouseLocation: clusterForm.warehouseLocation,
         distributionCapacity: clusterForm.distributionCapacity,
         logisticsAvailable: clusterForm.logisticsAvailable,
-        bvnVerification: bvnUrl,
         proofOfAddress: poaUrl,
-        cacRegistration: cacUrl,
         businessLicense: licUrl,
         taxClearance: taxUrl,
       });
@@ -312,8 +339,6 @@ export default function FarmerProfilePage() {
               ["Email", "email"],
               ["Farm Name", "farmName"],
               ["Farm Address", "farmAddress"],
-              ["State", "state"],
-              ["Local Government", "localGovernment"],
             ] as [string, keyof ProfileForm][]
           ).map(([label, key]) => (
             <DynamicInput
@@ -364,6 +389,29 @@ export default function FarmerProfilePage() {
               setForm((prev) => ({ ...prev, yearsOfExperience: Number(e.target.value || 0) }))
             }
           />
+
+          {isEditing ? (
+            <div className="md:col-span-2">
+              <LocationPicker
+                value={{ state: form.state, lga: form.localGovernment, ward: form.ward }}
+                onChange={(next: LocationValue) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    state: next.state,
+                    localGovernment: next.lga,
+                    ward: next.ward,
+                  }))
+                }
+                activeStates={activeStates}
+              />
+            </div>
+          ) : (
+            <>
+              <DynamicInput label="State" value={form.state} disabled />
+              <DynamicInput label="Local Government" value={form.localGovernment} disabled />
+              <DynamicInput label="Ward / Community" value={form.ward} disabled />
+            </>
+          )}
         </div>
       </motion.div>
 
@@ -453,13 +501,33 @@ export default function FarmerProfilePage() {
                     placeholder="Your registered business name"
                     required
                   />
-                  <DynamicInput
-                    label="CAC Number"
-                    value={clusterForm.cacNumber}
-                    onChange={(e) => setClusterForm((p) => ({ ...p, cacNumber: e.target.value }))}
-                    placeholder="CAC registration number"
-                    required
-                  />
+                  <div className="flex flex-col gap-2">
+                    <DynamicInput
+                      label="CAC Number"
+                      value={clusterForm.cacNumber}
+                      onChange={(e) => {
+                        setClusterForm((p) => ({ ...p, cacNumber: e.target.value }));
+                        setCacVerified(false);
+                      }}
+                      placeholder="CAC registration number"
+                      required
+                    />
+                    <div className="flex items-center gap-2">
+                      <SubmitSecondaryButton
+                        type="button"
+                        onClick={verifyCacNumber}
+                        disabled={cacVerifying || cacVerified || clusterForm.cacNumber.trim().length < 3}
+                        className="h-9 rounded-full px-4 text-xs"
+                      >
+                        {cacVerifying ? "Verifying..." : cacVerified ? "Verified" : "Verify CAC"}
+                      </SubmitSecondaryButton>
+                      {cacVerified && (
+                        <span className="flex items-center gap-1 text-xs font-medium text-green-600">
+                          <CheckCircle size={14} /> Verified
+                        </span>
+                      )}
+                    </div>
+                  </div>
                   <DynamicInput
                     label="Warehouse Location"
                     value={clusterForm.warehouseLocation}

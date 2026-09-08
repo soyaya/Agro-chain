@@ -11,15 +11,20 @@ interface PackagingSelectorProps {
   totalKg: number;
   packaging: PackagingOption[];
   onChange: (packaging: PackagingOption[]) => void;
+  /** Admin-regulated rate for the selected fish type — price is derived from
+   * this, never typed in directly. Undefined until a fish type with a set
+   * price has been chosen. */
+  pricePerKg?: number;
   error?: string;
 }
 
-export function PackagingSelector({ totalKg, packaging, onChange, error }: PackagingSelectorProps) {
+export function PackagingSelector({ totalKg, packaging, onChange, pricePerKg, error }: PackagingSelectorProps) {
   const [selectedWeight, setSelectedWeight] = useState<number>(1);
-  const [pricePerUnit, setPricePerUnit] = useState<number>(0);
+
+  const computedPricePerUnit = pricePerKg ? pricePerKg * selectedWeight : 0;
 
   const addPackaging = () => {
-    if (selectedWeight <= 0 || pricePerUnit <= 0) return;
+    if (selectedWeight <= 0 || !pricePerKg) return;
 
     const quantity = Math.floor(totalKg / selectedWeight);
     if (quantity <= 0) return;
@@ -27,11 +32,10 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
     const newPackaging: PackagingOption = {
       weightKg: selectedWeight,
       quantity,
-      pricePerUnit,
+      pricePerUnit: computedPricePerUnit,
     };
 
     onChange([...packaging, newPackaging]);
-    setPricePerUnit(0);
   };
 
   const removePackaging = (index: number) => {
@@ -69,21 +73,22 @@ export function PackagingSelector({ totalKg, packaging, onChange, error }: Packa
           aria-label="Select package weight in kilograms"
         />
 
-        <NumberInput
-          label="Price per unit"
-          placeholder="0"
-          value={pricePerUnit}
-          onChange={(e) => setPricePerUnit(Number(e.target.value))}
-          aria-label="Enter price per unit in Naira"
-        />
+        <div className="flex flex-col gap-1.5">
+          <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+            Price per unit
+          </label>
+          <div className="flex h-12 items-center rounded-full border border-(--border-input) bg-(--gray-bg) px-(--space-lg) font-roboto-slab text-sm text-(--heading-colour)">
+            {pricePerKg ? `₦${computedPricePerUnit.toLocaleString()} (admin rate)` : "Select a priced fish type"}
+          </div>
+        </div>
 
         <div className="flex items-end">
           <button
             type="button"
             onClick={addPackaging}
-            disabled={!totalKg || pricePerUnit <= 0}
+            disabled={!totalKg || !pricePerKg}
             aria-label="Add packaging option"
-            aria-disabled={!totalKg || pricePerUnit <= 0}
+            aria-disabled={!totalKg || !pricePerKg}
             className="font-roboto-slab flex h-12 w-full items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) font-medium text-white transition-all duration-200 hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Plus size={18} aria-hidden="true" />

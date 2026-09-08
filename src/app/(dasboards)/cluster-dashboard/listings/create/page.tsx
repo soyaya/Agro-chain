@@ -10,9 +10,9 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
+import { FishTypePicker } from "~/components/listings/FishTypePicker";
 import type { PackagingOption } from "~/types";
 import {
-  FISH_TYPES,
   NIGERIAN_STATES,
   DELIVERY_OPTIONS,
   MIN_SUPPLY_KG,
@@ -103,7 +103,6 @@ export default function CreateClusterListingPage() {
     }
   };
 
-  const fishTypeOptions = FISH_TYPES.map((f) => ({ label: f, value: f }));
   const stateOptions = NIGERIAN_STATES.map((s) => ({ label: s, value: s }));
 
   return (
@@ -145,15 +144,14 @@ export default function CreateClusterListingPage() {
                 <h2 className="font-ubuntu mb-(--space-lg) text-lg font-semibold text-(--heading-colour)">
                   Supply Details
                 </h2>
-                <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
-                  <SelectInput
-                    label="Fish Type"
+                <div className="mb-(--gap-base)">
+                  <FishTypePicker
                     value={watch("fishType") ?? ""}
-                    onValueChange={(v) => setValue("fishType", v, { shouldValidate: true })}
-                    options={fishTypeOptions}
+                    onChange={(v) => setValue("fishType", v, { shouldValidate: true })}
                     error={errors.fishType?.message}
-                    required
                   />
+                </div>
+                <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
                   <DynamicInput
                     label="Harvest Date"
                     type="date"

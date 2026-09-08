@@ -4,23 +4,49 @@ import { motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { SelectInput, DynamicInput } from "~/components/dynamic-input";
 import type { MarketplaceFilters as Filters } from "~/types";
-import { FISH_TYPES, NIGERIAN_STATES, FADE_IN_VARIANT } from "~/types/constants";
+import { FISH_TYPE_OPTIONS, FADE_IN_VARIANT } from "~/types/constants";
+import wardData from "~/data/nigeria-wards.json";
+
+type WardData = Record<string, Record<string, string[]>>;
+const NIGERIA_WARDS = wardData as WardData;
 
 interface MarketplaceFiltersProps {
   filters: Filters;
   onChange: (filters: Filters) => void;
   onReset: () => void;
+  /** States open for selection (admin-controlled) — undefined means unrestricted. */
+  activeStates?: string[];
 }
 
-export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFiltersProps) {
-  const fishTypeOptions = [
-    { label: "All Fish Types", value: "" },
-    ...FISH_TYPES.map((fish) => ({ label: fish, value: fish })),
-  ];
+export function MarketplaceFilters({ filters, onChange, onReset, activeStates }: MarketplaceFiltersProps) {
+  const fishTypeOptions = [{ label: "All Fish Types", value: "" }, ...FISH_TYPE_OPTIONS];
 
   const stateOptions = [
     { label: "All States", value: "" },
-    ...NIGERIAN_STATES.map((state) => ({ label: state, value: state })),
+    ...Object.keys(NIGERIA_WARDS)
+      .sort()
+      .map((state) => {
+        const isActive = !activeStates || activeStates.includes(state);
+        return {
+          label: isActive ? state : `${state} (Coming soon)`,
+          value: state,
+          disabled: !isActive,
+        };
+      }),
+  ];
+
+  // LGA/Ward names are stored on listings verbatim (not slugs), so the
+  // dataset's real names double as the filter values here to match real data.
+  const lgas = filters.state ? NIGERIA_WARDS[filters.state] : undefined;
+  const lgaOptions = [
+    { label: "All LGAs", value: "" },
+    ...(lgas ? Object.keys(lgas).sort() : []).map((lga) => ({ label: lga, value: lga })),
+  ];
+
+  const wards = filters.state && filters.localGovernment ? lgas?.[filters.localGovernment] : undefined;
+  const wardOptions = [
+    { label: "All Wards", value: "" },
+    ...(wards ?? []).map((ward) => ({ label: ward, value: ward })),
   ];
 
   const sortOptions = [
@@ -39,10 +65,20 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
     });
   };
 
+  const handleStateChange = (value: string) => {
+    onChange({ ...filters, state: value || undefined, localGovernment: undefined, ward: undefined });
+  };
+
+  const handleLgaChange = (value: string) => {
+    onChange({ ...filters, localGovernment: value || undefined, ward: undefined });
+  };
+
   const hasActiveFilters =
     filters.search ||
     filters.fishType ||
     filters.state ||
+    filters.localGovernment ||
+    filters.ward ||
     filters.minPrice ||
     filters.maxPrice ||
     filters.minQuantity;
@@ -96,8 +132,24 @@ export function MarketplaceFilters({ filters, onChange, onReset }: MarketplaceFi
       <SelectInput
         label="State"
         value={filters.state || ""}
-        onValueChange={(value) => handleFilterChange("state", value)}
+        onValueChange={handleStateChange}
         options={stateOptions}
+      />
+
+      {/* Local Government Area */}
+      <SelectInput
+        label="Local Government Area"
+        value={filters.localGovernment || ""}
+        onValueChange={handleLgaChange}
+        options={lgaOptions}
+      />
+
+      {/* Ward / Community */}
+      <SelectInput
+        label="Ward / Community"
+        value={filters.ward || ""}
+        onValueChange={(value) => handleFilterChange("ward", value)}
+        options={wardOptions}
       />
 
       {/* Price Range */}

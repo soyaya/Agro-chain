@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -10,69 +10,42 @@ import type { MarketplaceListing } from "~/types";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { LoadingState } from "~/components/ui/LoadingState";
-
-// Mock data - replace with actual API call
-const mockSavedListings: MarketplaceListing[] = [
-  {
-    id: "1",
-    clusterFarmerId: "cluster-1",
-    clusterFarmerName: "Green Valley Farms",
-    businessName: "Green Valley Fish Supply",
-    fishType: "Catfish",
-    harvestDate: new Date("2024-03-15"),
-    totalAvailableKg: 2000,
-    packaging: [
-      { weightKg: 1, quantity: 1000, pricePerUnit: 1500 },
-      { weightKg: 5, quantity: 200, pricePerUnit: 7000 },
-    ],
-    location: "Kaduna North, Kaduna",
-    state: "Kaduna",
-    localGovernment: "Kaduna North",
-    pricePerKg: 1500,
-    deliveryOptions: ["Pickup from warehouse", "Delivery within state"],
-    visibleOnMarketplace: true,
-    status: "approved",
-    clusterFarmerContact: "08012345678",
-    warehouseLocation: "123 Farm Road, Kaduna",
-    logisticsAvailable: true,
-    createdAt: new Date("2024-03-10"),
-    updatedAt: new Date("2024-03-10"),
-  },
-  {
-    id: "2",
-    clusterFarmerId: "cluster-2",
-    clusterFarmerName: "Blue Ocean Fisheries",
-    businessName: "Blue Ocean Fish Market",
-    fishType: "Tilapia",
-    harvestDate: new Date("2024-03-12"),
-    totalAvailableKg: 1500,
-    packaging: [
-      { weightKg: 2, quantity: 750, pricePerUnit: 2800 },
-      { weightKg: 10, quantity: 150, pricePerUnit: 13500 },
-    ],
-    location: "Lagos Island, Lagos",
-    state: "Lagos",
-    localGovernment: "Lagos Island",
-    pricePerKg: 1400,
-    deliveryOptions: ["Pickup from warehouse", "Delivery nationwide"],
-    visibleOnMarketplace: true,
-    status: "approved",
-    clusterFarmerContact: "08098765432",
-    warehouseLocation: "45 Market Street, Lagos",
-    logisticsAvailable: true,
-    createdAt: new Date("2024-03-08"),
-    updatedAt: new Date("2024-03-08"),
-  },
-];
+import { buyerService } from "~/lib/services/buyer.service";
 
 export default function SavedListingsPage() {
   const router = useRouter();
-  const [savedListings, setSavedListings] = useState<MarketplaceListing[]>(mockSavedListings);
-  const [loading, setLoading] = useState(false);
+  const [savedListings, setSavedListings] = useState<MarketplaceListing[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleRemove = (listingId: string) => {
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res = await buyerService.getSavedListings();
+        if (mounted) setSavedListings(res.data.listings);
+      } catch (error) {
+        if (mounted) toast.error(error instanceof Error ? error.message : "Failed to load saved listings");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleRemove = async (listingId: string) => {
+    const previous = savedListings;
     setSavedListings((prev) => prev.filter((l) => l.id !== listingId));
-    toast.success("Removed from saved listings");
+    try {
+      await buyerService.unsaveListing(listingId);
+      toast.success("Removed from saved listings");
+    } catch (error) {
+      setSavedListings(previous);
+      toast.error(error instanceof Error ? error.message : "Failed to remove listing");
+    }
   };
 
   const handleAddToCart = (listing: MarketplaceListing) => {
@@ -126,7 +99,7 @@ export default function SavedListingsPage() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleRemove(listing.id);
+                  void handleRemove(listing.id);
                 }}
                 className="absolute top-4 right-4 rounded-full border border-gray-200 bg-(--white)/90 p-2 text-(--error-red) opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
                 aria-label="Remove from saved"

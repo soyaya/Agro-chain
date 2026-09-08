@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   navLinks,
   buyerDashboardConfig,
-  adminDashboardConfig,
   farmerDashboardConfig,
   clusterFarmerDashboardConfig,
   enhancedFarmerDashboardConfig,
@@ -100,22 +99,11 @@ describe("buyerDashboardConfig", () => {
   });
 });
 
-describe("adminDashboardConfig", () => {
-  assertDashboardShape(adminDashboardConfig, "adminDashboardConfig");
-
-  it("contains a Cluster Applications link", () => {
-    const apps = adminDashboardConfig.navLinks.find(
-      (l) => (l as { href: string }).href === "/admin-dashboard/applications",
-    );
-    expect(apps).toBeDefined();
-  });
-});
-
 describe("farmerDashboardConfig", () => {
   assertDashboardShape(farmerDashboardConfig, "farmerDashboardConfig");
 
-  it("has financialServices enabled", () => {
-    expect(farmerDashboardConfig.financialServices?.enabled).toBe(true);
+  it("has financialServices disabled (farmers do not use loans)", () => {
+    expect(farmerDashboardConfig.financialServices?.enabled).toBe(false);
   });
 });
 
@@ -133,20 +121,22 @@ describe("clusterFarmerDashboardConfig", () => {
 describe("enhancedFarmerDashboardConfig", () => {
   assertDashboardShape(enhancedFarmerDashboardConfig, "enhancedFarmerDashboardConfig");
 
-  it("has a Financial Services nav item with submenu", () => {
+  it("does not have a Financial Services nav item (farmers ignore loans)", () => {
     const financial = enhancedFarmerDashboardConfig.navLinks.find(
       (l) => (l as { href: string }).href === "/farmers-dashboard/financial",
-    ) as { submenu?: unknown[] } | undefined;
-    expect(financial).toBeDefined();
-    expect(financial?.submenu?.length).toBeGreaterThan(0);
+    );
+    expect(financial).toBeUndefined();
   });
 
-  it("financial submenu contains Loan Applications", () => {
-    const financial = enhancedFarmerDashboardConfig.navLinks.find(
-      (l) => (l as { href: string }).href === "/farmers-dashboard/financial",
-    ) as { submenu?: Array<{ label: string }> } | undefined;
-    const loans = financial?.submenu?.find((s) => s.label === "Loan Applications");
-    expect(loans).toBeDefined();
+  it("has financialServices disabled", () => {
+    expect(enhancedFarmerDashboardConfig.financialServices?.enabled).toBe(false);
+  });
+
+  it("has a Wallet nav link", () => {
+    const wallet = enhancedFarmerDashboardConfig.navLinks.find(
+      (l) => (l as { href: string }).href === "/farmers-dashboard/wallet",
+    );
+    expect(wallet).toBeDefined();
   });
 });
 

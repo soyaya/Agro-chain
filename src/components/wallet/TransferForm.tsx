@@ -1,13 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
-import { NIGERIAN_BANK_CODES } from "~/lib/constants/bankCodes";
-import { walletService } from "~/lib/services/wallet.service";
+import { walletService, type Bank, type WalletBalance } from "~/lib/services/wallet.service";
 
-export function TransferForm({ onSuccess }: { onSuccess?: () => void }) {
+export function TransferForm({
+  wallet,
+  onSuccess,
+}: {
+  wallet?: WalletBalance | null;
+  onSuccess?: () => void;
+}) {
+  const [banks, setBanks] = useState<Bank[]>([]);
+  const [loadingBanks, setLoadingBanks] = useState(true);
   const [accountNumber, setAccountNumber] = useState("");
   const [bankCode, setBankCode] = useState("");
   const [beneficiaryName, setBeneficiaryName] = useState("");
@@ -15,6 +22,29 @@ export function TransferForm({ onSuccess }: { onSuccess?: () => void }) {
   const [narration, setNarration] = useState("");
   const [resolvingName, setResolvingName] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    walletService
+      .getBanks()
+      .then((response) => setBanks(response.data.banks))
+      .catch(() => {
+        // Non-fatal — the bank select just stays empty; the user can retry by reopening the form.
+      })
+      .finally(() => setLoadingBanks(false));
+  }, []);
+
+  // Auto-resolve the beneficiary name as soon as both fields are complete,
+  // instead of only on blur/select-change — covers pasting an account number,
+  // editing it after already picking a bank, or changing the bank after the
+  // account number was already typed.
+  useEffect(() => {
+    if (accountNumber.length !== 10 || !bankCode) return;
+    const timer = setTimeout(() => {
+      resolveBeneficiaryName();
+    }, 400);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountNumber, bankCode]);
 
   const resolveBeneficiaryName = async () => {
     if (accountNumber.length !== 10 || !bankCode) return;
@@ -58,7 +88,7 @@ export function TransferForm({ onSuccess }: { onSuccess?: () => void }) {
         amount: parsedAmount,
         narration: narration || undefined,
       });
-      toast.success("Transfer initiated.");
+      toast.success("Withdrawal initiated.");
       setAccountNumber("");
       setBankCode("");
       setBeneficiaryName("");
@@ -66,7 +96,7 @@ export function TransferForm({ onSuccess }: { onSuccess?: () => void }) {
       setNarration("");
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Transfer failed.");
+      toast.error(error instanceof Error ? error.message : "Withdrawal failed.");
     } finally {
       setSubmitting(false);
     }
@@ -77,12 +107,27 @@ export function TransferForm({ onSuccess }: { onSuccess?: () => void }) {
       onSubmit={handleSubmit}
       className="flex flex-col gap-(--space-lg) rounded-2xl border border-(--border-input) bg-(--white) p-(--space-xl) shadow-sm"
     >
-      <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">Send Money</h2>
+      <div>
+        <h2 className="font-ubuntu text-xl font-semibold text-(--heading-colour)">Withdraw to Bank Account</h2>
+        <p className="font-roboto-slab mt-1 text-sm text-(--text-colour)">
+          Send funds from your wallet to any bank account.
+        </p>
+        {wallet?.accountNumber && (
+          <p className="font-roboto-slab mt-2 rounded-lg bg-gray-50 px-(--space-md) py-(--space-sm) text-sm text-(--text-colour)">
+            Withdrawing from:{" "}
+            <span className="font-medium">
+              {wallet.accountNumber}
+              {wallet.accountName ? ` (${wallet.accountName})` : ""}
+            </span>{" "}
+            — Balance: {wallet.currency} {wallet.balance.toLocaleString()}
+          </p>
+        )}
+      </div>
 
       <SelectInput
-        label="Bank"
+        label={loadingBanks ? "Bank (loading...)" : "Bank"}
         required
-        options={NIGERIAN_BANK_CODES}
+        options={banks.map((bank) => ({ label: bank.bankName, value: bank.bankCode }))}
         value={bankCode}
         onValueChange={(value) => {
           setBankCode(value);
@@ -124,7 +169,7 @@ export function TransferForm({ onSuccess }: { onSuccess?: () => void }) {
       />
 
       <SubmitPrimaryButton loading={submitting} loadingText="Sending...">
-        Send Money
+        Withdraw
       </SubmitPrimaryButton>
     </form>
   );

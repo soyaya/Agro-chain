@@ -9,9 +9,13 @@ import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import { MarketplaceFilters } from "~/components/marketplace/MarketplaceFilters";
 import type { MarketplaceListing, MarketplaceFilters as Filters } from "~/types";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, BASE_PRICE_PER_KG_NAIRA } from "~/types/constants";
-import { apiFetch } from "~/lib/api";
+import { apiFetch, ApiError } from "~/lib/api";
+import { buyerService } from "~/lib/services/buyer.service";
+import { platformService } from "~/lib/services/platform.service";
 import { useCart } from "~/components/marketplace/useCart";
 import { CartDrawer } from "~/components/marketplace/CartDrawer";
+import { OnboardingOverlay } from "~/components/marketplace/OnboardingOverlay";
+import { useAuth } from "~/lib/auth-context";
 
 type MarketplaceResponse = {
   status: string;
@@ -23,24 +27,60 @@ type MarketplaceResponse = {
 
 export default function MarketplacePage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [listings, setListings] = useState<MarketplaceListing[]>([]);
   const [filters, setFilters] = useState<Filters>({
     sortBy: "date",
     sortOrder: "desc",
   });
+  const [locationDefaultApplied, setLocationDefaultApplied] = useState(false);
+  const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
   const [likedListings, setLikedListings] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const cart = useCart();
-  
+
+  // Buyers see their own location's listings first — once, on load, not
+  // re-applied if they've already changed the filter themselves (e.g. to
+  // browse a different LGA, which should stick even after this effect
+  // re-runs on an unrelated user object change).
   useEffect(() => {
-    const saved = localStorage.getItem("liked_listings");
-    if (saved) {
-      try {
-        setLikedListings(JSON.parse(saved));
-      } catch (e) {}
-    }
+    if (locationDefaultApplied || !user?.locationState) return;
+    setFilters((prev) => ({
+      ...prev,
+      state: prev.state ?? user.locationState,
+      localGovernment: prev.localGovernment ?? user.locationLga,
+    }));
+    setLocationDefaultApplied(true);
+  }, [user, locationDefaultApplied]);
+
+  useEffect(() => {
+    let mounted = true;
+    platformService
+      .getActiveStates()
+      .then((res) => {
+        if (mounted) setActiveStates(res.data.activeStates);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    buyerService
+      .getSavedListings()
+      .then((res) => {
+        if (mounted) setLikedListings(res.data.listings.map((l) => l.id));
+      })
+      .catch(() => {
+        // Not logged in, or request failed — saved listings just stays empty.
+      });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -84,16 +124,24 @@ export default function MarketplacePage() {
     };
   }, []);
 
-  const handleToggleLike = (listing: MarketplaceListing) => {
-    setLikedListings((prev) => {
-      const isLiked = prev.includes(listing.id);
-      const newLikes = isLiked ? prev.filter(id => id !== listing.id) : [...prev, listing.id];
-      localStorage.setItem("liked_listings", JSON.stringify(newLikes));
-      if (!isLiked) {
-        toast.success("Added to liked listings!");
+  const handleToggleLike = async (listing: MarketplaceListing) => {
+    const isLiked = likedListings.includes(listing.id);
+    try {
+      if (isLiked) {
+        await buyerService.unsaveListing(listing.id);
+        setLikedListings((prev) => prev.filter((id) => id !== listing.id));
+      } else {
+        await buyerService.saveListing(listing.id);
+        setLikedListings((prev) => [...prev, listing.id]);
+        toast.success("Added to saved listings!");
       }
-      return newLikes;
-    });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        toast.error("Log in to save listings.");
+        return;
+      }
+      toast.error(error instanceof Error ? error.message : "Failed to update saved listings");
+    }
   };
 
   const handleAddToCart = (listing: MarketplaceListing) => {
@@ -127,14 +175,28 @@ export default function MarketplacePage() {
     }
     if (filters.fishType && listing.fishType !== filters.fishType) return false;
     if (filters.state && listing.state !== filters.state) return false;
+    if (filters.localGovernment && listing.localGovernment !== filters.localGovernment) return false;
+    if (filters.ward && listing.ward !== filters.ward) return false;
     if (filters.minPrice && listing.pricePerKg < filters.minPrice) return false;
     if (filters.maxPrice && listing.pricePerKg > filters.maxPrice) return false;
     if (filters.minQuantity && listing.totalAvailableKg < filters.minQuantity) return false;
     return true;
   });
 
+  // Buyers see their own ward first, then the rest of their LGA, then
+  // everything else — a proximity tiebreak ahead of whatever sort they pick,
+  // so "around me" stays the default browsing order without hiding anything.
+  const proximityRank = (listing: MarketplaceListing): number => {
+    if (user?.locationWard && listing.ward === user.locationWard) return 0;
+    if (user?.locationLga && listing.localGovernment === user.locationLga) return 1;
+    return 2;
+  };
+
   // Apply sorting
   const sortedListings = [...filteredListings].sort((a, b) => {
+    const proximityDiff = proximityRank(a) - proximityRank(b);
+    if (proximityDiff !== 0) return proximityDiff;
+
     const order = filters.sortOrder === "asc" ? 1 : -1;
 
     switch (filters.sortBy) {
@@ -150,6 +212,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-(--gray-bg)">
+      <OnboardingOverlay />
       <div className="container-max-width px-(--section-px) py-(--section-py) sm:px-(--section-px-sm) sm:py-(--section-py-sm) lg:px-(--section-px-lg) lg:py-(--section-py-lg)">
         <motion.div
           initial="hidden"
@@ -217,7 +280,7 @@ export default function MarketplacePage() {
 
             <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
               <span className="text-2xl font-bold text-(--heading-colour)">
-                {sortedListings.reduce((sum, l) => sum + l.totalAvailableKg, 0).toLocaleString()}
+                {sortedListings.reduce((sum, l) => sum + Number(l.totalAvailableKg), 0).toLocaleString()}
                 kg
               </span>
               <span className="text-sm text-(--text-colour)">Total Available</span>
@@ -232,11 +295,35 @@ export default function MarketplacePage() {
                 filters={filters}
                 onChange={setFilters}
                 onReset={handleResetFilters}
+                activeStates={activeStates}
               />
             </div>
 
             {/* Listings Grid */}
             <div className="lg:col-span-3">
+              {(filters.state || filters.localGovernment || filters.ward) && (
+                <div className="mb-(--gap-base) flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-md)">
+                  <p className="text-sm text-(--text-colour)">
+                    Showing listings in{" "}
+                    <span className="font-medium text-(--heading-colour)">
+                      {[filters.ward, filters.localGovernment, filters.state].filter(Boolean).join(", ")}
+                    </span>
+                  </p>
+                  <button
+                    onClick={() =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        state: undefined,
+                        localGovernment: undefined,
+                        ward: undefined,
+                      }))
+                    }
+                    className="text-sm font-medium text-(--theme-green-dark) transition hover:opacity-80"
+                  >
+                    Show all locations
+                  </button>
+                </div>
+              )}
               {loading ? (
                 <motion.div
                   variants={FADE_IN_VARIANT}

@@ -5,8 +5,11 @@ import { motion } from "framer-motion";
 import { Package, FileText, Clock, CheckCircle } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { farmerService, type FarmerListingSummary } from "~/lib/services/farmer.service";
+import { useAuth } from "~/lib/auth-context";
 
 export default function FarmersDashboardPage() {
+  const { user } = useAuth();
+  const firstName = user?.fullName?.trim().split(/\s+/)[0] || "Farmer";
   const [summary, setSummary] = useState<FarmerListingSummary>({
     totalListings: 0,
     pendingApproval: 0,
@@ -96,7 +99,7 @@ export default function FarmersDashboardPage() {
         transition={{ duration: 0.4 }}
       >
         <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">
-          Welcome back, Farmer! 👋
+          Welcome back, {firstName}! 👋
         </h1>
         <p className="font-roboto-slab text-(--text-colour)">
           Here&apos;s an overview of your farm activities

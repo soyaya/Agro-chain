@@ -7,7 +7,7 @@ import type { LucideIcon } from "lucide-react";
 // COMMON TYPES
 // ============================================
 
-export type UserRole = "farmer" | "buyer" | "admin";
+export type UserRole = "farmer" | "buyer" | "admin" | "rider";
 
 export type ApplicationStatus = "pending" | "approved" | "rejected";
 
@@ -96,7 +96,7 @@ export interface CreditServiceConfig {
 /**
  * Dashboard type identifier for different user roles
  */
-export type DashboardType = "farmer" | "cluster-farmer" | "buyer" | "admin";
+export type DashboardType = "farmer" | "cluster-farmer" | "buyer" | "admin" | "rider";
 
 /**
  * Return type for the useDashboardNav hook
@@ -157,6 +157,11 @@ export interface BaseUser {
 export interface AuthUser extends BaseUser {
   isClusterFarmer: boolean;
   profileComplete: boolean;
+  mustSetPassword: boolean;
+  riderApproved?: boolean;
+  locationState: string;
+  locationLga: string;
+  locationWard?: string | null;
 }
 
 // ============================================
@@ -253,6 +258,7 @@ export interface FarmerSupplyListing {
   farmerId: string;
   farmerName: string;
   fishType: string;
+  unit?: "kg" | "piece";
   harvestDate: Date;
   totalAvailableKg: number;
   packaging: PackagingOption[];
@@ -269,18 +275,22 @@ export interface ClusterFarmerListing {
   businessName: string;
   originalFarmerListingId?: string;
   fishType: string;
+  /** "piece" for seedling listings (priced/sold per piece); "kg" otherwise. */
+  unit?: "kg" | "piece";
   harvestDate: Date;
   totalAvailableKg: number;
   packaging: PackagingOption[];
   location: string;
   state: string;
   localGovernment: string;
+  ward?: string | null;
   pricePerKg: number;
   deliveryOptions: string[];
   visibleOnMarketplace: boolean;
   status: ListingStatus;
   createdAt: Date;
   updatedAt: Date;
+  imageUrl?: string | null;
 }
 
 // ============================================
@@ -444,6 +454,7 @@ export interface MarketplaceListing extends ClusterFarmerListing {
 export interface OrderItem {
   listingId: string;
   fishType: string;
+  unit?: "kg" | "piece";
   variant?: string;
   processed?: boolean;
   weightKg: number;
@@ -452,27 +463,44 @@ export interface OrderItem {
   totalPrice: number;
 }
 
+export type FulfillmentStage =
+  | "awaiting_farmer_dispatch"
+  | "dispatched_to_cluster"
+  | "at_cluster_office"
+  | "ready_for_pickup"
+  | "escalated_to_rider"
+  | "out_for_delivery"
+  | "delivered_awaiting_confirmation"
+  | "completed";
+
 export interface Order {
   id: string;
+  orderNumber: string;
   buyerId: string;
-  buyerName: string;
-  buyerPhone: string;
-  clusterFarmerId: string;
+  clusterFarmerId: string | null;
   clusterFarmerName: string;
+  clusterFarmerContact: string | null;
+  warehouseLocation: string | null;
+  listingFishType: string | null;
   items: OrderItem[];
+  quantity: number;
+  weightKg: number | null;
   totalAmount: number;
-  deliveryFee?: number;
-  deliveryType?: DeliveryType;
+  deliveryFee: number;
+  grandTotal: number;
+  deliveryType: string | null;
   deliveryAddress: string;
-  deliveryOption: string;
+  fulfillmentMethod: "pickup" | "delivery";
+  fulfillmentStage: FulfillmentStage;
+  assignedRiderId: string | null;
   status: OrderStatus;
-  deliveryConfirmed?: boolean;
-  buyerConfirmedAt?: Date;
   paymentStatus: "pending" | "paid" | "failed";
-  paymentMethod?: string;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
+  deliveredAt?: Date;
+  confirmedAt?: Date;
+  completedAt?: Date;
 }
 
 // ============================================
@@ -554,10 +582,18 @@ export interface BuyerProfileFormData {
 }
 
 export interface SupplyListingFormData {
-  fishType: string;
+  fishVariant: "broodstock" | "table_size" | "dried" | "seedlings";
+  weightBracket?:
+    | "weight_300_500"
+    | "weight_500_700"
+    | "weight_700_1000"
+    | "weight_1000_1200"
+    | "weight_1200_plus";
+  availableKg?: number;
+  seedlingSize?: "juveniles" | "post" | "jumbo";
+  availablePieces?: number;
   harvestDate: Date;
-  totalAvailableKg: number;
-  packaging: PackagingOption[];
+  priceAgreementAccepted: boolean;
 }
 
 export interface ClusterApplicationFormData {
@@ -603,6 +639,7 @@ export interface MarketplaceFilters {
   maxPrice?: number;
   state?: string;
   localGovernment?: string;
+  ward?: string;
   minQuantity?: number;
   sortBy?: "price" | "quantity" | "date";
   sortOrder?: "asc" | "desc";

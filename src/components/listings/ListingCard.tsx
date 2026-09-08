@@ -29,6 +29,8 @@ export function ListingCard({
     });
   };
 
+  const unit = listing.unit === "piece" ? "piece" : "kg";
+
   return (
     <motion.div
       variants={SCALE_IN_VARIANT}
@@ -64,7 +66,9 @@ export function ListingCard({
       <div className="flex flex-col gap-(--space-md)">
         <div className="flex items-center gap-2 text-sm text-(--text-colour)">
           <Package size={16} />
-          <span>{listing.totalAvailableKg}kg available</span>
+          <span>
+            {listing.totalAvailableKg} {unit === "piece" ? "pieces" : "kg"} available
+          </span>
         </div>
 
         <div className="flex items-center gap-2 text-sm text-(--text-colour)">
@@ -84,7 +88,7 @@ export function ListingCard({
         <div className="flex flex-col gap-1">
           {listing.packaging.map((pkg, index) => (
             <div key={index} className="text-sm text-(--text-colour)">
-              {pkg.weightKg}kg × {pkg.quantity}
+              {unit === "piece" ? "1 piece" : `${pkg.weightKg}kg`} × {pkg.quantity}
             </div>
           ))}
         </div>

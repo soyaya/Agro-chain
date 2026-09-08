@@ -17,7 +17,7 @@ describe('Financial Services Utilities', () => {
       expect(hasFinancialServices(buyerDashboardConfig)).toBe(false);
     });
 
-    it('should return true for enhanced dashboard config', () => {
+    it('should return true for enhanced dashboard config (key present, even though disabled)', () => {
       expect(hasFinancialServices(enhancedFarmerDashboardConfig)).toBe(true);
     });
 
@@ -32,11 +32,11 @@ describe('Financial Services Utilities', () => {
       expect(isFinancialFeatureEnabled(buyerDashboardConfig, 'credit')).toBe(false);
     });
 
-    it('should return true for enabled features in enhanced config', () => {
-      expect(isFinancialFeatureEnabled(enhancedFarmerDashboardConfig, 'loans')).toBe(true);
-      expect(isFinancialFeatureEnabled(enhancedFarmerDashboardConfig, 'credit')).toBe(true);
-      expect(isFinancialFeatureEnabled(enhancedFarmerDashboardConfig, 'payments')).toBe(true);
-      expect(isFinancialFeatureEnabled(enhancedFarmerDashboardConfig, 'profile')).toBe(true);
+    it('should return false for farmer config (farmers ignore loans/financial services)', () => {
+      expect(isFinancialFeatureEnabled(enhancedFarmerDashboardConfig, 'loans')).toBe(false);
+      expect(isFinancialFeatureEnabled(enhancedFarmerDashboardConfig, 'credit')).toBe(false);
+      expect(isFinancialFeatureEnabled(enhancedFarmerDashboardConfig, 'payments')).toBe(false);
+      expect(isFinancialFeatureEnabled(enhancedFarmerDashboardConfig, 'profile')).toBe(false);
     });
   });
 
@@ -46,22 +46,16 @@ describe('Financial Services Utilities', () => {
       expect(items).toHaveLength(0);
     });
 
-    it('should return financial navigation items for enhanced config', () => {
+    it('should return empty array for farmer config (no Financial Services nav item)', () => {
       const items = getFinancialNavigationItems(enhancedFarmerDashboardConfig);
-      expect(items.length).toBeGreaterThan(0);
-
-      // Should return the submenu items from Financial Services
-      expect(items.some(item => item.label === 'Loan Applications')).toBe(true);
-      expect(items.some(item => item.label === 'Credit Purchases')).toBe(true);
-      expect(items.some(item => item.label === 'Payment History')).toBe(true);
-      expect(items.some(item => item.label === 'Financial Profile')).toBe(true);
+      expect(items).toHaveLength(0);
     });
   });
 
   describe('shouldShowFinancialServices', () => {
-    it('should return true for farmer dashboard paths', () => {
-      expect(shouldShowFinancialServices('/farmers-dashboard')).toBe(true);
-      expect(shouldShowFinancialServices('/farmers-dashboard/profile')).toBe(true);
+    it('should return false for farmer dashboard paths (farmers ignore loans)', () => {
+      expect(shouldShowFinancialServices('/farmers-dashboard')).toBe(false);
+      expect(shouldShowFinancialServices('/farmers-dashboard/profile')).toBe(false);
     });
 
     it('should return true for cluster dashboard paths', () => {

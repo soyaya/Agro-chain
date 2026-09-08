@@ -8,9 +8,9 @@ function getDashboardFromCookie(request: NextRequest): string {
       role?: string;
       isClusterFarmer?: boolean;
     };
-    if (user.role === "admin") return "/admin-dashboard";
     if (user.isClusterFarmer || user.role === "cluster") return "/cluster-dashboard";
     if (user.role === "farmer") return "/farmers-dashboard";
+    if (user.role === "rider") return "/rider-dashboard";
     return "/buyers-dashboard";
   } catch {
     return "/buyers-dashboard";
@@ -25,16 +25,29 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/farmers-dashboard") ||
     pathname.startsWith("/buyers-dashboard") ||
     pathname.startsWith("/cluster-dashboard") ||
-    pathname.startsWith("/admin-dashboard");
+    pathname.startsWith("/rider-dashboard");
 
   if (isDashboardRoute && !hasSession) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (
-    hasSession &&
-    (pathname.startsWith("/login") || pathname.startsWith("/register"))
-  ) {
+  if (pathname.startsWith("/marketplace/checkout") && !hasSession) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("returnTo", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Login-only: a direct hit on /register is deliberately NOT bounced here even
+  // when hasSession is true. The `current_user` cookie only proves a session
+  // *existed*, not that it's still valid server-side (e.g. the account was
+  // deleted, or the session was revoked elsewhere) — auth-context.tsx clears
+  // this cookie on the first 401 it sees, but that check runs client-side,
+  // after this middleware has already decided whether to serve the page. A
+  // stale cookie bouncing /login away is a minor inconvenience (the user
+  // lands on their dashboard, which self-corrects to /login via auth-context);
+  // bouncing /register away is worse — a multi-step OTP flow gets abandoned
+  // entirely with no way back in until the cookie clears itself.
+  if (hasSession && pathname.startsWith("/login")) {
     return NextResponse.redirect(new URL(getDashboardFromCookie(request), request.url));
   }
 
@@ -46,8 +59,9 @@ export const config = {
     "/farmers-dashboard/:path*",
     "/buyers-dashboard/:path*",
     "/cluster-dashboard/:path*",
-    "/admin-dashboard/:path*",
+    "/rider-dashboard/:path*",
     "/login",
     "/register",
+    "/marketplace/checkout",
   ],
 };

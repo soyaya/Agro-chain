@@ -1,23 +1,26 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { DynamicInput, SelectInput } from "~/components/dynamic-input";
+import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
 import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
-import { kadunaLga } from "~/models/models";
+import { EmailExistsModal } from "~/components/shared/EmailExistsModal";
+import { LocationPicker, type LocationValue } from "~/components/shared/LocationPicker";
+import { platformService } from "~/lib/services/platform.service";
+import { MAX_OTP_RESEND_ATTEMPTS } from "~/types/constants";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
 } from "~/components/ui/input-otp";
-import { cn } from "~/lib/utils";
+import { cn, getSafeReturnTo } from "~/lib/utils";
 
 // === Zod Schema
 const registerSchema = z
@@ -28,7 +31,6 @@ const registerSchema = z
       .min(10, "Phone number is too short")
       .regex(/^(0|\+234)[789][01]\d{8}$/, "Invalid Nigerian phone number (+234 or 0 prefix)"),
     email: z.string().email("Invalid email address"),
-    location: z.string().min(2, "Location is required").optional(),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(8, "Confirm your password"),
   })
@@ -43,9 +45,12 @@ type Role = "farmer" | "buyer";
 
 function RegisterFormContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const role = (searchParams.get("role")?.toLowerCase() || "") as Role;
+  const safeReturnTo = getSafeReturnTo(searchParams.get("returnTo"));
 
-  const [isLga, setSelectedLga] = useState<string>("off");
+  const [location, setLocation] = useState<LocationValue>({ state: "", lga: "", ward: "" });
+  const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [otp, setOtp] = useState("");
@@ -53,6 +58,7 @@ function RegisterFormContent() {
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [resendLocked, setResendLocked] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [emailExistsModal, setEmailExistsModal] = useState(false);
   const [statusModal, setStatusModal] = useState<{
     open: boolean;
     variant: "loading" | "success";
@@ -70,14 +76,60 @@ function RegisterFormContent() {
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     mode: "onChange",
-    defaultValues: { location: "" },
   });
 
-  // Sync LGA selection with form location field
-  const handleLgaChange = (value: string) => {
-    setSelectedLga(value);
-    setValue("location", value, { shouldValidate: true });
-  };
+  // Deep link from login: `?verify=<email>` resumes verification for an
+  // already-registered-but-unverified account instead of re-collecting the form.
+  useEffect(() => {
+    let mounted = true;
+    platformService
+      .getActiveStates()
+      .then((res) => {
+        if (mounted) setActiveStates(res.data.activeStates);
+      })
+      .catch(() => {
+        // Falls back to "not restricted yet" — leaves the picker unrestricted
+        // rather than blocking registration if this lookup fails.
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const verifyOtpSentRef = useRef(false);
+  useEffect(() => {
+    const verifyEmail = searchParams.get("verify");
+    if (!verifyEmail) return;
+    // Guards against React StrictMode's dev-only double-effect-invocation
+    // sending two OTP emails for a single page load.
+    if (verifyOtpSentRef.current) return;
+    verifyOtpSentRef.current = true;
+
+    setValue("email", verifyEmail, { shouldValidate: true });
+    setStep(2);
+
+    (async () => {
+      try {
+        const response = await fetch("/api/auth/register/otp/resend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ emailAddress: verifyEmail }),
+        });
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.message || "Failed to send verification code");
+        }
+        toast.success("Verification code sent to your email.");
+        setCooldownSeconds(60);
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to send verification code.",
+        );
+      }
+    })();
+    // Runs once on mount to consume the deep-link param.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async (data: RegisterForm) => {
     setSubmitting(true);
@@ -97,7 +149,9 @@ function RegisterFormContent() {
           fullName: data.fullName,
           phone: data.phone,
           email: data.email,
-          location: data.location,
+          state: location.state,
+          lga: location.lga,
+          ward: location.ward || undefined,
           password: data.password,
           role,
         }),
@@ -118,13 +172,22 @@ function RegisterFormContent() {
       setStatusModal({ open: false, variant: "loading" });
       const message =
         error instanceof Error ? error.message : "Registration failed. Please try again.";
-      toast.error(message);
+
+      if (/email/i.test(message) && /already exists/i.test(message)) {
+        setEmailExistsModal(true);
+      } else {
+        toast.error(message);
+      }
     } finally {
       setSubmitting(false);
     }
   };
 
-  const isFormComplete = isValid && isLga !== "off";
+  const isFormComplete =
+    isValid &&
+    !!location.state &&
+    !!location.lga &&
+    (!activeStates || activeStates.includes(location.state));
 
   useEffect(() => {
     if (step !== 2 || resendLocked) return;
@@ -160,9 +223,6 @@ function RegisterFormContent() {
         throw new Error(data.message || "OTP verification failed");
       }
 
-      setStatusModal({ open: true, variant: "success" });
-      toast.success("Account verified! Taking you to your dashboard.");
-
       const role = data.data?.user?.role;
       const dashboardRoute =
         role === "farmer"
@@ -173,10 +233,19 @@ function RegisterFormContent() {
               ? "/buyers-dashboard"
               : "/login";
 
+      // A returnTo present means registration was reached via the checkout
+      // auth gate — resume that purchase instead of jumping to the dashboard.
+      const destination = safeReturnTo || dashboardRoute;
+
+      setStatusModal({ open: true, variant: "success" });
+      toast.success(
+        safeReturnTo ? "Account verified! Continuing your order." : "Account verified! Taking you to your dashboard.",
+      );
+
       // Use window.location to force a full navigation so the browser commits
       // the httpOnly cookies set by the proxy before the middleware reads them.
       setTimeout(() => {
-        window.location.href = dashboardRoute;
+        window.location.href = destination;
       }, 1800);
     } catch (error) {
       const message =
@@ -191,7 +260,7 @@ function RegisterFormContent() {
 
   const handleResendOtp = async () => {
     if (submitting || resendLocked || cooldownSeconds > 0) return;
-    if (resendAttempts >= 2) {
+    if (resendAttempts >= MAX_OTP_RESEND_ATTEMPTS) {
       setResendLocked(true);
       return;
     }
@@ -209,10 +278,10 @@ function RegisterFormContent() {
       }
 
       const nextAttempts = resendAttempts + 1;
-      const attemptsLeft = 2 - nextAttempts;
+      const attemptsLeft = MAX_OTP_RESEND_ATTEMPTS - nextAttempts;
       setResendAttempts(nextAttempts);
       setCooldownSeconds(60);
-      if (nextAttempts >= 2) {
+      if (nextAttempts >= MAX_OTP_RESEND_ATTEMPTS) {
         setResendLocked(true);
       }
       toast.success(
@@ -282,11 +351,10 @@ function RegisterFormContent() {
                 required
               />
 
-              <SelectInput
-                label="Location"
-                value={isLga}
-                onValueChange={handleLgaChange}
-                options={kadunaLga}
+              <LocationPicker
+                value={location}
+                onChange={setLocation}
+                activeStates={activeStates}
                 required
               />
             </div>
@@ -359,8 +427,8 @@ function RegisterFormContent() {
                 <p className="text-center text-xs text-(--text-colour)">
                   {resendLocked
                     ? "You’ve reached the resend limit. Try again after 24 hours."
-                    : `${Math.max(0, 2 - resendAttempts)} resend${
-                        2 - resendAttempts === 1 ? "" : "s"
+                    : `${Math.max(0, MAX_OTP_RESEND_ATTEMPTS - resendAttempts)} resend${
+                        MAX_OTP_RESEND_ATTEMPTS - resendAttempts === 1 ? "" : "s"
                       } left`}
                 </p>
               </div>
@@ -382,6 +450,13 @@ function RegisterFormContent() {
         description={
           statusModal.variant === "success" ? "We're preparing your dashboard now." : undefined
         }
+      />
+
+      <EmailExistsModal
+        open={emailExistsModal}
+        email={getValues("email")}
+        onLogin={() => router.push(`/login?email=${encodeURIComponent(getValues("email"))}`)}
+        onDismiss={() => setEmailExistsModal(false)}
       />
     </>
   );

@@ -1,9 +1,5 @@
-import Image from "next/image";
-
 export default function AppLogo() {
   return (
-    <>
-      <Image src="/debridger-logo.png" alt="Debridger Logo" />
-    </>
+    <span className="font-ubuntu text-xl font-bold text-(--theme-green-dark)">Agro-chain</span>
   );
 }

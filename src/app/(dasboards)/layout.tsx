@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import { DashboardLayout } from "~/components/dashboard/DashboardLayout";
 import {
   buyerDashboardConfig,
-  adminDashboardConfig,
   enhancedFarmerDashboardConfig,
   enhancedClusterFarmerDashboardConfig,
+  riderDashboardConfig,
 } from "~/models/models";
 
 interface DashboardsLayoutProps {
@@ -24,10 +24,10 @@ export default function DashboardsLayout({ children }: DashboardsLayoutProps) {
     config = enhancedClusterFarmerDashboardConfig;
   } else if (pathname.startsWith("/buyers-dashboard")) {
     config = buyerDashboardConfig;
-  } else if (pathname.startsWith("/admin-dashboard")) {
-    config = adminDashboardConfig;
   } else if (pathname.startsWith("/farmers-dashboard")) {
     config = enhancedFarmerDashboardConfig;
+  } else if (pathname.startsWith("/rider-dashboard")) {
+    config = riderDashboardConfig;
   }
 
   return <DashboardLayout config={config}>{children}</DashboardLayout>;

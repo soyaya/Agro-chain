@@ -11,7 +11,7 @@ import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { ProfileAvatar } from "./ProfileAvatar";
 import type { FarmerProfile, FarmerProfileFormData } from "~/types";
 import {
-  FISH_TYPES,
+  FISH_TYPE_OPTIONS,
   NIGERIAN_STATES,
   MIN_FARMING_CAPACITY_KG,
   MIN_YEARS_EXPERIENCE,
@@ -142,10 +142,7 @@ export function FarmerProfileForm({
     value: state,
   }));
 
-  const fishTypeOptions = FISH_TYPES.map((fish) => ({
-    label: fish,
-    value: fish,
-  }));
+  const fishTypeOptions = FISH_TYPE_OPTIONS;
 
   return (
     <motion.form

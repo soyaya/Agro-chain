@@ -70,8 +70,8 @@ export function getFinancialNavigationItems(
  * Check if financial services should be displayed for a given pathname
  */
 export function shouldShowFinancialServices(pathname: string): boolean {
-  // Only show financial services for farmer and cluster farmer dashboards
-  return pathname.startsWith("/farmers-dashboard") || pathname.startsWith("/cluster-dashboard");
+  // Farmers ignore the financial/loans route entirely; only cluster farmers use it.
+  return pathname.startsWith("/cluster-dashboard");
 }
 
 /**

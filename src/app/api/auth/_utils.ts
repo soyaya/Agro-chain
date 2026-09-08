@@ -118,7 +118,17 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
 
   const data = (parsed.data ?? {}) as Record<string, unknown>;
   const accessToken = data.access_token as string | undefined;
+  const refreshToken = data.refresh_token as string | undefined;
   const user = data.user as Record<string, unknown> | undefined;
+
+  // The backend's own session length ("remember me" = 30d, else 7d) is only
+  // knowable from expires_at — falling back to the 7-day default keeps
+  // "remember me" from silently degrading to the shorter window.
+  const expiresAt = data.expires_at ? new Date(data.expires_at as string) : null;
+  const maxAge =
+    expiresAt && !Number.isNaN(expiresAt.getTime())
+      ? Math.max(0, Math.round((expiresAt.getTime() - Date.now()) / 1000))
+      : COOKIE_MAX_AGE;
 
   // Build a clean response body — strip tokens so they never reach the browser
   const cleanData: Record<string, unknown> = { ...data };
@@ -135,7 +145,22 @@ export async function forwardAuthAndSetCookies(req: Request, path: string) {
       httpOnly: true,
       secure: IS_PROD,
       sameSite: "lax",
-      maxAge: COOKIE_MAX_AGE,
+      maxAge,
+      path: "/",
+    });
+  }
+
+  if (refreshToken) {
+    // The access token JWT itself self-expires in hours (JWT_ACCESS_EXPIRES),
+    // well before this cookie does — cookieing the refresh token too lets
+    // apiFetch's silent /auth/refresh retry mint a new one instead of the
+    // user hitting a hard "Invalid or expired session" while auth_token is
+    // still sitting in their browser looking valid.
+    nextResponse.cookies.set("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: IS_PROD,
+      sameSite: "lax",
+      maxAge,
       path: "/",
     });
   }

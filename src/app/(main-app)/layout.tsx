@@ -1,4 +1,5 @@
-// import Header from "~/components/PageLanding/Header";
+import Header from "~/components/Header";
+import { CartProvider } from "~/components/marketplace/useCart";
 // import SubscribeSection from "~/components/PageLanding/SubscribeSection";
 // import Footer from "~/components/PageLanding/Footer";
 
@@ -44,11 +45,11 @@ export const metadata = {
 
 export default function MainLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
-      {/* <Header /> */}
+    <CartProvider>
+      <Header />
       <main>{children}</main>
       {/* <SubscribeSection />
       <Footer /> */}
-    </>
+    </CartProvider>
   );
 }
