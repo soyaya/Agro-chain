@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { DashboardLayout } from "~/components/dashboard/DashboardLayout";
+import { CartProvider } from "~/components/marketplace/useCart";
 import {
   buyerDashboardConfig,
   enhancedFarmerDashboardConfig,
@@ -30,5 +31,9 @@ export default function DashboardsLayout({ children }: DashboardsLayoutProps) {
     config = riderDashboardConfig;
   }
 
-  return <DashboardLayout config={config}>{children}</DashboardLayout>;
+  return (
+    <CartProvider>
+      <DashboardLayout config={config}>{children}</DashboardLayout>
+    </CartProvider>
+  );
 }
