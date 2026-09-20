@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
+import { SwimmingCatfish } from "~/components/marketplace/SwimmingCatfish";
 
 const ONBOARDING_KEY = "onboarding-completed";
 
@@ -197,6 +198,7 @@ export function OnboardingOverlay() {
                       className="object-cover"
                     />
                   </motion.div>
+                  {!reduceMotion && <SwimmingCatfish />}
                   {/* Soft light sweeping across the "water" */}
                   {!reduceMotion && (
                     <motion.div
