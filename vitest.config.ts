@@ -9,6 +9,13 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["src/__tests__/setup.ts"],
+    // e2e/ holds Playwright specs (its own test()/test.use() API, run via
+    // `npm run test:e2e`) — vitest's default glob would otherwise also pick
+    // up *.spec.ts files there and crash on the API mismatch. .claude/ can
+    // contain leftover agent worktrees with their own node_modules, which
+    // vitest would otherwise also try to run as a second, version-mismatched
+    // copy of this same test suite.
+    exclude: ["**/node_modules/**", "**/e2e/**", "**/.claude/**"],
   },
   resolve: {
     alias: {

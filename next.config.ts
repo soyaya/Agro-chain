@@ -44,6 +44,13 @@ const nextInternals: Record<string, string> = {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // Playwright's e2e stack runs its own `next dev` (port 3010) alongside
+  // whatever regular dev server (port 3000) might already be running from
+  // this same checkout — both would otherwise fight over the single
+  // `.next/dev/lock` file and one fails to start ("Unable to acquire lock").
+  // playwright.config.ts sets E2E=true only for its own webServer process.
+  ...(process.env.E2E === "true" ? { distDir: ".next-e2e" } : {}),
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
