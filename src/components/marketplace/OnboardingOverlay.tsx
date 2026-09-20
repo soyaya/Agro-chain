@@ -4,8 +4,6 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
-import { SwimmingCatfish } from "~/components/marketplace/SwimmingCatfish";
-
 const ONBOARDING_KEY = "onboarding-completed";
 
 const CLOUDINARY = "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005";
@@ -198,17 +196,6 @@ export function OnboardingOverlay() {
                       className="object-cover"
                     />
                   </motion.div>
-                  {!reduceMotion && <SwimmingCatfish />}
-                  {/* Soft light sweeping across the "water" */}
-                  {!reduceMotion && (
-                    <motion.div
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/25 to-transparent"
-                      initial={{ x: "0%" }}
-                      animate={{ x: "400%" }}
-                      transition={{ duration: 2.6, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.2 }}
-                    />
-                  )}
                 </div>
                 <h1
                   ref={headingRef}
