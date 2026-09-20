@@ -6,9 +6,8 @@ export interface RiderOrder {
   buyerName: string;
   deliveryAddress: string;
   fulfillmentStage: string;
-  phoneVerifiedAt: string | null;
+  fishVariant: string | null;
   pickupPhotoUrl: string | null;
-  deliveryOtpVerifiedAt: string | null;
   handoffPhotoUrl: string | null;
   createdAt: string;
 }
@@ -18,9 +17,8 @@ export interface RiderDemand {
   buyerName: string;
   deliveryAddress: string;
   fulfillmentStage: string;
-  phoneVerifiedAt: string | null;
+  fishVariant: string | null;
   pickupPhotoUrl: string | null;
-  deliveryOtpVerifiedAt: string | null;
   handoffPhotoUrl: string | null;
   createdAt: string;
 }
@@ -53,33 +51,19 @@ export const riderService = {
     });
   },
 
-  /** Send a phone-verification OTP to the buyer before starting delivery. */
-  sendPhoneOtp(orderId: string) {
-    return apiFetch(`/riders/orders/${orderId}/send-phone-otp`, { method: "POST" });
-  },
-
-  /** Verify the phone OTP and start delivery with a pickup photo. */
-  startDelivery(orderId: string, otp: string, photoUrl: string) {
+  /**
+   * Starts delivery with a pickup photo — no OTP. The chain of custody is
+   * photo-only: this photo (and the handoff one below) is what the buyer
+   * compares before confirming, and what admin reviews on a dispute.
+   */
+  startDelivery(orderId: string, photoUrl: string) {
     return apiFetch(`/riders/orders/${orderId}/start-delivery`, {
       method: "POST",
-      body: JSON.stringify({ otp, photoUrl }),
+      body: JSON.stringify({ photoUrl }),
     });
   },
 
-  /** Send an arrival OTP to the buyer once the rider reaches them. */
-  sendArrivalOtp(orderId: string) {
-    return apiFetch(`/riders/orders/${orderId}/send-arrival-otp`, { method: "POST" });
-  },
-
-  /** Verify the buyer's identity via the arrival OTP. */
-  verifyArrivalOtp(orderId: string, otp: string) {
-    return apiFetch(`/riders/orders/${orderId}/verify-arrival-otp`, {
-      method: "POST",
-      body: JSON.stringify({ otp }),
-    });
-  },
-
-  /** Complete the handoff with a proof-of-delivery photo. */
+  /** Completes the handoff with a proof-of-delivery photo. */
   completeHandoff(orderId: string, photoUrl: string) {
     return apiFetch(`/riders/orders/${orderId}/complete-handoff`, {
       method: "POST",
@@ -94,25 +78,10 @@ export const riderService = {
     return apiFetch<{ status: string; data: { demands: RiderDemand[] } }>("/riders/demands");
   },
 
-  sendDemandPhoneOtp(demandId: string) {
-    return apiFetch(`/riders/demands/${demandId}/send-phone-otp`, { method: "POST" });
-  },
-
-  startDemandDelivery(demandId: string, otp: string, photoUrl: string) {
+  startDemandDelivery(demandId: string, photoUrl: string) {
     return apiFetch(`/riders/demands/${demandId}/start-delivery`, {
       method: "POST",
-      body: JSON.stringify({ otp, photoUrl }),
-    });
-  },
-
-  sendDemandArrivalOtp(demandId: string) {
-    return apiFetch(`/riders/demands/${demandId}/send-arrival-otp`, { method: "POST" });
-  },
-
-  verifyDemandArrivalOtp(demandId: string, otp: string) {
-    return apiFetch(`/riders/demands/${demandId}/verify-arrival-otp`, {
-      method: "POST",
-      body: JSON.stringify({ otp }),
+      body: JSON.stringify({ photoUrl }),
     });
   },
 
@@ -121,5 +90,23 @@ export const riderService = {
       method: "POST",
       body: JSON.stringify({ photoUrl }),
     });
+  },
+
+  /** Get payout history — the delivery fee earned per completed order/demand. */
+  getPayouts() {
+    return apiFetch<{
+      status: string;
+      data: {
+        payouts: Array<{
+          payoutId: string;
+          orderId: string | null;
+          demandId: string | null;
+          amount: number;
+          scheduledFor: string;
+          status: "pending" | "processing" | "paid" | "failed";
+          createdAt: string;
+        }>;
+      };
+    }>("/riders/payouts");
   },
 };

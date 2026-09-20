@@ -147,20 +147,55 @@ export type SelectInputProps = {
   onValueChange?: (value: string) => void;
 
   className?: string;
+
+  // Opt-in — adds a search box above the options list that filters by label
+  // as the user types. Off by default so every existing short-option-list
+  // caller (states, business types, etc.) is unaffected; turn it on for
+  // lists too long to scan by eye, like the ~1000-entry bank list.
+  searchable?: boolean;
+  searchPlaceholder?: string;
 };
 
 export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
-  ({ label, required = false, error, options = [], value, onValueChange, className }, ref) => {
+  (
+    {
+      label,
+      required = false,
+      error,
+      options = [],
+      value,
+      onValueChange,
+      className,
+      searchable = false,
+      searchPlaceholder = "Search...",
+    },
+    ref,
+  ) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [query, setQuery] = useState("");
 
     const triggerRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
     const dropdownId = `dropdown-${label?.replace(/\s+/g, "-").toLowerCase() || "select"}`;
 
     const hasError = !!error || typeof error === "string";
 
     const selectedOption = options.find((opt) => opt.value === value);
     const display = selectedOption?.label || "Select an option";
+
+    const visibleOptions = searchable && query.trim()
+      ? options.filter((opt) => opt.label.toLowerCase().includes(query.trim().toLowerCase()))
+      : options;
+
+    useEffect(() => {
+      if (isOpen && searchable) {
+        setQuery("");
+        // Focus after the open animation starts so the dropdown is already mounted.
+        const timer = setTimeout(() => searchInputRef.current?.focus(), 0);
+        return () => clearTimeout(timer);
+      }
+    }, [isOpen, searchable]);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -244,9 +279,33 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
                 transition={{ duration: 0.2 }}
                 role="listbox"
                 aria-label={label ? `${label} options` : "Options"}
-                className="absolute right-0 left-0 z-50 mt-2 max-h-60 overflow-auto rounded-xl border border-(--border-input) bg-(--white) shadow-lg"
+                className="absolute right-0 left-0 z-50 mt-2 max-h-72 overflow-hidden rounded-xl border border-(--border-input) bg-(--white) shadow-lg"
               >
-                {options.map((option) => (
+                {searchable && (
+                  <div className="sticky top-0 border-b border-(--border-input) bg-(--white) p-(--space-sm)">
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") setIsOpen(false);
+                        e.stopPropagation();
+                      }}
+                      placeholder={searchPlaceholder}
+                      aria-label={searchPlaceholder}
+                      className="font-roboto-slab h-9 w-full rounded-lg border border-(--border-input) px-(--space-md) text-sm outline-none focus:border-(--theme-green-dark)"
+                    />
+                  </div>
+                )}
+                <div className="max-h-60 overflow-auto">
+                {visibleOptions.length === 0 && (
+                  <div className="font-roboto-slab px-(--space-md) py-(--space-md) text-sm text-gray-400">
+                    No matches found.
+                  </div>
+                )}
+                {visibleOptions.map((option) => (
                   <div
                     key={option.value}
                     onClick={() => {
@@ -277,6 +336,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
                     {option.label}
                   </div>
                 ))}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

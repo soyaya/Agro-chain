@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Package, Clock, CheckCircle } from "lucide-react";
-import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
+import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT, formatStatus, statusColorClass } from "~/types/constants";
 import { buyerService, type BackendOrder } from "~/lib/services/buyer.service";
 import { useAuth } from "~/lib/auth-context";
 
@@ -148,9 +148,10 @@ export default function BuyersDashboardPage() {
           {(orders.slice(0, 4)).map((order) => (
             <div key={order.orderId} className="flex items-center gap-(--space-md) rounded-lg p-(--space-md) transition-colors hover:bg-(--bg-pink)">
               <div className="h-2 w-2 rounded-full bg-green-500" />
-              <p className="font-roboto-slab text-sm text-(--text-colour)">
-                {order.orderNumber} - {order.status}
-              </p>
+              <p className="font-roboto-slab text-sm text-(--text-colour)">{order.orderNumber}</p>
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColorClass(order.status)}`}>
+                {formatStatus(order.status)}
+              </span>
               <span className="ml-auto text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</span>
             </div>
           ))}

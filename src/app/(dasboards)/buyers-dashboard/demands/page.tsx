@@ -9,6 +9,7 @@ import { buyerService, type BackendDemand, type DemandStatus } from "~/lib/servi
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
+import { PaymentStatusBadge, getPayButtonState } from "~/components/ui/PaymentStatusBadge";
 
 // === Status config
 
@@ -252,13 +253,10 @@ export default function BuyerDemandsPage() {
                       </div>
                       <div>
                         <p className="font-roboto-slab text-xs text-gray-500">Payment</p>
-                        <p
-                          className={`font-ubuntu font-semibold capitalize ${
-                            demand.paymentStatus === "paid" ? "text-green-600" : "text-yellow-600"
-                          }`}
-                        >
-                          {demand.paymentStatus}
-                        </p>
+                        <PaymentStatusBadge
+                          paymentStatus={demand.paymentStatus}
+                          walletPaymentStatus={demand.walletPaymentStatus}
+                        />
                       </div>
                     </div>
 
@@ -276,16 +274,19 @@ export default function BuyerDemandsPage() {
                     >
                       View Details
                     </button>
-                    {demand.status === "pending" && demand.paymentStatus !== "paid" && (
-                      <button
-                        onClick={() => void handlePay(demand.id)}
-                        disabled={paying === demand.id}
-                        className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) px-(--space-lg) py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-                      >
-                        {paying === demand.id ? "Paying..." : `Pay ₦${demand.grandTotal.toLocaleString()}`}
-                      </button>
-                    )}
-                    {demand.status === "pending" && (
+                    {demand.status === "pending" &&
+                      getPayButtonState(demand.paymentStatus, demand.walletPaymentStatus).show && (
+                        <button
+                          onClick={() => void handlePay(demand.id)}
+                          disabled={paying === demand.id}
+                          className="font-roboto-slab flex items-center justify-center gap-2 rounded-xl bg-(--theme-green-dark) px-(--space-lg) py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+                        >
+                          {paying === demand.id
+                            ? "Paying..."
+                            : `${getPayButtonState(demand.paymentStatus, demand.walletPaymentStatus).label} ₦${demand.grandTotal.toLocaleString()}`}
+                        </button>
+                      )}
+                    {demand.status === "pending" && demand.walletPaymentStatus !== "processing" && (
                       <button
                         onClick={() => handleCancel(demand.id)}
                         disabled={cancelling === demand.id}

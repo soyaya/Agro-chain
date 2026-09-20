@@ -180,14 +180,6 @@ export const clusterService = {
     );
   },
 
-  /** Update the status of a cluster order. */
-  updateOrderStatus(orderId: string, status: string) {
-    return apiFetch(`/cluster/orders/${orderId}`, {
-      method: "PATCH",
-      body: JSON.stringify({ status }),
-    });
-  },
-
   /** Get payout history for the cluster. */
   getPayouts() {
     return apiFetch<{

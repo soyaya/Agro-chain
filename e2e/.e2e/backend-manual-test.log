@@ -1,0 +1,165 @@
+
+> agrochain_backend@1.0.0 dev
+> nodemon
+
+[33m[nodemon] 3.1.14[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): src\**\*[39m
+[33m[nodemon] watching extensions: ts[39m
+[32m[nodemon] starting `npx tsx src/server.ts`[39m
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[SwaggerService][0m Swagger UI initialized with 84 documented path(s)
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/health, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/role, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/register, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/register/otp, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/register/otp/resend, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/login, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/login/otp, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/login/otp/resend, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/verify, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/verify/otp, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/forgot-password, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/forgot-password/otp, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/forgot-password/otp/resend, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/set-password, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/me, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/refresh, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/logout, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/logout/all, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/auth/sessions, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/listings/create, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/listings/get, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/listings/:listingId, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/recent-activities, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/account-profile, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/cluster-farmer-application, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/verify-cac, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/orders, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/payouts, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/listing-prices, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/farmers/orders/:orderId/dispatch, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/account-profile, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/listings/get, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/current-activities, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/pending-approvals, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/pending-approvals/:listingId, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/farmers, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/orders, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/payouts, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/demands, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/demands/:demandId/accept, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/demands/:demandId/decline, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/demands/:demandId/ready-for-pickup, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/demands/:demandId/escalate, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/riders/pending, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/riders/approved, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/riders/:riderId/review, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/orders/:orderId/receive, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/orders/:orderId/ready-for-pickup, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/cluster/orders/:orderId/escalate, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/account-profile, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/orders, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/orders, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/orders/:orderId, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/orders/:orderId/tracking, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/orders/:orderId/confirm-delivery, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/orders/:orderId/pay-with-wallet, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/demand-prices, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/demands, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/demands/:id, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/demands, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/demands/:id, DELETE} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/demands/:id/pay-with-wallet, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/demands/:id/tracking, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/buyers/demands/:id/confirm-receipt, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/riders/orders, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/riders/orders/:orderId/start-delivery, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/riders/orders/:orderId/complete-handoff, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/riders/demands, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/riders/demands/:demandId/start-delivery, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/riders/demands/:demandId/complete-handoff, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/riders/payouts, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/cart, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/cart, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/cart/:cartItemId, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/cart/:cartItemId, DELETE} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/checkout, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/saved, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/saved/:listingId, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/saved/:listingId, DELETE} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/delivery-fee, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/active-states, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/marketplace/:listingId, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/wallet/, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/wallet/transactions, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/wallet/banks, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/wallet/name-enquiry, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/wallet/transfer, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/users/, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/users/profile, PUT} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/users/cluster-application, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/cluster-applications, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/cluster-applications/:id/approve, PUT} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/cluster-applications/:id/reject, PUT} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/dashboard/metrics, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/dashboard/charts, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/dashboard/activities, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/analytics/overview, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/analytics/cohorts, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/demands, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/demands/:id, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/demands/:id/assign, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/farmers, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/farmers/:id, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/farmers/:id/toggle-active, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/orders, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/orders/:id, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/listings, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/listings/:id/flag, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/listings/:id, DELETE} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/settings, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/settings, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/demand-prices, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/demand-prices/bracket/:variant/:weightBracket, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/demand-prices/seedling/:seedlingSize, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/riders/invite, POST} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/wallets, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/wallets/:userId/freeze, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/wallets/:userId/unfreeze, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/wallets/:userId/notify, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/listings, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/listings/:listingId/override-decision, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/orders, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/orders/:orderId/override-stage, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/orders/:orderId/cancel, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/finance, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/payouts/:payoutId/mark-paid, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api/admin/overview/wallet-transactions/:id/resolve, PATCH} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[RouterExplorer][0m Mapped {/api-docs.json, GET} route
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[BootstrapService][0m Application successfully started
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[BootstrapService][0m Application running on: http://localhost:5098/api
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:05 PM[0m     [32mLOG    [0m [33m[BootstrapService][0m Swagger UI available at: http://localhost:5098/api-docs
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:18 PM[0m     [32mLOG    [0m [36m[Router][0m GET /api/health 200 5ms
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:10:18 PM[0m     [32mLOG    [0m [36m[Router][0m GET /api/health 200 1ms
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:12:23 PM[0m     [32mLOG    [0m [36m[Router][0m GET /api/health 200 1ms
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:12:23 PM[0m     [32mLOG    [0m [36m[Router][0m GET /api/health 200 0ms
+
+-----------------------------------
+[DEV ONLY] Email OTP for e2e-buyer-1789733597709@internal.test: 107893
+-----------------------------------
+
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:13:24 PM[0m     [32mLOG    [0m [33m[App][0m Email sent successfully  [2mto="e2e-buyer-1789733597709@internal.test"[0m [2mtryNumber=1[0m [2mid="01a0b46f-3264-7765-a422-ecb8b6a17fb5"[0m
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:13:24 PM[0m     [32mLOG    [0m [36m[Router][0m POST /api/auth/register 201 4393ms
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:14:56 PM[0m     [32mLOG    [0m [36m[Router][0m GET /api/health 200 1ms
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:14:56 PM[0m     [32mLOG    [0m [36m[Router][0m GET /api/health 200 1ms
+
+-----------------------------------
+[DEV ONLY] Email OTP for e2e-buyer-1789733737160@internal.test: 770310
+-----------------------------------
+
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:16:01 PM[0m     [32mLOG    [0m [33m[App][0m Email sent successfully  [2mto="e2e-buyer-1789733737160@internal.test"[0m [2mtryNumber=1[0m [2mid="01a0b471-9879-732f-9cf7-e7eea9c08fc6"[0m
+[32m[AgroChain][0m [2m3708[0m  - [2m09/18/2026, 1:16:01 PM[0m     [32mLOG    [0m [36m[Router][0m POST /api/auth/register 201 2712ms
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

@@ -209,10 +209,14 @@ export default function CheckoutPage() {
 
                 {deliveryType === "delivery" && (
                   <div className="mt-4">
-                    <label className="text-sm font-medium text-(--heading-colour)">
+                    <label
+                      htmlFor="delivery-address"
+                      className="text-sm font-medium text-(--heading-colour)"
+                    >
                       Delivery Address
                     </label>
                     <textarea
+                      id="delivery-address"
                       value={deliveryAddress}
                       onChange={(e) => {
                         setDeliveryAddress(e.target.value);

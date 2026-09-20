@@ -134,12 +134,12 @@ export default function CreateDemandPage() {
       try {
         await buyerService.payDemandWithWallet(demandId);
         toast.success("Payment successful. Your demand is now live.");
-      } catch (payError) {
-        toast.error(
-          payError instanceof Error
-            ? `Demand created, but payment failed: ${payError.message}`
-            : "Demand created, but payment failed. Pay from My Demands.",
-        );
+      } catch {
+        // The real reason (insufficient balance, a payment already in
+        // flight, a provider hiccup) is shown properly via PaymentStatusBadge
+        // on the demand list/detail page — this toast just needs to explain
+        // there's a next step, not repeat a raw backend error string.
+        toast.error("Demand created — payment didn't go through. You can pay from My Demands.");
       }
 
       router.push("/buyers-dashboard/demands");

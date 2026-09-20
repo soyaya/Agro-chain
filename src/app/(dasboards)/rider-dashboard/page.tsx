@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Truck, Phone, Camera, ShieldCheck, CheckCircle2, Clock } from "lucide-react";
+import { Truck, Camera, CheckCircle2, Clock, AlertTriangle, RefreshCw, Upload as UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 import { riderService, type RiderOrder, type RiderDemand } from "~/lib/services/rider.service";
 import { uploadFile } from "~/lib/upload";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, deliveryPhotoGuidance } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { useAuth } from "~/lib/auth-context";
@@ -28,28 +28,79 @@ interface DeliveryItem {
   buyerName: string;
   deliveryAddress: string;
   fulfillmentStage: string;
-  deliveryOtpVerifiedAt: string | null;
+  fishVariant: string | null;
 }
 
 interface ItemUiState {
-  otpSent: boolean;
-  otpInput: string;
-  arrivalOtpSent: boolean;
-  arrivalOtpInput: string;
   pickupFile: File | null;
   handoffFile: File | null;
   submitting: boolean;
 }
 
 const defaultUiState: ItemUiState = {
-  otpSent: false,
-  otpInput: "",
-  arrivalOtpSent: false,
-  arrivalOtpInput: "",
   pickupFile: null,
   handoffFile: null,
   submitting: false,
 };
+
+// A plain <input type="file"> gives no feedback that an image was actually
+// selected. This shows a clear "Upload Photo" affordance, then a thumbnail +
+// retake control once one exists, so it's never ambiguous whether the photo
+// step is done.
+function DeliveryPhotoCapture({
+  label,
+  file,
+  onChange,
+}: {
+  label: string;
+  file: File | null;
+  onChange: (file: File | null) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
+  useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
+
+  if (file && previewUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- ephemeral local blob: URL, not worth Next/Image's optimization pipeline
+      <div className="flex items-center gap-3 rounded-lg border border-(--border-gray) bg-(--white) p-3">
+        <img src={previewUrl} alt="Selected delivery photo" className="h-14 w-14 rounded-md object-cover" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs font-medium text-(--heading-colour)">{file.name}</p>
+          <p className="flex items-center gap-1 text-xs font-semibold text-green-700">
+            <CheckCircle2 size={12} /> Photo ready
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => onChange(null)}
+          className="flex shrink-0 items-center gap-1 rounded-full border border-(--border-gray) px-3 py-1.5 text-xs font-semibold text-(--text-colour) transition hover:border-(--theme-green-dark) hover:text-(--theme-green-dark)"
+        >
+          <RefreshCw size={12} /> Replace
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-(--border-gray) bg-(--white) px-4 py-3 text-sm font-semibold text-(--heading-colour) transition hover:border-(--theme-green-dark) hover:text-(--theme-green-dark)"
+      >
+        <UploadIcon size={16} /> {label}
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+        className="hidden"
+      />
+    </div>
+  );
+}
 
 export default function RiderDashboardPage() {
   const { user } = useAuth();
@@ -71,7 +122,7 @@ export default function RiderDashboardPage() {
         buyerName: o.buyerName,
         deliveryAddress: o.deliveryAddress,
         fulfillmentStage: o.fulfillmentStage,
-        deliveryOtpVerifiedAt: o.deliveryOtpVerifiedAt,
+        fishVariant: o.fishVariant,
       }));
       const demandItems: DeliveryItem[] = (demandsRes.data.demands ?? []).map((d: RiderDemand) => ({
         key: `demand:${d.demandId}`,
@@ -81,7 +132,7 @@ export default function RiderDashboardPage() {
         buyerName: d.buyerName,
         deliveryAddress: d.deliveryAddress,
         fulfillmentStage: d.fulfillmentStage,
-        deliveryOtpVerifiedAt: d.deliveryOtpVerifiedAt,
+        fishVariant: d.fishVariant,
       }));
       setItems([...orderItems, ...demandItems]);
     } catch (error) {
@@ -100,61 +151,18 @@ export default function RiderDashboardPage() {
     setUiState((prev) => ({ ...prev, [key]: { ...getUi(key), ...patch } }));
   };
 
-  const handleSendPhoneOtp = async (item: DeliveryItem) => {
-    patchUi(item.key, { submitting: true });
-    try {
-      if (item.type === "order") await riderService.sendPhoneOtp(item.id);
-      else await riderService.sendDemandPhoneOtp(item.id);
-      patchUi(item.key, { otpSent: true, submitting: false });
-      toast.success("OTP sent to buyer's phone.");
-    } catch (error) {
-      patchUi(item.key, { submitting: false });
-      toast.error(error instanceof Error ? error.message : "Failed to send OTP");
-    }
-  };
-
   const handleStartDelivery = async (item: DeliveryItem) => {
     const ui = getUi(item.key);
-    if (!ui.otpInput.trim()) return toast.error("Enter the OTP the buyer read out to you.");
     if (!ui.pickupFile) return toast.error("Take a photo of the product before moving it.");
     patchUi(item.key, { submitting: true });
     try {
       const photoUrl = await uploadFile(ui.pickupFile);
-      if (item.type === "order") await riderService.startDelivery(item.id, ui.otpInput.trim(), photoUrl);
-      else await riderService.startDemandDelivery(item.id, ui.otpInput.trim(), photoUrl);
+      if (item.type === "order") await riderService.startDelivery(item.id, photoUrl);
+      else await riderService.startDemandDelivery(item.id, photoUrl);
       toast.success("Delivery started.");
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to start delivery");
-    } finally {
-      patchUi(item.key, { submitting: false });
-    }
-  };
-
-  const handleSendArrivalOtp = async (item: DeliveryItem) => {
-    patchUi(item.key, { submitting: true });
-    try {
-      if (item.type === "order") await riderService.sendArrivalOtp(item.id);
-      else await riderService.sendDemandArrivalOtp(item.id);
-      patchUi(item.key, { arrivalOtpSent: true, submitting: false });
-      toast.success("Arrival OTP sent to buyer's phone.");
-    } catch (error) {
-      patchUi(item.key, { submitting: false });
-      toast.error(error instanceof Error ? error.message : "Failed to send arrival OTP");
-    }
-  };
-
-  const handleVerifyArrivalOtp = async (item: DeliveryItem) => {
-    const ui = getUi(item.key);
-    if (!ui.arrivalOtpInput.trim()) return toast.error("Enter the OTP the buyer read out to you.");
-    patchUi(item.key, { submitting: true });
-    try {
-      if (item.type === "order") await riderService.verifyArrivalOtp(item.id, ui.arrivalOtpInput.trim());
-      else await riderService.verifyDemandArrivalOtp(item.id, ui.arrivalOtpInput.trim());
-      toast.success("Buyer identity confirmed.");
-      await load();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to verify OTP");
     } finally {
       patchUi(item.key, { submitting: false });
     }
@@ -197,8 +205,8 @@ export default function RiderDashboardPage() {
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">My Deliveries</h1>
         <p className="font-roboto-slab text-(--text-colour)">
-          Orders and demands escalated to you for delivery. Work through each step in order —
-          verify the buyer's phone, pick up the product, confirm identity on arrival, then hand it over.
+          Orders and demands escalated to you for delivery. Photograph the product at pickup, then again at
+          handoff — the buyer compares both before confirming, so no OTP is needed.
         </p>
       </motion.div>
 
@@ -222,6 +230,7 @@ export default function RiderDashboardPage() {
         <motion.div variants={STAGGER_CONTAINER_VARIANT} initial="hidden" animate="visible" className="flex flex-col gap-4">
           {items.map((item) => {
             const ui = getUi(item.key);
+            const guidance = deliveryPhotoGuidance(item.fishVariant);
             return (
               <motion.div
                 key={item.key}
@@ -240,104 +249,53 @@ export default function RiderDashboardPage() {
                 </div>
 
                 <div className="mt-4 rounded-xl border border-(--border-gray) bg-(--gray-bg) p-4">
-                  {item.fulfillmentStage === "escalated_to_rider" && !ui.otpSent && (
-                    <button
-                      onClick={() => handleSendPhoneOtp(item)}
-                      disabled={ui.submitting}
-                      className="flex items-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-                    >
-                      <Phone size={14} />
-                      Send OTP to Buyer's Phone
-                    </button>
-                  )}
-
-                  {item.fulfillmentStage === "escalated_to_rider" && ui.otpSent && (
+                  {item.fulfillmentStage === "escalated_to_rider" && (
                     <div className="flex flex-col gap-3">
-                      <p className="font-roboto-slab text-xs text-(--text-colour)">
-                        Ask the buyer to read back the OTP sent to their phone, then photograph the product (kg/size visible) before moving it.
+                      <p className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
+                        <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                        {guidance}
                       </p>
-                      <input
-                        type="text"
-                        placeholder="Enter OTP from buyer"
-                        value={ui.otpInput}
-                        onChange={(e) => patchUi(item.key, { otpInput: e.target.value })}
-                        className="rounded-lg border border-(--border-gray) px-3 py-2 text-sm"
-                      />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        onChange={(e) => patchUi(item.key, { pickupFile: e.target.files?.[0] ?? null })}
-                        className="text-xs"
+                      <DeliveryPhotoCapture
+                        label="Upload Pickup Photo"
+                        file={ui.pickupFile}
+                        onChange={(f) => patchUi(item.key, { pickupFile: f })}
                       />
                       <button
                         onClick={() => handleStartDelivery(item)}
-                        disabled={ui.submitting}
-                        className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                        disabled={ui.submitting || !ui.pickupFile}
+                        className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <Camera size={14} />
-                        Confirm Pickup & Start Delivery
+                        {ui.submitting ? "Uploading..." : "Confirm Pickup & Start Delivery"}
                       </button>
+                      {!ui.pickupFile && (
+                        <p className="text-xs text-(--text-colour)">Upload a photo above to enable this button.</p>
+                      )}
                     </div>
                   )}
 
-                  {item.fulfillmentStage === "out_for_delivery" && !item.deliveryOtpVerifiedAt && !ui.arrivalOtpSent && (
-                    <button
-                      onClick={() => handleSendArrivalOtp(item)}
-                      disabled={ui.submitting}
-                      className="flex items-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-                    >
-                      <ShieldCheck size={14} />
-                      Send Arrival OTP
-                    </button>
-                  )}
-
-                  {item.fulfillmentStage === "out_for_delivery" && !item.deliveryOtpVerifiedAt && ui.arrivalOtpSent && (
+                  {item.fulfillmentStage === "out_for_delivery" && (
                     <div className="flex flex-col gap-3">
-                      <p className="font-roboto-slab text-xs text-(--text-colour)">
-                        Ask the buyer to read back the OTP just sent to their phone to confirm their identity.
+                      <p className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
+                        <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                        {guidance}
                       </p>
-                      <input
-                        type="text"
-                        placeholder="Enter OTP from buyer"
-                        value={ui.arrivalOtpInput}
-                        onChange={(e) => patchUi(item.key, { arrivalOtpInput: e.target.value })}
-                        className="rounded-lg border border-(--border-gray) px-3 py-2 text-sm"
-                      />
-                      <button
-                        onClick={() => handleVerifyArrivalOtp(item)}
-                        disabled={ui.submitting}
-                        className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-                      >
-                        <ShieldCheck size={14} />
-                        Verify Buyer Identity
-                      </button>
-                    </div>
-                  )}
-
-                  {item.fulfillmentStage === "out_for_delivery" && item.deliveryOtpVerifiedAt && (
-                    <div className="flex flex-col gap-3">
-                      <p className="flex items-center gap-1 text-xs font-semibold text-green-700">
-                        <CheckCircle2 size={14} /> Buyer identity confirmed
-                      </p>
-                      <p className="font-roboto-slab text-xs text-(--text-colour)">
-                        Photograph the product at handoff (kg/size visible) before completing the delivery.
-                      </p>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        onChange={(e) => patchUi(item.key, { handoffFile: e.target.files?.[0] ?? null })}
-                        className="text-xs"
+                      <DeliveryPhotoCapture
+                        label="Upload Handoff Photo"
+                        file={ui.handoffFile}
+                        onChange={(f) => patchUi(item.key, { handoffFile: f })}
                       />
                       <button
                         onClick={() => handleCompleteHandoff(item)}
-                        disabled={ui.submitting}
-                        className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                        disabled={ui.submitting || !ui.handoffFile}
+                        className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <Camera size={14} />
-                        Complete Handoff
+                        {ui.submitting ? "Uploading..." : "Complete Handoff"}
                       </button>
+                      {!ui.handoffFile && (
+                        <p className="text-xs text-(--text-colour)">Upload a photo above to enable this button.</p>
+                      )}
                     </div>
                   )}
 

@@ -996,6 +996,7 @@ export const riderDashboardConfig: DashboardConfig = {
   navLinks: [
     { label: "Deliveries", href: "/rider-dashboard", icon: Truck },
     { label: "Profile", href: "/rider-dashboard/profile", icon: User },
+    { label: "Payouts", href: "/rider-dashboard/payouts", icon: Banknote },
     { label: "Wallet", href: "/rider-dashboard/wallet", icon: Wallet },
   ],
 };

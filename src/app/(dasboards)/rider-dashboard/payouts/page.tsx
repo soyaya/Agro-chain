@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Wallet } from "lucide-react";
-import { clusterService } from "~/lib/services/cluster.service";
+import { riderService } from "~/lib/services/rider.service";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, formatStatus } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
@@ -25,7 +25,7 @@ const STATUS_STYLES: Record<Payout["status"], string> = {
   failed: "bg-red-100 text-red-800",
 };
 
-export default function ClusterPayoutsPage() {
+export default function RiderPayoutsPage() {
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export default function ClusterPayoutsPage() {
       setLoading(true);
       setErrorMessage(null);
       try {
-        const res = await clusterService.getPayouts();
+        const res = await riderService.getPayouts();
         if (mounted) setPayouts(res.data.payouts);
       } catch (error) {
         if (mounted) setErrorMessage(error instanceof Error ? error.message : "Failed to load payouts");
@@ -75,7 +75,7 @@ export default function ClusterPayoutsPage() {
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="font-ubuntu mb-2 text-3xl font-bold text-(--heading-colour)">Payouts</h1>
         <p className="font-roboto-slab text-(--text-colour)">
-          Your incentive earnings from approved orders and demands you've fulfilled.
+          Your delivery fee earnings, scheduled after each buyer confirms receipt.
         </p>
       </motion.div>
 
@@ -98,7 +98,7 @@ export default function ClusterPayoutsPage() {
         <EmptyState
           icon={Wallet}
           title="No payouts yet"
-          description="Payouts appear here once a buyer confirms receipt of an order or demand you handled."
+          description="Payouts appear here once a buyer confirms receipt of a delivery you completed."
           size="lg"
         />
       ) : (
@@ -111,7 +111,7 @@ export default function ClusterPayoutsPage() {
             >
               <div>
                 <p className="font-medium text-(--heading-colour)">
-                  {payout.orderId ? `Order #${payout.orderId.slice(0, 8)}` : "Demand payout"}
+                  {payout.orderId ? `Order #${payout.orderId.slice(0, 8)}` : "Demand delivery"}
                 </p>
                 <p className="text-xs text-(--text-colour)">
                   {new Date(payout.createdAt).toLocaleString()} · Scheduled{" "}

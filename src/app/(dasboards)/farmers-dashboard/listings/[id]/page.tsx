@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Package, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, STATUS_COLORS } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, formatStatus, statusColorClass } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { farmerService, type FarmerListingDetail, type FarmerListingOrder } from "~/lib/services/farmer.service";
@@ -82,12 +82,12 @@ export default function FarmerListingDetailPage() {
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             Back to Listings
           </button>
-          <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) capitalize">
-            {listing.fishType.replace(/_/g, " ")}
+          <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">
+            {formatStatus(listing.fishType)}
           </h1>
         </div>
-        <span className={`rounded-full px-4 py-2 text-sm font-medium capitalize ${STATUS_COLORS[listing.status]}`}>
-          {listing.status}
+        <span className={`rounded-full px-4 py-2 text-sm font-medium ${statusColorClass(listing.status)}`}>
+          {formatStatus(listing.status)}
         </span>
       </motion.div>
 
@@ -124,7 +124,7 @@ export default function FarmerListingDetailPage() {
                       </p>
                       <p className="font-roboto-slab text-sm text-(--text-colour) capitalize">
                         {order.quantity} unit(s) • {order.fulfillmentMethod} •{" "}
-                        {order.fulfillmentStage.replace(/_/g, " ")}
+                        {formatStatus(order.fulfillmentStage)}
                       </p>
                     </div>
                     <div className="text-left sm:text-right">

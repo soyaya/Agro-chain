@@ -55,41 +55,31 @@ describe("proxy — unauthenticated requests", () => {
 // ─── authenticated access to auth pages ──────────────────────────────────────
 
 describe("proxy — authenticated users hitting auth pages", () => {
-  it("redirects /login → /farmers-dashboard for a farmer", () => {
-    const req = makeRequest("/login", encodeUser({ role: "farmer" }));
-    const res = proxy(req);
-    expect(res?.status).toBe(307);
-    expect(res?.headers.get("location")).toContain("/farmers-dashboard");
+  // Neither /login nor /register is ever bounced away for an already-
+  // authenticated visitor. The `current_user` cookie only proves *a* session
+  // existed — not that it's still valid, and not that it's the account the
+  // visitor now intends to use. Auto-redirecting /login to that session's
+  // dashboard silently trapped anyone trying to switch accounts (submit
+  // different credentials) in their old identity, with no way back to the
+  // login form short of finding logout first — see proxy.ts's comment.
+  it("does NOT redirect /login away even with a session cookie present, regardless of role", () => {
+    for (const user of [
+      { role: "farmer" },
+      { role: "admin" },
+      { role: "farmer", isClusterFarmer: true },
+      { role: "cluster" },
+      { role: "buyer" },
+    ]) {
+      const req = makeRequest("/login", encodeUser(user));
+      const res = proxy(req);
+      expect(res?.status).not.toBe(307);
+    }
   });
 
   it("does NOT redirect /register away even with a session cookie present", () => {
-    // Deliberate: the `current_user` cookie only proves a session existed, not
-    // that it's still valid server-side (e.g. account deleted, session revoked
-    // elsewhere). Bouncing /register away on a stale cookie would trap the user
-    // with no way to re-register until the cookie self-clears client-side —
-    // see auth-context.tsx. /login staying gated is an acceptable tradeoff
-    // since a wrongly-bounced dashboard self-corrects back to /login anyway.
     const req = makeRequest("/register", encodeUser({ role: "buyer" }));
     const res = proxy(req);
     expect(res?.status).not.toBe(307);
-  });
-
-  it("redirects /login → /buyers-dashboard for an admin (no dashboard in this app)", () => {
-    const req = makeRequest("/login", encodeUser({ role: "admin" }));
-    const res = proxy(req);
-    expect(res?.headers.get("location")).toContain("/buyers-dashboard");
-  });
-
-  it("redirects /login → /cluster-dashboard for a cluster farmer (isClusterFarmer=true)", () => {
-    const req = makeRequest("/login", encodeUser({ role: "farmer", isClusterFarmer: true }));
-    const res = proxy(req);
-    expect(res?.headers.get("location")).toContain("/cluster-dashboard");
-  });
-
-  it("redirects /login → /cluster-dashboard for role='cluster'", () => {
-    const req = makeRequest("/login", encodeUser({ role: "cluster" }));
-    const res = proxy(req);
-    expect(res?.headers.get("location")).toContain("/cluster-dashboard");
   });
 });
 
@@ -144,22 +134,5 @@ describe("proxy — checkout auth gate", () => {
     const req = makeRequest("/marketplace/some-listing-id");
     const res = proxy(req);
     expect(res?.status).not.toBe(307);
-  });
-});
-
-// ─── getDashboardFromCookie edge cases ───────────────────────────────────────
-
-describe("proxy — getDashboardFromCookie edge cases", () => {
-  it("falls back to /buyers-dashboard when cookie is malformed JSON", () => {
-    const req = makeRequest("/login");
-    req.cookies.set("current_user", "not-valid-json");
-    const res = proxy(req);
-    expect(res?.headers.get("location")).toContain("/buyers-dashboard");
-  });
-
-  it("falls back to /buyers-dashboard when cookie has no recognised role", () => {
-    const req = makeRequest("/login", encodeUser({ role: "unknown" }));
-    const res = proxy(req);
-    expect(res?.headers.get("location")).toContain("/buyers-dashboard");
   });
 });

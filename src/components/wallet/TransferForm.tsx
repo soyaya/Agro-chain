@@ -127,6 +127,8 @@ export function TransferForm({
       <SelectInput
         label={loadingBanks ? "Bank (loading...)" : "Bank"}
         required
+        searchable
+        searchPlaceholder="Search banks..."
         options={banks.map((bank) => ({ label: bank.bankName, value: bank.bankCode }))}
         value={bankCode}
         onValueChange={(value) => {
@@ -141,7 +143,12 @@ export function TransferForm({
         value={accountNumber}
         onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
         onBlur={resolveBeneficiaryName}
-        maxLength={10}
+        // No native maxLength: the browser would count letters/dashes toward
+        // the limit and truncate the raw string *before* the digit-only
+        // strip above runs, silently dropping real trailing digits from
+        // anything pasted with non-digit characters mixed in (e.g. a
+        // formatted "0123-4567-89"). The replace+slice above already caps
+        // the final value at 10 real digits, so no native limit is needed.
         placeholder="Enter 10-digit account number"
       />
 

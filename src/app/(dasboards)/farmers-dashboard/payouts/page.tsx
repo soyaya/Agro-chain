@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Wallet } from "lucide-react";
 import { farmerService } from "~/lib/services/farmer.service";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, formatStatus } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
@@ -123,9 +123,9 @@ export default function FarmerPayoutsPage() {
                   ₦{Number(payout.amount).toLocaleString()}
                 </span>
                 <span
-                  className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${STATUS_STYLES[payout.status]}`}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[payout.status]}`}
                 >
-                  {payout.status}
+                  {formatStatus(payout.status)}
                 </span>
               </div>
             </motion.div>

@@ -5,9 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Package, Clock, CheckCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, formatStatus, isWeighedFishVariant, WEIGHT_VARIANCE_NOTICE } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
+import { PaymentStatusBadge, getPayButtonState } from "~/components/ui/PaymentStatusBadge";
 import { buyerService, type BuyerOrderDetail, type BuyerOrderTrackingEvent } from "~/lib/services/buyer.service";
 
 const FULFILLMENT_STAGE_LABELS: Record<string, string> = {
@@ -134,7 +135,7 @@ export default function OrderDetailsPage() {
 
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 capitalize">
-            {order.status.replace(/_/g, " ")}
+            {formatStatus(order.status)}
           </span>
           <button className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
             <FileText size={16} />
@@ -229,7 +230,7 @@ export default function OrderDetailsPage() {
                     </div>
                     <div className="ml-8">
                       <p className="font-roboto-slab font-semibold text-gray-900 capitalize">
-                        {event.status.replace(/_/g, " ")}
+                        {FULFILLMENT_STAGE_LABELS[event.status] ?? formatStatus(event.status)}
                       </p>
                       <p className="font-roboto-slab text-sm text-gray-500">{event.message}</p>
                       <p className="font-roboto-slab text-xs text-gray-400">
@@ -247,6 +248,62 @@ export default function OrderDetailsPage() {
               </div>
             )}
           </motion.div>
+
+          {/* Delivery photos — the rider photographs the product at pickup and
+              again at handoff (no OTP in this flow); comparing the two here is
+              what replaces the old phone-verification step. */}
+          {(order.pickupPhotoUrl || order.handoffPhotoUrl) && (
+            <motion.div
+              variants={FADE_IN_VARIANT}
+              className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+            >
+              <h2 className="font-ubuntu mb-2 text-xl font-bold text-gray-900">Delivery Photos</h2>
+              <p className="font-roboto-slab mb-4 text-sm text-gray-500">
+                Compare the product at pickup and at handoff before confirming.
+              </p>
+              {isWeighedFishVariant(order.fishVariant) && (
+                <p className="font-roboto-slab mb-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
+                  {WEIGHT_VARIANCE_NOTICE}
+                </p>
+              )}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="font-roboto-slab mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                    At Pickup
+                  </p>
+                  {order.pickupPhotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={order.pickupPhotoUrl}
+                      alt="Product at pickup"
+                      className="aspect-square w-full rounded-xl border border-gray-200 object-cover"
+                    />
+                  ) : (
+                    <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-gray-300 text-xs text-gray-400">
+                      Not photographed yet
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="font-roboto-slab mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                    At Handoff
+                  </p>
+                  {order.handoffPhotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={order.handoffPhotoUrl}
+                      alt="Product at handoff"
+                      className="aspect-square w-full rounded-xl border border-gray-200 object-cover"
+                    />
+                  ) : (
+                    <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-gray-300 text-xs text-gray-400">
+                      Not delivered yet
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Confirm delivery/pickup */}
           {canConfirm && (
@@ -364,23 +421,22 @@ export default function OrderDetailsPage() {
             <div className="flex flex-col gap-4">
               <div>
                 <p className="font-roboto-slab mb-1 text-sm text-gray-500">Payment Status</p>
-                <span
-                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase ${
-                    order.paymentStatus === "paid"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {order.paymentStatus}
-                </span>
+                <PaymentStatusBadge
+                  paymentStatus={order.paymentStatus}
+                  walletPaymentStatus={order.walletPaymentStatus}
+                />
               </div>
-              {order.paymentStatus !== "paid" && (
+              {getPayButtonState(order.paymentStatus, order.walletPaymentStatus).show && (
                 <button
                   onClick={handlePayNow}
                   disabled={payingNow}
                   className="flex h-12 w-full items-center justify-center rounded-full bg-(--theme-green-dark) text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {payingNow ? "Processing..." : "Pay Now"}
+                  {payingNow
+                    ? "Processing..."
+                    : getPayButtonState(order.paymentStatus, order.walletPaymentStatus).label === "Retry Payment"
+                      ? "Retry Payment"
+                      : "Pay Now"}
                 </button>
               )}
             </div>

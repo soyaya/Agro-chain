@@ -37,14 +37,15 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
   return (
     <motion.div
       variants={SCALE_IN_VARIANT}
-      whileHover={{ scale: 1.02, y: -4 }}
-      transition={{ duration: 0.2 }}
       onClick={onClick}
       role="article"
       aria-label={`${listing.fishType} listing from ${listing.businessName}`}
+      // No hover scale/translate: animating layout-affecting transforms on a
+      // whole card makes click targets shift under the cursor. Hover feedback
+      // is border + shadow only.
       className={cn(
-        "flex flex-col gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--space-lg) shadow-sm transition",
-        onClick && "cursor-pointer hover:shadow-md",
+        "flex flex-col gap-(--gap-base) rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg) shadow-sm transition-[border-color,box-shadow] duration-200",
+        onClick && "cursor-pointer hover:border-(--theme-green-dark)/40 hover:shadow-md",
       )}
     >
       {/* Image */}
@@ -67,7 +68,7 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
       {/* Header */}
       <div className="flex items-start justify-between relative">
         <div className="flex flex-col gap-1 pr-8">
-          <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
+          <h3 className="font-ubuntu text-xl font-bold text-balance text-(--heading-colour)">
             {listing.fishType}
           </h3>
           <p className="text-sm font-medium text-(--text-colour)">{listing.businessName}</p>
@@ -155,7 +156,7 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
             onClick?.();
           }}
           aria-label={`View details for ${listing.fishType} listing`}
-          className="flex h-10 items-center justify-center rounded-full border border-(--border-gray) text-sm font-medium text-(--text-colour) transition hover:bg-(--gray-bg)"
+          className="flex h-10 items-center justify-center rounded-full border border-(--border-gray) text-sm font-medium text-(--text-colour) transition hover:bg-(--gray-bg) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--theme-green-dark)"
         >
           View Details
         </button>
@@ -165,7 +166,7 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
             onAddToCart?.(listing);
           }}
           aria-label={`Add ${listing.fishType} to cart`}
-          className="flex h-10 items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90"
+          className="flex h-10 items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--theme-green-dark)"
         >
           <ShoppingCart size={16} aria-hidden="true" />
           Order Now

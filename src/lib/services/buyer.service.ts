@@ -31,6 +31,13 @@ export interface BackendDemand {
   fulfillmentStage: string;
   assignedRiderId?: string;
   paymentStatus: "pending" | "paid" | "refunded" | "failed";
+  // Set only when paymentStatus is "pending" — distinguishes "never attempted
+  // to pay" (null) from "a transfer is stuck processing" or "the last
+  // attempt failed", neither of which the coarse paymentStatus enum can
+  // represent on its own. See PaymentStatusBadge.
+  walletPaymentStatus?: "processing" | "failed" | null;
+  pickupPhotoUrl?: string | null;
+  handoffPhotoUrl?: string | null;
   paidAt?: string;
   locationState: string;
   locationLga: string;
@@ -67,7 +74,8 @@ export interface BackendOrder {
   clusterFarmerName: string;
   deliveryOption: string;
   status: string;
-  payment_status: string;
+  paymentStatus: string;
+  walletPaymentStatus?: "processing" | "failed" | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -81,6 +89,9 @@ export interface BuyerOrderDetail {
   clusterFarmerContact: string | null;
   warehouseLocation: string | null;
   listingFishType: string | null;
+  fishVariant: string | null;
+  pickupPhotoUrl: string | null;
+  handoffPhotoUrl: string | null;
   items: Array<{
     fishType?: string;
     unit?: "kg" | "piece";
@@ -103,6 +114,7 @@ export interface BuyerOrderDetail {
   assignedRiderId: string | null;
   status: string;
   paymentStatus: string;
+  walletPaymentStatus?: "processing" | "failed" | null;
   notes?: string;
   createdAt: string;
   updatedAt: string;

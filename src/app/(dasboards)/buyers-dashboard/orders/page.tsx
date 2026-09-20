@@ -5,17 +5,10 @@ import { motion } from "framer-motion";
 import { Package, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { buyerService, type BackendOrder } from "~/lib/services/buyer.service";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, STATUS_COLORS } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, formatStatus, statusColorClass } from "~/types/constants";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { LoadingState } from "~/components/ui/LoadingState";
-
-// Guards against a missing/undefined status crashing the whole list — a
-// stale session refetch (401) or an order row missing this field shouldn't
-// take the page down.
-function capitalize(value: string | null | undefined): string {
-  if (!value) return "Unknown";
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
+import { PaymentStatusBadge } from "~/components/ui/PaymentStatusBadge";
 
 export default function BuyerOrdersPage() {
   const router = useRouter();
@@ -141,9 +134,7 @@ export default function BuyerOrdersPage() {
           className="flex flex-col gap-4"
         >
           {filteredOrders.map((order) => {
-            const statusColor =
-              STATUS_COLORS[order.status as keyof typeof STATUS_COLORS] ??
-              "bg-gray-100 text-gray-800";
+            const statusColor = statusColorClass(order.status);
 
             return (
               <motion.div
@@ -174,7 +165,7 @@ export default function BuyerOrdersPage() {
 
                     <div className="flex items-center gap-3">
                       <span className={`rounded-full px-4 py-2 text-sm font-medium ${statusColor}`}>
-                        {capitalize(order.status)}
+                        {formatStatus(order.status)}
                       </span>
                     </div>
                   </div>
@@ -195,13 +186,10 @@ export default function BuyerOrdersPage() {
                     </div>
                     <div>
                       <p className="font-roboto-slab mb-1 text-gray-600">Payment Status</p>
-                      <p
-                        className={`font-roboto-slab font-medium ${
-                          order.payment_status === "paid" ? "text-green-600" : "text-yellow-600"
-                        }`}
-                      >
-                        {capitalize(order.payment_status)}
-                      </p>
+                      <PaymentStatusBadge
+                        paymentStatus={order.paymentStatus}
+                        walletPaymentStatus={order.walletPaymentStatus}
+                      />
                     </div>
                   </div>
 

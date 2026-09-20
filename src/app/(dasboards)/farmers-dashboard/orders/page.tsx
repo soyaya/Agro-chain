@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Package, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { farmerService, type FarmerOrder } from "~/lib/services/farmer.service";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, formatStatus, statusColorClass } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
@@ -109,8 +109,8 @@ export default function FarmerOrdersPage() {
                   </h3>
                   <p className="text-sm text-(--text-colour)">{order.buyerName}</p>
                 </div>
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 capitalize">
-                  {order.status}
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusColorClass(order.status)}`}>
+                  {formatStatus(order.status)}
                 </span>
               </div>
 

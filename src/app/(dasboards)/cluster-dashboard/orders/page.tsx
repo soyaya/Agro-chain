@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, Package, Truck, XCircle, X } from "lucide-react";
+import { CheckCircle, Package, Truck, X } from "lucide-react";
 import { toast } from "sonner";
 import { clusterService, type BackendClusterOrder, type ApprovedRider } from "~/lib/services/cluster.service";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, formatStatus, statusColorClass } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
@@ -146,16 +146,6 @@ export default function ClusterOrdersPage() {
     };
   }, []);
 
-  const updateOrderStatus = async (orderId: string, status: string) => {
-    try {
-      await clusterService.updateOrderStatus(orderId, status);
-      setOrders((prev) => prev.map((o) => (o.orderId === orderId ? { ...o, status } : o)));
-      toast.success("Order updated");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update order");
-    }
-  };
-
   const handleReceive = async (orderId: string) => {
     setActionLoading(orderId);
     try {
@@ -262,8 +252,8 @@ export default function ClusterOrdersPage() {
                     {order.buyerName} • {order.buyerPhone}
                   </p>
                 </div>
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
-                  {order.status}
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusColorClass(order.status)}`}>
+                  {formatStatus(order.status)}
                 </span>
               </div>
 
@@ -275,57 +265,6 @@ export default function ClusterOrdersPage() {
                   {order.weightKg}kg × {order.quantity} • {order.deliveryOption}
                 </p>
                 <p>{new Date(order.createdAt).toLocaleString()}</p>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {order.status === "pending" && (
-                  <>
-                    <button
-                      onClick={() => updateOrderStatus(order.orderId, "confirmed")}
-                      className="flex items-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
-                    >
-                      <CheckCircle size={14} />
-                      Accept
-                    </button>
-                    <button
-                      onClick={() => updateOrderStatus(order.orderId, "cancelled")}
-                      className="flex items-center gap-2 rounded-full border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                    >
-                      <XCircle size={14} />
-                      Reject
-                    </button>
-                  </>
-                )}
-
-                {order.status === "confirmed" && (
-                  <button
-                    onClick={() => updateOrderStatus(order.orderId, "processing")}
-                    className="flex items-center gap-2 rounded-full border border-(--border-gray) px-4 py-2 text-xs font-semibold text-(--heading-colour) transition hover:bg-(--gray-bg)"
-                  >
-                    <Package size={14} />
-                    Start Processing
-                  </button>
-                )}
-
-                {order.status === "processing" && (
-                  <button
-                    onClick={() => updateOrderStatus(order.orderId, "shipped")}
-                    className="flex items-center gap-2 rounded-full border border-(--border-gray) px-4 py-2 text-xs font-semibold text-(--heading-colour) transition hover:bg-(--gray-bg)"
-                  >
-                    <Truck size={14} />
-                    Mark as Shipped
-                  </button>
-                )}
-
-                {order.status === "shipped" && (
-                  <button
-                    onClick={() => updateOrderStatus(order.orderId, "delivered")}
-                    className="flex items-center gap-2 rounded-full border border-(--border-gray) px-4 py-2 text-xs font-semibold text-(--heading-colour) transition hover:bg-(--gray-bg)"
-                  >
-                    <CheckCircle size={14} />
-                    Mark Delivered
-                  </button>
-                )}
               </div>
 
               {/* Physical Fulfillment */}

@@ -6,9 +6,11 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Package, CheckCircle, Clock, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { buyerService, type BackendDemand, type BuyerOrderTrackingEvent } from "~/lib/services/buyer.service";
-import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
+import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, isWeighedFishVariant, WEIGHT_VARIANCE_NOTICE } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
+import { PaymentStatusBadge, getPayButtonState } from "~/components/ui/PaymentStatusBadge";
+import { formatStatus, statusColorClass } from "~/types/constants";
 
 const FULFILLMENT_STAGE_LABELS: Record<string, string> = {
   awaiting_farmer_dispatch: "Awaiting acceptance",
@@ -120,19 +122,11 @@ export default function DemandDetailPage() {
             Back to Demands
           </button>
           <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) capitalize">
-            {demand.fishVariant.replace("_", " ")} Demand
+            {formatStatus(demand.fishVariant)} Demand
           </h1>
         </div>
-        <span
-          className={`rounded-full px-4 py-2 text-sm font-medium capitalize ${
-            demand.status === "fulfilled"
-              ? "bg-green-100 text-green-700"
-              : demand.status === "cancelled" || demand.status === "declined"
-                ? "bg-gray-100 text-gray-600"
-                : "bg-blue-100 text-blue-700"
-          }`}
-        >
-          {demand.status}
+        <span className={`rounded-full px-4 py-2 text-sm font-medium ${statusColorClass(demand.status)}`}>
+          {formatStatus(demand.status)}
         </span>
       </motion.div>
 
@@ -196,7 +190,7 @@ export default function DemandDetailPage() {
                     </div>
                     <div className="ml-8">
                       <p className="font-roboto-slab font-semibold text-(--heading-colour) capitalize">
-                        {event.status.replace("_", " ")}
+                        {FULFILLMENT_STAGE_LABELS[event.status] ?? formatStatus(event.status)}
                       </p>
                       <p className="font-roboto-slab text-sm text-(--text-colour)">{event.message}</p>
                       <p className="font-roboto-slab text-xs text-gray-400">
@@ -214,6 +208,62 @@ export default function DemandDetailPage() {
               </div>
             )}
           </motion.div>
+
+          {/* Delivery photos — the rider photographs the product at pickup and
+              again at handoff (no OTP in this flow); comparing the two here is
+              what replaces the old phone-verification step. */}
+          {(demand.pickupPhotoUrl || demand.handoffPhotoUrl) && (
+            <motion.div
+              variants={FADE_IN_VARIANT}
+              className="rounded-2xl border border-(--border-gray) bg-(--white) p-6 shadow-sm"
+            >
+              <h2 className="font-ubuntu mb-2 text-xl font-bold text-(--heading-colour)">Delivery Photos</h2>
+              <p className="font-roboto-slab mb-4 text-sm text-(--text-colour)">
+                Compare the product at pickup and at handoff before confirming.
+              </p>
+              {isWeighedFishVariant(demand.fishVariant) && (
+                <p className="font-roboto-slab mb-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
+                  {WEIGHT_VARIANCE_NOTICE}
+                </p>
+              )}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="font-roboto-slab mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                    At Pickup
+                  </p>
+                  {demand.pickupPhotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={demand.pickupPhotoUrl}
+                      alt="Product at pickup"
+                      className="aspect-square w-full rounded-xl border border-(--border-gray) object-cover"
+                    />
+                  ) : (
+                    <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-gray-300 text-xs text-gray-400">
+                      Not photographed yet
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="font-roboto-slab mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                    At Handoff
+                  </p>
+                  {demand.handoffPhotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={demand.handoffPhotoUrl}
+                      alt="Product at handoff"
+                      className="aspect-square w-full rounded-xl border border-(--border-gray) object-cover"
+                    />
+                  ) : (
+                    <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-gray-300 text-xs text-gray-400">
+                      Not delivered yet
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Confirm receipt */}
           {canConfirmReceipt && (
@@ -277,25 +327,23 @@ export default function DemandDetailPage() {
             <div className="flex flex-col gap-4">
               <div>
                 <p className="font-roboto-slab mb-1 text-sm text-gray-500">Status</p>
-                <span
-                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase ${
-                    demand.paymentStatus === "paid"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {demand.paymentStatus}
-                </span>
+                <PaymentStatusBadge
+                  paymentStatus={demand.paymentStatus}
+                  walletPaymentStatus={demand.walletPaymentStatus}
+                />
               </div>
-              {demand.paymentStatus !== "paid" && demand.status === "pending" && (
-                <button
-                  onClick={handlePay}
-                  disabled={paying}
-                  className="flex h-12 w-full items-center justify-center rounded-full bg-(--theme-green-dark) text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-                >
-                  {paying ? "Paying..." : `Pay ₦${demand.grandTotal.toLocaleString()}`}
-                </button>
-              )}
+              {demand.status === "pending" &&
+                getPayButtonState(demand.paymentStatus, demand.walletPaymentStatus).show && (
+                  <button
+                    onClick={handlePay}
+                    disabled={paying}
+                    className="flex h-12 w-full items-center justify-center rounded-full bg-(--theme-green-dark) text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                  >
+                    {paying
+                      ? "Paying..."
+                      : `${getPayButtonState(demand.paymentStatus, demand.walletPaymentStatus).label} ₦${demand.grandTotal.toLocaleString()}`}
+                  </button>
+                )}
             </div>
           </motion.div>
 
