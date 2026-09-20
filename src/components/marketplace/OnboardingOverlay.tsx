@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 
 const ONBOARDING_KEY = "onboarding-completed";
@@ -37,6 +37,7 @@ const steps = [
 ];
 
 export function OnboardingOverlay() {
+  const reduceMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -167,14 +168,45 @@ export function OnboardingOverlay() {
                 className="flex w-full flex-col gap-6 px-6"
               >
                 <div className="relative h-56 w-full overflow-hidden rounded-2xl bg-zinc-200 shadow-sm sm:h-64">
-                  <Image
-                    src={steps[currentStep].imageUrl}
-                    alt={steps[currentStep].imageAlt}
-                    fill
-                    priority={currentStep === 0}
-                    sizes="(max-width: 448px) 100vw, 448px"
-                    className="object-cover"
-                  />
+                  {/* Slow zoom + drift (Ken Burns); direction alternates per
+                      step so consecutive photos don't move the same way. */}
+                  <motion.div
+                    className="absolute inset-0"
+                    // Starts at 1.25, not 1: the Broodstock source photo has
+                    // white bars baked into its left/right edges, which this
+                    // crop keeps out of frame (drift stays well inside the
+                    // ~12% margin the extra zoom creates).
+                    initial={{ scale: 1.25, x: 0, y: 0 }}
+                    animate={
+                      reduceMotion
+                        ? { scale: 1.25, x: 0, y: 0 }
+                        : {
+                            scale: 1.4,
+                            x: currentStep % 2 === 0 ? -14 : 14,
+                            y: currentStep === 1 ? 8 : -8,
+                          }
+                    }
+                    transition={{ duration: 6, ease: "easeOut" }}
+                  >
+                    <Image
+                      src={steps[currentStep].imageUrl}
+                      alt={steps[currentStep].imageAlt}
+                      fill
+                      priority={currentStep === 0}
+                      sizes="(max-width: 448px) 100vw, 448px"
+                      className="object-cover"
+                    />
+                  </motion.div>
+                  {/* Soft light sweeping across the "water" */}
+                  {!reduceMotion && (
+                    <motion.div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/25 to-transparent"
+                      initial={{ x: "0%" }}
+                      animate={{ x: "400%" }}
+                      transition={{ duration: 2.6, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.2 }}
+                    />
+                  )}
                 </div>
                 <h1
                   ref={headingRef}
