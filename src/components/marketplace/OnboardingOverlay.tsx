@@ -1,24 +1,38 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 
 const ONBOARDING_KEY = "onboarding-completed";
 
+const CLOUDINARY = "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005";
+
+// Each step pairs a catfish photo with one thing the platform actually does
+// (all of it is enforced in the backend: cluster-farmer approval, admin-set
+// price catalog, pickup/handoff delivery photos, payout after confirmation).
 const steps = [
   {
     heading: "Explore",
-    description: "We guarantee total satisfaction",
+    description:
+      "Fresh catfish from verified cluster farmers near you — table size, broodstock, fingerlings and dried.",
+    imageUrl: `${CLOUDINARY}/Table_size.jpg`,
+    imageAlt: "Fresh table-size catfish",
   },
   {
     heading: "Order It",
     description:
-      "Welcome! We're here to simplify your life. Sit back, relax, and let's get started.",
+      "Fair prices set by us, not haggled over. Pay from your wallet and we take it from there.",
+    imageUrl: `${CLOUDINARY}/Broodstock.jpg`,
+    imageAlt: "Healthy broodstock catfish",
   },
   {
     heading: "You Got It",
-    description: "New Users, score big! Grab FREE delivery on us with this exclusive offer!",
+    description:
+      "We photograph your fish at pickup and at handoff, and farmers are paid only after you confirm.",
+    imageUrl: `${CLOUDINARY}/Dry_Fish.jpg`,
+    imageAlt: "Dried catfish",
   },
 ];
 
@@ -150,8 +164,18 @@ export function OnboardingOverlay() {
                   duration: 0.45,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="flex w-full flex-col gap-6"
+                className="flex w-full flex-col gap-6 px-6"
               >
+                <div className="relative h-56 w-full overflow-hidden rounded-2xl bg-zinc-200 shadow-sm sm:h-64">
+                  <Image
+                    src={steps[currentStep].imageUrl}
+                    alt={steps[currentStep].imageAlt}
+                    fill
+                    priority={currentStep === 0}
+                    sizes="(max-width: 448px) 100vw, 448px"
+                    className="object-cover"
+                  />
+                </div>
                 <h1
                   ref={headingRef}
                   tabIndex={-1}
