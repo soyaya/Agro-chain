@@ -1,13 +1,16 @@
 export const BASE_BACKEND_URL =
   process.env.BASE_BACKEND_URL?.trim() ?? process.env.NEXT_PUBLIC_BASE_BACKEND_URL?.trim() ?? "";
 
-const normalizeBase = (base: string) => base.replace(/\/+$/, "");
 const normalizePath = (path: string) => (path.startsWith("/") ? path : `/${path}`);
 
+// All client-side API calls go through the Next.js catch-all proxy at
+// /api/proxy/* so the request runs server-side and the httpOnly auth_token
+// cookie (scoped to this origin) is forwarded to the backend correctly.
+// Calling the Render backend URL directly from the browser means cookies
+// are never sent cross-origin → every authenticated request gets a 401.
 export const buildApiUrl = (path: string) => {
-  const base = normalizeBase(BASE_BACKEND_URL).replace(/\/api$/, "");
   const normalizedPath = normalizePath(path);
-  return base ? `${base}/api${normalizedPath}` : normalizedPath;
+  return `/api/proxy${normalizedPath}`;
 };
 
 export class ApiError extends Error {
@@ -62,6 +65,9 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
 
   let response = await doFetch(url, options, headers);
 
+  // Skip the refresh retry for auth routes themselves to avoid loops.
+  // path is the original /auth/* path (e.g. /auth/login) before buildApiUrl
+  // rewrites it to /api/proxy/auth/* — check the original value.
   const isAuthRoute = path.startsWith("/auth/");
   if (response.status === 401 && !isAuthRoute) {
     const refreshed = await attemptRefresh();
