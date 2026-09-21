@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { SelectInput, DynamicInput } from "~/components/dynamic-input";
 import type { MarketplaceFilters as Filters } from "~/types";
@@ -16,9 +16,23 @@ interface MarketplaceFiltersProps {
   onReset: () => void;
   /** States open for selection (admin-controlled) — undefined means unrestricted. */
   activeStates?: string[];
+  /** How many listings the current filters return — shown on the mobile close button. */
+  resultCount?: number;
+  /** Mobile drawer: controlled open state */
+  mobileOpen?: boolean;
+  /** Mobile drawer: called when user closes it */
+  onMobileClose?: () => void;
 }
 
-export function MarketplaceFilters({ filters, onChange, onReset, activeStates }: MarketplaceFiltersProps) {
+export function MarketplaceFilters({
+  filters,
+  onChange,
+  onReset,
+  activeStates,
+  resultCount,
+  mobileOpen = false,
+  onMobileClose,
+}: MarketplaceFiltersProps) {
   const fishTypeOptions = [{ label: "All Fish Types", value: "" }, ...FISH_TYPE_OPTIONS];
 
   const stateOptions = [
@@ -35,15 +49,14 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
       }),
   ];
 
-  // LGA/Ward names are stored on listings verbatim (not slugs), so the
-  // dataset's real names double as the filter values here to match real data.
   const lgas = filters.state ? NIGERIA_WARDS[filters.state] : undefined;
   const lgaOptions = [
     { label: "All LGAs", value: "" },
     ...(lgas ? Object.keys(lgas).sort() : []).map((lga) => ({ label: lga, value: lga })),
   ];
 
-  const wards = filters.state && filters.localGovernment ? lgas?.[filters.localGovernment] : undefined;
+  const wards =
+    filters.state && filters.localGovernment ? lgas?.[filters.localGovernment] : undefined;
   const wardOptions = [
     { label: "All Wards", value: "" },
     ...(wards ?? []).map((ward) => ({ label: ward, value: ward })),
@@ -59,10 +72,7 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
   ];
 
   const handleFilterChange = (key: keyof Filters, value: string | number) => {
-    onChange({
-      ...filters,
-      [key]: value || undefined,
-    });
+    onChange({ ...filters, [key]: value || undefined });
   };
 
   const handleStateChange = (value: string) => {
@@ -83,28 +93,9 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
     filters.maxPrice ||
     filters.minQuantity;
 
-  return (
-    <motion.div
-      variants={FADE_IN_VARIANT}
-      className="flex flex-col gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--space-lg) shadow-sm"
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal size={20} className="text-(--text-colour)" />
-          <h3 className="font-roboto-slab text-lg font-medium text-(--heading-colour)">Filters</h3>
-        </div>
-        {hasActiveFilters && (
-          <button
-            onClick={onReset}
-            className="flex items-center gap-1 text-sm text-(--text-colour) transition hover:text-(--heading-colour)"
-          >
-            <X size={16} />
-            Reset
-          </button>
-        )}
-      </div>
-
+  // ── Shared filter fields ────────────────────────────────────────────────
+  const filterBody = (
+    <div className="flex flex-col gap-(--gap-base)">
       {/* Search */}
       <div className="relative">
         <Search
@@ -120,7 +111,6 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
         />
       </div>
 
-      {/* Fish Type */}
       <SelectInput
         label="Fish Type"
         value={filters.fishType || ""}
@@ -128,7 +118,6 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
         options={fishTypeOptions}
       />
 
-      {/* State */}
       <SelectInput
         label="State"
         value={filters.state || ""}
@@ -136,7 +125,6 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
         options={stateOptions}
       />
 
-      {/* Local Government Area */}
       <SelectInput
         label="Local Government Area"
         value={filters.localGovernment || ""}
@@ -144,7 +132,6 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
         options={lgaOptions}
       />
 
-      {/* Ward / Community */}
       <SelectInput
         label="Ward / Community"
         value={filters.ward || ""}
@@ -152,7 +139,6 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
         options={wardOptions}
       />
 
-      {/* Price Range */}
       <div className="flex flex-col gap-(--space-md)">
         <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
           Price Range (₦)
@@ -173,7 +159,6 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
         </div>
       </div>
 
-      {/* Minimum Quantity */}
       <DynamicInput
         label="Minimum Quantity (kg)"
         type="number"
@@ -182,7 +167,6 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
         onChange={(e) => handleFilterChange("minQuantity", Number(e.target.value))}
       />
 
-      {/* Sort By */}
       <SelectInput
         label="Sort By"
         value={
@@ -195,14 +179,125 @@ export function MarketplaceFilters({ filters, onChange, onReset, activeStates }:
             "price" | "quantity" | "date",
             "asc" | "desc",
           ];
-          onChange({
-            ...filters,
-            sortBy,
-            sortOrder,
-          });
+          onChange({ ...filters, sortBy, sortOrder });
         }}
         options={sortOptions}
       />
+    </div>
+  );
+
+  // ── Desktop sidebar (lg+) ───────────────────────────────────────────────
+  const desktopSidebar = (
+    <motion.div
+      variants={FADE_IN_VARIANT}
+      className="hidden lg:flex flex-col gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--space-lg) shadow-sm"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal size={20} className="text-(--text-colour)" />
+          <h3 className="font-roboto-slab text-lg font-medium text-(--heading-colour)">Filters</h3>
+        </div>
+        {hasActiveFilters && (
+          <button
+            onClick={onReset}
+            className="flex items-center gap-1 text-sm text-(--text-colour) transition hover:text-(--heading-colour)"
+          >
+            <X size={16} />
+            Reset
+          </button>
+        )}
+      </div>
+      {filterBody}
     </motion.div>
+  );
+
+  // ── Mobile bottom-sheet drawer (< lg) ──────────────────────────────────
+  const mobileDrawer = (
+    <AnimatePresence>
+      {mobileOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+            onClick={onMobileClose}
+            aria-hidden="true"
+          />
+
+          {/* Drawer panel */}
+          <motion.div
+            key="drawer"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 z-50 flex max-h-[85dvh] flex-col rounded-t-3xl bg-(--white) shadow-2xl lg:hidden"
+            role="dialog"
+            aria-label="Filters"
+          >
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="h-1 w-10 rounded-full bg-gray-300" />
+            </div>
+
+            {/* Drawer header */}
+            <div className="flex items-center justify-between px-(--space-lg) py-(--space-md) border-b border-(--border-gray)">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal size={20} className="text-(--text-colour)" />
+                <h3 className="font-roboto-slab text-lg font-semibold text-(--heading-colour)">
+                  Filters
+                </h3>
+              </div>
+              <div className="flex items-center gap-3">
+                {hasActiveFilters && (
+                  <button
+                    onClick={onReset}
+                    className="flex items-center gap-1 text-sm text-(--text-colour) transition hover:text-(--heading-colour)"
+                  >
+                    <X size={15} />
+                    Reset
+                  </button>
+                )}
+                <button
+                  onClick={onMobileClose}
+                  aria-label="Close filters"
+                  className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable filter content */}
+            <div className="flex-1 overflow-y-auto px-(--space-lg) py-(--space-lg)">
+              {filterBody}
+            </div>
+
+            {/* Show results CTA */}
+            <div className="px-(--space-lg) py-(--space-lg) border-t border-(--border-gray)">
+              <button
+                onClick={onMobileClose}
+                className="font-roboto-slab w-full rounded-2xl bg-(--theme-green-dark) py-3.5 text-base font-semibold text-white transition hover:opacity-90"
+              >
+                {resultCount !== undefined
+                  ? `Show ${resultCount} result${resultCount === 1 ? "" : "s"}`
+                  : "Show results"}
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+
+  return (
+    <>
+      {desktopSidebar}
+      {mobileDrawer}
+    </>
   );
 }

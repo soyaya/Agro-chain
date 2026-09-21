@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Store, ShoppingBag } from "lucide-react";
+import { Store, ShoppingBag, SlidersHorizontal } from "lucide-react";
 import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import { MarketplaceFilters } from "~/components/marketplace/MarketplaceFilters";
 import type { MarketplaceListing, MarketplaceFilters as Filters } from "~/types";
@@ -39,6 +39,7 @@ export default function MarketplacePage() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const cart = useCart();
 
   // Buyers see their own location's listings first — once, on load, not
@@ -160,6 +161,28 @@ export default function MarketplacePage() {
       sortOrder: "desc",
     });
   };
+
+  // Count active filters for the mobile badge
+  const hasActiveFilters =
+    filters.search ||
+    filters.fishType ||
+    filters.state ||
+    filters.localGovernment ||
+    filters.ward ||
+    filters.minPrice ||
+    filters.maxPrice ||
+    filters.minQuantity;
+
+  const activeFilterCount = [
+    filters.search,
+    filters.fishType,
+    filters.state,
+    filters.localGovernment,
+    filters.ward,
+    filters.minPrice,
+    filters.maxPrice,
+    filters.minQuantity,
+  ].filter(Boolean).length;
 
   // Apply filters
   const filteredListings = listings.filter((listing) => {
@@ -287,15 +310,37 @@ export default function MarketplacePage() {
             </div>
           </motion.div>
 
+          {/* Mobile filter + sort bar — visible only below lg */}
+          <motion.div
+            variants={FADE_IN_VARIANT}
+            className="flex items-center gap-(--gap-base) lg:hidden"
+          >
+            <button
+              onClick={() => setMobileFiltersOpen(true)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-(--border-gray) bg-(--white) py-3 text-sm font-semibold text-(--heading-colour) shadow-sm transition hover:bg-(--gray-bg)"
+            >
+              <SlidersHorizontal size={16} />
+              Filters
+              {hasActiveFilters && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-(--theme-green-dark) text-xs font-semibold text-white">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+          </motion.div>
+
           {/* Content */}
           <div className="grid grid-cols-1 gap-(--gap-lg) lg:grid-cols-4">
-            {/* Filters Sidebar */}
+            {/* Filters Sidebar — desktop only; mobile uses bottom drawer */}
             <div className="lg:col-span-1">
               <MarketplaceFilters
                 filters={filters}
                 onChange={setFilters}
                 onReset={handleResetFilters}
                 activeStates={activeStates}
+                resultCount={sortedListings.length}
+                mobileOpen={mobileFiltersOpen}
+                onMobileClose={() => setMobileFiltersOpen(false)}
               />
             </div>
 
