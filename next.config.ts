@@ -92,7 +92,11 @@ const nextConfig: NextConfig = {
 const withSerwist = withSerwistInit({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
-  disable: true,
+  // Enabled in production; disabled in dev to avoid caching dev responses.
+  // The screen-sensitive install prompt (usePwaInstall hook) controls whether
+  // the browser's install UI is shown — the SW itself runs on all screen sizes
+  // so offline caching works everywhere, only the install nudge is mobile-only.
+  disable: process.env.NODE_ENV === "development",
   register: true,
 });
 

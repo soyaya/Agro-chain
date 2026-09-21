@@ -8,12 +8,12 @@ export const metadata = {
   metadataBase: new URL("https://agro-chain-bom-vercel.vercel.app"),
 
   title: {
-    template: "%s | Agro-chain",
-    default: "Agro-chain | Catfish Marketplace for Farmers & Buyers",
+    template: "%s | AgroChain",
+    default: "AgroChain | Catfish Marketplace for Farmers & Buyers",
   },
 
   description:
-    "Agro-chain is a digital marketplace connecting cluster catfish farmers with verified bulk buyers. We streamline sourcing, secure payments, and coordinate logistics for fresh, traceable supply.",
+    "AgroChain is a digital marketplace connecting cluster catfish farmers with verified bulk buyers. We streamline sourcing, secure payments, and coordinate logistics for fresh, traceable supply.",
 
   keywords: [
     "catfish",
@@ -27,13 +27,13 @@ export const metadata = {
 
   authors: [
     {
-      name: "Agro-chain Team",
+      name: "AgroChain Team",
       url: "https://agro-chain-bom-vercel.vercel.app/",
     },
   ],
 
-  creator: "Agro-chain Team",
-  publisher: "Agro-chain",
+  creator: "AgroChain Team",
+  publisher: "AgroChain",
 
   robots: {
     index: true,
@@ -51,16 +51,23 @@ export const metadata = {
     canonical: "/",
   },
 
+  // PWA / Apple meta
+  appleWebApp: {
+    capable: true,
+    title: "AgroChain",
+    statusBarStyle: "default",
+  },
+
   openGraph: {
     type: "website",
     locale: "en_NG",
-    siteName: "Agro-chain",
+    siteName: "AgroChain",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Agro-chain platform connecting catfish farmers and bulk buyers with secure payments and coordinated delivery",
+        alt: "AgroChain platform connecting catfish farmers and bulk buyers with secure payments and coordinated delivery",
       },
     ],
   },
@@ -71,15 +78,33 @@ export const metadata = {
     creator: "@AgroChain",
     images: {
       url: "/twitter-image.png",
-      alt: "Agro-chain catfish marketplace connecting cluster farmers to verified buyers",
+      alt: "AgroChain catfish marketplace connecting cluster farmers to verified buyers",
     },
   },
 };
 
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* PWA theme color — matches manifest.ts */}
+        <meta name="theme-color" content="#1a5c1a" />
+
+        {/* Apple/iOS PWA tags — Safari ignores the web manifest for these */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="AgroChain" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+        {/* Favicon */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png" />
+
+        {/* Splash screen color for Android */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="AgroChain" />
+      </head>
       <body className={`${inter.variable} ${openSans.variable} antialiased`}>
         <AuthProvider>
           <LocationProvider>

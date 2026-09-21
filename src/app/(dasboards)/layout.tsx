@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { DashboardLayout } from "~/components/dashboard/DashboardLayout";
 import { CartProvider } from "~/components/marketplace/useCart";
+import { PwaInstallBanner } from "~/components/PwaInstallBanner";
 import {
   buyerDashboardConfig,
   enhancedFarmerDashboardConfig,
@@ -34,6 +35,8 @@ export default function DashboardsLayout({ children }: DashboardsLayoutProps) {
   return (
     <CartProvider>
       <DashboardLayout config={config}>{children}</DashboardLayout>
+      {/* Mobile-only PWA install nudge — hidden on desktop via md:hidden in the component */}
+      <PwaInstallBanner />
     </CartProvider>
   );
 }
