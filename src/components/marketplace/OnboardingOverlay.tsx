@@ -1,37 +1,37 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
+import {
+  ExploreIllustration,
+  OrderIllustration,
+  DeliveredIllustration,
+} from "~/components/marketplace/onboarding-illustrations";
+
 const ONBOARDING_KEY = "onboarding-completed";
 
-const CLOUDINARY = "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005";
-
-// Each step pairs a catfish photo with one thing the platform actually does
-// (all of it is enforced in the backend: cluster-farmer approval, admin-set
-// price catalog, pickup/handoff delivery photos, payout after confirmation).
 const steps = [
   {
     heading: "Explore",
     description:
       "Fresh catfish from verified cluster farmers near you — table size, broodstock, fingerlings and dried.",
-    imageUrl: `${CLOUDINARY}/Table_size.jpg`,
-    imageAlt: "Fresh table-size catfish",
+    Illustration: ExploreIllustration,
+    imageAlt: "Farmer standing behind a market stall with fresh catfish",
   },
   {
     heading: "Order It",
     description:
       "Fair prices set by us, not haggled over. Pay from your wallet and we take it from there.",
-    imageUrl: `${CLOUDINARY}/Broodstock.jpg`,
-    imageAlt: "Healthy broodstock catfish",
+    Illustration: OrderIllustration,
+    imageAlt: "Phone showing the AgroChain app checkout with wallet payment",
   },
   {
     heading: "You Got It",
     description:
       "We photograph your fish at pickup and at handoff, and farmers are paid only after you confirm.",
-    imageUrl: `${CLOUDINARY}/Dry_Fish.jpg`,
-    imageAlt: "Dried catfish",
+    Illustration: DeliveredIllustration,
+    imageAlt: "Rider handing a package to a buyer with a confirmation checkmark",
   },
 ];
 
@@ -166,35 +166,29 @@ export function OnboardingOverlay() {
                 }}
                 className="flex w-full flex-col gap-6 px-6"
               >
-                <div className="relative h-56 w-full overflow-hidden rounded-2xl bg-zinc-200 shadow-sm sm:h-64">
-                  {/* Slow zoom + drift (Ken Burns); direction alternates per
-                      step so consecutive photos don't move the same way. */}
+                <div
+                  className="relative h-56 w-full overflow-hidden rounded-2xl bg-zinc-100 shadow-sm sm:h-64"
+                  aria-label={steps[currentStep].imageAlt}
+                >
+                  {/* Slow zoom + drift (Ken Burns) */}
                   <motion.div
-                    className="absolute inset-0"
-                    // Starts at 1.25, not 1: the Broodstock source photo has
-                    // white bars baked into its left/right edges, which this
-                    // crop keeps out of frame (drift stays well inside the
-                    // ~12% margin the extra zoom creates).
-                    initial={{ scale: 1.25, x: 0, y: 0 }}
+                    className="absolute inset-0 flex items-center justify-center"
+                    initial={{ scale: 1.06, x: 0, y: 0 }}
                     animate={
                       reduceMotion
-                        ? { scale: 1.25, x: 0, y: 0 }
+                        ? { scale: 1.06, x: 0, y: 0 }
                         : {
-                            scale: 1.4,
-                            x: currentStep % 2 === 0 ? -14 : 14,
-                            y: currentStep === 1 ? 8 : -8,
+                            scale: 1.12,
+                            x: currentStep % 2 === 0 ? -6 : 6,
+                            y: currentStep === 1 ? 4 : -4,
                           }
                     }
                     transition={{ duration: 6, ease: "easeOut" }}
                   >
-                    <Image
-                      src={steps[currentStep].imageUrl}
-                      alt={steps[currentStep].imageAlt}
-                      fill
-                      priority={currentStep === 0}
-                      sizes="(max-width: 448px) 100vw, 448px"
-                      className="object-cover"
-                    />
+                    {(() => {
+                      const { Illustration } = steps[currentStep];
+                      return <Illustration />;
+                    })()}
                   </motion.div>
                 </div>
                 <h1
