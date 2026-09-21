@@ -55,9 +55,15 @@ export interface RefreshResponse {
 // === Auth Service
 
 export const authService = {
-  /** Fetch the currently authenticated user's profile. */
+  /** Fetch the currently authenticated user's profile.
+   *  Goes through the Next.js proxy so the httpOnly auth_token cookie
+   *  (scoped to this origin) is forwarded to the backend correctly. */
   getMe(): Promise<MeResponse> {
-    return apiFetch<MeResponse>("/auth/me");
+    return fetch("/api/auth/me", { credentials: "include" }).then(async (res) => {
+      const data = await res.json();
+      if (!res.ok) throw Object.assign(new Error(data?.message ?? "Unauthorized"), { status: res.status });
+      return data as MeResponse;
+    });
   },
 
   /** Submit BVN identity verification. */
@@ -76,9 +82,16 @@ export const authService = {
     });
   },
 
-  /** Refresh the access token. The refresh token itself lives in an httpOnly cookie the browser sends automatically. */
+  /** Refresh the access token through the Next.js proxy so the httpOnly
+   *  refresh_token cookie (scoped to this origin) is forwarded correctly. */
   refresh(): Promise<RefreshResponse> {
-    return apiFetch<RefreshResponse>("/auth/refresh", { method: "POST" });
+    return fetch("/api/auth/refresh", { method: "POST", credentials: "include" }).then(
+      async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw Object.assign(new Error(data?.message ?? "Session expired"), { status: res.status });
+        return data as RefreshResponse;
+      },
+    );
   },
 
   /** Logout from the current device. */

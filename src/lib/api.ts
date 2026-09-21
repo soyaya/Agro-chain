@@ -30,7 +30,7 @@ let refreshPromise: Promise<boolean> | null = null;
 
 async function attemptRefresh(): Promise<boolean> {
   if (!refreshPromise) {
-    refreshPromise = fetch(buildApiUrl("/auth/refresh"), {
+    refreshPromise = fetch("/api/auth/refresh", {
       method: "POST",
       credentials: "include",
     })
