@@ -14,8 +14,8 @@ import { buyerService } from "~/lib/services/buyer.service";
 import { platformService } from "~/lib/services/platform.service";
 import { useCart } from "~/components/marketplace/useCart";
 import { CartDrawer } from "~/components/marketplace/CartDrawer";
+import { MarketplaceSkeletonGrid } from "~/components/marketplace/MarketplaceSkeletonCard";
 import { OnboardingOverlay } from "~/components/marketplace/OnboardingOverlay";
-import { useAuth } from "~/lib/auth-context";
 
 type MarketplaceResponse = {
   status: string;
@@ -280,34 +280,21 @@ export default function MarketplacePage() {
             variants={FADE_IN_VARIANT}
             className="grid grid-cols-2 gap-(--gap-base) md:grid-cols-4"
           >
-            <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
-              <span className="text-2xl font-bold text-(--heading-colour)">
-                {sortedListings.length}
-              </span>
-              <span className="text-sm text-(--text-colour)">Available Listings</span>
-            </div>
-
-            <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
-              <span className="text-2xl font-bold text-(--heading-colour)">
-                {new Set(sortedListings.map((l) => l.fishType)).size}
-              </span>
-              <span className="text-sm text-(--text-colour)">Fish Types</span>
-            </div>
-
-            <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
-              <span className="text-2xl font-bold text-(--heading-colour)">
-                {new Set(sortedListings.map((l) => l.state)).size}
-              </span>
-              <span className="text-sm text-(--text-colour)">States</span>
-            </div>
-
-            <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
-              <span className="text-2xl font-bold text-(--heading-colour)">
-                {sortedListings.reduce((sum, l) => sum + Number(l.totalAvailableKg), 0).toLocaleString()}
-                kg
-              </span>
-              <span className="text-sm text-(--text-colour)">Total Available</span>
-            </div>
+            {[
+              { value: loading ? null : sortedListings.length, label: "Available Listings" },
+              { value: loading ? null : new Set(sortedListings.map((l) => l.fishType)).size, label: "Fish Types" },
+              { value: loading ? null : new Set(sortedListings.map((l) => l.state)).size, label: "States" },
+              { value: loading ? null : `${sortedListings.reduce((sum, l) => sum + Number(l.totalAvailableKg), 0).toLocaleString()}kg`, label: "Total Available" },
+            ].map(({ value, label }) => (
+              <div key={label} className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
+                {loading ? (
+                  <div className="h-8 w-16 rounded-full bg-gray-200 animate-pulse" />
+                ) : (
+                  <span className="text-2xl font-bold text-(--heading-colour)">{value}</span>
+                )}
+                <span className="text-sm text-(--text-colour)">{label}</span>
+              </div>
+            ))}
           </motion.div>
 
           {/* Mobile filter + sort bar — visible only below lg */}
@@ -370,12 +357,8 @@ export default function MarketplacePage() {
                 </div>
               )}
               {loading ? (
-                <motion.div
-                  variants={FADE_IN_VARIANT}
-                  className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
-                >
-                  <ShoppingBag size={48} className="text-(--text-colour)" />
-                  <p className="text-(--text-colour)">Loading marketplace listings...</p>
+                <motion.div variants={FADE_IN_VARIANT}>
+                  <MarketplaceSkeletonGrid count={6} />
                 </motion.div>
               ) : errorMessage ? (
                 <motion.div
