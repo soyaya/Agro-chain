@@ -76,11 +76,14 @@ export function SupplyListingForm({ onSubmit, isLoading = false }: SupplyListing
   const quantity = isSeedling ? Number(availablePieces) : Number(availableKg);
   const total = currentPrice !== null && quantity > 0 ? currentPrice * quantity : null;
 
+  const today = new Date().toISOString().split("T")[0];
+
   const canSubmit =
     !!fishVariant &&
     (isSeedling ? !!seedlingSize && Number(availablePieces) > 0 : !!weightBracket && Number(availableKg) >= MIN_SUPPLY_KG) &&
     currentPrice !== null &&
     !!harvestDate &&
+    harvestDate <= today &&
     priceAgreementAccepted;
 
   const handleSubmit = async () => {
@@ -194,13 +197,28 @@ export function SupplyListingForm({ onSubmit, isLoading = false }: SupplyListing
 
       {/* Harvest Date */}
       <motion.div variants={FADE_IN_VARIANT} className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
-        <DynamicInput
-          label="Harvest Date"
-          type="date"
-          value={harvestDate}
-          onChange={(e) => setHarvestDate(e.target.value)}
-          required
-        />
+        <div className="flex flex-col gap-1.5">
+          <DynamicInput
+            label="Harvest Date"
+            type="date"
+            value={harvestDate}
+            onChange={(e) => {
+              const selected = e.target.value;
+              const today = new Date().toISOString().split("T")[0];
+              if (selected > today) {
+                toast.error("Harvest date cannot be in the future. Only list fish that has already been harvested.");
+                setHarvestDate(today);
+              } else {
+                setHarvestDate(selected);
+              }
+            }}
+            max={new Date().toISOString().split("T")[0]}
+            required
+          />
+          <p className="text-xs text-(--text-colour)">
+            Only fish that has already been harvested can be listed.
+          </p>
+        </div>
       </motion.div>
 
       {/* Price summary */}
