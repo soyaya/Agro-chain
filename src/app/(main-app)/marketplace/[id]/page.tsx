@@ -22,9 +22,7 @@ import {
   FADE_IN_VARIANT,
   SLIDE_UP_VARIANT,
   BASE_PRICE_PER_KG_NAIRA,
-  FISH_VARIANTS,
   FISH_TYPE_CATEGORIES,
-  type FishVariant,
 } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
@@ -48,8 +46,6 @@ export default function ListingDetailPage() {
   const listingId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [listing, setListing] = useState<MarketplaceListing | null>(null);
   const [selectedDelivery, setSelectedDelivery] = useState<string>("");
-  const [selectedVariant, setSelectedVariant] = useState<FishVariant>(FISH_VARIANTS[0]);
-  const [processed, setProcessed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const cart = useCart();
@@ -98,7 +94,7 @@ export default function ListingDetailPage() {
 
   const addToCart = (pkg: PackagingOption) => {
     if (!listing) return;
-    cart.addToCart(listing, pkg, { variant: selectedVariant, processed });
+    cart.addToCart(listing, pkg, { variant: listing.fishType as any, processed: false });
   };
 
   const totalAmount = cart.subtotal;
@@ -255,64 +251,11 @@ export default function ListingDetailPage() {
                   <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">
                     Available Packages
                   </h3>
-                  <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
-                    <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) p-(--space-md)">
-                      <span className="text-sm font-medium text-(--heading-colour)">
-                        Choose Fish Type
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {FISH_VARIANTS.map((variant) => (
-                          <button
-                            key={variant}
-                            onClick={() => setSelectedVariant(variant)}
-                            className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
-                              selectedVariant === variant
-                                ? "bg-(--theme-green-dark) text-white"
-                                : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
-                            }`}
-                          >
-                            {variant}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) p-(--space-md)">
-                      <span className="text-sm font-medium text-(--heading-colour)">
-                        Processing Preference
-                      </span>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => setProcessed(false)}
-                          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition ${
-                            !processed
-                              ? "bg-(--theme-green-dark) text-white"
-                              : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
-                          }`}
-                        >
-                          Unprocessed
-                        </button>
-                        <button
-                          onClick={() => setProcessed(true)}
-                          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition ${
-                            processed
-                              ? "bg-(--theme-green-dark) text-white"
-                              : "border border-(--border-gray) text-(--text-colour) hover:bg-(--gray-bg)"
-                          }`}
-                        >
-                          Processed
-                        </button>
-                      </div>
-                    </div>
-                  </div>
 
                   <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
                     {(listing.packaging ?? []).map((pkg, index) => {
                       const cartItemIndex = cart.items.findIndex(
-                        (item) =>
-                          item.weightKg === pkg.weightKg &&
-                          item.variant === selectedVariant &&
-                          item.processed === processed,
+                        (item) => item.weightKg === pkg.weightKg,
                       );
                       const cartItem = cartItemIndex >= 0 ? cart.items[cartItemIndex] : null;
 
@@ -358,7 +301,7 @@ export default function ListingDetailPage() {
                           ) : (
                             <button
                               onClick={() => addToCart(pkg)}
-                              className="flex h-10 items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90"
+                              className="flex h-10 items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90 cursor-pointer"
                             >
                               <ShoppingCart size={16} />
                               Add to Cart

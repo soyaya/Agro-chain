@@ -16,6 +16,7 @@ import { useCart } from "~/components/marketplace/useCart";
 import { CartDrawer } from "~/components/marketplace/CartDrawer";
 import { MarketplaceSkeletonGrid } from "~/components/marketplace/MarketplaceSkeletonCard";
 import { OnboardingOverlay } from "~/components/marketplace/OnboardingOverlay";
+import { useAuth } from "~/lib/auth-context";
 
 type MarketplaceResponse = {
   status: string;
