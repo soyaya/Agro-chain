@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { DynamicInput } from "~/components/dynamic-input";
+import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
 import { FullScreenStatusModal } from "~/components/shared/FullScreenStatusModal";
@@ -50,6 +50,7 @@ function RegisterFormContent() {
   const safeReturnTo = getSafeReturnTo(searchParams.get("returnTo"));
 
   const [location, setLocation] = useState<LocationValue>({ state: "", lga: "", ward: "" });
+  const [acquisitionChannel, setAcquisitionChannel] = useState("");
   const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
@@ -154,6 +155,7 @@ function RegisterFormContent() {
           ward: location.ward || undefined,
           password: data.password,
           role,
+          acquisitionChannel: acquisitionChannel || undefined,
         }),
       });
 
@@ -356,6 +358,20 @@ function RegisterFormContent() {
                 onChange={setLocation}
                 activeStates={activeStates}
                 required
+              />
+
+              <SelectInput
+                label="How did you hear about AgroChain? (optional)"
+                value={acquisitionChannel}
+                onValueChange={setAcquisitionChannel}
+                options={[
+                  { value: "social_media", label: "Social Media" },
+                  { value: "friend_referral", label: "Friend or Family Referral" },
+                  { value: "cluster_farmer", label: "A Cluster Farmer" },
+                  { value: "search_engine", label: "Search Engine" },
+                  { value: "advertisement", label: "Advertisement" },
+                  { value: "other", label: "Other" },
+                ]}
               />
             </div>
 
