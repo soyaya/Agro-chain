@@ -7,7 +7,7 @@ import type { LucideIcon } from "lucide-react";
 // COMMON TYPES
 // ============================================
 
-export type UserRole = "farmer" | "buyer" | "admin" | "rider";
+export type UserRole = "farmer" | "buyer" | "admin" | "rider" | "supply_admin";
 
 export type ApplicationStatus = "pending" | "approved" | "rejected";
 

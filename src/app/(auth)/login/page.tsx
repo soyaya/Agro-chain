@@ -123,7 +123,8 @@ function LoginPageContent() {
       const isCluster = user?.is_cluster_farmer === true || role === "cluster";
 
       let dashboardPath = "/buyers-dashboard";
-      if (isCluster) dashboardPath = "/cluster-dashboard";
+      if (role === "supply_admin") dashboardPath = "/supply-admin-dashboard";
+      else if (isCluster) dashboardPath = "/cluster-dashboard";
       else if (role === "farmer") dashboardPath = "/farmers-dashboard";
       else if (role === "rider") dashboardPath = "/rider-dashboard";
 

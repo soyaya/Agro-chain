@@ -10,6 +10,7 @@ import type { AuthUser } from "~/types/index";
  */
 export function getDashboardPath(user: AuthUser | null): string {
   if (!user) return "/buyers-dashboard";
+  if (user.role === "supply_admin") return "/supply-admin-dashboard";
   if (user.isClusterFarmer) return "/cluster-dashboard";
   if (user.role === "farmer") return "/farmers-dashboard";
   if (user.role === "rider") return "/rider-dashboard";
@@ -18,6 +19,6 @@ export function getDashboardPath(user: AuthUser | null): string {
 
 /** Matches the leading `/xxx-dashboard` segment of a pathname, if any. */
 export function getDashboardSection(pathname: string): string | null {
-  const match = pathname.match(/^\/(farmers|buyers|cluster|rider)-dashboard/);
+  const match = pathname.match(/^\/(farmers|buyers|cluster|rider|supply-admin)-dashboard/);
   return match ? `/${match[1]}-dashboard` : null;
 }

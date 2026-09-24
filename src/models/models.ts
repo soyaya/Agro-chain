@@ -1032,6 +1032,42 @@ export const enhancedFarmerDashboardConfig: EnhancedDashboardConfig = {
   },
 };
 
+// ============================================
+// SUPPLY ADMIN DASHBOARD CONFIGURATION
+// ============================================
+// No "Pending Approvals" item — unlike cluster onboarding, a supply admin's
+// team (cluster farmers, farmers, riders) is direct-invited, not
+// apply-then-approve, so there's no approval queue for the supply admin
+// themselves to work through.
+
+export const supplyAdminDashboardConfig: EnhancedDashboardConfig = {
+  title: "Supply Admin Dashboard",
+  description: "Build out your region and fulfill cross-region demand",
+  navLinks: [
+    { label: "Dashboard", href: "/supply-admin-dashboard", icon: LayoutDashboard },
+    { label: "Profile", href: "/supply-admin-dashboard/profile", icon: User },
+    { label: "Demands", href: "/supply-admin-dashboard/demands", icon: Receipt },
+    { label: "Cluster Farmers", href: "/supply-admin-dashboard/team/cluster-farmers", icon: UsersIcon },
+    { label: "Farmers", href: "/supply-admin-dashboard/team/farmers", icon: FileText },
+    { label: "Riders", href: "/supply-admin-dashboard/team/riders", icon: Truck },
+    { label: "Payouts", href: "/supply-admin-dashboard/payouts", icon: Banknote },
+    { label: "Wallet", href: "/supply-admin-dashboard/wallet", icon: Wallet },
+  ],
+  financialServices: {
+    enabled: false,
+    loanServices: {
+      applicationEnabled: false,
+      trackingEnabled: false,
+      historyEnabled: false,
+    },
+    creditServices: {
+      purchaseEnabled: false,
+      catalogEnabled: false,
+      paymentTrackingEnabled: false,
+    },
+  },
+};
+
 export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
   title: "Cluster Farmer Dashboard",
   description: "Manage farmers and marketplace listings",

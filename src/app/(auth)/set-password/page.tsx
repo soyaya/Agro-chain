@@ -43,7 +43,8 @@ export default function SetPasswordPage() {
       if (user) updateUser({ ...user, mustSetPassword: false });
 
       let destination = "/buyers-dashboard";
-      if (user?.role === "rider") destination = "/rider-dashboard";
+      if (user?.role === "supply_admin") destination = "/supply-admin-dashboard";
+      else if (user?.role === "rider") destination = "/rider-dashboard";
       else if (user?.isClusterFarmer) destination = "/cluster-dashboard";
       else if (user?.role === "farmer") destination = "/farmers-dashboard";
 

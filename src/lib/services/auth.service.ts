@@ -7,7 +7,7 @@ export interface BackendUser {
   full_name: string;
   email: string;
   phone_number: string;
-  role: "farmer" | "buyer" | "cluster" | "admin" | "pending" | "rider";
+  role: "farmer" | "buyer" | "cluster" | "admin" | "pending" | "rider" | "supply_admin";
   verification_status: "unverified" | "pending" | "verified" | "rejected";
   profile_completed: boolean;
   must_set_password: boolean;
