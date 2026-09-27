@@ -87,6 +87,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Meta/Facebook Business domain verification — do not remove, this
+            proves domain ownership for the Meta Business account. Re-added
+            here (not via next/head or a script) so it's always static HTML
+            in the initial response, since Meta's crawler doesn't execute
+            client-side JS when checking for this tag. */}
+        <meta name="facebook-domain-verification" content="kwl1en12gdmag6eh6jlyfkkug471jp" />
+
         {/* PWA theme color — matches manifest.ts */}
         <meta name="theme-color" content="#1a5c1a" />
 
