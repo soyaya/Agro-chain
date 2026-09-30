@@ -281,6 +281,7 @@ export function SupplyListingForm({ onSubmit, isLoading = false }: SupplyListing
       <motion.div variants={FADE_IN_VARIANT} className="mt-(--submit-button-mt)">
         <SubmitPrimaryButton
           loading={isLoading}
+          loadingText="Submitting Listing..."
           disabled={!canSubmit || isLoading}
           onClick={handleSubmit}
           type="button"

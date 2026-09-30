@@ -377,7 +377,7 @@ function RegisterFormContent() {
 
             <div className="mx-auto mt-(--submit-button-mt) flex w-full max-w-sm flex-col">
               {isFormComplete ? (
-                <SubmitPrimaryButton loading={submitting} type="submit">
+                <SubmitPrimaryButton loading={submitting} loadingText="Creating Account..." type="submit">
                   Create Account
                 </SubmitPrimaryButton>
               ) : (
@@ -421,6 +421,7 @@ function RegisterFormContent() {
                   onClick={handleVerifyOtp}
                   disabled={otp.length < 6 || submitting}
                   loading={submitting}
+                  loadingText="Verifying..."
                 >
                   Verify OTP
                 </SubmitPrimaryButton>

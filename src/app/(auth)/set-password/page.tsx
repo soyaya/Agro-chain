@@ -88,7 +88,7 @@ export default function SetPasswordPage() {
           disabled={loading}
         />
 
-        <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
+        <SubmitPrimaryButton loading={loading} loadingText="Setting Password..." disabled={!isValid || loading} type="submit">
           Set Password & Continue
         </SubmitPrimaryButton>
       </form>

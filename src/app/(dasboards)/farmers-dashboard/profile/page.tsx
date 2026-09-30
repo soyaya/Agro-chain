@@ -634,6 +634,7 @@ export default function FarmerProfilePage() {
                   {canSubmitCluster ? (
                     <SubmitPrimaryButton
                       loading={applyingCluster}
+                      loadingText={hasApplied ? "Updating Application..." : "Submitting Application..."}
                       onClick={submitClusterApplication}
                       type="button"
                     >

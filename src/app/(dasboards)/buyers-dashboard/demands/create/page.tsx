@@ -341,7 +341,7 @@ export default function CreateDemandPage() {
           {/* Submit */}
           <div className="mx-auto w-full max-w-sm">
             {canSubmit ? (
-              <SubmitPrimaryButton loading={submitting} onClick={handleSubmit} type="button">
+              <SubmitPrimaryButton loading={submitting} loadingText="Submitting Demand..." onClick={handleSubmit} type="button">
                 {total !== null ? `Pay ₦${total.toLocaleString()} & Submit` : "Submit Demand"}
               </SubmitPrimaryButton>
             ) : (

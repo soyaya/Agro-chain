@@ -250,7 +250,7 @@ function LoginPageContent() {
               />
 
               <div className="mt-(--submit-button-mt) flex w-full flex-col gap-(--gap-base)">
-                <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
+                <SubmitPrimaryButton loading={loading} loadingText="Sending OTP..." disabled={!isValid || loading} type="submit">
                   Send OTP
                 </SubmitPrimaryButton>
                 <p className="text-center text-sm text-(--text-colour)">

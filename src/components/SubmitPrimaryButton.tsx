@@ -15,7 +15,7 @@ export const SubmitPrimaryButton = React.forwardRef<HTMLButtonElement, SubmitPri
   (
     {
       loading = false,
-      loadingText = "Creating Account...",
+      loadingText,
       children = "Submit",
       className,
       disabled,
@@ -39,7 +39,15 @@ export const SubmitPrimaryButton = React.forwardRef<HTMLButtonElement, SubmitPri
         )}
         {...props}
       >
-        {loading ? loadingText : children}
+        {/* Falling back to `children` (not a fixed generic string) when no
+            loadingText is given — this used to default to "Creating
+            Account...", which every caller that skipped loadingText (e.g.
+            login's "Send OTP") silently inherited regardless of what the
+            button actually did. Callers that already compute their own
+            loading-aware label via `children` (e.g. login's OTP-verify step)
+            now render correctly too, since children is no longer discarded
+            whenever loading is true. */}
+        {loading ? (loadingText ?? children) : children}
       </Button>
     );
   },

@@ -360,6 +360,7 @@ export function FarmerProfileForm({
       <motion.div variants={FADE_IN_VARIANT} className="mt-(--submit-button-mt)">
         <SubmitPrimaryButton
           loading={isLoading}
+          loadingText={initialData ? "Updating Profile..." : "Creating Profile..."}
           disabled={!isValid || isLoading}
           type="submit"
         >

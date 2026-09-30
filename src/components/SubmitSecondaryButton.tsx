@@ -15,7 +15,7 @@ export const SubmitSecondaryButton = React.forwardRef<HTMLButtonElement, SubmitS
   (
     {
       loading = false,
-      loadingText = "Creating Account...",
+      loadingText,
       children = "Submit",
       className,
       disabled,
@@ -39,7 +39,7 @@ export const SubmitSecondaryButton = React.forwardRef<HTMLButtonElement, SubmitS
         )}
         {...props}
       >
-        {loading ? loadingText : children}
+        {loading ? (loadingText ?? children) : children}
       </Button>
     );
   },

@@ -148,7 +148,12 @@ export default function VerifyIdentity() {
             <SubmitSecondaryButton onClick={handleSubmitBvn} className="h-14 rounded-full">
               Resend OTP
             </SubmitSecondaryButton>
-            <SubmitPrimaryButton onClick={handleSubmitOtp} disabled={otp.trim().length < 4 || verifying}>
+            <SubmitPrimaryButton
+              onClick={handleSubmitOtp}
+              disabled={otp.trim().length < 4 || verifying}
+              loading={verifying}
+              loadingText="Verifying..."
+            >
               Verify
             </SubmitPrimaryButton>
           </div>
@@ -194,6 +199,8 @@ export default function VerifyIdentity() {
           <SubmitPrimaryButton
             onClick={handleSubmitBvn}
             disabled={!bvn.trim() || bvn.length !== 11 || !creditConsent || verifying}
+            loading={verifying}
+            loadingText="Verifying BVN..."
           >
             Verify
           </SubmitPrimaryButton>

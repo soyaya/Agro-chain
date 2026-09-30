@@ -183,7 +183,7 @@ export default function ForgotPasswordPage() {
             required
             disabled={loading}
           />
-          <SubmitPrimaryButton loading={loading} disabled={!isValid || loading} type="submit">
+          <SubmitPrimaryButton loading={loading} loadingText="Sending OTP..." disabled={!isValid || loading} type="submit">
             Send OTP
           </SubmitPrimaryButton>
         </form>
@@ -235,7 +235,7 @@ export default function ForgotPasswordPage() {
             required
           />
 
-          <SubmitPrimaryButton loading={loading} disabled={!resetValid || loading} type="submit">
+          <SubmitPrimaryButton loading={loading} loadingText="Resetting Password..." disabled={!resetValid || loading} type="submit">
             Reset Password
           </SubmitPrimaryButton>
 
