@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Users, UserPlus } from "lucide-react";
+import { Users, UserPlus, Mail } from "lucide-react";
 import { toast } from "sonner";
-import { supplyAdminService, type SupplyAdminTeamMember } from "~/lib/services/supply-admin.service";
+import { supplyAdminService, type SupplyAdminTeamMember, type InviteResult } from "~/lib/services/supply-admin.service";
 import { DynamicInput } from "~/components/dynamic-input";
+import { InviteCredentialsCard } from "~/components/shared/InviteCredentialsCard";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
@@ -15,6 +16,8 @@ export default function SupplyAdminClusterFarmersPage() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [inviting, setInviting] = useState(false);
+  const [inviteResult, setInviteResult] = useState<InviteResult | null>(null);
+  const [resending, setResending] = useState<string | null>(null);
   const [form, setForm] = useState({ fullName: "", phone: "", email: "", locationLga: "" });
 
   const load = async () => {
@@ -41,14 +44,30 @@ export default function SupplyAdminClusterFarmersPage() {
     }
     setInviting(true);
     try {
-      await supplyAdminService.inviteClusterFarmer(form);
-      toast.success("Cluster farmer invited and auto-approved — they can start right away.");
+      const res = await supplyAdminService.inviteClusterFarmer(form);
+      if (res.data.emailSent) toast.success("Cluster farmer invited and auto-approved — they can start right away.");
+      else toast.error(res.message);
+      setInviteResult({ loginUrl: res.data.loginUrl, tempPassword: res.data.tempPassword, emailSent: res.data.emailSent });
       setForm({ fullName: "", phone: "", email: "", locationLga: "" });
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to invite cluster farmer");
     } finally {
       setInviting(false);
+    }
+  };
+
+  const handleResendInvite = async (member: SupplyAdminTeamMember) => {
+    setResending(member.id);
+    try {
+      const res = await supplyAdminService.resendTeamInvite(member.id);
+      if (res.data.emailSent) toast.success(res.message);
+      else toast.error(res.message);
+      setInviteResult(res.data);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to resend invite");
+    } finally {
+      setResending(null);
     }
   };
 
@@ -111,6 +130,7 @@ export default function SupplyAdminClusterFarmersPage() {
         >
           {inviting ? "Inviting..." : "Invite Cluster Farmer"}
         </button>
+        {inviteResult && <InviteCredentialsCard loginUrl={inviteResult.loginUrl} tempPassword={inviteResult.tempPassword} />}
       </motion.div>
 
       {clusterFarmers.length > 0 ? (
@@ -125,7 +145,19 @@ export default function SupplyAdminClusterFarmersPage() {
                 <p className="font-roboto-slab font-medium text-(--heading-colour)">{member.full_name}</p>
                 <p className="font-roboto-slab text-xs text-(--text-colour)">{member.location_lga}</p>
               </div>
-              <p className="font-roboto-slab text-sm text-(--text-colour)">{member.phone_number}</p>
+              <div className="flex items-center gap-3">
+                <p className="font-roboto-slab text-sm text-(--text-colour)">{member.phone_number}</p>
+                {!member.invite_accepted && (
+                  <button
+                    onClick={() => handleResendInvite(member)}
+                    disabled={resending === member.id}
+                    className="font-roboto-slab flex items-center gap-1.5 rounded-full border border-(--border-gray) px-3 py-1.5 text-xs font-medium text-(--text-colour) transition hover:bg-(--bg-pink) disabled:opacity-50"
+                  >
+                    <Mail size={14} />
+                    {resending === member.id ? "Resending..." : "Resend Invite"}
+                  </button>
+                )}
+              </div>
             </motion.div>
           ))}
         </motion.div>

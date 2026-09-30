@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, XCircle, Truck, UserPlus } from "lucide-react";
+import { CheckCircle, XCircle, Truck, UserPlus, Mail } from "lucide-react";
 import { toast } from "sonner";
-import { supplyAdminService } from "~/lib/services/supply-admin.service";
+import { supplyAdminService, type InviteResult } from "~/lib/services/supply-admin.service";
 import type { PendingRider, ApprovedRider } from "~/lib/services/cluster.service";
 import { DynamicInput } from "~/components/dynamic-input";
+import { InviteCredentialsCard } from "~/components/shared/InviteCredentialsCard";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
@@ -18,6 +19,8 @@ export default function SupplyAdminRidersPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [inviting, setInviting] = useState(false);
+  const [inviteResult, setInviteResult] = useState<InviteResult | null>(null);
+  const [resending, setResending] = useState<string | null>(null);
   const [form, setForm] = useState({ fullName: "", phone: "", email: "", locationLga: "" });
 
   const load = async () => {
@@ -48,14 +51,30 @@ export default function SupplyAdminRidersPage() {
     }
     setInviting(true);
     try {
-      await supplyAdminService.inviteRider(form);
-      toast.success("Rider invited — they'll get an email with a temporary password.");
+      const res = await supplyAdminService.inviteRider(form);
+      if (res.data.emailSent) toast.success("Rider invited — they'll get an email with a temporary password.");
+      else toast.error(res.message);
+      setInviteResult({ loginUrl: res.data.loginUrl, tempPassword: res.data.tempPassword, emailSent: res.data.emailSent });
       setForm({ fullName: "", phone: "", email: "", locationLga: "" });
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to invite rider");
     } finally {
       setInviting(false);
+    }
+  };
+
+  const handleResendInvite = async (riderId: string) => {
+    setResending(riderId);
+    try {
+      const res = await supplyAdminService.resendTeamInvite(riderId);
+      if (res.data.emailSent) toast.success(res.message);
+      else toast.error(res.message);
+      setInviteResult(res.data);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to resend invite");
+    } finally {
+      setResending(null);
     }
   };
 
@@ -130,6 +149,7 @@ export default function SupplyAdminRidersPage() {
         >
           {inviting ? "Inviting..." : "Invite Rider"}
         </button>
+        {inviteResult && <InviteCredentialsCard loginUrl={inviteResult.loginUrl} tempPassword={inviteResult.tempPassword} />}
       </motion.div>
 
       <div>
@@ -178,6 +198,14 @@ export default function SupplyAdminRidersPage() {
                     Approve
                   </button>
                 </div>
+                <button
+                  onClick={() => handleResendInvite(rider.id)}
+                  disabled={resending === rider.id}
+                  className="font-roboto-slab flex h-9 items-center justify-center gap-1.5 rounded-xl border border-(--border-gray) text-xs font-medium text-(--text-colour) transition hover:bg-(--bg-pink) disabled:opacity-50"
+                >
+                  <Mail size={14} />
+                  {resending === rider.id ? "Resending..." : "Resend Invite"}
+                </button>
               </motion.div>
             ))}
           </motion.div>

@@ -12,7 +12,14 @@ export interface SupplyAdminTeamMember {
   location_lga: string;
   is_active: boolean;
   rider_approved: boolean | null;
+  invite_accepted: boolean;
   created_at: string;
+}
+
+export interface InviteResult {
+  loginUrl: string;
+  tempPassword: string;
+  emailSent: boolean;
 }
 
 export interface SupplyAdminContract {
@@ -48,23 +55,36 @@ export const supplyAdminService = {
   // === Team building
 
   inviteClusterFarmer(payload: InviteTeamMemberPayload) {
-    return apiFetch<{ status: string; data: { clusterFarmer: { id: string; email: string; locationLga: string } } }>(
-      "/supply-admin/team/cluster-farmers/invite",
-      { method: "POST", body: JSON.stringify(payload) },
-    );
+    return apiFetch<{
+      status: string;
+      message: string;
+      data: { clusterFarmer: { id: string; email: string; locationLga: string } } & InviteResult;
+    }>("/supply-admin/team/cluster-farmers/invite", { method: "POST", body: JSON.stringify(payload) });
   },
 
   inviteFarmer(payload: InviteTeamMemberPayload) {
-    return apiFetch<{ status: string; data: { farmer: { id: string; email: string; locationLga: string } } }>(
-      "/supply-admin/team/farmers/invite",
-      { method: "POST", body: JSON.stringify(payload) },
-    );
+    return apiFetch<{
+      status: string;
+      message: string;
+      data: { farmer: { id: string; email: string; locationLga: string } } & InviteResult;
+    }>("/supply-admin/team/farmers/invite", { method: "POST", body: JSON.stringify(payload) });
   },
 
   inviteRider(payload: InviteTeamMemberPayload) {
-    return apiFetch<{ status: string; data: { rider: { id: string; email: string; locationLga: string } } }>(
-      "/supply-admin/team/riders/invite",
-      { method: "POST", body: JSON.stringify(payload) },
+    return apiFetch<{
+      status: string;
+      message: string;
+      data: { rider: { id: string; email: string; locationLga: string } } & InviteResult;
+    }>("/supply-admin/team/riders/invite", { method: "POST", body: JSON.stringify(payload) });
+  },
+
+  // Covers a team member never receiving (or losing) their original invite
+  // email — only works while they haven't yet logged in and set their own
+  // password (must_set_password still true on the backend).
+  resendTeamInvite(memberId: string) {
+    return apiFetch<{ status: string; message: string; data: InviteResult }>(
+      `/supply-admin/team/${memberId}/resend-invite`,
+      { method: "PATCH" },
     );
   },
 
