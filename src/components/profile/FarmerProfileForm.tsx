@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { DynamicInput, SelectInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
+import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
+import { farmerService } from "~/lib/services/farmer.service";
 import { ProfileAvatar } from "./ProfileAvatar";
 import type { FarmerProfile, FarmerProfileFormData } from "~/types";
 import {
@@ -82,6 +84,44 @@ export function FarmerProfileForm({
     initialData?.profileImage
   );
 
+  const CAC_VERIFICATION_FEE = 200;
+  const [cacFunding, setCacFunding] = useState<{ accountNumber: string; bankName: string; balance: number } | null>(null);
+  const [cacFundingLoading, setCacFundingLoading] = useState(false);
+  const [cacVerifyLoading, setCacVerifyLoading] = useState(false);
+  const [cacVerifyResult, setCacVerifyResult] = useState<{ verified: boolean; companyName?: string } | null>(null);
+
+  const loadCacFundingAccount = async () => {
+    setCacFundingLoading(true);
+    try {
+      const res = await farmerService.getCacFundingAccount();
+      setCacFunding(res.data);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not load CAC funding account");
+    } finally {
+      setCacFundingLoading(false);
+    }
+  };
+
+  const handleVerifyCac = async (cacNumber: string) => {
+    setCacVerifyLoading(true);
+    setCacVerifyResult(null);
+    try {
+      const res = await farmerService.verifyCac(cacNumber);
+      setCacVerifyResult(res.data);
+      if (res.data.verified) {
+        toast.success(`CAC Verified: ${res.data.companyName ?? cacNumber}`);
+      } else {
+        toast.error("CAC lookup did not find an active match for that RC number.");
+      }
+      // Balance just moved (fee debited) — refresh it.
+      await loadCacFundingAccount();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "CAC verification failed");
+    } finally {
+      setCacVerifyLoading(false);
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -113,6 +153,7 @@ export function FarmerProfileForm({
   const selectedState = watch("state");
   const selectedFishType = watch("fishType");
   const isClusterFarmer = watch("isClusterFarmer");
+  const cacNumberValue = watch("cacNumber");
 
   const handleImageChange = (file: File) => {
     setProfileImage(file);
@@ -309,13 +350,63 @@ export function FarmerProfileForm({
                   required={isClusterFarmer}
                 />
 
-                <DynamicInput
-                  label="CAC Registration Number"
-                  error={errors.cacNumber?.message}
-                  {...register("cacNumber")}
-                  placeholder="Enter CAC number"
-                  required={isClusterFarmer}
-                />
+                <div>
+                  <DynamicInput
+                    label="CAC Registration Number"
+                    error={errors.cacNumber?.message}
+                    {...register("cacNumber")}
+                    placeholder="Enter RC number (e.g. 1234567)"
+                    required={isClusterFarmer}
+                  />
+
+                  <div className="mt-(--space-sm) rounded-md border border-(--color-border) p-(--space-sm) text-sm">
+                    <p className="font-medium">CAC Verification (₦{CAC_VERIFICATION_FEE})</p>
+                    {!cacFunding ? (
+                      <SubmitSecondaryButton
+                        type="button"
+                        loading={cacFundingLoading}
+                        loadingText="Loading account..."
+                        onClick={loadCacFundingAccount}
+                        className="mt-(--space-xs)"
+                      >
+                        Check Funding Account
+                      </SubmitSecondaryButton>
+                    ) : (
+                      <>
+                        <p className="mt-(--space-xs) text-(--color-muted-foreground)">
+                          Fund account <span className="font-mono">{cacFunding.accountNumber}</span> ({cacFunding.bankName}) with at least ₦{CAC_VERIFICATION_FEE}.
+                        </p>
+                        <p className="text-(--color-muted-foreground)">Current balance: ₦{cacFunding.balance}</p>
+                        <div className="mt-(--space-xs) flex gap-(--gap-sm)">
+                          <SubmitSecondaryButton
+                            type="button"
+                            loading={cacFundingLoading}
+                            loadingText="Refreshing..."
+                            onClick={loadCacFundingAccount}
+                          >
+                            Refresh Balance
+                          </SubmitSecondaryButton>
+                          <SubmitPrimaryButton
+                            type="button"
+                            loading={cacVerifyLoading}
+                            loadingText="Verifying..."
+                            disabled={!cacNumberValue || cacNumberValue.length < 5 || cacFunding.balance < CAC_VERIFICATION_FEE}
+                            onClick={() => handleVerifyCac(cacNumberValue!)}
+                          >
+                            Verify CAC
+                          </SubmitPrimaryButton>
+                        </div>
+                      </>
+                    )}
+                    {cacVerifyResult && (
+                      <p className={`mt-(--space-xs) font-medium ${cacVerifyResult.verified ? "text-(--theme-green-dark)" : "text-(--color-destructive)"}`}>
+                        {cacVerifyResult.verified
+                          ? `✅ Verified: ${cacVerifyResult.companyName ?? ""}`
+                          : "❌ No active match found for that RC number."}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
                 <DynamicInput
                   label="Warehouse Location"

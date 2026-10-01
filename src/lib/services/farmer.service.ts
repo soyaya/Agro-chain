@@ -197,16 +197,29 @@ export const farmerService = {
   },
 
   /**
-   * Verify a CAC number against AutoRamp instead of requiring a manually
-   * uploaded registration certificate. Experimental — AutoRamp's support for
-   * this isn't confirmed, so a failure here doesn't necessarily mean the
-   * number is invalid.
+   * Returns the farmer's dedicated Pulse funding account (provisioning it on
+   * first call) — this is what they fund with at least ₦200 before
+   * verifyCac below will succeed.
+   */
+  getCacFundingAccount() {
+    return apiFetch<{
+      status: string;
+      data: { accountNumber: string; bankName: string; balance: number; currency: string };
+    }>("/farmers/cac-funding-account");
+  },
+
+  /**
+   * Verify a CAC/RC number against Pulse MFB's real company registry search.
+   * Costs ₦200, debited from the farmer's own funding account above (₦150
+   * recoups what Pulse charges AgroChain, ₦50 is margin) — charged whether
+   * or not the match turns out to be active, since Pulse's own fee is
+   * charged on any successful lookup regardless.
    */
   verifyCac(cacNumber: string) {
-    return apiFetch<{ status: string; data: { verified: boolean; autorampStatus: string } }>(
-      "/farmers/verify-cac",
-      { method: "POST", body: JSON.stringify({ cacNumber }) },
-    );
+    return apiFetch<{
+      status: string;
+      data: { verified: boolean; companyName?: string; classification?: string; feeCharged: number; feeRecouped: boolean };
+    }>("/farmers/verify-cac", { method: "POST", body: JSON.stringify({ cacNumber }) });
   },
 
   /** Get all orders for the farmer's listings. */

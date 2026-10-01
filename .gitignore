@@ -47,6 +47,9 @@ next-env.d.ts
 docker-compose.override.yml
 .turbo/
 
+# Scratch notes containing real credentials — never meant to be committed
+pulse.md
+
 # Playwright e2e
 /test-results/
 /playwright-report/
