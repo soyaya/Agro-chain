@@ -47,7 +47,13 @@ export default function VerifyIdentity() {
         throw new Error(data.message || "Verification failed");
       }
 
-      if (data?.data?.otpSent) {
+      if (data?.data?.otpRequired === false) {
+        // AutoRamp couldn't send an OTP — the backend already fell back to
+        // Pulse and finished verification in one step, no code to enter.
+        setSuccess(true);
+        toast.success("Verification complete — your wallet is ready!");
+        setTimeout(() => router.push(getDashboardPath(user)), 2400);
+      } else if (data?.data?.otpSent) {
         toast.success("OTP sent to your phone.");
         setStep("otp");
       } else {
