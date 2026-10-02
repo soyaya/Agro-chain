@@ -30,7 +30,7 @@ export const metadata = {
   },
 
   openGraph: {
-    url: "https://agro-chain-bom-vercel.vercel.app",
+    url: "https://www.agrochain.com.ng",
     title: "Agro-chain | Catfish Marketplace for Farmers & Buyers in Nigeria",
     description:
       "Connect with verified catfish farmers and bulk buyers on Agro-chain. Fresh, traceable catfish supply with secure payments and coordinated logistics.",

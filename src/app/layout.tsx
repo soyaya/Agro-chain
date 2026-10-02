@@ -5,7 +5,7 @@ import { LocationProvider } from "~/lib/location-context";
 import { AuthProvider } from "~/lib/auth-context";
 
 export const metadata = {
-  metadataBase: new URL("https://agro-chain-bom-vercel.vercel.app"),
+  metadataBase: new URL("https://www.agrochain.com.ng"),
 
   title: {
     template: "%s | AgroChain",
@@ -28,7 +28,7 @@ export const metadata = {
   authors: [
     {
       name: "AgroChain Team",
-      url: "https://agro-chain-bom-vercel.vercel.app/",
+      url: "https://www.agrochain.com.ng/",
     },
   ],
 

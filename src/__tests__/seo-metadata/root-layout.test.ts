@@ -15,9 +15,9 @@ describe("Root layout metadata", () => {
       expect(metadata.metadataBase).toBeDefined();
     });
 
-    it("equals https://agro-chain-bom-vercel.vercel.app", () => {
+    it("equals the real production domain", () => {
       expect(metadata.metadataBase?.toString()).toBe(
-        "https://agro-chain-bom-vercel.vercel.app/"
+        "https://www.agrochain.com.ng/"
       );
     });
   });
