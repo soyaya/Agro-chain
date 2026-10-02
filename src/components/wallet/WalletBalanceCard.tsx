@@ -115,6 +115,11 @@ export function WalletBalanceCard({ onWalletLoaded }: { onWalletLoaded?: (wallet
               Account Name: <span className="font-medium text-(--text-colour)">{wallet.accountName}</span>
             </p>
           )}
+          {wallet.bankName && (
+            <p className="font-roboto-slab text-sm text-gray-500">
+              Bank: <span className="font-medium text-(--text-colour)">{wallet.bankName}</span>
+            </p>
+          )}
         </div>
       )}
     </div>

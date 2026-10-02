@@ -29,9 +29,9 @@ describe("Root layout metadata", () => {
       expect((metadata.title as { template: string }).template).toBeDefined();
     });
 
-    it('template equals "%s | Agro-chain"', () => {
+    it('template equals "%s | AgroChain"', () => {
       expect((metadata.title as { template: string }).template).toBe(
-        "%s | Agro-chain"
+        "%s | AgroChain"
       );
     });
 

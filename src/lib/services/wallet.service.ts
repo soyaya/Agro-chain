@@ -9,6 +9,7 @@ export type WalletTransactionStatus = "pending" | "processing" | "completed" | "
 export interface WalletBalance {
   accountNumber: string | null;
   accountName: string | null;
+  bankName: string | null;
   balance: number;
   ledgerBalance: number;
   currency: string;

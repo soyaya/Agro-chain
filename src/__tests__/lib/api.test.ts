@@ -1,55 +1,24 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ApiError, apiFetch } from "~/lib/api";
+import { ApiError, apiFetch, buildApiUrl } from "~/lib/api";
 
 // ─── buildApiUrl ────────────────────────────────────────────────────────────
 
 describe("buildApiUrl", () => {
-  it("prepends /api to the path when BASE_BACKEND_URL is set", async () => {
-    vi.resetModules();
-    process.env.BASE_BACKEND_URL = "http://localhost:5005";
-    const { buildApiUrl: freshBuild } = await import("~/lib/api");
-    expect(freshBuild("/users")).toBe("http://localhost:5005/api/users");
-    vi.resetModules();
-    delete process.env.BASE_BACKEND_URL;
+  // Every client-side call goes through the same-origin Next.js proxy route
+  // (/api/proxy/*) regardless of BASE_BACKEND_URL — that env var is read
+  // server-side, inside the proxy route handler itself, not here. Calling
+  // the backend directly from the browser would mean httpOnly auth cookies
+  // never get sent cross-origin, so buildApiUrl deliberately ignores it.
+  it("prepends /api/proxy to a path that starts with a slash", () => {
+    expect(buildApiUrl("/users")).toBe("/api/proxy/users");
   });
 
-  it("normalises a path that does not start with a slash", async () => {
-    vi.resetModules();
-    process.env.BASE_BACKEND_URL = "http://localhost:5005";
-    const { buildApiUrl: freshBuild } = await import("~/lib/api");
-    expect(freshBuild("users")).toBe("http://localhost:5005/api/users");
-    vi.resetModules();
-    delete process.env.BASE_BACKEND_URL;
+  it("normalises a path that does not start with a slash", () => {
+    expect(buildApiUrl("users")).toBe("/api/proxy/users");
   });
 
-  it("strips a trailing slash from the base URL", async () => {
-    vi.resetModules();
-    process.env.BASE_BACKEND_URL = "http://localhost:5005/";
-    const { buildApiUrl: freshBuild } = await import("~/lib/api");
-    const url = freshBuild("/auth/me");
-    expect(url).not.toMatch(/\/\/api/);
-    expect(url).toBe("http://localhost:5005/api/auth/me");
-    vi.resetModules();
-    delete process.env.BASE_BACKEND_URL;
-  });
-
-  it("strips a trailing /api from the base URL before appending", async () => {
-    vi.resetModules();
-    process.env.BASE_BACKEND_URL = "http://localhost:5005/api";
-    const { buildApiUrl: freshBuild } = await import("~/lib/api");
-    expect(freshBuild("/users")).toBe("http://localhost:5005/api/users");
-    vi.resetModules();
-    delete process.env.BASE_BACKEND_URL;
-  });
-
-  it("returns the normalised path when no base is configured", async () => {
-    vi.resetModules();
-    delete process.env.BASE_BACKEND_URL;
-    delete process.env.NEXT_PUBLIC_BASE_BACKEND_URL;
-    const { buildApiUrl: freshBuild } = await import("~/lib/api");
-    const url = freshBuild("/health");
-    expect(url).toBe("/health");
-    vi.resetModules();
+  it("returns the proxy-prefixed path regardless of any configured backend URL", () => {
+    expect(buildApiUrl("/health")).toBe("/api/proxy/health");
   });
 });
 
