@@ -212,7 +212,11 @@ export default function FarmerProfilePage() {
       if (res.data.verified) {
         toast.success("CAC number verified.");
       } else {
-        toast.error(`CAC verification did not pass (status: ${res.data.autorampStatus}).`);
+        toast.error(
+          res.data.classification
+            ? `CAC verification did not pass (classification: ${res.data.classification}).`
+            : "CAC verification did not pass.",
+        );
       }
     } catch (error) {
       setCacVerified(false);
