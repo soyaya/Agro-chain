@@ -4,16 +4,22 @@ import { createContext, createElement, useCallback, useContext, useEffect, useMe
 import type { ReactNode } from "react";
 import { toast } from "sonner";
 import type { MarketplaceListing, PackagingOption } from "~/types";
+import type { FeedListing } from "~/lib/services/feed.service";
 import { BASE_PRICE_PER_KG_NAIRA } from "~/types/constants";
 import type { FishVariant } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 
 export interface CartItem {
   cartItemId?: string;
-  listingId: string;
-  fishType: string;
-  variant: FishVariant;
-  processed: boolean;
+  // Defaults to "fish" for backward compatibility with carts already sitting
+  // in a browser's localStorage from before Feed Hub existed.
+  itemType?: "fish" | "feed";
+  listingId?: string;
+  feedListingId?: string;
+  fishType?: string;
+  brandName?: string;
+  variant?: FishVariant;
+  processed?: boolean;
   weightKg: number;
   quantity: number;
   pricePerUnit: number;
@@ -58,11 +64,14 @@ function useCartState() {
           data: {
             cartId: string; items: Array<{
               cartItemId: string;
-              listingId: string;
-              fishType: string;
-              variant: string;
+              itemType?: "fish" | "feed";
+              listingId?: string;
+              feedListingId?: string;
+              fishType?: string;
+              brandName?: string;
+              variant?: string;
               processed: boolean;
-              weightKg: number;
+              weightKg?: number;
               quantity: number;
               pricePerUnit: number;
               totalPrice: number;
@@ -75,11 +84,14 @@ function useCartState() {
           // Server cart takes precedence over stale localStorage
           const mapped: CartItem[] = serverItems.map((item) => ({
             cartItemId: item.cartItemId,
+            itemType: item.itemType ?? "fish",
             listingId: item.listingId,
+            feedListingId: item.feedListingId,
             fishType: item.fishType,
-            variant: item.variant as FishVariant,
+            brandName: item.brandName,
+            variant: item.variant as FishVariant | undefined,
             processed: item.processed,
-            weightKg: Number(item.weightKg),
+            weightKg: item.weightKg != null ? Number(item.weightKg) : 0,
             quantity: item.quantity,
             pricePerUnit: Number(item.pricePerUnit),
             totalPrice: Number(item.totalPrice),
@@ -99,14 +111,23 @@ function useCartState() {
                   "/marketplace/cart",
                   {
                     method: "POST",
-                    body: JSON.stringify({
-                      listingId: item.listingId,
-                      variant: item.variant,
-                      processed: item.processed,
-                      weightKg: item.weightKg,
-                      quantity: item.quantity,
-                      pricePerUnit: item.pricePerUnit,
-                    }),
+                    body: JSON.stringify(
+                      item.itemType === "feed"
+                        ? {
+                            feedListingId: item.feedListingId,
+                            processed: item.processed,
+                            quantity: item.quantity,
+                            pricePerUnit: item.pricePerUnit,
+                          }
+                        : {
+                            listingId: item.listingId,
+                            variant: item.variant,
+                            processed: item.processed,
+                            weightKg: item.weightKg,
+                            quantity: item.quantity,
+                            pricePerUnit: item.pricePerUnit,
+                          },
+                    ),
                   },
                 );
                 const serverId = flushResponse.data?.cartItemId;
@@ -183,6 +204,7 @@ function useCartState() {
           ...prev,
           {
             cartItemId: localId,
+            itemType: "fish",
             listingId: listing.id,
             fishType: listing.fishType,
             variant: options.variant,
@@ -230,6 +252,64 @@ function useCartState() {
     [],
   );
 
+  const addFeedToCart = useCallback((feedListing: FeedListing, quantity = 1) => {
+    const pricePerUnit = feedListing.pricePerBag;
+    const localId = createLocalId();
+    setItems((prev) => {
+      const existing = prev.find((item) => item.itemType === "feed" && item.feedListingId === feedListing.id);
+
+      if (existing) {
+        return prev.map((item) =>
+          item === existing
+            ? {
+                ...item,
+                quantity: item.quantity + quantity,
+                totalPrice: (item.quantity + quantity) * item.pricePerUnit,
+              }
+            : item,
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          cartItemId: localId,
+          itemType: "feed" as const,
+          feedListingId: feedListing.id,
+          brandName: feedListing.brandName,
+          processed: false,
+          weightKg: feedListing.bagWeightKg * quantity,
+          quantity,
+          pricePerUnit,
+          totalPrice: pricePerUnit * quantity,
+          businessName: feedListing.businessName ?? "",
+          clusterFarmerName: feedListing.clusterFarmerName,
+        },
+      ];
+    });
+    void (async () => {
+      try {
+        const response = await apiFetch<{ status: string; data: { cartItemId: string } }>(
+          "/marketplace/cart",
+          {
+            method: "POST",
+            body: JSON.stringify({ feedListingId: feedListing.id, processed: false, quantity, pricePerUnit }),
+          },
+        );
+        const serverId = response.data?.cartItemId;
+        if (serverId) {
+          setItems((prev) =>
+            prev.map((item) => (item.cartItemId === localId ? { ...item, cartItemId: serverId } : item)),
+          );
+        }
+      } catch {
+        // keep local cart in place even if backend sync fails — same
+        // guest-cart-flush safety net as fish addToCart above
+      }
+    })();
+    toast.success("Added to cart");
+  }, []);
+
   const updateQuantity = useCallback((index: number, quantity: number) => {
     setItems((prev) => {
       if (index < 0 || index >= prev.length) return prev;
@@ -264,6 +344,7 @@ function useCartState() {
     totalItems,
     subtotal,
     synced,
+    addFeedToCart,
     addToCart,
     updateQuantity,
     clearCart,

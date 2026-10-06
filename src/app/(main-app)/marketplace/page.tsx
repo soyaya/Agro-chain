@@ -2,16 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Store, ShoppingBag, SlidersHorizontal } from "lucide-react";
+import { Store, ShoppingBag, SlidersHorizontal, Fish, Wheat } from "lucide-react";
 import { MarketplaceCard } from "~/components/marketplace/MarketplaceCard";
 import { MarketplaceFilters } from "~/components/marketplace/MarketplaceFilters";
+import { FeedListingCard } from "~/components/marketplace/FeedListingCard";
 import type { MarketplaceListing, MarketplaceFilters as Filters } from "~/types";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, BASE_PRICE_PER_KG_NAIRA } from "~/types/constants";
 import { apiFetch, ApiError } from "~/lib/api";
 import { buyerService } from "~/lib/services/buyer.service";
 import { platformService } from "~/lib/services/platform.service";
+import { feedService, type FeedListing } from "~/lib/services/feed.service";
 import { useCart } from "~/components/marketplace/useCart";
 import { CartDrawer } from "~/components/marketplace/CartDrawer";
 import { MarketplaceSkeletonGrid } from "~/components/marketplace/MarketplaceSkeletonCard";
@@ -28,7 +30,9 @@ type MarketplaceResponse = {
 
 export default function MarketplacePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
+  const activeTab = searchParams.get("type") === "feed" ? "feed" : "fish";
   const [listings, setListings] = useState<MarketplaceListing[]>([]);
   const [filters, setFilters] = useState<Filters>({
     sortBy: "date",
@@ -42,6 +46,49 @@ export default function MarketplacePage() {
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const cart = useCart();
+
+  // Feed Hub — a second, independent browse experience sharing this page's
+  // shell (header, cart) but not its fish-specific filter/sort state.
+  const [feedListings, setFeedListings] = useState<FeedListing[]>([]);
+  const [feedLoading, setFeedLoading] = useState(true);
+  const [feedError, setFeedError] = useState<string | null>(null);
+  const [feedSearch, setFeedSearch] = useState("");
+
+  useEffect(() => {
+    if (activeTab !== "feed") return;
+    let mounted = true;
+    setFeedLoading(true);
+    setFeedError(null);
+    feedService
+      .getFeedListings()
+      .then((res) => {
+        if (mounted) setFeedListings(res.data.listings ?? []);
+      })
+      .catch((error) => {
+        if (mounted) setFeedError(error instanceof Error ? error.message : "Failed to load feed listings");
+      })
+      .finally(() => {
+        if (mounted) setFeedLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [activeTab]);
+
+  const handleAddFeedToCart = (listing: FeedListing) => {
+    cart.addFeedToCart(listing, 1);
+    setCartOpen(true);
+  };
+
+  const filteredFeedListings = feedListings.filter((listing) => {
+    if (!feedSearch) return true;
+    const q = feedSearch.toLowerCase();
+    return (
+      listing.brandName.toLowerCase().includes(q) ||
+      listing.categoryLabel.toLowerCase().includes(q) ||
+      listing.state.toLowerCase().includes(q)
+    );
+  });
 
   // Buyers see their own location's listings first — once, on load, not
   // re-applied if they've already changed the filter themselves (e.g. to
@@ -252,10 +299,12 @@ export default function MarketplacePage() {
               </div>
               <div>
                 <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour) lg:text-4xl">
-                  Fish Marketplace
+                  {activeTab === "feed" ? "Feed Hub" : "Fish Marketplace"}
                 </h1>
                 <p className="mt-1 text-(--text-colour)">
-                  Browse fresh fish supplies from verified cluster farmers
+                  {activeTab === "feed"
+                    ? "Browse fish feed from verified cluster farmers"
+                    : "Browse fresh fish supplies from verified cluster farmers"}
                 </p>
               </div>
               <div className="ml-auto">
@@ -275,6 +324,99 @@ export default function MarketplacePage() {
               </div>
             </div>
           </motion.div>
+
+          {/* Fish / Feed tabs */}
+          <motion.div variants={FADE_IN_VARIANT} className="flex gap-2 border-b border-(--border-gray)">
+            <button
+              onClick={() => router.push("/marketplace")}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition ${
+                activeTab === "fish"
+                  ? "border-(--theme-green-dark) text-(--theme-green-dark)"
+                  : "border-transparent text-(--text-colour) hover:text-(--heading-colour)"
+              }`}
+            >
+              <Fish size={16} /> Fish Marketplace
+            </button>
+            <button
+              onClick={() => router.push("/marketplace?type=feed")}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition ${
+                activeTab === "feed"
+                  ? "border-(--theme-green-dark) text-(--theme-green-dark)"
+                  : "border-transparent text-(--text-colour) hover:text-(--heading-colour)"
+              }`}
+            >
+              <Wheat size={16} /> Feed Hub
+            </button>
+          </motion.div>
+
+          {activeTab === "feed" ? (
+            <>
+              {/* Feed Hub stats */}
+              <motion.div variants={FADE_IN_VARIANT} className="grid grid-cols-2 gap-(--gap-base) md:grid-cols-3">
+                {[
+                  { value: feedLoading ? null : filteredFeedListings.length, label: "Available Listings" },
+                  { value: feedLoading ? null : new Set(filteredFeedListings.map((l) => l.categoryLabel)).size, label: "Feed Categories" },
+                  { value: feedLoading ? null : new Set(filteredFeedListings.map((l) => l.state)).size, label: "States" },
+                ].map(({ value, label }) => (
+                  <div key={label} className="flex flex-col gap-2 rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg)">
+                    {feedLoading ? (
+                      <div className="h-8 w-16 rounded-full bg-gray-200 animate-pulse" />
+                    ) : (
+                      <span className="text-2xl font-bold text-(--heading-colour)">{value}</span>
+                    )}
+                    <span className="text-sm text-(--text-colour)">{label}</span>
+                  </div>
+                ))}
+              </motion.div>
+
+              {/* Feed search */}
+              <motion.div variants={FADE_IN_VARIANT}>
+                <input
+                  type="text"
+                  value={feedSearch}
+                  onChange={(e) => setFeedSearch(e.target.value)}
+                  placeholder="Search by brand, category, or state..."
+                  className="w-full rounded-2xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-md) text-(--text-colour) outline-none focus:border-(--theme-green-dark)"
+                />
+              </motion.div>
+
+              {feedLoading ? (
+                <motion.div variants={FADE_IN_VARIANT}>
+                  <MarketplaceSkeletonGrid count={6} />
+                </motion.div>
+              ) : feedError ? (
+                <motion.div
+                  variants={FADE_IN_VARIANT}
+                  className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+                >
+                  <ShoppingBag size={48} className="text-(--text-colour)" />
+                  <p className="text-(--error-red)">{feedError}</p>
+                </motion.div>
+              ) : filteredFeedListings.length > 0 ? (
+                <motion.div
+                  variants={STAGGER_CONTAINER_VARIANT}
+                  className="grid grid-cols-1 gap-(--gap-lg) md:grid-cols-2 xl:grid-cols-3"
+                >
+                  {filteredFeedListings.map((listing) => (
+                    <FeedListingCard
+                      key={listing.id}
+                      listing={listing}
+                      onClick={() => router.push(`/marketplace/feed/${listing.id}`)}
+                    />
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div
+                  variants={FADE_IN_VARIANT}
+                  className="flex flex-col items-center justify-center gap-(--gap-base) rounded-3xl border border-(--border-gray) bg-(--white) p-(--section-gap)"
+                >
+                  <Wheat size={48} className="text-(--text-colour)" />
+                  <h3 className="font-ubuntu text-xl font-bold text-(--heading-colour)">No feed listings found</h3>
+                </motion.div>
+              )}
+            </>
+          ) : (
+            <>
 
           {/* Stats */}
           <motion.div
@@ -415,6 +557,8 @@ export default function MarketplacePage() {
               )}
             </div>
           </div>
+            </>
+          )}
         </motion.div>
       </div>
       <CartDrawer

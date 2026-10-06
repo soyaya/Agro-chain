@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import type { MarketplaceListing, PackagingOption } from "~/types";
+import type { FeedListing } from "~/lib/services/feed.service";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
@@ -19,6 +20,31 @@ const listing: MarketplaceListing = {
 } as MarketplaceListing;
 
 const pkg: PackagingOption = { weightKg: 5, quantity: 400, pricePerUnit: 1000 } as PackagingOption;
+
+const feedListing: FeedListing = {
+  id: "feed_1",
+  clusterFarmerId: "cluster_1",
+  clusterFarmerName: "E2E Test Cluster Farmer",
+  businessName: "E2E Cluster Co",
+  clusterFarmerContact: "0800000000",
+  feedCategoryId: "cat_1",
+  categoryLabel: "Juvenile (6g-30g)",
+  minPelletSizeMm: 2,
+  maxPelletSizeMm: 3,
+  pelletForm: "floating",
+  brandName: "Blue Crown",
+  proteinPercent: 42,
+  bagWeightKg: 15,
+  pricePerBag: 3680,
+  quantityAvailable: 20,
+  description: null,
+  location: "123 Farm Road",
+  state: "Kaduna",
+  localGovernment: "Kaduna North",
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  imageUrl: null,
+};
 
 function wrapper({ children }: { children: React.ReactNode }) {
   return <CartProvider>{children}</CartProvider>;
@@ -175,5 +201,74 @@ describe("useCart", () => {
       result.current.clearCart();
     });
     expect(result.current.items).toHaveLength(0);
+  });
+
+  describe("addFeedToCart", () => {
+    it("adds a feed item, pricing it from the listing's pricePerBag", async () => {
+      apiFetchMock
+        .mockRejectedValueOnce(new Error("401")) // initial GET /marketplace/cart (anonymous)
+        .mockResolvedValueOnce({ data: { cartItemId: "server-feed-1" } }); // POST /marketplace/cart
+
+      const { result } = renderHook(() => useCart(), { wrapper });
+      await waitFor(() => expect(result.current.synced).toBe(true));
+
+      act(() => {
+        result.current.addFeedToCart(feedListing, 1);
+      });
+
+      expect(result.current.items).toHaveLength(1);
+      expect(result.current.items[0]).toMatchObject({
+        itemType: "feed",
+        feedListingId: "feed_1",
+        brandName: "Blue Crown",
+        pricePerUnit: 3680,
+        totalPrice: 3680,
+        weightKg: 15,
+      });
+      expect(apiFetchMock).toHaveBeenCalledWith(
+        "/marketplace/cart",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ feedListingId: "feed_1", processed: false, quantity: 1, pricePerUnit: 3680 }),
+        }),
+      );
+    });
+
+    it("increments quantity instead of duplicating when the same feed listing is added twice", async () => {
+      apiFetchMock.mockRejectedValue(new Error("401"));
+
+      const { result } = renderHook(() => useCart(), { wrapper });
+      await waitFor(() => expect(result.current.synced).toBe(true));
+
+      act(() => {
+        result.current.addFeedToCart(feedListing, 1);
+      });
+      act(() => {
+        result.current.addFeedToCart(feedListing, 2);
+      });
+
+      expect(result.current.items).toHaveLength(1);
+      expect(result.current.items[0].quantity).toBe(3);
+      expect(result.current.items[0].totalPrice).toBe(3 * 3680);
+    });
+
+    it("keeps fish and feed items as separate cart lines", async () => {
+      apiFetchMock.mockRejectedValue(new Error("401"));
+
+      const { result } = renderHook(() => useCart(), { wrapper });
+      await waitFor(() => expect(result.current.synced).toBe(true));
+
+      act(() => {
+        result.current.addToCart(listing, pkg, { variant: "Table Size" as any, processed: false });
+      });
+      act(() => {
+        result.current.addFeedToCart(feedListing, 1);
+      });
+
+      expect(result.current.items).toHaveLength(2);
+      expect(result.current.items.map((i) => i.itemType)).toEqual(
+        expect.arrayContaining(["fish", "feed"]),
+      );
+    });
   });
 });

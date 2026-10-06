@@ -58,17 +58,22 @@ export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity 
                 <div className="flex flex-col gap-4">
                   {items.map((item, index) => (
                     <div
-                      key={`${item.listingId}-${item.weightKg}-${item.variant}-${item.processed}-${index}`}
+                      key={`${item.listingId ?? item.feedListingId}-${item.weightKg}-${item.variant}-${item.processed}-${index}`}
                       className="rounded-2xl border border-gray-200 bg-gray-50 p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-roboto-slab font-semibold text-(--heading-colour)">
-                            {item.fishType} • {item.variant}
+                            {item.itemType === "feed" ? item.brandName : `${item.fishType} • ${item.variant}`}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {item.processed ? "Processed" : "Unprocessed"} •{" "}
-                            {isSeedlingFishType(item.fishType) ? `${item.weightKg} piece` : `${item.weightKg}kg`} pack
+                            {item.itemType === "feed"
+                              ? `${item.quantity} bag${item.quantity === 1 ? "" : "s"}`
+                              : `${item.processed ? "Processed" : "Unprocessed"} • ${
+                                  item.fishType && isSeedlingFishType(item.fishType)
+                                    ? `${item.weightKg} piece`
+                                    : `${item.weightKg}kg`
+                                } pack`}
                           </p>
                           <p className="mt-1 text-xs text-gray-500">
                             {item.clusterFarmerName}
@@ -99,7 +104,7 @@ export function CartDrawer({ isOpen, items, subtotal, onClose, onUpdateQuantity 
                           </button>
                         </div>
                         <p className="text-xs text-gray-500">
-                          ₦{item.pricePerUnit.toLocaleString()} per pack
+                          ₦{item.pricePerUnit.toLocaleString()} {item.itemType === "feed" ? "per bag" : "per pack"}
                         </p>
                       </div>
                     </div>

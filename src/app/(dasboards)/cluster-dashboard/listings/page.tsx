@@ -100,13 +100,22 @@ export default function ClusterListingsPage() {
               </p>
             </div>
 
-            <button
-              onClick={() => router.push("/cluster-dashboard/listings/create")}
-              className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
-            >
-              <Plus size={18} />
-              Create Listing
-            </button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                onClick={() => router.push("/cluster-dashboard/listings/create")}
+                className="flex items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-white transition hover:opacity-90"
+              >
+                <Plus size={18} />
+                Create Listing
+              </button>
+              <button
+                onClick={() => router.push("/cluster-dashboard/listings/create-feed")}
+                className="flex items-center justify-center gap-2 rounded-full border border-(--theme-green-dark) px-(--space-xl) py-(--space-md) text-(--theme-green-dark) transition hover:bg-green-50"
+              >
+                <Plus size={18} />
+                Add Feed Listing
+              </button>
+            </div>
           </motion.div>
 
           {/* Stats */}

@@ -148,17 +148,22 @@ export default function CheckoutPage() {
                 ) : (
                   cart.items.map((item, index) => (
                     <div
-                      key={`${item.listingId}-${item.weightKg}-${item.variant}-${index}`}
+                      key={`${item.listingId ?? item.feedListingId}-${item.weightKg}-${item.variant}-${index}`}
                       className="flex flex-col gap-3 rounded-2xl border border-(--border-gray) p-4"
                     >
                       <div className="flex items-start justify-between">
                         <div>
                           <p className="font-roboto-slab font-semibold text-(--heading-colour)">
-                            {item.fishType} • {item.variant}
+                            {item.itemType === "feed" ? item.brandName : `${item.fishType} • ${item.variant}`}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {item.processed ? "Processed" : "Unprocessed"} •{" "}
-                            {isSeedlingFishType(item.fishType) ? `${item.weightKg} piece` : `${item.weightKg}kg`} pack
+                            {item.itemType === "feed"
+                              ? `${item.quantity} bag${item.quantity === 1 ? "" : "s"}`
+                              : `${item.processed ? "Processed" : "Unprocessed"} • ${
+                                  item.fishType && isSeedlingFishType(item.fishType)
+                                    ? `${item.weightKg} piece`
+                                    : `${item.weightKg}kg`
+                                } pack`}
                           </p>
                         </div>
                         <p className="text-sm font-semibold text-(--heading-colour)">
@@ -167,7 +172,9 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <span>Qty: {item.quantity}</span>
-                        <span>₦{Number(item.pricePerUnit).toLocaleString()} per pack</span>
+                        <span>
+                          ₦{Number(item.pricePerUnit).toLocaleString()} {item.itemType === "feed" ? "per bag" : "per pack"}
+                        </span>
                       </div>
                     </div>
                   ))
