@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -29,6 +29,14 @@ type MarketplaceResponse = {
 };
 
 export default function MarketplacePage() {
+  return (
+    <Suspense fallback={<MarketplaceSkeletonGrid count={6} />}>
+      <MarketplacePageInner />
+    </Suspense>
+  );
+}
+
+function MarketplacePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
