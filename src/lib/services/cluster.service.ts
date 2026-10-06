@@ -24,6 +24,10 @@ export interface ApprovedRider {
   id: string;
   full_name: string;
   phone_number: string;
+  rider_approved_at: string | null;
+  activeDeliveries: number;
+  completedDeliveries: number;
+  lastActiveAt: string | null;
 }
 
 export interface BackendClusterFarmer {

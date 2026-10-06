@@ -2,18 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, XCircle, Truck } from "lucide-react";
+import { CheckCircle, XCircle, Truck, Activity } from "lucide-react";
 import { toast } from "sonner";
-import { clusterService, type PendingRider } from "~/lib/services/cluster.service";
+import { clusterService, type PendingRider, type ApprovedRider } from "~/lib/services/cluster.service";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 
 export default function ClusterRidersPage() {
   const [riders, setRiders] = useState<PendingRider[]>([]);
+  const [approvedRiders, setApprovedRiders] = useState<ApprovedRider[]>([]);
   const [loading, setLoading] = useState(true);
+  const [approvedLoading, setApprovedLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const loadApproved = async () => {
+    setApprovedLoading(true);
+    try {
+      const res = await clusterService.getApprovedRiders();
+      setApprovedRiders(res.data.riders);
+    } catch {
+      // Non-fatal — the approvals section above still works without this.
+    } finally {
+      setApprovedLoading(false);
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -30,6 +44,7 @@ export default function ClusterRidersPage() {
       }
     };
     void load();
+    void loadApproved();
     return () => {
       mounted = false;
     };
@@ -40,6 +55,7 @@ export default function ClusterRidersPage() {
     try {
       await clusterService.reviewRider(riderId, status);
       setRiders((prev) => prev.filter((r) => r.id !== riderId));
+      if (status === "approved") void loadApproved();
       toast.success(status === "approved" ? "Rider approved." : "Rider rejected.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to review rider");
@@ -126,6 +142,68 @@ export default function ClusterRidersPage() {
           icon={Truck}
           title="No riders pending review"
           description="Riders invited by admin for your region will appear here."
+          size="lg"
+        />
+      )}
+
+      {/* Approved riders + their delivery activity */}
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <h2 className="font-ubuntu mb-2 text-2xl font-bold text-(--heading-colour)">Approved Riders</h2>
+        <p className="font-roboto-slab text-(--text-colour)">
+          Riders already approved for your region, and their current delivery activity.
+        </p>
+      </motion.div>
+
+      {approvedLoading ? (
+        <LoadingState message="Loading approved riders..." size="lg" />
+      ) : approvedRiders.length > 0 ? (
+        <motion.div
+          variants={STAGGER_CONTAINER_VARIANT}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 gap-(--gap-lg) md:grid-cols-2 lg:grid-cols-3"
+        >
+          {approvedRiders.map((rider) => (
+            <motion.div
+              key={rider.id}
+              variants={FADE_IN_VARIANT}
+              className="flex flex-col gap-(--gap-base) rounded-2xl border border-(--border-gray) bg-(--white) p-(--space-lg) shadow-sm"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-50">
+                  <Truck size={22} className="text-green-600" />
+                </div>
+                <div>
+                  <p className="font-ubuntu font-semibold text-(--heading-colour)">{rider.full_name}</p>
+                  <p className="font-roboto-slab text-sm text-(--text-colour)">{rider.phone_number}</p>
+                </div>
+              </div>
+
+              <div className="font-roboto-slab grid grid-cols-2 gap-(--gap-base) rounded-xl bg-(--gray-bg) p-(--space-md) text-sm">
+                <div>
+                  <p className="font-ubuntu text-lg font-bold text-(--heading-colour)">{rider.activeDeliveries}</p>
+                  <p className="text-(--text-colour)">En route now</p>
+                </div>
+                <div>
+                  <p className="font-ubuntu text-lg font-bold text-(--heading-colour)">{rider.completedDeliveries}</p>
+                  <p className="text-(--text-colour)">Completed</p>
+                </div>
+              </div>
+
+              <div className="font-roboto-slab flex items-center gap-2 text-xs text-(--text-colour)">
+                <Activity size={14} />
+                {rider.lastActiveAt
+                  ? `Last active ${new Date(rider.lastActiveAt).toLocaleString()}`
+                  : "No delivery activity yet"}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      ) : (
+        <EmptyState
+          icon={Truck}
+          title="No approved riders yet"
+          description="Riders you approve above will appear here along with their delivery activity."
           size="lg"
         />
       )}
