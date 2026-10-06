@@ -20,6 +20,7 @@ const supportLinks: NavLink[] = [
 
 const footer2Links: NavLink[] = [
   { label: "Privacy Policy", href: "/privacy#privacy" },
+  { label: "Platform Policy", href: "/policy" },
   { label: "Terms of Use", href: "/terms" },
   { label: "Legal", href: "/privacy" },
   { label: "Site Map", href: "/" },
