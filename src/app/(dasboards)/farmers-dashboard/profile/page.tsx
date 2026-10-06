@@ -27,6 +27,9 @@ type ProfileForm = {
   state: string;
   localGovernment: string;
   ward: string;
+  subCommunity: string;
+  latitude?: number;
+  longitude?: number;
   fishType: string;
   farmingCapacityKg: number;
   yearsOfExperience: number;
@@ -87,6 +90,7 @@ export default function FarmerProfilePage() {
     state: "",
     localGovernment: "",
     ward: "",
+    subCommunity: "",
     fishType: "",
     farmingCapacityKg: 0,
     yearsOfExperience: 0,
@@ -142,6 +146,7 @@ export default function FarmerProfilePage() {
           state: u.location_state ?? "",
           localGovernment: u.location_lga ?? "",
           ward: u.location_ward ?? "",
+          subCommunity: u.location_sub_community ?? "",
           fishType: u.fish_type_preference ?? "",
           farmingCapacityKg: Number(u.farming_capacity_kg ?? 0),
           yearsOfExperience: Number(u.years_of_experience ?? 0),
@@ -186,6 +191,9 @@ export default function FarmerProfilePage() {
         state: form.state,
         localGovernment: form.localGovernment,
         ward: form.ward,
+        subCommunity: form.subCommunity,
+        latitude: form.latitude,
+        longitude: form.longitude,
         fishType: form.fishType,
         farmingCapacityKg: form.farmingCapacityKg,
         yearsOfExperience: form.yearsOfExperience,
@@ -397,13 +405,21 @@ export default function FarmerProfilePage() {
           {isEditing ? (
             <div className="md:col-span-2">
               <LocationPicker
-                value={{ state: form.state, lga: form.localGovernment, ward: form.ward }}
+                value={{
+                  state: form.state,
+                  lga: form.localGovernment,
+                  ward: form.ward,
+                  subCommunity: form.subCommunity,
+                }}
                 onChange={(next: LocationValue) =>
                   setForm((prev) => ({
                     ...prev,
                     state: next.state,
                     localGovernment: next.lga,
                     ward: next.ward,
+                    subCommunity: next.subCommunity,
+                    latitude: next.latitude,
+                    longitude: next.longitude,
                   }))
                 }
                 activeStates={activeStates}

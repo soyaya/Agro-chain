@@ -139,6 +139,9 @@ export interface UpdateBuyerProfilePayload {
   localGovernment?: string;
   state?: string;
   ward?: string;
+  subCommunity?: string;
+  latitude?: number;
+  longitude?: number;
   businessType?: string;
 }
 

@@ -154,6 +154,11 @@ export type SelectInputProps = {
   // lists too long to scan by eye, like the ~1000-entry bank list.
   searchable?: boolean;
   searchPlaceholder?: string;
+  // Fires on every keystroke in the search box, in addition to the built-in
+  // client-side label filter — lets a caller drive a server-side lookup
+  // (e.g. the sub-community autocomplete, whose full list is too large to
+  // ship client-side) off the same input instead of duplicating it.
+  onSearchChange?: (query: string) => void;
 };
 
 export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
@@ -168,6 +173,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
       className,
       searchable = false,
       searchPlaceholder = "Search...",
+      onSearchChange,
     },
     ref,
   ) => {
@@ -287,7 +293,10 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectInputProps>(
                       ref={searchInputRef}
                       type="text"
                       value={query}
-                      onChange={(e) => setQuery(e.target.value)}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        onSearchChange?.(e.target.value);
+                      }}
                       onClick={(e) => e.stopPropagation()}
                       onKeyDown={(e) => {
                         if (e.key === "Escape") setIsOpen(false);

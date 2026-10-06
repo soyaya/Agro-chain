@@ -61,7 +61,7 @@ export default function CreateDemandPage() {
   const [seedlingSize, setSeedlingSize] = useState<SeedlingSize | "">("");
   const [quantityPieces, setQuantityPieces] = useState("");
   const [fulfillmentMethod, setFulfillmentMethod] = useState<"pickup" | "delivery">("pickup");
-  const [location, setLocation] = useState({ state: "", lga: "", ward: "" });
+  const [location, setLocation] = useState({ state: "", lga: "", ward: "", subCommunity: "" });
   const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [notes, setNotes] = useState("");

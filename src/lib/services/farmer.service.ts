@@ -129,6 +129,9 @@ export interface UpdateFarmerProfilePayload {
   localGovernment?: string;
   state?: string;
   ward?: string;
+  subCommunity?: string;
+  latitude?: number;
+  longitude?: number;
   fishType?: string;
   farmingCapacityKg?: number;
   yearsOfExperience?: number;

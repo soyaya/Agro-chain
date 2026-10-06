@@ -17,6 +17,9 @@ type ClusterForm = {
   state: string;
   localGovernment: string;
   ward: string;
+  subCommunity: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export default function ClusterProfilePage() {
@@ -28,6 +31,7 @@ export default function ClusterProfilePage() {
     state: "",
     localGovernment: "",
     ward: "",
+    subCommunity: "",
   });
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -63,6 +67,7 @@ export default function ClusterProfilePage() {
           state: user.location_state ?? "",
           localGovernment: user.location_lga ?? "",
           ward: user.location_ward ?? "",
+          subCommunity: user.location_sub_community ?? "",
         });
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to load profile");
@@ -87,6 +92,9 @@ export default function ClusterProfilePage() {
         state: form.state,
         localGovernment: form.localGovernment,
         ward: form.ward,
+        subCommunity: form.subCommunity,
+        latitude: form.latitude,
+        longitude: form.longitude,
       });
       setEditing(false);
       toast.success("Profile updated successfully");
@@ -145,13 +153,21 @@ export default function ClusterProfilePage() {
               it precisely.
             </p>
             <LocationPicker
-              value={{ state: form.state, lga: form.localGovernment, ward: form.ward }}
+              value={{
+                state: form.state,
+                lga: form.localGovernment,
+                ward: form.ward,
+                subCommunity: form.subCommunity,
+              }}
               onChange={(next: LocationValue) =>
                 setForm((prev) => ({
                   ...prev,
                   state: next.state,
                   localGovernment: next.lga,
                   ward: next.ward,
+                  subCommunity: next.subCommunity,
+                  latitude: next.latitude,
+                  longitude: next.longitude,
                 }))
               }
               activeStates={activeStates}

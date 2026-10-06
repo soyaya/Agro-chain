@@ -80,6 +80,9 @@ export interface UpdateClusterProfilePayload {
   state?: string;
   localGovernment?: string;
   ward?: string;
+  subCommunity?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface PendingRider {

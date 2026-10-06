@@ -17,6 +17,9 @@ type BuyerForm = {
   state: string;
   localGovernment: string;
   ward: string;
+  subCommunity: string;
+  latitude?: number;
+  longitude?: number;
   businessType: string;
 };
 
@@ -30,6 +33,7 @@ export default function BuyerProfilePage() {
     state: "",
     localGovernment: "",
     ward: "",
+    subCommunity: "",
     businessType: "",
   });
   const [loading, setLoading] = useState(true);
@@ -67,6 +71,7 @@ export default function BuyerProfilePage() {
           state: user.location_state ?? "",
           localGovernment: user.location_lga ?? "",
           ward: user.location_ward ?? "",
+          subCommunity: user.location_sub_community ?? "",
           businessType: user.business_type ?? "",
         });
       } catch (error) {
@@ -93,6 +98,9 @@ export default function BuyerProfilePage() {
         state: form.state,
         localGovernment: form.localGovernment,
         ward: form.ward,
+        subCommunity: form.subCommunity,
+        latitude: form.latitude,
+        longitude: form.longitude,
         businessType: form.businessType,
       });
       setEditing(false);
@@ -150,13 +158,21 @@ export default function BuyerProfilePage() {
         {editing ? (
           <div className="md:col-span-2">
             <LocationPicker
-              value={{ state: form.state, lga: form.localGovernment, ward: form.ward }}
+              value={{
+                state: form.state,
+                lga: form.localGovernment,
+                ward: form.ward,
+                subCommunity: form.subCommunity,
+              }}
               onChange={(next: LocationValue) =>
                 setForm((prev) => ({
                   ...prev,
                   state: next.state,
                   localGovernment: next.lga,
                   ward: next.ward,
+                  subCommunity: next.subCommunity,
+                  latitude: next.latitude,
+                  longitude: next.longitude,
                 }))
               }
               activeStates={activeStates}

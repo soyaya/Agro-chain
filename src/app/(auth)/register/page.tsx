@@ -49,7 +49,7 @@ function RegisterFormContent() {
   const role = (searchParams.get("role")?.toLowerCase() || "") as Role;
   const safeReturnTo = getSafeReturnTo(searchParams.get("returnTo"));
 
-  const [location, setLocation] = useState<LocationValue>({ state: "", lga: "", ward: "" });
+  const [location, setLocation] = useState<LocationValue>({ state: "", lga: "", ward: "", subCommunity: "" });
   const [acquisitionChannel, setAcquisitionChannel] = useState("");
   const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
@@ -153,6 +153,9 @@ function RegisterFormContent() {
           state: location.state,
           lga: location.lga,
           ward: location.ward || undefined,
+          subCommunity: location.subCommunity || undefined,
+          latitude: location.latitude,
+          longitude: location.longitude,
           password: data.password,
           role,
           acquisitionChannel: acquisitionChannel || undefined,
