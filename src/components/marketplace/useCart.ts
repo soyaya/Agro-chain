@@ -24,7 +24,7 @@ export interface CartItem {
   quantity: number;
   pricePerUnit: number;
   totalPrice: number;
-  businessName: string;
+  businessName: string | null;
   clusterFarmerName: string;
 }
 

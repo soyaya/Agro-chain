@@ -92,9 +92,9 @@ function MarketplacePageInner() {
     if (!feedSearch) return true;
     const q = feedSearch.toLowerCase();
     return (
-      listing.brandName.toLowerCase().includes(q) ||
-      listing.categoryLabel.toLowerCase().includes(q) ||
-      listing.state.toLowerCase().includes(q)
+      (listing.brandName ?? "").toLowerCase().includes(q) ||
+      (listing.categoryLabel ?? "").toLowerCase().includes(q) ||
+      (listing.state ?? "").toLowerCase().includes(q)
     );
   });
 
@@ -246,11 +246,11 @@ function MarketplacePageInner() {
   const filteredListings = listings.filter((listing) => {
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      const matchesSearch = 
-        listing.fishType.toLowerCase().includes(searchLower) ||
-        listing.businessName.toLowerCase().includes(searchLower) ||
-        listing.clusterFarmerName.toLowerCase().includes(searchLower) ||
-        listing.state.toLowerCase().includes(searchLower);
+      const matchesSearch =
+        (listing.fishType ?? "").toLowerCase().includes(searchLower) ||
+        (listing.businessName ?? "").toLowerCase().includes(searchLower) ||
+        (listing.clusterFarmerName ?? "").toLowerCase().includes(searchLower) ||
+        (listing.state ?? "").toLowerCase().includes(searchLower);
       
       if (!matchesSearch) return false;
     }

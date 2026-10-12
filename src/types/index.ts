@@ -272,7 +272,9 @@ export interface ClusterFarmerListing {
   id: string;
   clusterFarmerId: string;
   clusterFarmerName: string;
-  businessName: string;
+  // Nullable at the API level (marketplace.controller.ts: `clusterFarmer?.business_name ?? null`)
+  // — a cluster farmer isn't required to have set a business name.
+  businessName: string | null;
   originalFarmerListingId?: string;
   fishType: string;
   /** "piece" for seedling listings (priced/sold per piece); "kg" otherwise. */
