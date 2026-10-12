@@ -107,7 +107,11 @@ export default function ClusterRidersPage() {
                 </div>
                 <div>
                   <p className="font-ubuntu font-semibold text-(--heading-colour)">{rider.full_name}</p>
-                  <p className="font-roboto-slab text-sm text-(--text-colour)">{rider.location_lga}</p>
+                  <p className="font-roboto-slab text-sm text-(--text-colour)">
+                    {[rider.location_sub_community, rider.location_ward, rider.location_lga]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
                 </div>
               </div>
 

@@ -10,10 +10,23 @@ export interface SupplyAdminTeamMember {
   phone_number: string;
   role: "cluster" | "farmer" | "rider";
   location_lga: string;
+  location_ward?: string | null;
+  location_sub_community?: string | null;
   is_active: boolean;
   rider_approved: boolean | null;
   invite_accepted: boolean;
   created_at: string;
+}
+
+export interface UpdateSupplyAdminProfilePayload {
+  fullName?: string;
+  locationState?: string;
+  locationLga?: string;
+  locationWard?: string;
+  locationSubCommunity?: string;
+  latitude?: number;
+  longitude?: number;
+  locationAddress?: string;
 }
 
 export interface InviteResult {
@@ -52,6 +65,25 @@ export interface InviteTeamMemberPayload {
 // functions, just mounted under /supply-admin instead of /cluster).
 
 export const supplyAdminService = {
+  /** Update the supply admin's own profile. Supply admin has no role-specific
+   * profile endpoint like buyer/cluster/farmer — this wraps the same generic
+   * one riderService uses. */
+  updateProfile(data: UpdateSupplyAdminProfilePayload) {
+    return apiFetch("/users/profile", {
+      method: "PUT",
+      body: JSON.stringify({
+        full_name: data.fullName,
+        location_state: data.locationState,
+        location_lga: data.locationLga,
+        location_ward: data.locationWard,
+        location_sub_community: data.locationSubCommunity,
+        location_latitude: data.latitude,
+        location_longitude: data.longitude,
+        location_address: data.locationAddress,
+      }),
+    });
+  },
+
   // === Team building
 
   inviteClusterFarmer(payload: InviteTeamMemberPayload) {

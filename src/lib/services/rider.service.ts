@@ -27,6 +27,10 @@ export interface UpdateRiderProfilePayload {
   fullName?: string;
   locationState?: string;
   locationLga?: string;
+  locationWard?: string;
+  locationSubCommunity?: string;
+  latitude?: number;
+  longitude?: number;
   locationAddress?: string;
 }
 
@@ -46,6 +50,10 @@ export const riderService = {
         full_name: data.fullName,
         location_state: data.locationState,
         location_lga: data.locationLga,
+        location_ward: data.locationWard,
+        location_sub_community: data.locationSubCommunity,
+        location_latitude: data.latitude,
+        location_longitude: data.longitude,
         location_address: data.locationAddress,
       }),
     });

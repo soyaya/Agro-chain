@@ -91,6 +91,8 @@ export interface PendingRider {
   phone_number: string;
   email: string | null;
   location_lga: string;
+  location_ward?: string | null;
+  location_sub_community?: string | null;
   created_at: string;
 }
 

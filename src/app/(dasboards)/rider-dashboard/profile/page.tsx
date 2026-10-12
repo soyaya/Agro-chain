@@ -6,6 +6,9 @@ import { Clock } from "lucide-react";
 import { toast } from "sonner";
 import { authService } from "~/lib/services/auth.service";
 import { riderService } from "~/lib/services/rider.service";
+import { platformService } from "~/lib/services/platform.service";
+import { DynamicInput } from "~/components/dynamic-input";
+import { LocationPicker, type LocationValue } from "~/components/shared/LocationPicker";
 
 type RiderForm = {
   fullName: string;
@@ -13,6 +16,10 @@ type RiderForm = {
   email: string;
   locationState: string;
   locationLga: string;
+  locationWard: string;
+  subCommunity: string;
+  latitude?: number;
+  longitude?: number;
   locationAddress: string;
 };
 
@@ -23,12 +30,28 @@ export default function RiderProfilePage() {
     email: "",
     locationState: "",
     locationLga: "",
+    locationWard: "",
+    subCommunity: "",
     locationAddress: "",
   });
   const [riderApproved, setRiderApproved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [activeStates, setActiveStates] = useState<string[] | undefined>(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    platformService
+      .getActiveStates()
+      .then((res) => {
+        if (mounted) setActiveStates(res.data.activeStates);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -44,6 +67,8 @@ export default function RiderProfilePage() {
           email: user.email ?? "",
           locationState: user.location_state ?? "",
           locationLga: user.location_lga ?? "",
+          locationWard: user.location_ward ?? "",
+          subCommunity: user.location_sub_community ?? "",
           locationAddress: user.location_address ?? "",
         });
         setRiderApproved(!!user.rider_approved);
@@ -66,6 +91,10 @@ export default function RiderProfilePage() {
         fullName: form.fullName,
         locationState: form.locationState,
         locationLga: form.locationLga,
+        locationWard: form.locationWard,
+        locationSubCommunity: form.subCommunity,
+        latitude: form.latitude,
+        longitude: form.longitude,
         locationAddress: form.locationAddress,
       });
       setEditing(false);
@@ -117,8 +146,6 @@ export default function RiderProfilePage() {
             ["Full Name", "fullName"],
             ["Phone Number", "phoneNumber"],
             ["Email", "email"],
-            ["State", "locationState"],
-            ["Local Government", "locationLga"],
             ["Address", "locationAddress"],
           ] as const
         ).map(([label, key]) => (
@@ -132,6 +159,38 @@ export default function RiderProfilePage() {
             />
           </label>
         ))}
+
+        {editing ? (
+          <div className="md:col-span-2">
+            <LocationPicker
+              value={{
+                state: form.locationState,
+                lga: form.locationLga,
+                ward: form.locationWard,
+                subCommunity: form.subCommunity,
+              }}
+              onChange={(next: LocationValue) =>
+                setForm((prev) => ({
+                  ...prev,
+                  locationState: next.state,
+                  locationLga: next.lga,
+                  locationWard: next.ward,
+                  subCommunity: next.subCommunity,
+                  latitude: next.latitude,
+                  longitude: next.longitude,
+                }))
+              }
+              activeStates={activeStates}
+            />
+          </div>
+        ) : (
+          <>
+            <DynamicInput label="State" value={form.locationState} disabled />
+            <DynamicInput label="Local Government" value={form.locationLga} disabled />
+            <DynamicInput label="Ward / Community" value={form.locationWard} disabled />
+            <DynamicInput label="Sub-community" value={form.subCommunity} disabled />
+          </>
+        )}
       </div>
     </div>
   );

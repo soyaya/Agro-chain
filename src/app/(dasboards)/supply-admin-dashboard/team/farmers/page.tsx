@@ -143,7 +143,11 @@ export default function SupplyAdminFarmersPage() {
             >
               <div>
                 <p className="font-roboto-slab font-medium text-(--heading-colour)">{member.full_name}</p>
-                <p className="font-roboto-slab text-xs text-(--text-colour)">{member.location_lga}</p>
+                <p className="font-roboto-slab text-xs text-(--text-colour)">
+                  {[member.location_sub_community, member.location_ward, member.location_lga]
+                    .filter(Boolean)
+                    .join(", ")}
+                </p>
               </div>
               <div className="flex items-center gap-3">
                 <p className="font-roboto-slab text-sm text-(--text-colour)">{member.phone_number}</p>
