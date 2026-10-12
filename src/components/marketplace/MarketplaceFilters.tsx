@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { SelectInput, DynamicInput } from "~/components/dynamic-input";
 import type { MarketplaceFilters as Filters } from "~/types";
 import { FISH_TYPE_OPTIONS, FADE_IN_VARIANT } from "~/types/constants";
 import wardData from "~/data/nigeria-wards.json";
+import { locationService } from "~/lib/services/location.service";
 
 type WardData = Record<string, Record<string, string[]>>;
 const NIGERIA_WARDS = wardData as WardData;
@@ -62,6 +64,32 @@ export function MarketplaceFilters({
     ...(wards ?? []).map((ward) => ({ label: ward, value: ward })),
   ];
 
+  // Sub-community is too fine-grained (292k+ settlements) to ship as a
+  // static dataset like state/LGA/ward — fetched live from the backend as
+  // the user types, ward-scoped so the lookup is always small.
+  const [subCommunityQuery, setSubCommunityQuery] = useState("");
+  const [subCommunityOptions, setSubCommunityOptions] = useState<{ label: string; value: string }[]>(
+    [],
+  );
+
+  useEffect(() => {
+    if (!filters.state || !filters.localGovernment || !filters.ward) {
+      setSubCommunityOptions([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      locationService
+        .getSubCommunities(filters.state!, filters.localGovernment!, filters.ward!, subCommunityQuery)
+        .then((res) => {
+          setSubCommunityOptions(res.data.settlements.map((s) => ({ label: s.name, value: s.name })));
+        })
+        .catch(() => setSubCommunityOptions([]));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [filters.state, filters.localGovernment, filters.ward, subCommunityQuery]);
+
+  const subCommunityOptionsWithAll = [{ label: "All Sub-communities", value: "" }, ...subCommunityOptions];
+
   const sortOptions = [
     { label: "Latest First", value: "date-desc" },
     { label: "Oldest First", value: "date-asc" },
@@ -76,11 +104,21 @@ export function MarketplaceFilters({
   };
 
   const handleStateChange = (value: string) => {
-    onChange({ ...filters, state: value || undefined, localGovernment: undefined, ward: undefined });
+    onChange({
+      ...filters,
+      state: value || undefined,
+      localGovernment: undefined,
+      ward: undefined,
+      subCommunity: undefined,
+    });
   };
 
   const handleLgaChange = (value: string) => {
-    onChange({ ...filters, localGovernment: value || undefined, ward: undefined });
+    onChange({ ...filters, localGovernment: value || undefined, ward: undefined, subCommunity: undefined });
+  };
+
+  const handleWardChange = (value: string) => {
+    onChange({ ...filters, ward: value || undefined, subCommunity: undefined });
   };
 
   const hasActiveFilters =
@@ -89,6 +127,7 @@ export function MarketplaceFilters({
     filters.state ||
     filters.localGovernment ||
     filters.ward ||
+    filters.subCommunity ||
     filters.minPrice ||
     filters.maxPrice ||
     filters.minQuantity;
@@ -123,6 +162,8 @@ export function MarketplaceFilters({
         value={filters.state || ""}
         onValueChange={handleStateChange}
         options={stateOptions}
+        searchable
+        searchPlaceholder="Search states..."
       />
 
       <SelectInput
@@ -130,14 +171,30 @@ export function MarketplaceFilters({
         value={filters.localGovernment || ""}
         onValueChange={handleLgaChange}
         options={lgaOptions}
+        searchable
+        searchPlaceholder="Search LGAs..."
       />
 
       <SelectInput
         label="Ward / Community"
         value={filters.ward || ""}
-        onValueChange={(value) => handleFilterChange("ward", value)}
+        onValueChange={handleWardChange}
         options={wardOptions}
+        searchable
+        searchPlaceholder="Search wards..."
       />
+
+      {filters.ward && (
+        <SelectInput
+          label="Sub-community"
+          value={filters.subCommunity || ""}
+          onValueChange={(value) => handleFilterChange("subCommunity", value)}
+          options={subCommunityOptionsWithAll}
+          searchable
+          searchPlaceholder="Type to search, e.g. Gonin Gora..."
+          onSearchChange={setSubCommunityQuery}
+        />
+      )}
 
       <div className="flex flex-col gap-(--space-md)">
         <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">

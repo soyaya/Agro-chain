@@ -225,6 +225,7 @@ function MarketplacePageInner() {
     filters.state ||
     filters.localGovernment ||
     filters.ward ||
+    filters.subCommunity ||
     filters.minPrice ||
     filters.maxPrice ||
     filters.minQuantity;
@@ -235,6 +236,7 @@ function MarketplacePageInner() {
     filters.state,
     filters.localGovernment,
     filters.ward,
+    filters.subCommunity,
     filters.minPrice,
     filters.maxPrice,
     filters.minQuantity,
@@ -256,6 +258,7 @@ function MarketplacePageInner() {
     if (filters.state && listing.state !== filters.state) return false;
     if (filters.localGovernment && listing.localGovernment !== filters.localGovernment) return false;
     if (filters.ward && listing.ward !== filters.ward) return false;
+    if (filters.subCommunity && listing.subCommunity !== filters.subCommunity) return false;
     if (filters.minPrice && listing.pricePerKg < filters.minPrice) return false;
     if (filters.maxPrice && listing.pricePerKg > filters.maxPrice) return false;
     if (filters.minQuantity && listing.totalAvailableKg < filters.minQuantity) return false;
@@ -484,12 +487,14 @@ function MarketplacePageInner() {
 
             {/* Listings Grid */}
             <div className="lg:col-span-3">
-              {(filters.state || filters.localGovernment || filters.ward) && (
+              {(filters.state || filters.localGovernment || filters.ward || filters.subCommunity) && (
                 <div className="mb-(--gap-base) flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-md)">
                   <p className="text-sm text-(--text-colour)">
                     Showing listings in{" "}
                     <span className="font-medium text-(--heading-colour)">
-                      {[filters.ward, filters.localGovernment, filters.state].filter(Boolean).join(", ")}
+                      {[filters.subCommunity, filters.ward, filters.localGovernment, filters.state]
+                        .filter(Boolean)
+                        .join(", ")}
                     </span>
                   </p>
                   <button
@@ -499,6 +504,7 @@ function MarketplacePageInner() {
                         state: undefined,
                         localGovernment: undefined,
                         ward: undefined,
+                        subCommunity: undefined,
                       }))
                     }
                     className="text-sm font-medium text-(--theme-green-dark) transition hover:opacity-80"

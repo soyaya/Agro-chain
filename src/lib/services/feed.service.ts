@@ -35,6 +35,8 @@ export interface FeedListing {
   location: string;
   state: string;
   localGovernment: string;
+  ward?: string | null;
+  subCommunity?: string | null;
   createdAt: string;
   updatedAt: string;
   imageUrl: string | null;

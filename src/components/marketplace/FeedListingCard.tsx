@@ -56,7 +56,9 @@ export function FeedListingCard({ listing, onClick }: FeedListingCardProps) {
         {/* Location */}
         <div className="flex items-center gap-1.5 text-sm text-(--text-colour)">
           <MapPin size={14} />
-          <span>{listing.localGovernment}, {listing.state}</span>
+          <span>
+            {[listing.subCommunity, listing.localGovernment, listing.state].filter(Boolean).join(", ")}
+          </span>
         </div>
 
         {/* Actions */}

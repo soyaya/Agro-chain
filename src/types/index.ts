@@ -284,6 +284,7 @@ export interface ClusterFarmerListing {
   state: string;
   localGovernment: string;
   ward?: string | null;
+  subCommunity?: string | null;
   pricePerKg: number;
   deliveryOptions: string[];
   visibleOnMarketplace: boolean;
@@ -640,6 +641,7 @@ export interface MarketplaceFilters {
   state?: string;
   localGovernment?: string;
   ward?: string;
+  subCommunity?: string;
   minQuantity?: number;
   sortBy?: "price" | "quantity" | "date";
   sortOrder?: "asc" | "desc";
