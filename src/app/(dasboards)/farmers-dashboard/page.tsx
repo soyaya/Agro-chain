@@ -6,6 +6,7 @@ import { Package, FileText, Clock, CheckCircle } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { farmerService, type FarmerListingSummary } from "~/lib/services/farmer.service";
 import { useAuth } from "~/lib/auth-context";
+import { LocationUpdatePrompt } from "~/components/shared/LocationUpdatePrompt";
 
 export default function FarmersDashboardPage() {
   const { user } = useAuth();
@@ -105,6 +106,8 @@ export default function FarmersDashboardPage() {
           Here&apos;s an overview of your farm activities
         </p>
       </motion.div>
+
+      <LocationUpdatePrompt />
 
       {/* Stats Grid */}
       <motion.div

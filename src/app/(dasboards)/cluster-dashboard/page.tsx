@@ -6,6 +6,7 @@ import { Users, FileText, Clock, CheckCircle } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { clusterService, type ClusterListingSummary } from "~/lib/services/cluster.service";
 import { useAuth } from "~/lib/auth-context";
+import { LocationUpdatePrompt } from "~/components/shared/LocationUpdatePrompt";
 
 export default function ClusterDashboardPage() {
   const { user } = useAuth();
@@ -94,6 +95,8 @@ export default function ClusterDashboardPage() {
           Manage your farmers and marketplace listings
         </p>
       </motion.div>
+
+      <LocationUpdatePrompt />
 
       {/* Stats Grid */}
       <motion.div

@@ -6,6 +6,7 @@ import { ShoppingCart, Package, Clock, CheckCircle } from "lucide-react";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT, formatStatus, statusColorClass } from "~/types/constants";
 import { buyerService, type BackendOrder } from "~/lib/services/buyer.service";
 import { useAuth } from "~/lib/auth-context";
+import { LocationUpdatePrompt } from "~/components/shared/LocationUpdatePrompt";
 
 export default function BuyersDashboardPage() {
   const { user } = useAuth();
@@ -80,6 +81,8 @@ export default function BuyersDashboardPage() {
           Here&apos;s an overview of your orders and activities
         </p>
       </motion.div>
+
+      <LocationUpdatePrompt />
 
       {/* Stats Grid */}
       <motion.div

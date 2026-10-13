@@ -141,6 +141,7 @@ function mapBackendUser(user: BackendUser): AuthUser {
     locationState: user.location_state,
     locationLga: user.location_lga,
     locationWard: user.location_ward,
+    locationSubCommunity: user.location_sub_community,
     createdAt: new Date(user.created_at),
     updatedAt: new Date(user.updated_at),
   };

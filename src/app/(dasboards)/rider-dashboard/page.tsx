@@ -10,6 +10,7 @@ import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, deliveryPhotoGuidance } fro
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { useAuth } from "~/lib/auth-context";
+import { LocationUpdatePrompt } from "~/components/shared/LocationUpdatePrompt";
 
 const FULFILLMENT_STAGE_LABELS: Record<string, string> = {
   escalated_to_rider: "Awaiting pickup",
@@ -209,6 +210,8 @@ export default function RiderDashboardPage() {
           handoff — the buyer compares both before confirming, so no OTP is needed.
         </p>
       </motion.div>
+
+      <LocationUpdatePrompt />
 
       {user?.riderApproved === false && (
         <motion.div

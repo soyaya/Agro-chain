@@ -162,6 +162,7 @@ export interface AuthUser extends BaseUser {
   locationState: string;
   locationLga: string;
   locationWard?: string | null;
+  locationSubCommunity?: string | null;
 }
 
 // ============================================

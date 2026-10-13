@@ -6,6 +6,7 @@ import { FileSignature, Receipt, Users, Truck, FileText } from "lucide-react";
 import { supplyAdminService, type SupplyAdminContract } from "~/lib/services/supply-admin.service";
 import { STAGGER_CONTAINER_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
+import { LocationUpdatePrompt } from "~/components/shared/LocationUpdatePrompt";
 
 export default function SupplyAdminOverviewPage() {
   const [loading, setLoading] = useState(true);
@@ -59,6 +60,8 @@ export default function SupplyAdminOverviewPage() {
           Build out your region and fulfill cross-region demand.
         </p>
       </motion.div>
+
+      <LocationUpdatePrompt />
 
       {contract && (
         <motion.div
