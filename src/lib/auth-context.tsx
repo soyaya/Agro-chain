@@ -142,6 +142,7 @@ function mapBackendUser(user: BackendUser): AuthUser {
     locationLga: user.location_lga,
     locationWard: user.location_ward,
     locationSubCommunity: user.location_sub_community,
+    clusterFarmerId: user.cluster_farmer_id,
     createdAt: new Date(user.created_at),
     updatedAt: new Date(user.updated_at),
   };

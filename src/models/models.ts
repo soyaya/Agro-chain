@@ -919,7 +919,7 @@ import {
   LayoutDashboard, User, FileText, Package,
   ShoppingCart, Users as UsersIcon,
   CheckSquare, Clock,
-  Receipt, Wallet, Truck, Banknote
+  Receipt, Wallet, Truck, Banknote, Store, FlaskConical
 } from 'lucide-react';
 import type { DashboardConfig, EnhancedDashboardConfig } from '~/types/index';
 
@@ -1016,6 +1016,7 @@ export const enhancedFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "My Orders", href: "/farmers-dashboard/orders", icon: Truck },
     { label: "Payouts", href: "/farmers-dashboard/payouts", icon: Banknote },
     { label: "Wallet", href: "/farmers-dashboard/wallet", icon: Wallet },
+    { label: "Farm Records", href: "/farmers-dashboard/farm-records", icon: FlaskConical },
   ],
   financialServices: {
     enabled: false,
@@ -1068,6 +1069,29 @@ export const supplyAdminDashboardConfig: EnhancedDashboardConfig = {
   },
 };
 
+export const procurementDashboardConfig: EnhancedDashboardConfig = {
+  title: "Procurement Officer Dashboard",
+  description: "Fill orders with no cluster farmer available, and run farm consultancy visits",
+  navLinks: [
+    { label: "Dashboard", href: "/procurement-dashboard", icon: LayoutDashboard },
+    { label: "Orders", href: "/procurement-dashboard/orders", icon: Package },
+    { label: "Farmer Records", href: "/procurement-dashboard/farmer-records", icon: FileText },
+  ],
+  financialServices: {
+    enabled: false,
+    loanServices: {
+      applicationEnabled: false,
+      trackingEnabled: false,
+      historyEnabled: false,
+    },
+    creditServices: {
+      purchaseEnabled: false,
+      catalogEnabled: false,
+      paymentTrackingEnabled: false,
+    },
+  },
+};
+
 export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
   title: "Cluster Farmer Dashboard",
   description: "Manage farmers and marketplace listings",
@@ -1079,6 +1103,7 @@ export const enhancedClusterFarmerDashboardConfig: EnhancedDashboardConfig = {
     { label: "Orders", href: "/cluster-dashboard/orders", icon: Package },
     { label: "My Listings", href: "/cluster-dashboard/listings", icon: FileText },
     { label: "Farmers", href: "/cluster-dashboard/farmers", icon: UsersIcon },
+    { label: "My Marketplace", href: "/cluster-dashboard/my-marketplace", icon: Store },
     { label: "Riders", href: "/cluster-dashboard/riders", icon: Truck },
     { label: "Payouts", href: "/cluster-dashboard/payouts", icon: Banknote },
     { label: "Wallet", href: "/cluster-dashboard/wallet", icon: Wallet },

@@ -262,6 +262,11 @@ export const clusterService = {
 
   // === Order Fulfillment
 
+  /** Pass on an order before taking physical custody — makes it eligible for a procurement officer to claim. */
+  declineOrder(orderId: string, reason?: string) {
+    return apiFetch(`/cluster/orders/${orderId}/decline`, { method: "PATCH", body: JSON.stringify({ reason }) });
+  },
+
   /** Confirm physical receipt of a farmer's dispatched product. */
   receiveOrder(orderId: string) {
     return apiFetch(`/cluster/orders/${orderId}/receive`, { method: "PATCH" });
@@ -279,4 +284,91 @@ export const clusterService = {
       body: JSON.stringify({ riderId }),
     });
   },
+
+  // === Private Marketplace
+
+  /**
+   * Email a buyer a referral signup link — no account is created here. The
+   * buyer signs up exactly like any other buyer (own email, own OTP, own
+   * password); the link just tags the new account as this cluster farmer's
+   * customer.
+   */
+  sendBuyerReferral(email: string) {
+    return apiFetch<{
+      status: string;
+      message: string;
+      data: { referralUrl: string; emailSent: boolean };
+    }>("/cluster/buyers/invite", { method: "POST", body: JSON.stringify({ email }) });
+  },
+
+  /** List buyers who signed up as this cluster farmer's customers. */
+  getMyBuyers() {
+    return apiFetch<{
+      status: string;
+      data: { buyers: ClusterBuyer[] };
+    }>("/cluster/buyers");
+  },
+
+  /** Approved listings from this cluster's own farmers, not yet in the storefront. */
+  getEligibleMarketplaceListings() {
+    return apiFetch<{ status: string; data: { listings: EligibleMarketplaceListing[] } }>(
+      "/cluster/eligible-listings",
+    );
+  },
+
+  /** This cluster farmer's own curated storefront. */
+  getMyMarketplace() {
+    return apiFetch<{ status: string; data: { listings: ClusterMarketplaceRow[] } }>("/cluster/my-marketplace");
+  },
+
+  /** Add a listing to the storefront with a marked-up price. */
+  addToMyMarketplace(listingId: string, markedUpPrice: number) {
+    return apiFetch<{ status: string; message: string; data: { id: string } }>("/cluster/my-marketplace", {
+      method: "POST",
+      body: JSON.stringify({ listingId, markedUpPrice }),
+    });
+  },
+
+  /** Update a storefront listing's price or active state. */
+  updateMyMarketplaceListing(id: string, data: { markedUpPrice?: number; active?: boolean }) {
+    return apiFetch(`/cluster/my-marketplace/${id}`, { method: "PATCH", body: JSON.stringify(data) });
+  },
+
+  /** Remove a listing from the storefront. */
+  removeFromMyMarketplace(id: string) {
+    return apiFetch(`/cluster/my-marketplace/${id}`, { method: "DELETE" });
+  },
 };
+
+export interface ClusterBuyer {
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface EligibleMarketplaceListing {
+  id: string;
+  fishType: string;
+  farmerName: string;
+  basePricePerFish: number;
+  basePricePerKg: number | null;
+  totalAvailableKg: number | null;
+  imageUrl: string | null;
+}
+
+export interface ClusterMarketplaceRow {
+  id: string;
+  listingId: string;
+  fishType: string;
+  farmerName: string;
+  basePricePerFish: number;
+  markedUpPricePerFish: number;
+  markedUpPricePerKg: number | null;
+  commissionPercent: number;
+  active: boolean;
+  imageUrl: string | null;
+  createdAt: string;
+}

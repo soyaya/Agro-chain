@@ -48,6 +48,11 @@ function RegisterFormContent() {
   const router = useRouter();
   const role = (searchParams.get("role")?.toLowerCase() || "") as Role;
   const safeReturnTo = getSafeReturnTo(searchParams.get("returnTo"));
+  // A referral link (?ref=<userId>) — from a cluster farmer (scopes the
+  // buyer's marketplace to their storefront) or an admin/marketing referral
+  // (pure tracking, no effect on what the buyer sees). The backend's
+  // register controller resolves which based on the referrer's own role.
+  const referrerId = searchParams.get("ref") || undefined;
 
   const [location, setLocation] = useState<LocationValue>({ state: "", lga: "", ward: "", subCommunity: "" });
   const [acquisitionChannel, setAcquisitionChannel] = useState("");
@@ -159,6 +164,7 @@ function RegisterFormContent() {
           password: data.password,
           role,
           acquisitionChannel: acquisitionChannel || undefined,
+          referrerId,
         }),
       });
 

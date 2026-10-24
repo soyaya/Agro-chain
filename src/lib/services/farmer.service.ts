@@ -257,4 +257,9 @@ export const farmerService = {
       };
     }>("/farmers/payouts");
   },
+
+  /** Read-only — this farmer's own ponds with full stocking/sampling/harvest/parameter history, logged by procurement officers. */
+  getMyPonds() {
+    return apiFetch<{ status: string; data: { ponds: import("./procurement.service").FarmPond[] } }>("/farmers/ponds");
+  },
 };

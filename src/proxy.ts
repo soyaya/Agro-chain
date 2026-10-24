@@ -9,7 +9,8 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/buyers-dashboard") ||
     pathname.startsWith("/cluster-dashboard") ||
     pathname.startsWith("/rider-dashboard") ||
-    pathname.startsWith("/supply-admin-dashboard");
+    pathname.startsWith("/supply-admin-dashboard") ||
+    pathname.startsWith("/procurement-dashboard");
 
   if (isDashboardRoute && !hasSession) {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -42,6 +43,7 @@ export const config = {
     "/cluster-dashboard/:path*",
     "/rider-dashboard/:path*",
     "/supply-admin-dashboard/:path*",
+    "/procurement-dashboard/:path*",
     "/login",
     "/register",
     "/marketplace/checkout",

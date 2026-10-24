@@ -7,7 +7,7 @@ import type { LucideIcon } from "lucide-react";
 // COMMON TYPES
 // ============================================
 
-export type UserRole = "farmer" | "buyer" | "admin" | "rider" | "supply_admin";
+export type UserRole = "farmer" | "buyer" | "admin" | "rider" | "supply_admin" | "procurement_officer";
 
 export type ApplicationStatus = "pending" | "approved" | "rejected";
 
@@ -163,6 +163,10 @@ export interface AuthUser extends BaseUser {
   locationLga: string;
   locationWard?: string | null;
   locationSubCommunity?: string | null;
+  // Set only for a buyer invited into a cluster farmer's private marketplace
+  // — scopes their entire marketplace view to that cluster farmer's
+  // storefront (see marketplace/page.tsx and MarketplaceFilters.tsx).
+  clusterFarmerId?: string | null;
 }
 
 // ============================================

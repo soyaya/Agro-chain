@@ -11,6 +11,7 @@ import {
   enhancedClusterFarmerDashboardConfig,
   riderDashboardConfig,
   supplyAdminDashboardConfig,
+  procurementDashboardConfig,
 } from "~/models/models";
 
 interface DashboardsLayoutProps {
@@ -33,6 +34,8 @@ export default function DashboardsLayout({ children }: DashboardsLayoutProps) {
     config = riderDashboardConfig;
   } else if (pathname.startsWith("/supply-admin-dashboard")) {
     config = supplyAdminDashboardConfig;
+  } else if (pathname.startsWith("/procurement-dashboard")) {
+    config = procurementDashboardConfig;
   }
 
   return (

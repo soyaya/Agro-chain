@@ -336,6 +336,15 @@ function MarketplacePageInner() {
             </div>
           </motion.div>
 
+          {user?.clusterFarmerId && (
+            <motion.div
+              variants={FADE_IN_VARIANT}
+              className="rounded-2xl border border-(--theme-green-dark) bg-green-50 px-(--space-lg) py-(--space-md) text-sm text-(--heading-colour)"
+            >
+              You&apos;re shopping a private marketplace — only this seller&apos;s listings are shown.
+            </motion.div>
+          )}
+
           {/* Fish / Feed tabs */}
           <motion.div variants={FADE_IN_VARIANT} className="flex gap-2 border-b border-(--border-gray)">
             <button
@@ -471,22 +480,27 @@ function MarketplacePageInner() {
           </motion.div>
 
           {/* Content */}
-          <div className="grid grid-cols-1 gap-(--gap-lg) lg:grid-cols-4">
-            {/* Filters Sidebar — desktop only; mobile uses bottom drawer */}
-            <div className="lg:col-span-1">
-              <MarketplaceFilters
-                filters={filters}
-                onChange={setFilters}
-                onReset={handleResetFilters}
-                activeStates={activeStates}
-                resultCount={sortedListings.length}
-                mobileOpen={mobileFiltersOpen}
-                onMobileClose={() => setMobileFiltersOpen(false)}
-              />
-            </div>
+          <div className={`grid grid-cols-1 gap-(--gap-lg) ${user?.clusterFarmerId ? "" : "lg:grid-cols-4"}`}>
+            {/* Filters Sidebar — desktop only, and irrelevant for a buyer
+                scoped to one cluster farmer's storefront (every listing is
+                already that one seller's, so state/LGA/ward filters have
+                nothing to narrow). */}
+            {!user?.clusterFarmerId && (
+              <div className="lg:col-span-1">
+                <MarketplaceFilters
+                  filters={filters}
+                  onChange={setFilters}
+                  onReset={handleResetFilters}
+                  activeStates={activeStates}
+                  resultCount={sortedListings.length}
+                  mobileOpen={mobileFiltersOpen}
+                  onMobileClose={() => setMobileFiltersOpen(false)}
+                />
+              </div>
+            )}
 
             {/* Listings Grid */}
-            <div className="lg:col-span-3">
+            <div className={user?.clusterFarmerId ? "" : "lg:col-span-3"}>
               {(filters.state || filters.localGovernment || filters.ward || filters.subCommunity) && (
                 <div className="mb-(--gap-base) flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-md)">
                   <p className="text-sm text-(--text-colour)">

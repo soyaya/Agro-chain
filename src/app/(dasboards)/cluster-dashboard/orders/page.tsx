@@ -146,6 +146,20 @@ export default function ClusterOrdersPage() {
     };
   }, []);
 
+  const handleDecline = async (orderId: string) => {
+    if (!window.confirm("Pass on this order? A procurement officer will be able to claim it instead.")) return;
+    setActionLoading(orderId);
+    try {
+      await clusterService.declineOrder(orderId);
+      setOrders((prev) => prev.filter((o) => o.orderId !== orderId));
+      toast.success("Order declined.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to decline order");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleReceive = async (orderId: string) => {
     setActionLoading(orderId);
     try {
@@ -273,6 +287,15 @@ export default function ClusterOrdersPage() {
                   {FULFILLMENT_STAGE_LABELS[order.fulfillmentStage] ?? order.fulfillmentStage}
                 </p>
                 <div className="flex flex-wrap gap-2">
+                  {["awaiting_farmer_dispatch", "dispatched_to_cluster"].includes(order.fulfillmentStage) && (
+                    <button
+                      onClick={() => handleDecline(order.orderId)}
+                      disabled={actionLoading === order.orderId}
+                      className="flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                    >
+                      Decline
+                    </button>
+                  )}
                   {order.fulfillmentStage === "dispatched_to_cluster" && (
                     <button
                       onClick={() => handleReceive(order.orderId)}

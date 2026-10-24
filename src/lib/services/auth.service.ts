@@ -17,6 +17,7 @@ export interface BackendUser {
   location_lga: string;
   location_ward?: string | null;
   location_sub_community?: string | null;
+  cluster_farmer_id?: string | null;
   location_latitude?: number | null;
   location_longitude?: number | null;
   location_address: string;
