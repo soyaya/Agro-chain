@@ -158,6 +158,10 @@ export const procurementService = {
     });
   },
 
+  updatePond(pondId: string, data: { pondType?: string; pondTankNumber?: string; pondDimensionM3?: number }) {
+    return apiFetch(`/procurement/ponds/${pondId}`, { method: "PATCH", body: JSON.stringify(data) });
+  },
+
   createStockingRecord(
     pondId: string,
     data: {
@@ -171,6 +175,21 @@ export const procurementService = {
     },
   ) {
     return apiFetch(`/procurement/ponds/${pondId}/stocking`, { method: "POST", body: JSON.stringify(data) });
+  },
+
+  updateStockingRecord(
+    stockingId: string,
+    data: {
+      dateOfStocking?: string;
+      species?: string;
+      numberOfFishStocked?: number;
+      stockingDensityPerM2?: number;
+      averageWeightStockedG?: number;
+      totalBiomassKg?: number;
+      sourceOfSeedling?: string;
+    },
+  ) {
+    return apiFetch(`/procurement/stocking/${stockingId}`, { method: "PATCH", body: JSON.stringify(data) });
   },
 
   createSamplingEntry(
@@ -192,8 +211,31 @@ export const procurementService = {
     return apiFetch(`/procurement/stocking/${stockingId}/sampling`, { method: "POST", body: JSON.stringify(data) });
   },
 
+  updateSamplingEntry(
+    samplingId: string,
+    data: {
+      date?: string;
+      avgBodyWeightG?: number;
+      dailyFeedFedKg?: number;
+      cumulativeFeedFedKg?: number;
+      feedBrand?: string;
+      feedSize?: string;
+      mortalityCount?: number;
+      mortalityWeightG?: number;
+      estimatedStockBalance?: number;
+      otherManagementPractices?: string;
+      remarks?: string;
+    },
+  ) {
+    return apiFetch(`/procurement/sampling/${samplingId}`, { method: "PATCH", body: JSON.stringify(data) });
+  },
+
   createHarvestRecord(stockingId: string, data: Record<string, unknown>) {
     return apiFetch(`/procurement/stocking/${stockingId}/harvest`, { method: "POST", body: JSON.stringify(data) });
+  },
+
+  updateHarvestRecord(harvestId: string, data: Record<string, unknown>) {
+    return apiFetch(`/procurement/harvest/${harvestId}`, { method: "PATCH", body: JSON.stringify(data) });
   },
 
   getParameterTypes(q?: string) {
@@ -211,5 +253,9 @@ export const procurementService = {
 
   createParameterReading(pondId: string, data: { parameterTypeId: string; value: string; date: string; notes?: string }) {
     return apiFetch(`/procurement/ponds/${pondId}/parameter-readings`, { method: "POST", body: JSON.stringify(data) });
+  },
+
+  updateParameterReading(readingId: string, data: { value?: string; date?: string; notes?: string }) {
+    return apiFetch(`/procurement/parameter-readings/${readingId}`, { method: "PATCH", body: JSON.stringify(data) });
   },
 };

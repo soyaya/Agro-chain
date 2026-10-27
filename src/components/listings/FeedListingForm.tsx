@@ -46,6 +46,7 @@ export function FeedListingForm({ onSubmit, isLoading = false }: FeedListingForm
   const [categories, setCategories] = useState<FeedCategory[]>([]);
   const [feedCategoryId, setFeedCategoryId] = useState("");
   const [pelletForm, setPelletForm] = useState<"floating" | "sinking" | "">("");
+  const [pelletSizeMm, setPelletSizeMm] = useState("");
   const [brandName, setBrandName] = useState("");
   const [proteinPercent, setProteinPercent] = useState("");
   const [bagWeightKg, setBagWeightKg] = useState("");
@@ -85,9 +86,16 @@ export function FeedListingForm({ onSubmit, isLoading = false }: FeedListingForm
     return Math.round(raw * 100) / 100;
   }, [selectedCategory, clusterPricePerBag]);
 
+  const pelletSizeInRange =
+    !selectedCategory ||
+    !pelletSizeMm ||
+    (Number(pelletSizeMm) >= selectedCategory.minPelletSizeMm && Number(pelletSizeMm) <= selectedCategory.maxPelletSizeMm);
+
   const canSubmit =
     !!feedCategoryId &&
     !!pelletForm &&
+    Number(pelletSizeMm) > 0 &&
+    pelletSizeInRange &&
     !!brandName.trim() &&
     Number(bagWeightKg) > 0 &&
     Number(clusterPricePerBag) > 0 &&
@@ -99,6 +107,7 @@ export function FeedListingForm({ onSubmit, isLoading = false }: FeedListingForm
       await onSubmit({
         feedCategoryId,
         pelletForm,
+        pelletSizeMm: Number(pelletSizeMm),
         brandName: brandName.trim(),
         proteinPercent: proteinPercent ? Number(proteinPercent) : undefined,
         bagWeightKg: Number(bagWeightKg),
@@ -132,6 +141,30 @@ export function FeedListingForm({ onSubmit, isLoading = false }: FeedListingForm
           options={categoryOptions}
           required
         />
+      </motion.div>
+
+      {/* Exact pellet size — buyers shop by this precise figure, not the category's range */}
+      <motion.div variants={FADE_IN_VARIANT} className="flex flex-col gap-1.5">
+        <label className="font-roboto-slab text-sm font-medium text-(--heading-colour)">
+          Pellet Size (mm) <span className="text-red-500">*</span>
+        </label>
+        <DynamicInput
+          label=""
+          type="number"
+          value={pelletSizeMm}
+          onChange={(e) => setPelletSizeMm(e.target.value)}
+          placeholder={selectedCategory ? `e.g. ${selectedCategory.minPelletSizeMm}` : "e.g. 4"}
+          required
+        />
+        {selectedCategory && (
+          <p className="text-xs text-(--text-colour)">
+            Must be between {selectedCategory.minPelletSizeMm}mm and {selectedCategory.maxPelletSizeMm}mm for the
+            "{selectedCategory.label}" category.
+          </p>
+        )}
+        {!pelletSizeInRange && pelletSizeMm && (
+          <p className="text-xs text-red-600">Pellet size is outside the selected category's range.</p>
+        )}
       </motion.div>
 
       {/* Pellet form + brand */}

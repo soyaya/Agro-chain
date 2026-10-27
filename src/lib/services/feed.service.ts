@@ -23,6 +23,9 @@ export interface FeedListing {
   categoryLabel: string;
   minPelletSizeMm: number;
   maxPelletSizeMm: number;
+  // The exact size this bag was milled to — buyers shop by this, not the
+  // category's range. Optional: older listings predate this field.
+  pelletSizeMm: number | null;
   pelletForm: "floating" | "sinking";
   brandName: string;
   proteinPercent: number | null;
@@ -63,6 +66,7 @@ export interface FeedCategoriesResponse {
 export interface FeedFiltersQuery {
   feedCategoryId?: string;
   pelletForm?: "floating" | "sinking";
+  pelletSizeMm?: number;
   brand?: string;
   state?: string;
   lga?: string;
@@ -75,6 +79,7 @@ export interface FeedFiltersQuery {
 export interface CreateFeedListingPayload {
   feedCategoryId: string;
   pelletForm: "floating" | "sinking";
+  pelletSizeMm?: number;
   brandName: string;
   proteinPercent?: number;
   bagWeightKg: number;
@@ -96,6 +101,7 @@ export const feedService = {
     const params = new URLSearchParams();
     if (filters?.feedCategoryId) params.set("feedCategoryId", filters.feedCategoryId);
     if (filters?.pelletForm) params.set("pelletForm", filters.pelletForm);
+    if (filters?.pelletSizeMm != null) params.set("pelletSizeMm", String(filters.pelletSizeMm));
     if (filters?.brand) params.set("brand", filters.brand);
     if (filters?.state) params.set("state", filters.state);
     if (filters?.lga) params.set("lga", filters.lga);

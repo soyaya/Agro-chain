@@ -134,7 +134,19 @@ export default function FeedListingDetailPage() {
                     <div className="flex flex-col">
                       <span className="text-sm text-(--text-colour)">Category</span>
                       <span className="font-roboto-slab font-medium text-(--heading-colour)">
-                        {listing.categoryLabel} ({listing.minPelletSizeMm}–{listing.maxPelletSizeMm}mm)
+                        {listing.categoryLabel}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-(--gap-base)">
+                    <Package size={20} className="text-(--text-colour)" />
+                    <div className="flex flex-col">
+                      <span className="text-sm text-(--text-colour)">Pellet size</span>
+                      <span className="font-roboto-slab font-medium text-(--heading-colour)">
+                        {listing.pelletSizeMm != null
+                          ? `${listing.pelletSizeMm}mm`
+                          : `${listing.minPelletSizeMm}–${listing.maxPelletSizeMm}mm (range)`}
                       </span>
                     </div>
                   </div>

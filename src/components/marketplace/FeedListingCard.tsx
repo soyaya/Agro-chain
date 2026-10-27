@@ -45,7 +45,8 @@ export function FeedListingCard({ listing, onClick }: FeedListingCardProps) {
               {listing.brandName}
             </h3>
             <p className="text-sm text-(--text-colour)">
-              {listing.categoryLabel} · {listing.pelletForm} · {listing.bagWeightKg}kg bag
+              {listing.categoryLabel} ({listing.pelletSizeMm != null ? `${listing.pelletSizeMm}mm` : `${listing.minPelletSizeMm}–${listing.maxPelletSizeMm}mm`}) ·{" "}
+              {listing.pelletForm} · {listing.bagWeightKg}kg bag
             </p>
           </div>
           <span className="font-ubuntu text-base font-bold text-(--theme-green-dark) whitespace-nowrap">

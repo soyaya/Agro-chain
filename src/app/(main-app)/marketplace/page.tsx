@@ -61,6 +61,7 @@ function MarketplacePageInner() {
   const [feedLoading, setFeedLoading] = useState(true);
   const [feedError, setFeedError] = useState<string | null>(null);
   const [feedSearch, setFeedSearch] = useState("");
+  const [feedPelletSize, setFeedPelletSize] = useState<string>("");
 
   useEffect(() => {
     if (activeTab !== "feed") return;
@@ -88,7 +89,14 @@ function MarketplacePageInner() {
     setCartOpen(true);
   };
 
+  // Distinct exact pellet sizes actually present in the currently loaded
+  // listings — buyers shop by this precise figure, not the category range.
+  const availablePelletSizes = Array.from(
+    new Set(feedListings.map((l) => l.pelletSizeMm).filter((v): v is number => v != null)),
+  ).sort((a, b) => a - b);
+
   const filteredFeedListings = feedListings.filter((listing) => {
+    if (feedPelletSize && String(listing.pelletSizeMm ?? "") !== feedPelletSize) return false;
     if (!feedSearch) return true;
     const q = feedSearch.toLowerCase();
     return (
@@ -389,15 +397,27 @@ function MarketplacePageInner() {
                 ))}
               </motion.div>
 
-              {/* Feed search */}
-              <motion.div variants={FADE_IN_VARIANT}>
+              {/* Feed search + pellet size filter */}
+              <motion.div variants={FADE_IN_VARIANT} className="flex flex-col gap-(--gap-base) sm:flex-row">
                 <input
                   type="text"
                   value={feedSearch}
                   onChange={(e) => setFeedSearch(e.target.value)}
                   placeholder="Search by brand, category, or state..."
-                  className="w-full rounded-2xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-md) text-(--text-colour) outline-none focus:border-(--theme-green-dark)"
+                  className="flex-1 rounded-2xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-md) text-(--text-colour) outline-none focus:border-(--theme-green-dark)"
                 />
+                <select
+                  value={feedPelletSize}
+                  onChange={(e) => setFeedPelletSize(e.target.value)}
+                  className="rounded-2xl border border-(--border-gray) bg-(--white) px-(--space-lg) py-(--space-md) text-(--text-colour) outline-none focus:border-(--theme-green-dark) sm:w-56"
+                >
+                  <option value="">All pellet sizes</option>
+                  {availablePelletSizes.map((size) => (
+                    <option key={size} value={String(size)}>
+                      {size}mm
+                    </option>
+                  ))}
+                </select>
               </motion.div>
 
               {feedLoading ? (
