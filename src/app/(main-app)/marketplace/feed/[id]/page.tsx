@@ -9,6 +9,7 @@ import { ArrowLeft, MapPin, Phone, Package, Building, ShoppingCart, Plus, Minus,
 import { FADE_IN_VARIANT, SLIDE_UP_VARIANT } from "~/types/constants";
 import { feedService, type FeedListing } from "~/lib/services/feed.service";
 import { useCart } from "~/components/marketplace/useCart";
+import { ShareButton } from "~/components/marketplace/ShareButton";
 
 export default function FeedListingDetailPage() {
   const router = useRouter();
@@ -119,7 +120,14 @@ export default function FeedListingDetailPage() {
                 </div>
 
                 <div className="flex flex-col gap-(--gap-base)">
-                  <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">{listing.brandName}</h1>
+                  <div className="flex items-center justify-between gap-(--gap-base)">
+                    <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">{listing.brandName}</h1>
+                    <ShareButton
+                      title={`${listing.brandName} feed on AgroChain`}
+                      path={`/marketplace/feed/${listing.id}`}
+                      compact={false}
+                    />
+                  </div>
                   <div className="flex items-center gap-(--gap-base)">
                     <Building size={20} className="text-(--text-colour)" />
                     <span className="font-roboto-slab text-lg text-(--text-colour)">

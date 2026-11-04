@@ -6,6 +6,7 @@ import { MapPin, Fish } from "lucide-react";
 import type { MarketplaceListing } from "~/types";
 import { SCALE_IN_VARIANT, FISH_TYPE_CATEGORIES } from "~/types/constants";
 import { cn } from "~/lib/utils";
+import { ShareButton } from "./ShareButton";
 
 interface MarketplaceCardProps {
   listing: MarketplaceListing;
@@ -31,6 +32,9 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
     >
       {/* Image */}
       <div className="relative h-44 w-full bg-(--gray-bg)">
+        <div className="absolute top-2 right-2 z-10">
+          <ShareButton title={`${listing.fishType} on AgroChain`} path={`/marketplace/${listing.id}`} />
+        </div>
         {displayImage ? (
           <Image
             src={displayImage}

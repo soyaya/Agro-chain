@@ -31,6 +31,7 @@ const feedListing: FeedListing = {
   categoryLabel: "Juvenile (6g-30g)",
   minPelletSizeMm: 2,
   maxPelletSizeMm: 3,
+  pelletSizeMm: 2.5,
   pelletForm: "floating",
   brandName: "Blue Crown",
   proteinPercent: 42,

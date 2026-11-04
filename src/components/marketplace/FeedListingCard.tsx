@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { MapPin, Wheat } from "lucide-react";
 import type { FeedListing } from "~/lib/services/feed.service";
 import { SCALE_IN_VARIANT } from "~/types/constants";
+import { ShareButton } from "./ShareButton";
 
 interface FeedListingCardProps {
   listing: FeedListing;
@@ -21,6 +22,9 @@ export function FeedListingCard({ listing, onClick }: FeedListingCardProps) {
     >
       {/* Image */}
       <div className="relative h-44 w-full bg-(--gray-bg)">
+        <div className="absolute top-2 right-2 z-10">
+          <ShareButton title={`${listing.brandName} feed on AgroChain`} path={`/marketplace/feed/${listing.id}`} />
+        </div>
         {listing.imageUrl ? (
           <Image
             src={listing.imageUrl}

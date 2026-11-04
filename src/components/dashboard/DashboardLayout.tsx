@@ -9,6 +9,7 @@ import { cn } from "~/lib/utils";
 import type { DashboardConfig, EnhancedDashboardConfig } from "~/types/index";
 import { FADE_IN_VARIANT } from "~/types/constants";
 import { useAuth } from "~/lib/auth-context";
+import { NotificationBell } from "./NotificationBell";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -247,6 +248,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
 
                 {/* Header Actions - User Profile */}
                 <div className="flex items-center gap-3">
+                  <NotificationBell />
                   <div className="flex cursor-pointer items-center gap-3 rounded-full px-3 py-2 transition-colors hover:bg-gray-100">
                     {/* User Avatar */}
                     <div className="relative">

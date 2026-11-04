@@ -26,6 +26,7 @@ import {
 } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
+import { ShareButton } from "~/components/marketplace/ShareButton";
 
 type MarketplaceDetailResponse =
   | MarketplaceListing
@@ -192,9 +193,16 @@ export default function ListingDetailPage() {
 
                 {/* Header */}
                 <div className="flex flex-col gap-(--gap-base)">
-                  <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">
-                    {listing.fishType}
-                  </h1>
+                  <div className="flex items-center justify-between gap-(--gap-base)">
+                    <h1 className="font-ubuntu text-3xl font-bold text-(--heading-colour)">
+                      {listing.fishType}
+                    </h1>
+                    <ShareButton
+                      title={`${listing.fishType} on AgroChain`}
+                      path={`/marketplace/${listing.id}`}
+                      compact={false}
+                    />
+                  </div>
                   <div className="flex items-center gap-(--gap-base)">
                     <Building size={20} className="text-(--text-colour)" />
                     <span className="font-roboto-slab text-lg text-(--text-colour)">
