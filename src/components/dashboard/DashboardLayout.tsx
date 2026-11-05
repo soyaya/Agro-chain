@@ -95,7 +95,13 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className={cn(
               "fixed top-0 left-0 z-50 flex h-full min-h-screen w-full max-w-70 flex-col border-r border-gray-200/50 bg-(--white)/95 shadow-xl backdrop-blur-sm lg:sticky lg:shadow-none",
-              "lg:translate-x-70",
+              // framer-motion's `animate` prop sets transform via inline
+              // style, which always wins over a plain Tailwind class — so
+              // "lg:translate-x-70" here was always a no-op and the sidebar
+              // rendered in its mobile closed/overlay position even at
+              // desktop widths. `!` forces an !important declaration, which
+              // is the only thing that actually beats an inline style.
+              "lg:!translate-x-0",
             )}
           >
             {/* Sidebar Header */}
