@@ -10,6 +10,7 @@ import type { DashboardConfig, EnhancedDashboardConfig } from "~/types/index";
 import { FADE_IN_VARIANT } from "~/types/constants";
 import { useAuth } from "~/lib/auth-context";
 import { NotificationBell } from "./NotificationBell";
+import { FirstTimeGuide } from "./FirstTimeGuide";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -40,6 +41,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-linear-to-br from-gray-50 via-white to-gray-100">
+      <FirstTimeGuide role={user?.role} isClusterFarmer={user?.isClusterFarmer} />
       {/* Animated Background Elements */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <motion.div
