@@ -23,7 +23,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
+    const mq = window.matchMedia("(min-width: 768px)");
     setIsDesktop(mq.matches);
     const listener = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
     mq.addEventListener("change", listener);
@@ -89,23 +89,23 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 cursor-pointer z-40 bg-(--black)/50 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 cursor-pointer z-40 bg-(--black)/50 backdrop-blur-sm md:hidden"
             aria-hidden="true"
           />
         )}
       </AnimatePresence>
 
       <div className="relative h-full w-full">
-        <div className="relative mx-auto grid min-h-screen w-full max-w-7xl lg:grid-cols-[280px_1fr]">
+        <div className="relative mx-auto grid min-h-screen w-full max-w-7xl md:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr]">
           {/* Sidebar */}
           <motion.aside
             initial={false}
             animate={{
               x: isDesktop || isSidebarOpen ? 0 : "-100%",
             }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            transition={{ type: "spring", damping: 30, stiffness: 320 }}
             className={cn(
-              "fixed top-0 left-0 z-50 flex h-full min-h-screen w-full max-w-70 flex-col border-r border-gray-200/50 bg-(--white)/95 shadow-xl backdrop-blur-sm lg:sticky lg:shadow-none",
+              "fixed top-0 left-0 z-50 flex h-full min-h-screen w-full max-w-70 flex-col border-r border-gray-200/50 bg-(--white)/95 shadow-xl backdrop-blur-sm md:sticky md:max-w-60 md:shadow-none lg:max-w-70",
             )}
           >
             {/* Sidebar Header */}
@@ -119,7 +119,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
               </Link>
               <button
                 onClick={() => setIsSidebarOpen(false)}
-                className="rounded-lg p-2 transition-colors hover:bg-gray-100 lg:hidden"
+                className="rounded-lg p-2 transition-colors hover:bg-gray-100 md:hidden"
                 aria-label="Close sidebar"
               >
                 <X size={20} className="text-gray-600" />
@@ -241,13 +241,13 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setIsSidebarOpen(true)}
-                    className="rounded-lg p-2 cursor-pointer transition-colors hover:bg-gray-100 lg:hidden"
+                    className="rounded-lg p-2 cursor-pointer transition-colors hover:bg-gray-100 md:hidden"
                     aria-label="Open sidebar"
                   >
                     <Menu size={24} className="text-gray-700" />
                   </button>
                   <div>
-                    <h1 className="font-ubuntu text-xl font-bold text-gray-900 lg:text-2xl">
+                    <h1 className="font-ubuntu text-xl font-bold text-gray-900 md:text-2xl">
                       {config.title}
                     </h1>
                     <p className="font-roboto-slab hidden text-sm text-gray-600 sm:block">
@@ -269,7 +269,7 @@ export function DashboardLayout({ children, config }: DashboardLayoutProps) {
                     </div>
 
                     {/* User Name - Hidden on mobile */}
-                    <div className="hidden lg:block">
+                    <div className="hidden sm:block">
                       <p className="font-roboto-slab text-sm font-medium text-gray-900">
                         {displayName || " "}
                       </p>
