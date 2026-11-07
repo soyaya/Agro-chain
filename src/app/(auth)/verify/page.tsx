@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
 import { SubmitSecondaryButton } from "~/components/SubmitSecondaryButton";
@@ -14,6 +14,8 @@ type Step = "bvn" | "otp";
 
 export default function VerifyIdentity() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const { user } = useAuth();
   const [step, setStep] = useState<Step>("bvn");
   const [bvn, setBvn] = useState<string>("");
@@ -84,7 +86,7 @@ export default function VerifyIdentity() {
 
       setSuccess(true);
       toast.success("Verification complete — your wallet is ready!");
-      setTimeout(() => router.push(getDashboardPath(user)), 2400);
+      setTimeout(() => router.push(redirectTo || getDashboardPath(user)), 2400);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "OTP verification failed. Please try again.";
