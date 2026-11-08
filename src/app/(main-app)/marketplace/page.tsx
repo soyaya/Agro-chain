@@ -95,10 +95,16 @@ function MarketplacePageInner() {
     new Set(feedListings.map((l) => l.pelletSizeMm).filter((v): v is number => v != null)),
   ).sort((a, b) => a - b);
 
+  const [debouncedFeedSearch, setDebouncedFeedSearch] = useState(feedSearch);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedFeedSearch(feedSearch), 200);
+    return () => clearTimeout(timer);
+  }, [feedSearch]);
+
   const filteredFeedListings = feedListings.filter((listing) => {
     if (feedPelletSize && String(listing.pelletSizeMm ?? "") !== feedPelletSize) return false;
-    if (!feedSearch) return true;
-    const q = feedSearch.toLowerCase();
+    if (!debouncedFeedSearch) return true;
+    const q = debouncedFeedSearch.toLowerCase();
     return (
       (listing.brandName ?? "").toLowerCase().includes(q) ||
       (listing.categoryLabel ?? "").toLowerCase().includes(q) ||
@@ -148,6 +154,8 @@ function MarketplacePageInner() {
     };
   }, []);
 
+  const [listingsReloadKey, setListingsReloadKey] = useState(0);
+
   useEffect(() => {
     let mounted = true;
 
@@ -187,7 +195,7 @@ function MarketplacePageInner() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [listingsReloadKey]);
 
   const handleToggleLike = async (listing: MarketplaceListing) => {
     const isLiked = likedListings.includes(listing.id);
@@ -250,10 +258,18 @@ function MarketplacePageInner() {
     filters.minQuantity,
   ].filter(Boolean).length;
 
+  // Debounced so filtering the whole listings array doesn't re-run on every
+  // keystroke — the input itself stays instant via `filters.search`.
+  const [debouncedSearch, setDebouncedSearch] = useState(filters.search ?? "");
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(filters.search ?? ""), 200);
+    return () => clearTimeout(timer);
+  }, [filters.search]);
+
   // Apply filters
   const filteredListings = listings.filter((listing) => {
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
+    if (debouncedSearch) {
+      const searchLower = debouncedSearch.toLowerCase();
       const matchesSearch =
         (listing.fishType ?? "").toLowerCase().includes(searchLower) ||
         (listing.businessName ?? "").toLowerCase().includes(searchLower) ||
@@ -559,7 +575,7 @@ function MarketplacePageInner() {
                   <ShoppingBag size={48} className="text-(--text-colour)" />
                   <p className="text-(--error-red)">{errorMessage}</p>
                   <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => setListingsReloadKey((k) => k + 1)}
                     className="rounded-full border border-(--border-gray) px-(--space-xl) py-(--space-md) text-(--heading-colour) transition hover:bg-(--gray-bg)"
                   >
                     Retry

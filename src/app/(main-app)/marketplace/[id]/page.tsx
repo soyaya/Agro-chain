@@ -98,8 +98,17 @@ export default function ListingDetailPage() {
     cart.addToCart(listing, pkg, { variant: listing.fishType as any, processed: false });
   };
 
-  const totalAmount = cart.subtotal;
-  const totalWeight = cart.items.reduce((sum, item) => sum + item.weightKg * item.quantity, 0);
+  // Scoped to this listing only — the sidebar should reflect what the buyer
+  // is looking at, not their whole cart (which may include other listings).
+  const listingCartItems = listing
+    ? cart.items.filter((item) => item.listingId === listing.id)
+    : [];
+  const totalAmount = listingCartItems.reduce(
+    (sum, item) => sum + item.pricePerUnit * item.quantity,
+    0,
+  );
+  const totalWeight = listingCartItems.reduce((sum, item) => sum + item.weightKg * item.quantity, 0);
+  const otherCartItemsCount = cart.items.length - listingCartItems.length;
   const unit = listing?.unit === "piece" ? "piece" : "kg";
 
   const handleCheckout = () => {
@@ -263,7 +272,7 @@ export default function ListingDetailPage() {
                   <div className="grid grid-cols-1 gap-(--gap-base) md:grid-cols-2">
                     {(listing.packaging ?? []).map((pkg, index) => {
                       const cartItemIndex = cart.items.findIndex(
-                        (item) => item.weightKg === pkg.weightKg,
+                        (item) => item.listingId === listing.id && item.weightKg === pkg.weightKg,
                       );
                       const cartItem = cartItemIndex >= 0 ? cart.items[cartItemIndex] : null;
 
@@ -361,10 +370,10 @@ export default function ListingDetailPage() {
                   Order Summary
                 </h3>
 
-                {cart.items.length > 0 ? (
+                {listingCartItems.length > 0 ? (
                   <>
                     <div className="flex flex-col gap-(--space-md)">
-                      {cart.items.map((item, index) => (
+                      {listingCartItems.map((item, index) => (
                         <div key={index} className="flex justify-between text-sm">
                           <span className="text-(--text-colour)">
                             {item.weightKg}{unit === "piece" ? " piece" : "kg"} × {item.quantity} ({item.variant})
@@ -398,6 +407,13 @@ export default function ListingDetailPage() {
                       </div>
                     </div>
 
+                    {otherCartItemsCount > 0 && (
+                      <p className="text-xs text-(--text-colour)">
+                        Your cart also has {otherCartItemsCount} item{otherCartItemsCount === 1 ? "" : "s"}{" "}
+                        from other listings — checkout covers everything in your cart.
+                      </p>
+                    )}
+
                     <button
                       onClick={handleCheckout}
                       className="flex h-12 items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) text-white transition hover:opacity-90"
@@ -410,7 +426,9 @@ export default function ListingDetailPage() {
                   <div className="flex flex-col items-center gap-(--gap-base) py-(--space-xl) text-center">
                     <ShoppingCart size={48} className="text-(--text-colour)" />
                     <p className="text-sm text-(--text-colour)">
-                      Your cart is empty. Add packages to get started.
+                      {otherCartItemsCount > 0
+                        ? "No packages from this listing in your cart yet."
+                        : "Your cart is empty. Add packages to get started."}
                     </p>
                   </div>
                 )}

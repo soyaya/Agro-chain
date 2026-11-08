@@ -52,6 +52,7 @@ export default function CheckoutPage() {
   // here always matches what the backend actually charges at checkout (it
   // recomputes this server-side and ignores any client-supplied value).
   const [realDeliveryFee, setRealDeliveryFee] = useState<number | null>(null);
+  const [deliveryFeeError, setDeliveryFeeError] = useState(false);
 
   const totalWeightKg = useMemo(
     () => cart.items.reduce((sum, item) => sum + item.weightKg, 0),
@@ -61,9 +62,11 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (deliveryType !== "delivery") {
       setRealDeliveryFee(null);
+      setDeliveryFeeError(false);
       return;
     }
     let mounted = true;
+    setDeliveryFeeError(false);
     const firstListingId = cart.items[0]?.listingId;
     const params = new URLSearchParams({ totalWeightKg: String(totalWeightKg) });
     if (firstListingId) params.set("listingId", firstListingId);
@@ -72,8 +75,10 @@ export default function CheckoutPage() {
         if (mounted) setRealDeliveryFee(res.data.deliveryFee);
       })
       .catch(() => {
-        // Non-fatal — the actual charge is still computed correctly server-side;
-        // this only affects the pre-payment preview.
+        // The real charge is still computed correctly server-side at
+        // checkout — but showing a silent ₦0 here would be misleading, so
+        // surface that the preview couldn't be confirmed instead.
+        if (mounted) setDeliveryFeeError(true);
       });
     return () => {
       mounted = false;
@@ -81,6 +86,7 @@ export default function CheckoutPage() {
   }, [deliveryType, totalWeightKg, cart.items]);
 
   const deliveryFee = deliveryType === "delivery" ? (realDeliveryFee ?? 0) : 0;
+  const deliveryFeeUnconfirmed = deliveryType === "delivery" && (deliveryFeeError || realDeliveryFee === null);
   const totalAmount = cart.subtotal + deliveryFee;
 
   useEffect(() => {
@@ -489,9 +495,15 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between">
                   <span>Delivery Fee</span>
                   <span className="font-semibold text-(--heading-colour)">
-                    ₦{deliveryFee.toLocaleString()}
+                    {deliveryFeeUnconfirmed ? "Calculating..." : `₦${deliveryFee.toLocaleString()}`}
                   </span>
                 </div>
+                {deliveryFeeError && (
+                  <p className="text-xs text-amber-600">
+                    Couldn&apos;t confirm the exact delivery fee — it will be calculated correctly
+                    when you place the order, and may differ from ₦{deliveryFee.toLocaleString()}.
+                  </p>
+                )}
                 <div className="flex items-center justify-between border-t border-(--border-gray) pt-3">
                   <span className="font-ubuntu text-base font-bold text-(--heading-colour)">
                     Total

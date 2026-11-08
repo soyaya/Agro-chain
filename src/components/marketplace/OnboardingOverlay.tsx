@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
+import { X } from "lucide-react";
 import {
   ExploreIllustration,
   OrderIllustration,
@@ -61,6 +62,11 @@ export function OnboardingOverlay() {
     headingRef.current?.focus();
   }, [currentStep, visible]);
 
+  const handleSkip = useCallback(() => {
+    localStorage.setItem(ONBOARDING_KEY, "true");
+    setVisible(false);
+  }, []);
+
   useEffect(() => {
     if (!visible) return;
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -68,11 +74,15 @@ export function OnboardingOverlay() {
         e.preventDefault();
         buttonRef.current?.click();
       }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        handleSkip();
+      }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [loading, visible]);
+  }, [loading, visible, handleSkip]);
 
   const goToStep = useCallback((index: number) => {
     if (loading || index === currentStep) return;
@@ -98,26 +108,6 @@ export function OnboardingOverlay() {
     goToStep(currentStep + 1);
   }, [currentStep, goToStep, isLastStep, loading]);
 
-  useEffect(() => {
-    if (!visible || loading || isLastStep) return;
-
-    const timer = setTimeout(() => {
-      goToStep(currentStep + 1);
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [currentStep, goToStep, loading, isLastStep, visible]);
-
-  useEffect(() => {
-    if (!visible || loading || !isLastStep) return;
-
-    const timer = setTimeout(() => {
-      handleNext();
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [handleNext, isLastStep, loading, visible]);
-
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 80 : -80,
@@ -141,6 +131,14 @@ export function OnboardingOverlay() {
       role="application"
       aria-label="Agro-chain onboarding"
     >
+      <button
+        type="button"
+        onClick={handleSkip}
+        aria-label="Skip onboarding"
+        className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-zinc-700 shadow-sm transition hover:bg-white focus:ring-2 focus:ring-black focus:outline-none sm:top-6 sm:right-6"
+      >
+        <X size={18} />
+      </button>
       <main
         className="relative flex min-h-screen w-full flex-col items-center justify-center text-center"
         aria-live="polite"

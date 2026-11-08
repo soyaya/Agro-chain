@@ -78,6 +78,62 @@ export default function OrderDetailsPage() {
     }
   };
 
+  const handlePrintInvoice = () => {
+    if (!order) return;
+    const rowsHtml = order.items
+      .map(
+        (item) => `
+          <tr>
+            <td>${item.fishType ?? order.listingFishType ?? "Item"}${item.variant ? ` • ${item.variant}` : ""}</td>
+            <td>${item.weightKg}${item.unit === "piece" ? " piece" : "kg"} × ${item.quantity}</td>
+            <td>₦${item.pricePerUnit.toLocaleString()}</td>
+            <td>₦${item.totalPrice.toLocaleString()}</td>
+          </tr>`,
+      )
+      .join("");
+
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Invoice ${order.orderNumber}</title>
+          <style>
+            body { font-family: Arial, sans-serif; color: #111; padding: 32px; }
+            h1 { font-size: 20px; margin-bottom: 4px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+            th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+            .totals { margin-top: 16px; width: 100%; max-width: 280px; margin-left: auto; }
+            .totals div { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+            .grand { font-weight: bold; font-size: 15px; border-top: 1px solid #111; padding-top: 8px; margin-top: 4px; }
+          </style>
+        </head>
+        <body>
+          <h1>AgroChain Invoice</h1>
+          <p>Order ${order.orderNumber} — ${formatStatus(order.status)}</p>
+          <table>
+            <thead><tr><th>Item</th><th>Qty</th><th>Unit price</th><th>Total</th></tr></thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+          <div class="totals">
+            <div><span>Subtotal</span><span>₦${order.totalAmount.toLocaleString()}</span></div>
+            <div><span>Delivery Fee</span><span>${order.deliveryFee ? `₦${order.deliveryFee.toLocaleString()}` : "None (pickup)"}</span></div>
+            <div class="grand"><span>Total</span><span>₦${order.grandTotal.toLocaleString()}</span></div>
+          </div>
+        </body>
+      </html>`;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      toast.error("Allow pop-ups to print your invoice.");
+      return;
+    }
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
   const handleConfirmDelivery = async () => {
     if (!order || !orderId) return;
     setConfirming(true);
@@ -137,7 +193,10 @@ export default function OrderDetailsPage() {
           <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 capitalize">
             {formatStatus(order.status)}
           </span>
-          <button className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <button
+            onClick={handlePrintInvoice}
+            className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
             <FileText size={16} />
             Invoice
           </button>
