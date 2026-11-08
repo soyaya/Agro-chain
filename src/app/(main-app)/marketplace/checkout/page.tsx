@@ -10,6 +10,7 @@ import { isSeedlingFishType } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { buyerService } from "~/lib/services/buyer.service";
 import { walletService } from "~/lib/services/wallet.service";
+import { BvnVerifyModal } from "~/components/marketplace/BvnVerifyModal";
 
 type WalletGateState = "checking" | "needs-verification" | "ready";
 
@@ -89,12 +90,12 @@ export default function CheckoutPage() {
   const deliveryFeeUnconfirmed = deliveryType === "delivery" && (deliveryFeeError || realDeliveryFee === null);
   const totalAmount = cart.subtotal + deliveryFee;
 
-  useEffect(() => {
-    let mounted = true;
+  const checkWallet = useCallback(() => {
+    let cancelled = false;
     walletService
       .getWallet()
       .then((res) => {
-        if (!mounted) return;
+        if (cancelled) return;
         setWalletGate("ready");
         setTransferTarget({
           accountNumber: res.data.accountNumber ?? "",
@@ -103,12 +104,27 @@ export default function CheckoutPage() {
         });
       })
       .catch(() => {
-        if (mounted) setWalletGate("needs-verification");
+        if (!cancelled) setWalletGate("needs-verification");
       });
     return () => {
-      mounted = false;
+      cancelled = true;
     };
   }, []);
+
+  useEffect(() => checkWallet(), [checkWallet]);
+
+  const handleBvnVerified = () => {
+    setShowBvnModal(false);
+    setWalletGate("checking");
+    checkWallet();
+  };
+
+  const [showBvnModal, setShowBvnModal] = useState(false);
+  // Open the moment the gate resolves to "needs-verification" — no extra
+  // click needed to find out what to do next.
+  useEffect(() => {
+    if (walletGate === "needs-verification") setShowBvnModal(true);
+  }, [walletGate]);
 
   const completePayment = useCallback(
     async (orderId: string) => {
@@ -367,12 +383,19 @@ export default function CheckoutPage() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => router.push("/verify?redirect=/marketplace/checkout")}
+                    onClick={() => setShowBvnModal(true)}
                     className="mt-3 h-10 rounded-full bg-(--theme-green-dark) px-4 text-xs font-semibold text-white"
                   >
                     Verify now
                   </button>
                 </div>
+              )}
+
+              {showBvnModal && (
+                <BvnVerifyModal
+                  onVerified={handleBvnVerified}
+                  onClose={() => setShowBvnModal(false)}
+                />
               )}
 
               <div className="mt-6 flex flex-col gap-4">

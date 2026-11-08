@@ -8,6 +8,11 @@ vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 const apiFetchMock = vi.fn();
 vi.mock("~/lib/api", () => ({ apiFetch: (...args: unknown[]) => apiFetchMock(...args) }));
 
+// Controllable per-test — lets tests simulate a logged-out → logged-in
+// transition without a real AuthProvider in the tree.
+let mockAuthUser: { id: string } | null = null;
+vi.mock("~/lib/auth-context", () => ({ useAuth: () => ({ user: mockAuthUser }) }));
+
 const { CartProvider, useCart } = await import("~/components/marketplace/useCart");
 
 const CART_STORAGE_KEY = "agro_chain_cart";
@@ -55,6 +60,7 @@ describe("useCart", () => {
   beforeEach(() => {
     localStorage.clear();
     apiFetchMock.mockReset();
+    mockAuthUser = null;
   });
 
   it("throws when used outside a CartProvider", () => {
@@ -151,6 +157,40 @@ describe("useCart", () => {
     );
     expect(result.current.items).toHaveLength(1);
     expect(result.current.items[0].cartItemId).toBe("server-flushed-1");
+  });
+
+  it("re-flushes a guest cart once the user logs in mid-session, with no remount", async () => {
+    // Reproduces the real bug: a buyer adds items anonymously, then
+    // registers/logs in via a client-side route transition (CartProvider
+    // never remounts). The old code only ever synced once, at mount, so
+    // every cartItemId stayed a fake local string and checkout rejected the
+    // order with "No valid cart items selected." This simulates that exact
+    // sequence — items added while mockAuthUser is still null, THEN
+    // mockAuthUser flips non-null without ever re-rendering CartProvider.
+    apiFetchMock.mockRejectedValue(new Error("401")); // anonymous throughout addToCart
+
+    const { result, rerender } = renderHook(() => useCart(), { wrapper });
+    await waitFor(() => expect(result.current.synced).toBe(true));
+
+    act(() => {
+      result.current.addToCart(listing, pkg, { variant: "Table Size" as any, processed: false });
+    });
+    expect(result.current.items).toHaveLength(1);
+    const fakeId = result.current.items[0].cartItemId;
+    expect(fakeId).toMatch(/^cart-/);
+
+    // Now the user logs in — same CartProvider instance, just a changed
+    // useAuth() return value (what happens on login/registration).
+    apiFetchMock.mockReset();
+    apiFetchMock
+      .mockResolvedValueOnce({ data: { cartId: "server-cart", items: [], cartTotal: 0 } }) // GET now succeeds, empty server cart
+      .mockResolvedValueOnce({ data: { cartItemId: "server-relogin-1" } }); // flush POST
+    mockAuthUser = { id: "user_1" };
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.items[0].cartItemId).toBe("server-relogin-1");
+    });
   });
 
   it("does not flush when the backend cart already has items — server cart takes precedence", async () => {

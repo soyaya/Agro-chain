@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
 import type { MarketplaceListing, PackagingOption } from "~/types";
@@ -8,6 +8,7 @@ import type { FeedListing } from "~/lib/services/feed.service";
 import { BASE_PRICE_PER_KG_NAIRA } from "~/types/constants";
 import type { FishVariant } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
+import { useAuth } from "~/lib/auth-context";
 
 export interface CartItem {
   cartItemId?: string;
@@ -51,13 +52,31 @@ const computePricePerUnit = (pkg: PackagingOption) =>
 function useCartState() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [synced, setSynced] = useState(false);
+  // Every addToCart/addFeedToCart POST 401s silently while anonymous, so a
+  // guest's cart items keep their fake local ids until the backend cart is
+  // actually synced/flushed. That sync used to run once on mount only — if
+  // the buyer registers/logs in via a client-side route transition (no full
+  // page reload), CartProvider never remounts and the flush never re-runs,
+  // leaving every cartItemId fake forever. Re-run whenever login state
+  // actually changes instead.
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
 
-  // Hydrate from localStorage first, then sync with backend cart if logged in
+  // Mirrors `items` so syncWithBackend can read the *current* cart
+  // synchronously — a functional setItems callback does NOT run
+  // synchronously (React defers it to the next render), so that can't be
+  // used to read "right now" state inside an async function.
+  const itemsRef = useRef<CartItem[]>([]);
   useEffect(() => {
-    const localItems = getInitialCart();
-    setItems(localItems);
+    itemsRef.current = items;
+  }, [items]);
 
-    const syncWithBackend = async () => {
+  // Re-synced from both the mount effect below and the login-transition
+  // effect further down — takes the local items to flush explicitly rather
+  // than guessing where to read them from, since "current" means something
+  // different at mount (localStorage, read before the first render commits)
+  // than mid-session (itemsRef, already committed).
+  const syncWithBackend = useCallback(async (localItems: CartItem[]) => {
       try {
         const response = await apiFetch<{
           status: string;
@@ -144,10 +163,28 @@ function useCartState() {
       } finally {
         setSynced(true);
       }
-    };
-
-    void syncWithBackend();
   }, []);
+
+  // Hydrate from localStorage, then sync with the backend cart once on mount
+  // (covers a page load where the session cookie already exists).
+  useEffect(() => {
+    const localItems = getInitialCart();
+    setItems(localItems);
+    void syncWithBackend(localItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-sync the instant a buyer logs in/registers mid-session (no full page
+  // reload) — otherwise any items added anonymously keep their fake local
+  // cartItemId forever and checkout rejects them as "No valid cart items
+  // selected." (they never match a real backend CartItem id).
+  const prevUserId = useRef(userId);
+  useEffect(() => {
+    if (prevUserId.current === null && userId !== null) {
+      void syncWithBackend(itemsRef.current);
+    }
+    prevUserId.current = userId;
+  }, [userId, syncWithBackend]);
 
   // Only persist to localStorage after the initial backend sync is done
   useEffect(() => {
