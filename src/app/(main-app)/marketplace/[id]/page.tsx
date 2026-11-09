@@ -23,6 +23,7 @@ import {
   SLIDE_UP_VARIANT,
   BASE_PRICE_PER_KG_NAIRA,
   FISH_TYPE_CATEGORIES,
+  toFishVariant,
 } from "~/types/constants";
 import { apiFetch } from "~/lib/api";
 import { useCart } from "~/components/marketplace/useCart";
@@ -95,7 +96,7 @@ export default function ListingDetailPage() {
 
   const addToCart = (pkg: PackagingOption) => {
     if (!listing) return;
-    cart.addToCart(listing, pkg, { variant: listing.fishType as any, processed: false });
+    cart.addToCart(listing, pkg, { variant: toFishVariant(listing.fishType) as any, processed: false });
   };
 
   // Scoped to this listing only — the sidebar should reflect what the buyer

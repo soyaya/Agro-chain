@@ -70,6 +70,13 @@ export type FishVariant = typeof FISH_VARIANTS[number];
 const SEEDLING_FISH_TYPES = ["juveniles", "post", "jumbo"];
 export const isSeedlingFishType = (fishType: string) => SEEDLING_FISH_TYPES.includes(fishType);
 
+// The backend's FishVariant enum (dried/jumbo/table_size/broodstock/seedlings)
+// doesn't mirror FishType 1:1 — "juveniles" and "post" are FishType values
+// with no matching FishVariant member, so a listing of either must be sent
+// to the cart as variant "seedlings" or prisma.cartItem.create() 500s.
+export const toFishVariant = (fishType: string): string =>
+  fishType === "juveniles" || fishType === "post" ? "seedlings" : fishType;
+
 export const BASE_PRICE_PER_KG_NAIRA = 3500;
 
 // ============================================
