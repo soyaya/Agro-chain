@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DynamicInput } from "~/components/dynamic-input";
 import { SubmitPrimaryButton } from "~/components/SubmitPrimaryButton";
@@ -13,6 +13,14 @@ import { getDashboardPath } from "~/lib/dashboard-path";
 type Step = "bvn" | "otp";
 
 export default function VerifyIdentity() {
+  return (
+    <Suspense fallback={null}>
+      <VerifyIdentityInner />
+    </Suspense>
+  );
+}
+
+function VerifyIdentityInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect");
