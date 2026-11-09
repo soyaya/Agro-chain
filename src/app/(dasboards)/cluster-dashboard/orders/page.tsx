@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, Package, Truck, X } from "lucide-react";
+import { CheckCircle, Package, Send, Truck, X } from "lucide-react";
 import { toast } from "sonner";
 import { clusterService, type BackendClusterOrder, type ApprovedRider } from "~/lib/services/cluster.service";
+import { farmerService } from "~/lib/services/farmer.service";
+import { useAuth } from "~/lib/auth-context";
 import { FADE_IN_VARIANT, STAGGER_CONTAINER_VARIANT, formatStatus, statusColorClass } from "~/types/constants";
 import { LoadingState } from "~/components/ui/LoadingState";
 import { EmptyState } from "~/components/ui/EmptyState";
@@ -106,6 +108,7 @@ function EscalateModal({ isOpen, riders, onClose, onConfirm, loading }: Escalate
 }
 
 export default function ClusterOrdersPage() {
+  const { user } = useAuth();
   const [orders, setOrders] = useState<BackendClusterOrder[]>([]);
   const [riders, setRiders] = useState<ApprovedRider[]>([]);
   const [loading, setLoading] = useState(true);
@@ -155,6 +158,24 @@ export default function ClusterOrdersPage() {
       toast.success("Order declined.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to decline order");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDispatch = async (orderId: string) => {
+    setActionLoading(orderId);
+    try {
+      await farmerService.dispatchOrder(orderId);
+      // A self-fulfilling cluster farmer's order skips straight to
+      // at_cluster_office server-side — never dispatched_to_cluster — since
+      // it's already at their own office the instant they dispatch it.
+      setOrders((prev) =>
+        prev.map((o) => (o.orderId === orderId ? { ...o, fulfillmentStage: "at_cluster_office" } : o)),
+      );
+      toast.success("Order dispatched — it's now at your office.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to dispatch order");
     } finally {
       setActionLoading(null);
     }
@@ -287,6 +308,16 @@ export default function ClusterOrdersPage() {
                   {FULFILLMENT_STAGE_LABELS[order.fulfillmentStage] ?? order.fulfillmentStage}
                 </p>
                 <div className="flex flex-wrap gap-2">
+                  {order.fulfillmentStage === "awaiting_farmer_dispatch" && order.farmerId === user?.id && (
+                    <button
+                      onClick={() => handleDispatch(order.orderId)}
+                      disabled={actionLoading === order.orderId}
+                      className="flex items-center gap-2 rounded-full bg-(--theme-green-dark) px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                    >
+                      <Send size={14} />
+                      Mark Dispatched
+                    </button>
+                  )}
                   {["awaiting_farmer_dispatch", "dispatched_to_cluster"].includes(order.fulfillmentStage) && (
                     <button
                       onClick={() => handleDecline(order.orderId)}

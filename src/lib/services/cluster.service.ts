@@ -5,6 +5,7 @@ import type { BackendListing } from "./farmer.service";
 
 export interface BackendClusterOrder {
   orderId: string;
+  farmerId: string;
   buyerName: string;
   buyerPhone: string;
   fishType: string;
