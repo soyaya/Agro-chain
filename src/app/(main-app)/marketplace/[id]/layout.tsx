@@ -25,6 +25,22 @@ function extractListing(payload: unknown): ListingForMetadata | null {
 
 const FALLBACK_IMAGE = "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005/Seedlings.webp";
 
+// A short promotional line per fish type — this is what turns a shared
+// listing link into a mini-ad rather than just a product card, which is
+// the whole point of the share button for marketing purposes (status
+// updates, social posts). Keep each one short: it sits right next to the
+// real price/location info in the preview, and social platforms truncate
+// long descriptions.
+const FISH_TYPE_TAGLINES: Record<string, string> = {
+  jumbo: "Big, fresh, and farm-raised — delivered straight to you.",
+  table_size: "Fresh off the farm, ready for your pot today.",
+  broodstock: "Premium breeding stock from a verified cluster farmer.",
+  dried: "Sun-dried and ready to cook — no middlemen, no markup.",
+  juveniles: "Healthy seedlings, farm to pond, verified quality.",
+  post: "Healthy seedlings, farm to pond, verified quality.",
+};
+const DEFAULT_TAGLINE = "Farm to you — fresh, verified, and delivered.";
+
 // Dynamic per-listing so sharing a specific listing link (via the share
 // icon on the detail page) actually unfurls a rich preview — the exact
 // item's photo, fish type, price, and location — on WhatsApp/Twitter/
@@ -74,7 +90,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const fishLabel = listing.fishType
       ? listing.fishType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
       : "Fish";
-    const seller = listing.businessName || listing.clusterFarmerName || "a verified cluster farmer";
     const priceLine = listing.pricePerKg
       ? `₦${Number(listing.pricePerKg).toLocaleString()}${listing.unit === "piece" ? " per piece" : " per kg"}`
       : null;
@@ -84,10 +99,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         ? `${listing.totalAvailableKg}${listing.unit === "piece" ? " pieces" : "kg"} available`
         : null;
 
-    const title = `${fishLabel} from ${seller} – Agro-chain`;
-    const description = [priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
-      .filter(Boolean)
-      .join(" · ") || "Fresh catfish supply from a verified cluster farmer on Agro-chain.";
+    const tagline = (listing.fishType && FISH_TYPE_TAGLINES[listing.fishType]) || DEFAULT_TAGLINE;
+    const title = `${fishLabel} – Agro-chain`;
+    // Tagline leads the description — this is the "ad" part a buyer sees
+    // the instant the preview unfurls, with the real price/location right
+    // after it so it still reads as genuine product info, not just a slogan.
+    const description =
+      [tagline, priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
+        .filter(Boolean)
+        .join(" · ") || "Fresh catfish supply from a verified cluster farmer on Agro-chain.";
     const image = listing.imageUrl || FALLBACK_IMAGE;
 
     return {

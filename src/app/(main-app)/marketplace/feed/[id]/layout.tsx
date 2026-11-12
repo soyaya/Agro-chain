@@ -6,6 +6,7 @@ const getBackendBase = () =>
 interface FeedListingForMetadata {
   brandName?: string;
   categoryLabel?: string;
+  pelletForm?: "floating" | "sinking";
   pricePerBag?: number;
   clusterFarmerName?: string;
   businessName?: string | null;
@@ -24,6 +25,13 @@ function extractListing(payload: unknown): FeedListingForMetadata | null {
 }
 
 const FALLBACK_IMAGE = "https://res.cloudinary.com/erw7cxay/image/upload/v1788775005/Seedlings.webp";
+
+// Same idea as the fish listing page's tagline map — see that layout.tsx.
+const PELLET_FORM_TAGLINES: Record<string, string> = {
+  floating: "Floating feed, farm to pond, delivered fast.",
+  sinking: "Sinking feed, farm to pond, delivered fast.",
+};
+const DEFAULT_TAGLINE = "Quality feed, farm to pond, delivered fast.";
 
 // Same per-listing OG metadata as the fish listing detail page — see that
 // layout.tsx for the full rationale.
@@ -59,15 +67,16 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const listing = extractListing(await res.json());
     if (!listing) return fallback;
 
-    const seller = listing.businessName || listing.clusterFarmerName || "a verified cluster farmer";
     const priceLine = listing.pricePerBag ? `₦${Number(listing.pricePerBag).toLocaleString()} per bag` : null;
     const locationLine = [listing.location, listing.state].filter(Boolean).join(", ");
     const availabilityLine = listing.quantityAvailable != null ? `${listing.quantityAvailable} bags available` : null;
 
-    const title = `${listing.brandName ?? listing.categoryLabel ?? "Fish Feed"} from ${seller} – Agro-chain`;
-    const description = [priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
-      .filter(Boolean)
-      .join(" · ") || "Fish feed supply from a verified cluster farmer on Agro-chain.";
+    const tagline = (listing.pelletForm && PELLET_FORM_TAGLINES[listing.pelletForm]) || DEFAULT_TAGLINE;
+    const title = `${listing.brandName ?? listing.categoryLabel ?? "Fish Feed"} – Agro-chain`;
+    const description =
+      [tagline, priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
+        .filter(Boolean)
+        .join(" · ") || "Fish feed supply from a verified cluster farmer on Agro-chain.";
     const image = listing.imageUrl || FALLBACK_IMAGE;
 
     return {
