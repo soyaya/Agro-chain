@@ -316,6 +316,14 @@ export default function ListingDetailPage() {
                                 <Plus size={16} />
                               </button>
                             </div>
+                          ) : listing.soldOut ? (
+                            <button
+                              disabled
+                              aria-label="This listing is sold out"
+                              className="flex h-10 items-center justify-center gap-2 rounded-full bg-(--gray-bg) text-sm font-medium text-(--text-colour) opacity-60 cursor-not-allowed"
+                            >
+                              Sold Out
+                            </button>
                           ) : (
                             <button
                               onClick={() => addToCart(pkg)}

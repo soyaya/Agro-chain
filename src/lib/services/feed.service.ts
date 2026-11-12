@@ -42,6 +42,8 @@ export interface FeedListing {
   subCommunity?: string | null;
   createdAt: string;
   updatedAt: string;
+  /** True for a brief grace window after a listing sells out — still shown (sunk to the bottom), marked Sold Out. */
+  soldOut?: boolean;
   imageUrl: string | null;
 }
 
