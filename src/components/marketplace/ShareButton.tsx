@@ -47,9 +47,9 @@ export function ShareButton({ title, text, path, compact = true, className = "" 
       <button
         onClick={handleShare}
         aria-label={`Share ${title}`}
-        className={`flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-(--heading-colour) shadow-sm backdrop-blur transition hover:bg-white ${className}`}
+        className={`flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-(--heading-colour) shadow-sm backdrop-blur transition hover:bg-white ${className}`}
       >
-        <Share2 size={16} />
+        <Share2 size={20} />
       </button>
     );
   }
