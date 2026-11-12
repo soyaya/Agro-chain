@@ -7,21 +7,36 @@ import { expect } from "vitest";
 
 import { metadata as homeMetadata } from "../../app/(main-app)/layout";
 import { metadata as marketplaceMetadata } from "../../app/(main-app)/marketplace/layout";
-import { metadata as marketplaceIdMetadata } from "../../app/(main-app)/marketplace/[id]/layout";
+import { generateMetadata as generateMarketplaceIdMetadata } from "../../app/(main-app)/marketplace/[id]/layout";
 import { metadata as privacyMetadata } from "../../app/(main-app)/privacy/layout";
 import { metadata as supportMetadata } from "../../app/(main-app)/support/layout";
 import { metadata as termsMetadata } from "../../app/(main-app)/terms/layout";
 
 type AnyMetadata = Record<string, unknown>;
 
-const publicPageMetadata: AnyMetadata[] = [
-  homeMetadata as AnyMetadata,
-  marketplaceMetadata as AnyMetadata,
-  marketplaceIdMetadata as AnyMetadata,
-  privacyMetadata as AnyMetadata,
-  supportMetadata as AnyMetadata,
-  termsMetadata as AnyMetadata,
-];
+// marketplace/[id] went from a static export to generateMetadata so a
+// shared listing link unfurls with that specific item's own photo/price
+// instead of one generic card for every listing — its no-backend-reachable
+// fallback is what's checked here for the same completeness guarantees.
+//
+// Resolved lazily inside the test below, not at module top level — a
+// top-level await here reliably crashed vitest's forked worker before it
+// could even report ready (manifesting as a baffling "timeout waiting for
+// worker to respond" with 0ms everywhere, no actual test code ever
+// running). BASE_BACKEND_URL is blanked for the call so generateMetadata
+// takes its no-backend-reachable fallback path deterministically, rather
+// than attempting a real network call against whatever a local .env points at.
+async function getMarketplaceIdMetadata(): Promise<AnyMetadata> {
+  const realBaseBackendUrl = process.env.BASE_BACKEND_URL;
+  process.env.BASE_BACKEND_URL = "";
+  try {
+    return (await generateMarketplaceIdMetadata({
+      params: Promise.resolve({ id: "test-listing-id" }),
+    })) as AnyMetadata;
+  } finally {
+    process.env.BASE_BACKEND_URL = realBaseBackendUrl;
+  }
+}
 
 const pageNames = [
   "home (/)",
@@ -35,7 +50,17 @@ const pageNames = [
 describe("Public page metadata — Property 1: completeness", () => {
   it(
     "every public page metadata object has all required SEO and social fields",
-    () => {
+    async () => {
+      const marketplaceIdMetadata = await getMarketplaceIdMetadata();
+      const publicPageMetadata: AnyMetadata[] = [
+        homeMetadata as AnyMetadata,
+        marketplaceMetadata as AnyMetadata,
+        marketplaceIdMetadata,
+        privacyMetadata as AnyMetadata,
+        supportMetadata as AnyMetadata,
+        termsMetadata as AnyMetadata,
+      ];
+
       fc.assert(
         fc.property(
           fc.integer({ min: 0, max: publicPageMetadata.length - 1 }),

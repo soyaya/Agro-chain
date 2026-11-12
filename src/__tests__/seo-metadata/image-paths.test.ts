@@ -6,9 +6,34 @@ import * as fc from "fast-check";
 
 import { metadata as rootMetadata } from "../../app/layout";
 import { metadata as marketplaceMetadata } from "../../app/(main-app)/marketplace/layout";
-import { metadata as marketplaceIdMetadata } from "../../app/(main-app)/marketplace/[id]/layout";
+import { generateMetadata as generateMarketplaceIdMetadata } from "../../app/(main-app)/marketplace/[id]/layout";
 
+// marketplace/[id]'s image is a specific listing's own photo (Cloudinary),
+// fetched per-request via generateMetadata — genuinely external/absolute by
+// design, unlike every other page here, which only ever references this
+// app's own static assets. Checked separately below instead of folded into
+// the "must be relative" property.
+//
+// Resolved lazily inside the test below, not at module top level — a
+// top-level await here reliably crashed vitest's forked worker before it
+// could even report ready (manifesting as "timeout waiting for worker to
+// respond" with 0ms everywhere, no actual test code ever running).
+// BASE_BACKEND_URL is blanked for the call so generateMetadata takes its
+// no-backend-reachable fallback path deterministically, rather than
+// attempting a real network call against whatever a local .env points at.
 type AnyMetadata = Record<string, unknown>;
+
+async function getMarketplaceIdMetadata(): Promise<AnyMetadata> {
+  const realBaseBackendUrl = process.env.BASE_BACKEND_URL;
+  process.env.BASE_BACKEND_URL = "";
+  try {
+    return (await generateMarketplaceIdMetadata({
+      params: Promise.resolve({ id: "test-listing-id" }),
+    })) as AnyMetadata;
+  } finally {
+    process.env.BASE_BACKEND_URL = realBaseBackendUrl;
+  }
+}
 
 interface ImageEntry {
   source: string;
@@ -43,7 +68,6 @@ function extractImageUrls(meta: AnyMetadata, sourceName: string): ImageEntry[] {
 const allImageEntries: ImageEntry[] = [
   ...extractImageUrls(rootMetadata as AnyMetadata, "root layout"),
   ...extractImageUrls(marketplaceMetadata as AnyMetadata, "marketplace layout"),
-  ...extractImageUrls(marketplaceIdMetadata as AnyMetadata, "marketplace/[id] layout"),
 ];
 
 describe("Image paths — Property 4: OG and Twitter image paths are relative", () => {
@@ -71,5 +95,14 @@ describe("Image paths — Property 4: OG and Twitter image paths are relative", 
       ),
       { numRuns: 100 }
     );
+  });
+
+  it("marketplace/[id]'s own listing-photo image is a valid absolute https URL (external by design, not a local asset)", async () => {
+    const marketplaceIdMetadata = await getMarketplaceIdMetadata();
+    const marketplaceIdImageEntries = extractImageUrls(marketplaceIdMetadata, "marketplace/[id] layout");
+    expect(marketplaceIdImageEntries.length).toBeGreaterThan(0);
+    for (const entry of marketplaceIdImageEntries) {
+      expect(entry.url.startsWith("https://"), `${entry.source} (${entry.type}): "${entry.url}" should be an absolute https URL`).toBe(true);
+    }
   });
 });
