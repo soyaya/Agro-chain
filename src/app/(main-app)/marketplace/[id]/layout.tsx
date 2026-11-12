@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FISH_TYPE_CATEGORIES } from "~/types/constants";
 
 const getBackendBase = () =>
   (process.env.BASE_BACKEND_URL ?? "").trim().replace(/\/+$/, "").replace(/\/api$/, "");
@@ -137,7 +138,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       [tagline, specLine, priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
         .filter(Boolean)
         .join(" · ") || "Fresh catfish supply from a verified cluster farmer on Agro-chain.";
-    const image = listing.imageUrl || FALLBACK_IMAGE;
+    // Most listings have no uploaded photo yet, so without this the share
+    // preview would show the same one generic Seedlings image regardless
+    // of fish type — a dried-fish listing shouldn't unfurl a seedlings
+    // photo. Falls back to the same per-category stock photo the
+    // marketplace card itself uses (FISH_TYPE_CATEGORIES), only reaching
+    // the single generic image if the fish type is somehow unrecognized.
+    const categoryImage = FISH_TYPE_CATEGORIES.find((c) => c.value === listing.fishType)?.imageUrl;
+    const image = listing.imageUrl || categoryImage || FALLBACK_IMAGE;
 
     return {
       title,
