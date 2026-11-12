@@ -21,6 +21,7 @@ interface ListingForMetadata {
   weightMinGrams?: number | null;
   weightMaxGrams?: number | null;
   harvestDate?: string | null;
+  packaging?: { weightKg?: number | null; quantity?: number }[];
 }
 
 function extractListing(payload: unknown): ListingForMetadata | null {
@@ -107,9 +108,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       listing.totalAvailableKg != null
         ? `${listing.totalAvailableKg}${listing.unit === "piece" ? " pieces" : "kg"} available`
         : null;
-    // Size/weight range makes the description specific to THIS listing
-    // rather than just the shared fish-type tagline below — two jumbo
-    // listings from different farmers will differ here.
+    // Pack weight and biological size/weight range make the description
+    // specific to THIS listing rather than just the shared fish-type
+    // tagline below — two table-size listings from different farmers will
+    // differ here. Pack weight is what a buyer actually shops by (how the
+    // product is bagged); size/weight-in-grams is only set for some listings
+    // (e.g. seedlings) and is a bonus detail when present.
+    const packWeightKg = listing.packaging?.[0]?.weightKg;
+    const packLine =
+      packWeightKg != null && listing.unit !== "piece" ? `${packWeightKg}kg pack` : null;
     const sizeLine =
       listing.sizeMinCm != null && listing.sizeMaxCm != null
         ? `${listing.sizeMinCm}-${listing.sizeMaxCm}cm`
@@ -118,7 +125,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       listing.weightMinGrams != null && listing.weightMaxGrams != null
         ? `${listing.weightMinGrams}-${listing.weightMaxGrams}g`
         : null;
-    const specLine = [sizeLine, weightLine].filter(Boolean).join(", ");
+    const specLine = [packLine, sizeLine, weightLine].filter(Boolean).join(", ");
 
     const tagline = (listing.fishType && FISH_TYPE_TAGLINES[listing.fishType]) || DEFAULT_TAGLINE;
     const title = `${fishLabel} – Agro-chain`;

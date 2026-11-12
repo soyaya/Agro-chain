@@ -12,7 +12,10 @@ interface FeedListingForMetadata {
   businessName?: string | null;
   state?: string;
   location?: string;
+  ward?: string | null;
+  subCommunity?: string | null;
   quantityAvailable?: number;
+  bagWeightKg?: number | null;
   imageUrl?: string | null;
 }
 
@@ -68,13 +71,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     if (!listing) return fallback;
 
     const priceLine = listing.pricePerBag ? `₦${Number(listing.pricePerBag).toLocaleString()} per bag` : null;
-    const locationLine = [listing.location, listing.state].filter(Boolean).join(", ");
+    const communityName = listing.subCommunity || listing.ward || listing.location;
+    const locationLine = [communityName, listing.state].filter(Boolean).join(", ");
     const availabilityLine = listing.quantityAvailable != null ? `${listing.quantityAvailable} bags available` : null;
+    const bagWeightLine = listing.bagWeightKg != null ? `${listing.bagWeightKg}kg per bag` : null;
 
     const tagline = (listing.pelletForm && PELLET_FORM_TAGLINES[listing.pelletForm]) || DEFAULT_TAGLINE;
     const title = `${listing.brandName ?? listing.categoryLabel ?? "Fish Feed"} – Agro-chain`;
     const description =
-      [tagline, priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
+      [tagline, bagWeightLine, priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
         .filter(Boolean)
         .join(" · ") || "Fish feed supply from a verified cluster farmer on Agro-chain.";
     const image = listing.imageUrl || FALLBACK_IMAGE;

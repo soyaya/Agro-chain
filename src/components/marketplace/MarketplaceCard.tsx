@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { MapPin, Fish } from "lucide-react";
+import { MapPin, Fish, Package } from "lucide-react";
 import type { MarketplaceListing } from "~/types";
 import { SCALE_IN_VARIANT, FISH_TYPE_CATEGORIES } from "~/types/constants";
 import { cn } from "~/lib/utils";
@@ -22,6 +22,19 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
 
   const displayImage =
     listing.imageUrl ?? FISH_TYPE_CATEGORIES.find((c) => c.value === listing.fishType)?.imageUrl;
+
+  // At-a-glance pack weight (e.g. "5kg pack") and total stock left — so a
+  // buyer scanning the marketplace grid doesn't have to open each listing
+  // just to see how it's packaged or how much is left.
+  const packWeightKg = listing.packaging?.[0]?.weightKg;
+  const glanceLine = [
+    packWeightKg != null && unit !== "piece" ? `${packWeightKg}kg pack` : null,
+    listing.totalAvailableKg != null
+      ? `${listing.totalAvailableKg}${unit === "piece" ? " pieces" : "kg"} available`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <motion.div
@@ -66,6 +79,14 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
             ₦{displayPricePerKg.toLocaleString()}/{unit}
           </span>
         </div>
+
+        {/* Pack weight + stock, at a glance */}
+        {glanceLine && (
+          <div className="flex items-center gap-1.5 text-sm text-(--text-colour)">
+            <Package size={14} />
+            <span>{glanceLine}</span>
+          </div>
+        )}
 
         {/* Location */}
         <div className="flex items-center gap-1.5 text-sm text-(--text-colour)">

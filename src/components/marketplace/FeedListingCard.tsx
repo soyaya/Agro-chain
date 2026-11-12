@@ -25,13 +25,18 @@ export function FeedListingCard({ listing, onClick }: FeedListingCardProps) {
         <div className="absolute top-2 right-2 z-10">
           <ShareButton title={`${listing.brandName} feed on AgroChain`} path={`/marketplace/feed/${listing.id}`} />
         </div>
+        {listing.soldOut && (
+          <div className="absolute top-2 left-2 z-10 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+            Sold Out
+          </div>
+        )}
         {listing.imageUrl ? (
           <Image
             src={listing.imageUrl}
             alt={listing.brandName}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover"
+            className={listing.soldOut ? "object-cover opacity-60 grayscale-[30%]" : "object-cover"}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
@@ -50,7 +55,7 @@ export function FeedListingCard({ listing, onClick }: FeedListingCardProps) {
             </h3>
             <p className="text-sm text-(--text-colour)">
               {listing.categoryLabel} ({listing.pelletSizeMm != null ? `${listing.pelletSizeMm}mm` : `${listing.minPelletSizeMm}–${listing.maxPelletSizeMm}mm`}) ·{" "}
-              {listing.pelletForm} · {listing.bagWeightKg}kg bag
+              {listing.pelletForm} · {listing.bagWeightKg}kg bag · {listing.quantityAvailable} bags available
             </p>
           </div>
           <span className="font-ubuntu text-base font-bold text-(--theme-green-dark) whitespace-nowrap">
@@ -72,7 +77,7 @@ export function FeedListingCard({ listing, onClick }: FeedListingCardProps) {
           aria-label={`View details for ${listing.brandName}`}
           className="flex h-10 items-center justify-center rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90 cursor-pointer mt-1"
         >
-          View Details
+          {listing.soldOut ? "View Details (Sold Out)" : "View Details"}
         </button>
       </div>
     </motion.div>
