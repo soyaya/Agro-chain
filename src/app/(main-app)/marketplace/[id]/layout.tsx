@@ -10,9 +10,17 @@ interface ListingForMetadata {
   pricePerKg?: number;
   location?: string;
   state?: string;
+  localGovernment?: string;
+  ward?: string | null;
+  subCommunity?: string | null;
   totalAvailableKg?: number;
   unit?: "kg" | "piece";
   imageUrl?: string | null;
+  sizeMinCm?: number | null;
+  sizeMaxCm?: number | null;
+  weightMinGrams?: number | null;
+  weightMaxGrams?: number | null;
+  harvestDate?: string | null;
 }
 
 function extractListing(payload: unknown): ListingForMetadata | null {
@@ -93,19 +101,33 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const priceLine = listing.pricePerKg
       ? `₦${Number(listing.pricePerKg).toLocaleString()}${listing.unit === "piece" ? " per piece" : " per kg"}`
       : null;
-    const locationLine = [listing.location, listing.state].filter(Boolean).join(", ");
+    const communityName = listing.subCommunity || listing.ward || listing.location;
+    const locationLine = [communityName, listing.state].filter(Boolean).join(", ");
     const availabilityLine =
       listing.totalAvailableKg != null
         ? `${listing.totalAvailableKg}${listing.unit === "piece" ? " pieces" : "kg"} available`
         : null;
+    // Size/weight range makes the description specific to THIS listing
+    // rather than just the shared fish-type tagline below — two jumbo
+    // listings from different farmers will differ here.
+    const sizeLine =
+      listing.sizeMinCm != null && listing.sizeMaxCm != null
+        ? `${listing.sizeMinCm}-${listing.sizeMaxCm}cm`
+        : null;
+    const weightLine =
+      listing.weightMinGrams != null && listing.weightMaxGrams != null
+        ? `${listing.weightMinGrams}-${listing.weightMaxGrams}g`
+        : null;
+    const specLine = [sizeLine, weightLine].filter(Boolean).join(", ");
 
     const tagline = (listing.fishType && FISH_TYPE_TAGLINES[listing.fishType]) || DEFAULT_TAGLINE;
     const title = `${fishLabel} – Agro-chain`;
     // Tagline leads the description — this is the "ad" part a buyer sees
-    // the instant the preview unfurls, with the real price/location right
-    // after it so it still reads as genuine product info, not just a slogan.
+    // the instant the preview unfurls — but everything after it (spec,
+    // price, availability, location) is pulled straight from this
+    // specific listing, so no two listings share the same description.
     const description =
-      [tagline, priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
+      [tagline, specLine, priceLine, availabilityLine, locationLine && `Located in ${locationLine}`]
         .filter(Boolean)
         .join(" · ") || "Fresh catfish supply from a verified cluster farmer on Agro-chain.";
     const image = listing.imageUrl || FALLBACK_IMAGE;
