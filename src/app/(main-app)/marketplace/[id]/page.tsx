@@ -16,6 +16,7 @@ import {
   ShoppingCart,
   Plus,
   Minus,
+  Scale,
 } from "lucide-react";
 import type { MarketplaceListing, PackagingOption } from "~/types";
 import {
@@ -111,6 +112,7 @@ export default function ListingDetailPage() {
   const totalWeight = listingCartItems.reduce((sum, item) => sum + item.weightKg * item.quantity, 0);
   const otherCartItemsCount = cart.items.length - listingCartItems.length;
   const unit = listing?.unit === "piece" ? "piece" : "kg";
+  const gramsToKg = (g: number) => (g % 1000 === 0 ? g / 1000 : Math.round((g / 1000) * 100) / 100);
 
   const handleCheckout = () => {
     if (cart.items.length === 0) {
@@ -242,6 +244,19 @@ export default function ListingDetailPage() {
                       </span>
                     </div>
                   </div>
+
+                  {listing.weightMinGrams != null && (
+                    <div className="flex items-center gap-(--gap-base)">
+                      <Scale size={20} className="text-(--text-colour)" />
+                      <div className="flex flex-col">
+                        <span className="text-sm text-(--text-colour)">Weight per fish</span>
+                        <span className="font-roboto-slab font-medium text-(--heading-colour)">
+                          {gramsToKg(listing.weightMinGrams)}kg
+                          {listing.weightMaxGrams != null ? `-${gramsToKg(listing.weightMaxGrams)}kg` : "+"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex items-center gap-(--gap-base)">
                     <MapPin size={20} className="text-(--text-colour)" />

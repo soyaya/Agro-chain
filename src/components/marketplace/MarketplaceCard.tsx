@@ -23,12 +23,21 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
   const displayImage =
     listing.imageUrl ?? FISH_TYPE_CATEGORIES.find((c) => c.value === listing.fishType)?.imageUrl;
 
-  // At-a-glance pack weight (e.g. "5kg pack") and total stock left — so a
-  // buyer scanning the marketplace grid doesn't have to open each listing
-  // just to see how it's packaged or how much is left.
+  // At-a-glance pack weight (e.g. "5kg pack"), per-unit weight range (e.g.
+  // "0.7kg-1kg"), and total stock left — so a buyer scanning the
+  // marketplace grid doesn't have to open each listing to see how it's
+  // packaged, sized, or how much is left.
   const packWeightKg = listing.packaging?.[0]?.weightKg;
+  const gramsToKg = (g: number) => (g % 1000 === 0 ? g / 1000 : Math.round((g / 1000) * 100) / 100);
+  const weightRangeLine =
+    listing.weightMinGrams != null
+      ? listing.weightMaxGrams != null
+        ? `${gramsToKg(listing.weightMinGrams)}kg-${gramsToKg(listing.weightMaxGrams)}kg`
+        : `${gramsToKg(listing.weightMinGrams)}kg+`
+      : null;
   const glanceLine = [
     packWeightKg != null && unit !== "piece" ? `${packWeightKg}kg pack` : null,
+    weightRangeLine,
     listing.totalAvailableKg != null
       ? `${listing.totalAvailableKg}${unit === "piece" ? " pieces" : "kg"} available`
       : null,

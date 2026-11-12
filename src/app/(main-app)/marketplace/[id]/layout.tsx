@@ -122,9 +122,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       listing.sizeMinCm != null && listing.sizeMaxCm != null
         ? `${listing.sizeMinCm}-${listing.sizeMaxCm}cm`
         : null;
+    // Shown in kg (e.g. "0.7kg-1kg"), matching the marketplace card — the
+    // underlying bracket is stored in grams, but buyers shop by kg.
+    const gramsToKg = (g: number) => (g % 1000 === 0 ? g / 1000 : Math.round((g / 1000) * 100) / 100);
     const weightLine =
-      listing.weightMinGrams != null && listing.weightMaxGrams != null
-        ? `${listing.weightMinGrams}-${listing.weightMaxGrams}g`
+      listing.weightMinGrams != null
+        ? listing.weightMaxGrams != null
+          ? `${gramsToKg(listing.weightMinGrams)}kg-${gramsToKg(listing.weightMaxGrams)}kg`
+          : `${gramsToKg(listing.weightMinGrams)}kg+`
         : null;
     const specLine = [packLine, sizeLine, weightLine].filter(Boolean).join(", ");
 

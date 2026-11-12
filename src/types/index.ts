@@ -298,6 +298,9 @@ export interface ClusterFarmerListing {
   status: ListingStatus;
   /** True for a brief grace window after a listing sells out — still shown (sunk to the bottom), marked Sold Out. */
   soldOut?: boolean;
+  /** Per-unit weight range in grams (e.g. 700-1000g) — set for bracket-priced listings (table size, broodstock, dried). weightMaxGrams is null for the open-ended "1200g+" bracket. */
+  weightMinGrams?: number | null;
+  weightMaxGrams?: number | null;
   createdAt: Date;
   updatedAt: Date;
   imageUrl?: string | null;
