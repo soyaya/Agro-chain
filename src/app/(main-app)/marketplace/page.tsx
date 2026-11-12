@@ -300,6 +300,12 @@ function MarketplacePageInner() {
 
   // Apply sorting
   const sortedListings = [...filteredListings].sort((a, b) => {
+    // Sold-out listings always sink below every active one, regardless of
+    // the chosen sort — otherwise this client-side sort silently undoes the
+    // backend's sold-out-sinks-to-the-bottom ordering.
+    const soldOutDiff = Number(!!a.soldOut) - Number(!!b.soldOut);
+    if (soldOutDiff !== 0) return soldOutDiff;
+
     const proximityDiff = proximityRank(a) - proximityRank(b);
     if (proximityDiff !== 0) return proximityDiff;
 
