@@ -35,13 +35,18 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
         <div className="absolute top-2 right-2 z-10">
           <ShareButton title={`${listing.fishType} on AgroChain`} path={`/marketplace/${listing.id}`} />
         </div>
+        {listing.soldOut && (
+          <div className="absolute top-2 left-2 z-10 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+            Sold Out
+          </div>
+        )}
         {displayImage ? (
           <Image
             src={displayImage}
             alt={`${listing.fishType}`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover"
+            className={cn("object-cover", listing.soldOut && "opacity-60 grayscale-[30%]")}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
@@ -81,12 +86,18 @@ export function MarketplaceCard({ listing, isLiked, onToggleLike, onClick, onAdd
             View Details
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); onClick?.(); }}
-            aria-label={`Order ${listing.fishType}`}
-            className="flex h-10 items-center justify-center gap-2 rounded-full bg-(--theme-green-dark) text-sm font-medium text-white transition hover:opacity-90 cursor-pointer"
-            style={{ cursor: "pointer" }}
+            onClick={(e) => { e.stopPropagation(); if (!listing.soldOut) onClick?.(); }}
+            aria-label={listing.soldOut ? `${listing.fishType} is sold out` : `Order ${listing.fishType}`}
+            disabled={listing.soldOut}
+            className={cn(
+              "flex h-10 items-center justify-center gap-2 rounded-full text-sm font-medium transition cursor-pointer",
+              listing.soldOut
+                ? "bg-(--gray-bg) text-(--text-colour) opacity-60 cursor-not-allowed"
+                : "bg-(--theme-green-dark) text-white hover:opacity-90",
+            )}
+            style={{ cursor: listing.soldOut ? "not-allowed" : "pointer" }}
           >
-            Order Now
+            {listing.soldOut ? "Sold Out" : "Order Now"}
           </button>
         </div>
       </div>

@@ -296,6 +296,8 @@ export interface ClusterFarmerListing {
   deliveryOptions: string[];
   visibleOnMarketplace: boolean;
   status: ListingStatus;
+  /** True for a brief grace window after a listing sells out — still shown (sunk to the bottom), marked Sold Out. */
+  soldOut?: boolean;
   createdAt: Date;
   updatedAt: Date;
   imageUrl?: string | null;
